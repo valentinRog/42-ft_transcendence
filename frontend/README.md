@@ -1,0 +1,1 @@
+SvelteKit + TailwindCSS + NestJS + Prisma + PostgreSQL
