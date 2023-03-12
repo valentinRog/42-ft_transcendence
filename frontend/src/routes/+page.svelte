@@ -1,1 +1,1 @@
-<h1 class="text-3xl font-bold text-center">Yo</h1>
+<h1>Yo</h1>
