@@ -2,6 +2,10 @@
 	import { onMount } from 'svelte';
 	import ioClient from 'socket.io-client';
 
+	const tickRate = 30;
+
+	let ping = 0;
+
 	interface Dimensions {
 		readonly width: number;
 		readonly height: number;
@@ -18,58 +22,46 @@
 		paddleWidth: 15
 	};
 
-	let ball = {
-		x: dimensions.width / 2,
-		y: dimensions.height / 2,
-		dx: -1,
-		dy: 0,
-		t: Date.now(),
-		speed: 250 //pixels per second
-	};
+	interface Ball {
+		x: number;
+		y: number;
+		dx: number;
+		dy: number;
+		speed: number;
+	}
 
-	let serverBall = {
-		x: dimensions.width / 2,
-		y: dimensions.height / 2,
-		dx: -1,
-		dy: 0,
-		t: Date.now(),
-		speed: 250 //pixels per second
-	};
+	interface GameState {
+		ball: Ball;
+		paddleY: number;
+	}
 
-	const paddles = [
-		dimensions.height - dimensions.paddleHeight,
-		dimensions.height - dimensions.paddleHeight
-	];
-	let index: 0 | 1 = 0;
+	let paddleY = dimensions.height / 2;
+	let inputs = new Array<[number, number]>();
+
+	let gameState: GameState = {
+		ball: {
+			x: dimensions.width / 2,
+			y: dimensions.height / 2,
+			dx: 1,
+			dy: 0,
+			speed: 5
+		},
+		paddleY
+	};
 
 	function draw(ctx: CanvasRenderingContext2D) {
 		ctx.clearRect(0, 0, dimensions.width, dimensions.height);
-
 		ctx.beginPath();
-		ctx.arc(ball.x, ball.y, dimensions.ballRadius, 0, Math.PI * 2);
+		ctx.arc(gameState.ball.x, gameState.ball.y, dimensions.ballRadius, 0, Math.PI * 2);
 		ctx.fill();
 		ctx.closePath();
-
-		ctx.fillStyle = 'red';
-		ctx.beginPath();
-		ctx.arc(serverBall.x, serverBall.y, dimensions.ballRadius, 0, Math.PI * 2);
-		ctx.fill();
-		ctx.closePath();
-		ctx.fillStyle = 'black';
-
-		ctx.rect(0, paddles[0], dimensions.paddleWidth, dimensions.paddleHeight);
-		ctx.rect(
-			dimensions.width - dimensions.paddleWidth,
-			paddles[1],
+		ctx.fillRect(
+			0,
+			gameState.paddleY - dimensions.paddleHeight / 2,
 			dimensions.paddleWidth,
 			dimensions.paddleHeight
 		);
-		ctx.fill();
-
-		requestAnimationFrame(() => {
-			update();
-			draw(ctx);
-		});
+		requestAnimationFrame(() => draw(ctx));
 	}
 
 	function handleMouseMove(e: MouseEvent, canvas: HTMLCanvasElement) {
@@ -78,7 +70,7 @@
 			relativeY > dimensions.paddleHeight / 2 &&
 			relativeY < dimensions.height - dimensions.paddleHeight / 2
 		) {
-			paddles[index] = relativeY - dimensions.paddleHeight / 2;
+			paddleY = relativeY;
 		}
 	}
 
@@ -89,63 +81,40 @@
 		};
 	}
 
-	function update(): void {
-		const now = Date.now();
-		const dt = (now - ball.t) / 1000;
-		ball.t = now;
-		ball.x += ball.dx * ball.speed * dt;
-		ball.y += ball.dy * ball.speed * dt;
+	function nextFrame(state: GameState): GameState {
+		const s: GameState = { ...state };
+		const ball = s.ball;
+		ball.x += ball.dx * ball.speed;
+		ball.y += ball.dy * ball.speed;
 
-		const maxAngle = Math.PI / 4;
-		const wallLeft = dimensions.ballRadius + dimensions.paddleWidth;
-		const wallRight = dimensions.width - dimensions.ballRadius - dimensions.paddleWidth;
-		if (ball.x < wallLeft && ball.dx < 0) {
-			if (ball.y < paddles[0] || ball.y > paddles[0] + dimensions.paddleHeight) {
+		if (ball.y - dimensions.ballRadius <= 0 && ball.dy < 0) {
+			ball.dy = -ball.dy;
+		} else if (ball.y + dimensions.ballRadius >= dimensions.height && ball.dy > 0) {
+			ball.dy = -ball.dy;
+		} else if (ball.x + dimensions.ballRadius > dimensions.width && ball.dx > 0) {
+			ball.dx = -ball.dx;
+		}
+
+		if (ball.x - dimensions.ballRadius < dimensions.paddleWidth) {
+			if (
+				ball.y > s.paddleY - dimensions.paddleHeight / 2 &&
+				ball.y < s.paddleY + dimensions.paddleHeight / 2 &&
+				ball.dx < 0
+			) {
+				ball.dx = 0.65;
+				ball.dy = Math.sqrt(1 - ball.dx * ball.dx);
+				if (ball.y < s.paddleY) {
+					ball.dy = -ball.dy;
+				}
+			} else if (ball.dx < 0) {
 				ball.x = dimensions.width / 2;
 				ball.y = dimensions.height / 2;
 				ball.dx = 1;
 				ball.dy = 0;
-				return;
 			}
-			const offset = Math.abs(ball.x - wallLeft);
-			const angle =
-				(ball.y - (paddles[0] + dimensions.paddleHeight / 2)) / (dimensions.paddleHeight / 2);
-			ball.dx = 1;
-			ball.dy = 0;
-			const { x, y } = rotate(ball.dx, ball.dy, angle * maxAngle);
-			ball.x = wallLeft + offset * x;
-			ball.y = ball.y + offset * y;
-			ball.dx = x;
-			ball.dy = y;
-		} else if (ball.x > wallRight && ball.dx > 0) {
-			if (ball.y < paddles[1] || ball.y > paddles[1] + dimensions.paddleHeight) {
-				ball.x = dimensions.width / 2;
-				ball.y = dimensions.height / 2;
-				ball.dx = -1;
-				ball.dy = 0;
-				return;
-			}
-			const offset = Math.abs(ball.x - wallRight);
-			const angle =
-				(ball.y - (paddles[1] + dimensions.paddleHeight / 2)) / (dimensions.paddleHeight / 2);
-			ball.dx = -1;
-			ball.dy = 0;
-			const { x, y } = rotate(ball.dx, ball.dy, angle * maxAngle);
-			ball.x = wallRight - offset * x;
-			ball.y = ball.y + offset * y;
-			ball.dx = x;
-			ball.dy = y;
 		}
 
-		if (ball.y < dimensions.ballRadius && ball.dy < 0) {
-			const offset = Math.abs(ball.y - dimensions.ballRadius);
-			ball.y = dimensions.ballRadius + offset;
-			ball.dy = -ball.dy;
-		} else if (ball.y > dimensions.height - dimensions.ballRadius && ball.dy > 0) {
-			const offset = Math.abs(ball.y - (dimensions.height - dimensions.ballRadius));
-			ball.y = dimensions.height - dimensions.ballRadius - offset;
-			ball.dy = -ball.dy;
-		}
+		return s;
 	}
 
 	onMount(() => {
@@ -160,30 +129,38 @@
 		document.addEventListener('mousemove', (e) => {
 			handleMouseMove(e, canvas);
 		});
-		socket.on('update', (data) => {
-			ball = { ...data };
-			serverBall = { ...data };
-			update();
-		});
-		socket.on('index', (data: 0 | 1) => {
-			index = data;
-		});
-		socket.on('paddle', (data: number) => {
-			paddles[Math.abs(index - 1)] = data;
-		});
+
 		setInterval(() => {
-			socket.emit('update', paddles[index]);
-		}, 1000 / 60);
+			const data: [number, number] = [Date.now(), paddleY];
+			socket.emit('input', data);
+			inputs.push(data);
+		}, 1000 / tickRate);
+		socket.on('rolleback', (data: [number, GameState]) => {
+			while (inputs[0][0] < data[0]) {
+				inputs.shift();
+			}
+			for (let i = 0; i < inputs.length; i++) {
+				data[1].paddleY = inputs[i][1];
+				data[1] = nextFrame(data[1]);
+			}
+			gameState = data[1];
+		});
+
 		setInterval(() => {
-			update();
-		}, 1000 / 60);
-		update();
-		draw(ctx);
+			socket.emit('ping', Date.now());
+		}, 1000 / 3);
+
+		socket.on('ping', (time: number) => {
+			ping = Date.now() - time;
+		});
 	});
 </script>
 
 <div>
 	<canvas />
+</div>
+<div>
+	<p>ping: {ping}ms</p>
 </div>
 
 <style lang="scss">
