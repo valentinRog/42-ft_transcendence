@@ -2,7 +2,9 @@
 	import { onMount } from 'svelte';
 	import ioClient from 'socket.io-client';
 
-	const tickRate = 30;
+	const serverTickRate = 40;
+
+	let socket: any;
 
 	let ping = 0;
 
@@ -27,12 +29,13 @@
 		y: number;
 		dx: number;
 		dy: number;
-		speed: number;
+		speed: number; //pixel per second
 	}
 
 	interface GameState {
 		ball: Ball;
 		paddleY: number;
+		lastUpdate: number;
 	}
 
 	let paddleY = dimensions.height / 2;
@@ -44,20 +47,24 @@
 			y: dimensions.height / 2,
 			dx: 1,
 			dy: 0,
-			speed: 5
+			speed: 400
 		},
-		paddleY
+		paddleY,
+		lastUpdate: Date.now()
 	};
 
 	function draw(ctx: CanvasRenderingContext2D) {
+		gameState = nextFrame(gameState, Date.now() - gameState.lastUpdate, false);
+
 		ctx.clearRect(0, 0, dimensions.width, dimensions.height);
 		ctx.beginPath();
 		ctx.arc(gameState.ball.x, gameState.ball.y, dimensions.ballRadius, 0, Math.PI * 2);
 		ctx.fill();
 		ctx.closePath();
+
 		ctx.fillRect(
 			0,
-			gameState.paddleY - dimensions.paddleHeight / 2,
+			paddleY - dimensions.paddleHeight / 2,
 			dimensions.paddleWidth,
 			dimensions.paddleHeight
 		);
@@ -74,53 +81,49 @@
 		}
 	}
 
-	function rotate(x: number, y: number, angle: number): { x: number; y: number } {
-		return {
-			x: x * Math.cos(angle) - y * Math.sin(angle),
-			y: x * Math.sin(angle) + y * Math.cos(angle)
-		};
-	}
-
-	function nextFrame(state: GameState): GameState {
-		const s: GameState = { ...state };
+	function nextFrame(state: GameState, delta: number, rolleback = true): GameState {
+		const s: GameState = JSON.parse(JSON.stringify(state));
 		const ball = s.ball;
-		ball.x += ball.dx * ball.speed;
-		ball.y += ball.dy * ball.speed;
-
-		if (ball.y - dimensions.ballRadius <= 0 && ball.dy < 0) {
-			ball.dy = -ball.dy;
-		} else if (ball.y + dimensions.ballRadius >= dimensions.height && ball.dy > 0) {
-			ball.dy = -ball.dy;
-		} else if (ball.x + dimensions.ballRadius > dimensions.width && ball.dx > 0) {
-			ball.dx = -ball.dx;
-		}
-
-		if (ball.x - dimensions.ballRadius < dimensions.paddleWidth) {
+		const paddle = rolleback ? s.paddleY : paddleY;
+		ball.x += ball.dx * (delta / 1000) * ball.speed;
+		ball.y += ball.dy * (delta / 1000) * ball.speed;
+		const wallLeft = dimensions.ballRadius + dimensions.paddleWidth;
+		const wallRight = dimensions.width - dimensions.ballRadius;
+		const wallTop = dimensions.ballRadius;
+		const wallBottom = dimensions.height - dimensions.ballRadius;
+		if (ball.x >= wallRight && ball.dx > 0) {
+			ball.x = wallRight - Math.abs(ball.x - wallRight);
+			ball.dx *= -1;
+		} else if (ball.y >= wallBottom && ball.dy > 0) {
+			ball.y = wallBottom - Math.abs(ball.y - wallBottom);
+			ball.dy *= -1;
+		} else if (ball.y <= wallTop && ball.dy < 0) {
+			ball.y = wallTop + Math.abs(ball.y - wallTop);
+			ball.dy *= -1;
+		} else if (ball.x <= wallLeft && ball.dx < 0) {
 			if (
-				ball.y > s.paddleY - dimensions.paddleHeight / 2 &&
-				ball.y < s.paddleY + dimensions.paddleHeight / 2 &&
-				ball.dx < 0
+				ball.x > dimensions.paddleWidth &&
+				Math.abs(ball.y - paddle) < dimensions.paddleHeight / 2
 			) {
-				ball.dx = 0.65;
-				ball.dy = Math.sqrt(1 - ball.dx * ball.dx);
-				if (ball.y < s.paddleY) {
-					ball.dy = -ball.dy;
-				}
-			} else if (ball.dx < 0) {
+				ball.x = wallLeft + Math.abs(ball.x - wallLeft);
+				const dyMax = 0.75;
+				ball.dy = ((ball.y - paddle) / (dimensions.paddleHeight / 2)) * dyMax;
+				ball.dx = Math.sqrt(1 - ball.dy * ball.dy);
+			} else if (ball.x < 0) {
 				ball.x = dimensions.width / 2;
 				ball.y = dimensions.height / 2;
 				ball.dx = 1;
 				ball.dy = 0;
 			}
 		}
-
+		s.lastUpdate = Date.now();
 		return s;
 	}
 
 	onMount(() => {
 		let url = window.location.origin;
 		url = url.substring(0, url.lastIndexOf(':'));
-		const socket = ioClient(url + ':3000');
+		socket = ioClient(url + ':3000');
 		const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 		const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 		canvas.width = dimensions.width;
@@ -133,17 +136,20 @@
 		setInterval(() => {
 			const data: [number, number] = [Date.now(), paddleY];
 			socket.emit('input', data);
-			inputs.push(data);
-		}, 1000 / tickRate);
+			if (inputs.length < 100) {
+				inputs.push(data);
+			}
+		}, 1000 / serverTickRate);
 		socket.on('rolleback', (data: [number, GameState]) => {
-			while (inputs[0][0] < data[0]) {
-				inputs.shift();
-			}
+			let [time, state] = data;
+			state.lastUpdate = time;
+			inputs.shift();
 			for (let i = 0; i < inputs.length; i++) {
-				data[1].paddleY = inputs[i][1];
-				data[1] = nextFrame(data[1]);
+				state.paddleY = inputs[i][1];
+				state = nextFrame(state, inputs[i][0] - state.lastUpdate);
+				state.lastUpdate = inputs[i][0];
 			}
-			gameState = data[1];
+			gameState = state;
 		});
 
 		setInterval(() => {

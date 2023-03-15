@@ -25,12 +25,13 @@ interface Ball {
   y: number;
   dx: number;
   dy: number;
-  speed: number;
+  speed: number; //pixel per second
 }
 
 interface GameState {
   ball: Ball;
   paddleY: number;
+  lastUpdate: number;
 }
 
 let gameState: GameState = {
@@ -39,60 +40,51 @@ let gameState: GameState = {
     y: dimensions.height / 2,
     dx: 1,
     dy: 0,
-    speed: 5,
+    speed: 400,
   },
   paddleY: dimensions.height / 2,
+  lastUpdate: Date.now(),
 };
 
-function rotate(x: number, y: number, angle: number): { x: number; y: number } {
-  return {
-    x: x * Math.cos(angle) - y * Math.sin(angle),
-    y: x * Math.sin(angle) + y * Math.cos(angle),
-  };
-}
-
-function nextFrame(state: GameState): GameState {
-  const s: GameState = { ...state };
+function nextFrame(state: GameState, delta: number): GameState {
+  const s: GameState = JSON.parse(JSON.stringify(state));
   const ball = s.ball;
-  ball.x += ball.dx * ball.speed;
-  ball.y += ball.dy * ball.speed;
-
-  if (ball.y - dimensions.ballRadius <= 0 && ball.dy < 0) {
-    ball.dy = -ball.dy;
-  } else if (
-    ball.y + dimensions.ballRadius >= dimensions.height &&
-    ball.dy > 0
-  ) {
-    ball.dy = -ball.dy;
-  } else if (ball.x + dimensions.ballRadius > dimensions.width && ball.dx > 0) {
-    ball.dx = -ball.dx;
-  }
-
-  if (ball.x - dimensions.ballRadius < dimensions.paddleWidth) {
+  ball.x += ball.dx * (delta / 1000) * ball.speed;
+  ball.y += ball.dy * (delta / 1000) * ball.speed;
+  const wallLeft = dimensions.ballRadius + dimensions.paddleWidth;
+  const wallRight = dimensions.width - dimensions.ballRadius;
+  const wallTop = dimensions.ballRadius;
+  const wallBottom = dimensions.height - dimensions.ballRadius;
+  if (ball.x >= wallRight && ball.dx > 0) {
+    ball.x = wallRight - Math.abs(ball.x - wallRight);
+    ball.dx *= -1;
+  } else if (ball.y >= wallBottom && ball.dy > 0) {
+    ball.y = wallBottom - Math.abs(ball.y - wallBottom);
+    ball.dy *= -1;
+  } else if (ball.y <= wallTop && ball.dy < 0) {
+    ball.y = wallTop + Math.abs(ball.y - wallTop);
+    ball.dy *= -1;
+  } else if (ball.x <= wallLeft && ball.dx < 0) {
     if (
-      ball.y > s.paddleY - dimensions.paddleHeight / 2 &&
-      ball.y < s.paddleY + dimensions.paddleHeight / 2 &&
-      ball.dx < 0
+      ball.x > dimensions.paddleWidth &&
+      Math.abs(ball.y - s.paddleY) < dimensions.paddleHeight / 2
     ) {
-      ball.dx = 0.65;
-      ball.dy = Math.sqrt(1 - ball.dx * ball.dx);
-      if (ball.y < s.paddleY) {
-        ball.dy = -ball.dy;
-      }
-    } else if (ball.dx < 0) {
+      ball.x = wallLeft + Math.abs(ball.x - wallLeft);
+      const dyMax = 0.75;
+      ball.dy = ((ball.y - s.paddleY) / (dimensions.paddleHeight / 2)) * dyMax;
+      ball.dx = Math.sqrt(1 - ball.dy * ball.dy);
+    } else if (ball.x < 0) {
       ball.x = dimensions.width / 2;
       ball.y = dimensions.height / 2;
       ball.dx = 1;
       ball.dy = 0;
     }
   }
-
+  s.lastUpdate = Date.now();
   return s;
 }
 
 let nUser = 0;
-
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 io.on("connection", (socket: any) => {
   if (nUser > 0) {
@@ -101,12 +93,10 @@ io.on("connection", (socket: any) => {
   nUser++;
   socket.on("input", (data: [number, number]) => {
     gameState.paddleY = data[1];
-    gameState = nextFrame(gameState);
-    //wait 10ms to simulate network latency
-    sleep(0).then(() => {
-      socket.emit("rolleback", [data[0], gameState]);
-    });
+    gameState = nextFrame(gameState, Date.now() - gameState.lastUpdate);
+    socket.emit("rolleback", [data[0], gameState]);
   });
+
   socket.on("disconnect", () => {
     nUser--;
   });
