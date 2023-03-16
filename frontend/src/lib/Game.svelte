@@ -4,8 +4,6 @@
 
 	const serverTickRate = 40;
 
-	let socket: any;
-
 	let ping = 0;
 
 	interface Dimensions {
@@ -17,8 +15,8 @@
 	}
 
 	const dimensions: Dimensions = {
-		width: 800,
-		height: 600,
+		width: 750,
+		height: 450,
 		ballRadius: 10,
 		paddleHeight: 120,
 		paddleWidth: 15
@@ -34,12 +32,15 @@
 
 	interface GameState {
 		ball: Ball;
-		paddleY: number;
+		paddle1Y: number;
+		paddle2Y: number;
 		lastUpdate: number;
 	}
 
 	let paddleY = dimensions.height / 2;
 	let inputs = new Array<[number, number]>();
+
+	let index: 1 | 2 | null = null;
 
 	let gameState: GameState = {
 		ball: {
@@ -49,12 +50,25 @@
 			dy: 0,
 			speed: 400
 		},
-		paddleY,
+		paddle1Y: paddleY,
+		paddle2Y: dimensions.height / 2,
 		lastUpdate: Date.now()
 	};
 
+	let t0 = 0;
+	let acc = 0;
+	let fps = 0;
 	function draw(ctx: CanvasRenderingContext2D) {
-		gameState = nextFrame(gameState, Date.now() - gameState.lastUpdate, false);
+		if (t0 === 0) {
+			t0 = Date.now();
+		} else if (t0 + 1000 < Date.now()) {
+			fps = acc;
+			acc = 0;
+			t0 = Date.now();
+		} else {
+			acc++;
+		}
+		gameState = nextFrame(gameState, Date.now() - gameState.lastUpdate);
 
 		ctx.clearRect(0, 0, dimensions.width, dimensions.height);
 		ctx.beginPath();
@@ -62,12 +76,37 @@
 		ctx.fill();
 		ctx.closePath();
 
-		ctx.fillRect(
-			0,
-			paddleY - dimensions.paddleHeight / 2,
-			dimensions.paddleWidth,
-			dimensions.paddleHeight
-		);
+		if (index === 1) {
+			ctx.fillRect(
+				0,
+				paddleY - dimensions.paddleHeight / 2,
+				dimensions.paddleWidth,
+				dimensions.paddleHeight
+			);
+		} else {
+			ctx.fillRect(
+				0,
+				gameState.paddle1Y - dimensions.paddleHeight / 2,
+				dimensions.paddleWidth,
+				dimensions.paddleHeight
+			);
+		}
+		if (index === 2) {
+			ctx.fillRect(
+				dimensions.width - dimensions.paddleWidth,
+				paddleY - dimensions.paddleHeight / 2,
+				dimensions.paddleWidth,
+				dimensions.paddleHeight
+			);
+		} else {
+			ctx.fillRect(
+				dimensions.width - dimensions.paddleWidth,
+				gameState.paddle2Y - dimensions.paddleHeight / 2,
+				dimensions.paddleWidth,
+				dimensions.paddleHeight
+			);
+		}
+
 		requestAnimationFrame(() => draw(ctx));
 	}
 
@@ -81,20 +120,16 @@
 		}
 	}
 
-	function nextFrame(state: GameState, delta: number, rolleback = true): GameState {
+	function nextFrame(state: GameState, delta: number): GameState {
 		const s: GameState = JSON.parse(JSON.stringify(state));
 		const ball = s.ball;
-		const paddle = rolleback ? s.paddleY : paddleY;
 		ball.x += ball.dx * (delta / 1000) * ball.speed;
 		ball.y += ball.dy * (delta / 1000) * ball.speed;
 		const wallLeft = dimensions.ballRadius + dimensions.paddleWidth;
-		const wallRight = dimensions.width - dimensions.ballRadius;
+		const wallRight = dimensions.width - dimensions.ballRadius - dimensions.paddleWidth;
 		const wallTop = dimensions.ballRadius;
 		const wallBottom = dimensions.height - dimensions.ballRadius;
-		if (ball.x >= wallRight && ball.dx > 0) {
-			ball.x = wallRight - Math.abs(ball.x - wallRight);
-			ball.dx *= -1;
-		} else if (ball.y >= wallBottom && ball.dy > 0) {
+		if (ball.y >= wallBottom && ball.dy > 0) {
 			ball.y = wallBottom - Math.abs(ball.y - wallBottom);
 			ball.dy *= -1;
 		} else if (ball.y <= wallTop && ball.dy < 0) {
@@ -103,16 +138,31 @@
 		} else if (ball.x <= wallLeft && ball.dx < 0) {
 			if (
 				ball.x > dimensions.paddleWidth &&
-				Math.abs(ball.y - paddle) < dimensions.paddleHeight / 2
+				Math.abs(ball.y - s.paddle1Y) < dimensions.paddleHeight / 2
 			) {
 				ball.x = wallLeft + Math.abs(ball.x - wallLeft);
 				const dyMax = 0.75;
-				ball.dy = ((ball.y - paddle) / (dimensions.paddleHeight / 2)) * dyMax;
+				ball.dy = ((ball.y - s.paddle1Y) / (dimensions.paddleHeight / 2)) * dyMax;
 				ball.dx = Math.sqrt(1 - ball.dy * ball.dy);
 			} else if (ball.x < 0) {
 				ball.x = dimensions.width / 2;
 				ball.y = dimensions.height / 2;
 				ball.dx = 1;
+				ball.dy = 0;
+			}
+		} else if (ball.x >= wallRight && ball.dx > 0) {
+			if (
+				ball.x < dimensions.width - dimensions.paddleWidth &&
+				Math.abs(ball.y - s.paddle2Y) < dimensions.paddleHeight / 2
+			) {
+				ball.x = wallRight - Math.abs(ball.x - wallRight);
+				const dyMax = 0.75;
+				ball.dy = ((ball.y - s.paddle2Y) / (dimensions.paddleHeight / 2)) * dyMax;
+				ball.dx = -Math.sqrt(1 - ball.dy * ball.dy);
+			} else if (ball.x > dimensions.width) {
+				ball.x = dimensions.width / 2;
+				ball.y = dimensions.height / 2;
+				ball.dx = -1;
 				ball.dy = 0;
 			}
 		}
@@ -123,7 +173,7 @@
 	onMount(() => {
 		let url = window.location.origin;
 		url = url.substring(0, url.lastIndexOf(':'));
-		socket = ioClient(url + ':3000');
+		const socket = ioClient(url + ':3000');
 		const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 		const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 		canvas.width = dimensions.width;
@@ -134,6 +184,9 @@
 		});
 
 		setInterval(() => {
+			if (index === null) {
+				return;
+			}
 			const data: [number, number] = [Date.now(), paddleY];
 			socket.emit('input', data);
 			if (inputs.length < 100) {
@@ -145,11 +198,18 @@
 			state.lastUpdate = time;
 			inputs.shift();
 			for (let i = 0; i < inputs.length; i++) {
-				state.paddleY = inputs[i][1];
+				state.paddle1Y = inputs[i][1];
 				state = nextFrame(state, inputs[i][0] - state.lastUpdate);
 				state.lastUpdate = inputs[i][0];
 			}
 			gameState = state;
+		});
+
+		socket.on('player1', () => {
+			index = 1;
+		});
+		socket.on('player2', () => {
+			index = 2;
 		});
 
 		setInterval(() => {
@@ -162,11 +222,22 @@
 	});
 </script>
 
+{#if index === 1}
+	<h2>Player 1</h2>
+{:else if index === 2}
+	<h2>Player 2</h2>
+{:else}
+	<h2>Spectator</h2>
+{/if}
+
 <div>
 	<canvas />
 </div>
 <div>
 	<p>ping: {ping}ms</p>
+</div>
+<div>
+	<p>fps: {fps}</p>
 </div>
 
 <style lang="scss">
@@ -181,5 +252,8 @@
 				cursor: none;
 			}
 		}
+	}
+	h2 {
+		text-align: center;
 	}
 </style>
