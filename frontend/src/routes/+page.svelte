@@ -8,5 +8,6 @@
 <style lang="scss">
     h1 {
         text-align: center;
+        margin: 3px 0;
     }
 </style>

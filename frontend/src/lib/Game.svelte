@@ -2,24 +2,27 @@
 	import { onMount } from 'svelte';
 	import ioClient from 'socket.io-client';
 
-	const serverTickRate = 40;
-
 	let ping = 0;
+	let serverDelta = 0;
+	const tickRate = 30;
+	const delay = 3;
 
 	interface Dimensions {
 		readonly width: number;
 		readonly height: number;
-		readonly ballRadius: number;
+		readonly ballWidth: number;
 		readonly paddleHeight: number;
 		readonly paddleWidth: number;
+		readonly paddleSpeed: number;
 	}
 
 	const dimensions: Dimensions = {
 		width: 750,
 		height: 450,
-		ballRadius: 10,
-		paddleHeight: 120,
-		paddleWidth: 15
+		ballWidth: 15,
+		paddleHeight: 90,
+		paddleWidth: 10,
+		paddleSpeed: 400
 	};
 
 	interface Ball {
@@ -30,145 +33,85 @@
 		speed: number; //pixel per second
 	}
 
-	interface GameState {
-		ball: Ball;
-		paddle1Y: number;
-		paddle2Y: number;
-		lastUpdate: number;
-	}
-
-	let paddleY = dimensions.height / 2;
-	let inputs = new Array<[number, number]>();
-
-	let index: 1 | 2 | null = null;
-
-	let gameState: GameState = {
-		ball: {
-			x: dimensions.width / 2,
-			y: dimensions.height / 2,
-			dx: 1,
-			dy: 0,
-			speed: 400
-		},
-		paddle1Y: paddleY,
-		paddle2Y: dimensions.height / 2,
-		lastUpdate: Date.now()
+	type Paddle = {
+		y: number;
+		up: boolean;
+		down: boolean;
 	};
 
-	let t0 = 0;
-	let acc = 0;
-	let fps = 0;
+	interface GameState {
+		ball: Ball;
+		paddle: Paddle;
+		time: number;
+		id: number;
+		inputed: boolean;
+	}
+
+	type Input = {
+		stateId: number;
+		idDelta: number;
+		clientTime: number;
+		up: boolean;
+		down: boolean;
+	};
+
+	let state: GameState = {
+		ball: {
+			x: 0,
+			y: 0,
+			dx: 0,
+			dy: 0,
+			speed: 0
+		},
+		paddle: {
+			y: 0,
+			up: false,
+			down: false
+		},
+		time: 0,
+		id: 0,
+		inputed: false
+	};
+
+	let inputs = new Array<Input>();
+
+	function update(state: GameState, delta: number): GameState {
+		const s = structuredClone(state) as GameState;
+		const ball = s.ball;
+		const paddle = s.paddle;
+		ball.x += ball.dx * ball.speed * (delta / 1000);
+		ball.y += ball.dy * ball.speed * (delta / 1000);
+		if (ball.x <= 0 && ball.dx < 0) {
+			ball.x = -ball.x;
+			ball.dx *= -1;
+		} else if (ball.x >= dimensions.width - dimensions.ballWidth && ball.dx > 0) {
+			ball.x = 2 * (dimensions.width - dimensions.ballWidth) - ball.x;
+			ball.dx *= -1;
+		}
+		paddle.y -= dimensions.paddleSpeed * (delta / 1000);
+		if (paddle.y < 0) {
+			paddle.y = 0;
+		}
+		paddle.y += dimensions.paddleSpeed * (delta / 1000);
+		if (paddle.y > dimensions.height - dimensions.paddleHeight) {
+			paddle.y = dimensions.height - dimensions.paddleHeight;
+		}
+
+		return s;
+	}
+
 	function draw(ctx: CanvasRenderingContext2D) {
-		if (t0 === 0) {
-			t0 = Date.now();
-		} else if (t0 + 1000 < Date.now()) {
-			fps = acc;
-			acc = 0;
-			t0 = Date.now();
-		} else {
-			acc++;
-		}
-		gameState = nextFrame(gameState, Date.now() - gameState.lastUpdate);
-
+		let u = state.paddle.up;
+		let d = state.paddle.down;
+		const s = update(state, Date.now() - state.time);
 		ctx.clearRect(0, 0, dimensions.width, dimensions.height);
-		ctx.beginPath();
-		ctx.arc(gameState.ball.x, gameState.ball.y, dimensions.ballRadius, 0, Math.PI * 2);
-		ctx.fill();
-		ctx.closePath();
-
-		if (index === 1) {
-			ctx.fillRect(
-				0,
-				paddleY - dimensions.paddleHeight / 2,
-				dimensions.paddleWidth,
-				dimensions.paddleHeight
-			);
-		} else {
-			ctx.fillRect(
-				0,
-				gameState.paddle1Y - dimensions.paddleHeight / 2,
-				dimensions.paddleWidth,
-				dimensions.paddleHeight
-			);
-		}
-		if (index === 2) {
-			ctx.fillRect(
-				dimensions.width - dimensions.paddleWidth,
-				paddleY - dimensions.paddleHeight / 2,
-				dimensions.paddleWidth,
-				dimensions.paddleHeight
-			);
-		} else {
-			ctx.fillRect(
-				dimensions.width - dimensions.paddleWidth,
-				gameState.paddle2Y - dimensions.paddleHeight / 2,
-				dimensions.paddleWidth,
-				dimensions.paddleHeight
-			);
-		}
-
+		ctx.fillRect(s.ball.x, s.ball.y, dimensions.ballWidth, dimensions.ballWidth);
+		ctx.fillRect(0, s.paddle.y, dimensions.paddleWidth, dimensions.paddleHeight);
 		requestAnimationFrame(() => draw(ctx));
 	}
 
-	function handleMouseMove(e: MouseEvent, canvas: HTMLCanvasElement) {
-		const relativeY = e.clientY - canvas.offsetTop;
-		if (
-			relativeY > dimensions.paddleHeight / 2 &&
-			relativeY < dimensions.height - dimensions.paddleHeight / 2
-		) {
-			paddleY = relativeY;
-		}
-	}
-
-	function nextFrame(state: GameState, delta: number): GameState {
-		const s: GameState = JSON.parse(JSON.stringify(state));
-		const ball = s.ball;
-		ball.x += ball.dx * (delta / 1000) * ball.speed;
-		ball.y += ball.dy * (delta / 1000) * ball.speed;
-		const wallLeft = dimensions.ballRadius + dimensions.paddleWidth;
-		const wallRight = dimensions.width - dimensions.ballRadius - dimensions.paddleWidth;
-		const wallTop = dimensions.ballRadius;
-		const wallBottom = dimensions.height - dimensions.ballRadius;
-		if (ball.y >= wallBottom && ball.dy > 0) {
-			ball.y = wallBottom - Math.abs(ball.y - wallBottom);
-			ball.dy *= -1;
-		} else if (ball.y <= wallTop && ball.dy < 0) {
-			ball.y = wallTop + Math.abs(ball.y - wallTop);
-			ball.dy *= -1;
-		} else if (ball.x <= wallLeft && ball.dx < 0) {
-			if (
-				ball.x > dimensions.paddleWidth &&
-				Math.abs(ball.y - s.paddle1Y) < dimensions.paddleHeight / 2
-			) {
-				ball.x = wallLeft + Math.abs(ball.x - wallLeft);
-				const dyMax = 0.75;
-				ball.dy = ((ball.y - s.paddle1Y) / (dimensions.paddleHeight / 2)) * dyMax;
-				ball.dx = Math.sqrt(1 - ball.dy * ball.dy);
-			} else if (ball.x < 0) {
-				ball.x = dimensions.width / 2;
-				ball.y = dimensions.height / 2;
-				ball.dx = 1;
-				ball.dy = 0;
-			}
-		} else if (ball.x >= wallRight && ball.dx > 0) {
-			if (
-				ball.x < dimensions.width - dimensions.paddleWidth &&
-				Math.abs(ball.y - s.paddle2Y) < dimensions.paddleHeight / 2
-			) {
-				ball.x = wallRight - Math.abs(ball.x - wallRight);
-				const dyMax = 0.75;
-				ball.dy = ((ball.y - s.paddle2Y) / (dimensions.paddleHeight / 2)) * dyMax;
-				ball.dx = -Math.sqrt(1 - ball.dy * ball.dy);
-			} else if (ball.x > dimensions.width) {
-				ball.x = dimensions.width / 2;
-				ball.y = dimensions.height / 2;
-				ball.dx = -1;
-				ball.dy = 0;
-			}
-		}
-		s.lastUpdate = Date.now();
-		return s;
-	}
+	let up = false;
+	let down = false;
 
 	onMount(() => {
 		let url = window.location.origin;
@@ -178,57 +121,65 @@
 		const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 		canvas.width = dimensions.width;
 		canvas.height = dimensions.height;
-		draw(ctx);
-		document.addEventListener('mousemove', (e) => {
-			handleMouseMove(e, canvas);
+
+		window.addEventListener('keydown', (e: KeyboardEvent) => {
+			if (e.key === 'ArrowUp') {
+				up = true;
+			} else if (e.key === 'ArrowDown') {
+				down = true;
+			}
+		});
+		window.addEventListener('keyup', (e: KeyboardEvent) => {
+			if (e.key === 'ArrowUp') {
+				up = false;
+			} else if (e.key === 'ArrowDown') {
+				down = false;
+			}
 		});
 
-		setInterval(() => {
-			if (index === null) {
+		socket.on('state', (s: GameState) => {
+			if (state.id === 0) {
+				state = s;
+				state.time = Date.now();
+				draw(ctx);
 				return;
 			}
-			const data: [number, number] = [Date.now(), paddleY];
-			socket.emit('input', data);
-			if (inputs.length < 100) {
-				inputs.push(data);
+			while (inputs.length && inputs[0].stateId < s.id) {
+				inputs.shift();
 			}
-		}, 1000 / serverTickRate);
-		socket.on('rolleback', (data: [number, GameState]) => {
-			let [time, state] = data;
-			state.lastUpdate = time;
-			inputs.shift();
-			for (let i = 0; i < inputs.length; i++) {
-				state.paddle1Y = inputs[i][1];
-				state = nextFrame(state, inputs[i][0] - state.lastUpdate);
-				state.lastUpdate = inputs[i][0];
+			if (inputs.length) {
+				s.paddle.up = inputs[0].up;
+				s.paddle.down = inputs[0].down;
+				for (let i = 1; i < inputs.length && inputs[i].clientTime <= Date.now(); i++) {
+					s.paddle.up = inputs[i].up;
+					s.paddle.down = inputs[i].down;
+					s.id = inputs[i].stateId;
+					s = update(s, inputs[i].clientTime - inputs[i - 1].clientTime);
+					console.log('rollback');
+				}
 			}
-			gameState = state;
+			s.time = Date.now();
+			state = s;
 		});
 
-		socket.on('player1', () => {
-			index = 1;
-		});
-		socket.on('player2', () => {
-			index = 2;
-		});
-
-		setInterval(() => {
-			socket.emit('ping', Date.now());
-		}, 1000 / 3);
-
-		socket.on('ping', (time: number) => {
-			ping = Date.now() - time;
-		});
+		function gameLoop(): void {
+			const input: Input = {
+				stateId: state.id + delay,
+				idDelta: Date.now() - state.time,
+				clientTime: Date.now() + delay * tickRate,
+				up,
+				down
+			};
+			socket.emit('input', input);
+			inputs.push(input);
+			if (inputs.length > 30) {
+				inputs.shift();
+			}
+			setTimeout(gameLoop, 1000 / tickRate);
+		}
+		gameLoop();
 	});
 </script>
-
-{#if index === 1}
-	<h2>Player 1</h2>
-{:else if index === 2}
-	<h2>Player 2</h2>
-{:else}
-	<h2>Spectator</h2>
-{/if}
 
 <div>
 	<canvas />
@@ -237,7 +188,7 @@
 	<p>ping: {ping}ms</p>
 </div>
 <div>
-	<p>fps: {fps}</p>
+	<p>server clock delta: {Math.round(serverDelta)}ms</p>
 </div>
 
 <style lang="scss">
@@ -252,8 +203,8 @@
 				cursor: none;
 			}
 		}
-	}
-	h2 {
-		text-align: center;
+		p {
+			margin: 2px;
+		}
 	}
 </style>
