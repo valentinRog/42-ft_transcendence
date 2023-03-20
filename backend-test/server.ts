@@ -6,7 +6,7 @@ const io = require("socket.io")(3000, {
   },
 });
 
-const tickRate = 30;
+const tickRate = 100;
 
 interface Dimensions {
   readonly width: number;
@@ -14,6 +14,7 @@ interface Dimensions {
   readonly ballWidth: number;
   readonly paddleHeight: number;
   readonly paddleWidth: number;
+  readonly paddleOffset: number;
   readonly paddleSpeed: number;
 }
 
@@ -23,7 +24,8 @@ const dimensions: Dimensions = {
   ballWidth: 15,
   paddleHeight: 90,
   paddleWidth: 10,
-  paddleSpeed: 350,
+  paddleOffset: 10,
+  paddleSpeed: 500,
 };
 
 interface Ball {
@@ -66,7 +68,7 @@ let state: GameState = {
     y: dimensions.height / 2 - dimensions.ballWidth / 2,
     dx: 1,
     dy: 0,
-    speed: 250,
+    speed: 300,
   },
   paddle: new Paddle(),
   time: Date.now(),
@@ -78,31 +80,63 @@ function update(state: GameState, delta: number): GameState {
   const s = structuredClone(state) as GameState;
   const ball = s.ball;
   const paddle = s.paddle;
+
   ball.x += ball.dx * ball.speed * (delta / 1000);
   ball.y += ball.dy * ball.speed * (delta / 1000);
-  if (ball.x <= 0 && ball.dx < 0) {
-    ball.x = -ball.x;
-    ball.dx *= -1;
-  } else if (ball.x >= dimensions.width - dimensions.ballWidth && ball.dx > 0) {
-    ball.x = 2 * (dimensions.width - dimensions.ballWidth) - ball.x;
+
+  const wallLeft = dimensions.paddleWidth + dimensions.paddleOffset;
+  const wallRight =
+    dimensions.width - dimensions.paddleWidth - dimensions.paddleOffset;
+  if (ball.x <= wallLeft && ball.dx < 0) {
+    if (
+      ball.y + dimensions.ballWidth >= paddle.y &&
+      ball.y <= paddle.y + dimensions.paddleHeight
+    ) {
+      const dyMax = 1;
+      const distToCenter = ball.y + dimensions.ballWidth / 2 - paddle.y;
+      const dy = dyMax * (distToCenter / dimensions.paddleHeight - 0.5);
+      ball.dx = Math.sqrt(1 - dy * dy);
+      ball.dy = dy;
+      ball.x = wallLeft + (wallLeft - ball.x);
+    } else {
+      ball.x = dimensions.width / 2 - dimensions.ballWidth / 2;
+      ball.y = dimensions.height / 2 - dimensions.ballWidth / 2;
+      ball.dx = 1;
+      ball.dy = 0;
+    }
+  } else if (ball.x >= wallRight && ball.dx > 0) {
+    ball.x = wallRight - (ball.x - wallRight);
     ball.dx *= -1;
   }
 
-  let u = s.paddle.up;
-  let d = s.paddle.down;
-  s.paddle.up = u;
-  s.paddle.down = d;
+  if (ball.y <= 0 && ball.dy < 0) {
+    ball.y = -ball.y;
+    ball.dy *= -1;
+  } else if (
+    ball.y >= dimensions.height - dimensions.ballWidth &&
+    ball.dy > 0
+  ) {
+    ball.y =
+      dimensions.height -
+      dimensions.ballWidth -
+      (ball.y - dimensions.height + dimensions.ballWidth);
+    ball.dy *= -1;
+  }
 
-  if (u) {
+  if (s.paddle.up) {
     paddle.y -= dimensions.paddleSpeed * (delta / 1000);
-    if (paddle.y < 0) {
-      paddle.y = 0;
+    if (paddle.y < dimensions.paddleOffset) {
+      paddle.y = dimensions.paddleOffset;
     }
   }
-  if (d) {
+  if (s.paddle.down) {
     paddle.y += dimensions.paddleSpeed * (delta / 1000);
-    if (paddle.y > dimensions.height - dimensions.paddleHeight) {
-      paddle.y = dimensions.height - dimensions.paddleHeight;
+    if (
+      paddle.y >
+      dimensions.height - dimensions.paddleHeight - dimensions.paddleOffset
+    ) {
+      paddle.y =
+        dimensions.height - dimensions.paddleHeight - dimensions.paddleOffset;
     }
   }
 
@@ -135,10 +169,8 @@ function gameLoop(): void {
   state.id++;
   while (inputs.length && inputs[0].stateId <= state.id) {
     const input = inputs.shift();
-    if (input) {
-      state.paddle.up = input.up;
-      state.paddle.down = input.down;
-    }
+    state.paddle.up = input!.up;
+    state.paddle.down = input!.down;
   }
   io.emit("state", state);
   setTimeout(gameLoop, 1000 / tickRate);
