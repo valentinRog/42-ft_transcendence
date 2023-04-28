@@ -1,5 +1,5 @@
 import { Controller, Get, Redirect, Query, Req, Res, Session } from '@nestjs/common';
-import { AuthService } from './app.service';
+import { AuthService } from './auth.service';
 import * as querystring from 'querystring';
 
 @Controller('auth')
