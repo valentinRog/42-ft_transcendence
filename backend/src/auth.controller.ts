@@ -1,6 +1,5 @@
 import { Controller, Get, Redirect, Query, Req, Res, Session } from '@nestjs/common';
-import { Request, Response } from 'express';
-import { AuthService, Api42Service } from './app.service';
+import { AuthService } from './app.service';
 import * as querystring from 'querystring';
 
 @Controller('auth')
@@ -19,32 +18,25 @@ export class AuthController {
 
 	constructor(
 		private readonly authService: AuthService,
-		private readonly api42Service: Api42Service
 	) {}
 
 	@Get('callback')
 	async callback(
 			@Query('code') authorizationCode: string,
-			@Req() request,
 			@Res() response,
 			@Session() session,
 		) {
 
-		console.log(`Received code: ${authorizationCode}`);
-		const accessToken = await this.authService.exchangeToken( authorizationCode, );
-		console.log(`Received access token: ${accessToken}`);
+		const accessToken = await this.authService.exchangeToken(authorizationCode);
 
 		// Store the access token in the session
 		session.accessToken = accessToken;
 
 		// Redirect the user to the home page
+		session.user = await this.authService.getUserInfo(accessToken);
 
-		session.user = await this.api42Service.getUserInfo(accessToken);
-
-		const userInfo = await this.api42Service.getUserInfo(accessToken);
-
-		console.log(userInfo);
-		console.log(userInfo.login);
+		console.log(session.user);
+		console.log(session.user.login);
 
 		response.redirect('/');
 	}

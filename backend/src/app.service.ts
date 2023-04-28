@@ -26,14 +26,11 @@ export class AuthService {
 
     return response.data.access_token;
   }
-}
 
-@Injectable()
-export class Api42Service {
-	async getUserInfo(accessToken: string): Promise<any> {
-		const response = await axios.get('https://api.intra.42.fr/v2/me',
-		  { headers: { Authorization: `Bearer ${accessToken}` } }
-		);
-		return response.data;
-	  }
+  async getUserInfo(accessToken: string): Promise<any> {
+	const response = await axios.get('https://api.intra.42.fr/v2/me',
+	  { headers: { Authorization: `Bearer ${accessToken}` } }
+	);
+	return response.data;
+  }
 }
