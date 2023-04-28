@@ -1,6 +1,6 @@
 import { Controller, Get, Redirect, Query, Req, Res, Session } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { AuthService } from './app.service';
+import { AuthService, Api42Service } from './app.service';
 import * as querystring from 'querystring';
 
 @Controller('auth')
@@ -17,17 +17,10 @@ export class AuthController {
 	)
 	redirectToNest(): void {}
 
-//  @Get('callback')
-//  async callback(@Query('code') code: string, @Res() res: Response) {
-//    // Handle the callback from the 42 API and retrieve the `code` parameter
-//    console.log(`Received code: ${code}`);
-
-//    // You can then use the code to obtain an access token from the 42 API
-
-//    // Send a response to the client
-//    return res.send('Callback received!');
-//  }
-	constructor(private readonly authService: AuthService) {}
+	constructor(
+		private readonly authService: AuthService,
+		private readonly api42Service: Api42Service
+	) {}
 
 	@Get('callback')
 	async callback(
@@ -45,6 +38,14 @@ export class AuthController {
 		session.accessToken = accessToken;
 
 		// Redirect the user to the home page
+
+		session.user = await this.api42Service.getUserInfo(accessToken);
+
+		const userInfo = await this.api42Service.getUserInfo(accessToken);
+
+		console.log(userInfo);
+		console.log(userInfo.login);
+
 		response.redirect('/');
 	}
 }
