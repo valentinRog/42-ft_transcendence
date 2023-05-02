@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@prisma/client';
 import axios from 'axios';
 import * as crypto from 'crypto';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class AuthService {
@@ -37,27 +38,38 @@ export class AuthService {
 		return this.randomState;
 	}
 
-	async signup(user: any): Promise<User> {
+	async signin(user: any): Promise<User> {
 
-		const { id, email, login, first_name, last_name, image } = user;
+		const prisma_user = await this.prisma.user.findUnique({ where: { id: user.id } });
 
-		//const myUser: User = {
-		//	id: id,
-		//	createdAt: new Date(),
-		//	updatedAt: new Date(),
-		//	username: login,
-		//	firstName: first_name,
-		//	lastName: last_name,
-		//  };
+		if (!prisma_user) {
+			return this.signup(user);
+		}
+		return prisma_user;
+	}
 
-		return this.prisma.user.create({ data: {
-			id: id,
-			createdAt: new Date(),
-			updatedAt: new Date(),
-			username: login,
-			email: email,
-			firstName: first_name,
-			lastName: last_name,
-		  } });
+	signup(user: any): Promise<User> {
+
+		const { id, login, email, first_name, last_name } = user;
+
+		try {
+			return this.prisma.user.create({ data: {
+				id: id,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+				username: login,
+				email: email,
+				firstName: first_name,
+				lastName: last_name,
+			  } });
+		}
+		catch (error) {
+			if (error instanceof PrismaClientKnownRequestError) {
+				if ( error.code == 'P2002') {
+					throw new ForbiddenException('User already exists');
+				}
+			}
+			throw error;
+		}
 	}
 }
