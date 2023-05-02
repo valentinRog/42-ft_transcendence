@@ -6,8 +6,9 @@ import * as querystring from 'querystring';
 export class AuthController {
 	constructor (private readonly authService: AuthService) {}
 
-	@Get('42')
+	@Get('login')
 	redirect(@Res() response): void {
+		console.log('redirect')
 		response.redirect('https://api.intra.42.fr/oauth/authorize?' +
 		querystring.stringify({
 			client_id: 'u-s4t2ud-60ebefcb75374b0f7a7aa4c158df08058f4db7e73bd1a7c7feeb8fe041f9ae6d',
@@ -21,6 +22,7 @@ export class AuthController {
 	async callback(
 			@Query('code') authorizationCode: string, @Query('state') state: string,
 			@Res() response,
+			@Req () request,
 			@Session() session,
 		) {
 
@@ -29,7 +31,6 @@ export class AuthController {
 			response.redirect('/');
 			return;
 		}
-
 		if (state !== this.authService.getRandomState()) {
 			console.log('State DOES NOT MATCH')
 			console.log(state)
@@ -37,15 +38,11 @@ export class AuthController {
 			response.redirect('/');
 			return;
 		}
-
 		const accessToken = await this.authService.exchangeToken(authorizationCode);
-
 		// Store the access token in the session
 		session.accessToken = accessToken;
-
 		// Redirect the user to the home page
 		session.user = await this.authService.getUserInfo(accessToken);
-
 		//console.log(session.user);
 		console.log(session.user.login);
 

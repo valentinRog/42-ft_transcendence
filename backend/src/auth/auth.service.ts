@@ -1,14 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { User } from '@prisma/client';
 import axios from 'axios';
 import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
+
 	private readonly randomState: string;
 
-	constructor() {
+	constructor( private prisma: PrismaService) {
 		this.randomState = crypto.randomBytes(5).toString('hex');
-	  }
+	}
 
 	async exchangeToken(authorizationCode: string): Promise<string> {
 		const clientId = 'u-s4t2ud-60ebefcb75374b0f7a7aa4c158df08058f4db7e73bd1a7c7feeb8fe041f9ae6d';
@@ -36,4 +39,6 @@ export class AuthService {
 	getRandomState(): string {
 		return this.randomState;
 	}
+
+
 }
