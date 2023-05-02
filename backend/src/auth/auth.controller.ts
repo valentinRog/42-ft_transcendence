@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Req, Res, Session } from '@nestjs/common';
+import { Controller, Get, Query, Res} from '@nestjs/common';
 import { AuthService} from './auth.service';
 import * as querystring from 'querystring';
 
@@ -21,9 +21,7 @@ export class AuthController {
 	@Get('callback')
 	async callback(
 			@Query('code') authorizationCode: string, @Query('state') state: string,
-			@Res() response,
-			@Session() session,
-		) {
+			@Res() response) {
 
 		if (state === undefined) {
 			console.log('State is empty');
@@ -37,20 +35,13 @@ export class AuthController {
 			response.redirect('/');
 			return;
 		}
+
 		const accessToken = await this.authService.exchangeToken(authorizationCode);
-		// Store the access token in the session
-		session.accessToken = accessToken;
+		const userInfo = await this.authService.getUserInfo(accessToken);
+
+		await this.authService.signup(userInfo);
+
 		// Redirect the user to the home page
-		session.user = await this.authService.getUserInfo(accessToken);
-
-		console.log(session.user.login);
-
-		await this.authService.signup(session.user);
-
-		//const user = await this.authService.signup(session.user);
-
-		//console.log(user);
-
 		response.redirect('/');
 	}
 }

@@ -15,10 +15,12 @@ model User {
 	createdAt DateTime @default(now())
 	updatedAt DateTime @updatedAt
 
-	username String
-	hash String
+	username String @unique
+	email String @unique
 
 	firstName String?
 	lastName String?
+
+	twoFactorEnabled Boolean @default(false)
 }
 

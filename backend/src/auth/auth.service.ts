@@ -41,16 +41,23 @@ export class AuthService {
 
 		const { id, email, login, first_name, last_name, image } = user;
 
-		const myUser: User = {
+		//const myUser: User = {
+		//	id: id,
+		//	createdAt: new Date(),
+		//	updatedAt: new Date(),
+		//	username: login,
+		//	firstName: first_name,
+		//	lastName: last_name,
+		//  };
+
+		return this.prisma.user.create({ data: {
 			id: id,
 			createdAt: new Date(),
 			updatedAt: new Date(),
 			username: login,
-			hash: 'myhashedpassword',
+			email: email,
 			firstName: first_name,
 			lastName: last_name,
-		  };
-
-		return this.prisma.user.create({ data: myUser });
+		  } });
 	}
 }
