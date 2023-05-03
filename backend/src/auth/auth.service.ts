@@ -9,35 +9,25 @@ export class AuthService {
 
 	constructor( private prisma: PrismaService) {}
 
-	async findOrCreate(user: any): Promise<any> {
-		// implement your logic for finding or creating the user in your database
-		// and return the user object with the required fields
-		return user;
-	  }
-
-	async signin(user: any): Promise<User> {
-
+	async findOrCreate(user: any): Promise<User> {
 		const prisma_user = await this.prisma.user.findUnique({ where: { id: user.id } });
 
 		if (!prisma_user) {
 			return this.signup(user);
 		}
 		return prisma_user;
-	}
+	  }
 
 	signup(user: any): Promise<User> {
-
-		const { id, login, email, first_name, last_name } = user;
-
 		try {
 			return this.prisma.user.create({ data: {
-				id: id,
+				id: user.id,
 				createdAt: new Date(),
 				updatedAt: new Date(),
-				username: login,
-				email: email,
-				firstName: first_name,
-				lastName: last_name,
+				username: user.userName,
+				email: user.email,
+				firstName: user.firstName,
+				lastName: user.lastName,
 			  } });
 		}
 		catch (error) {

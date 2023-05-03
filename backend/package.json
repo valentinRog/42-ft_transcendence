@@ -6,6 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+	"start:docker": "sudo service docker start",
     "prisma:dev:deploy": "prisma migrate deploy",
     "db:dev:rm": "docker-compose down",
     "db:dev:up": "docker-compose up -d dev-db",
