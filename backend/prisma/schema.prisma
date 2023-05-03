@@ -20,6 +20,8 @@ model User {
 
 	firstName String?
 	lastName String?
+	phone String?
+	image String?
 
 	twoFactorEnabled Boolean @default(false)
 }

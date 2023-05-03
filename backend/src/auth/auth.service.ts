@@ -8,11 +8,15 @@ export class AuthService {
 	constructor( private prisma: PrismaService) {}
 
 	async findOrCreate(user: any): Promise<User> {
+
 		const prisma_user = await this.prisma.user.findUnique({ where: { id: user.id } });
 
 		if (!prisma_user) {
 			return this.signup(user);
 		}
+		//else {
+		//	return this.update(user);
+		//}
 		return prisma_user;
 	  }
 
@@ -26,6 +30,8 @@ export class AuthService {
 				email: user.email,
 				firstName: user.firstName,
 				lastName: user.lastName,
+				phone: user.phone,
+				image: user.image,
 			  } });
 		}
 		catch (error) {
@@ -36,5 +42,12 @@ export class AuthService {
 			}
 			throw error;
 		}
+	}
+
+	update(user: any): Promise<User> {
+		return this.prisma.user.update({ where: { id: user.id }, data: {
+			updatedAt: new Date(),
+			phone: user.phone,
+		} });
 	}
 }

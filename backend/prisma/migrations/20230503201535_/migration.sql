@@ -7,6 +7,8 @@ CREATE TABLE "User" (
     "email" TEXT NOT NULL,
     "firstName" TEXT,
     "lastName" TEXT,
+    "phone" TEXT,
+    "image" TEXT,
     "twoFactorEnabled" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
