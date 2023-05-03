@@ -1,21 +1,19 @@
 import { Controller, Get, UseGuards, Req, Res, Session} from '@nestjs/common';
 import { AuthService} from './auth.service';
-import { AuthGuard } from '@nestjs/passport';
-import { session } from 'passport';
+import { LoginGuard } from './guard';
 
-@Controller()
+@UseGuards(LoginGuard)
+@Controller('auth')
 export class AuthController {
 	constructor(private readonly authService: AuthService) {}
 
-	@Get('auth/42login')
-	@UseGuards(AuthGuard('42login'))
+	@Get('42login')
 	async fortyTwoAuth(@Req() req) {
 		// this will not be called, since the authentication is handled by Passport
 		return;
 	}
 
-	@Get('auth/42login/callback')
-	@UseGuards(AuthGuard('42login'))
+	@Get('42login/callback')
 	async fortyTwoAuthCallback(@Req() request, @Res() response, @Session() session) {
 		try {
 			const user = await this.authService.findOrCreate(request.user);

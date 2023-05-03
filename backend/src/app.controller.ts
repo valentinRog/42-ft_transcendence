@@ -1,4 +1,4 @@
-import { Controller, Get, Req } from '@nestjs/common';
+import { Controller, Get, Req, Session } from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
@@ -6,8 +6,8 @@ export class AppController {
 	constructor(private readonly appService: AppService) {}
 
   	@Get()
-  	getHello(@Req() request): string {
-		const user = request.session.user;
+  	getHello(@Req() request, @Session() session): string {
+		const user = session.user;
 		if (user) {
 			return user;
 		}

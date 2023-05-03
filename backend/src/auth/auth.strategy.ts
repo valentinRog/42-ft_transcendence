@@ -4,7 +4,7 @@ import { Strategy } from 'passport-42';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class FortyTwoStrategy extends PassportStrategy(Strategy, '42login') {
+export class FortyTwoStrategy extends PassportStrategy(Strategy, 'login_guard') {
   constructor(private readonly configService: ConfigService) {
     super({
       clientID: configService.get('FORTYTWO_CLIENT_ID'),
