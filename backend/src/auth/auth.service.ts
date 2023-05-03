@@ -3,10 +3,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
-
 @Injectable()
 export class AuthService {
-
 	constructor( private prisma: PrismaService) {}
 
 	async findOrCreate(user: any): Promise<User> {
@@ -33,7 +31,7 @@ export class AuthService {
 		catch (error) {
 			if (error instanceof PrismaClientKnownRequestError) {
 				if ( error.code == 'P2002') {
-					throw new ForbiddenException('User already exists');
+					throw new ForbiddenException('user already exists');
 				}
 			}
 			throw error;

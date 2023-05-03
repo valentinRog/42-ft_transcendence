@@ -2,15 +2,14 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { Strategy } from 'passport-42';
 import { ConfigService } from '@nestjs/config';
-import { AuthService } from './auth.service';
 
 @Injectable()
-export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
-  constructor(private readonly configService: ConfigService, private authService: AuthService) {
+export class FortyTwoStrategy extends PassportStrategy(Strategy, '42login') {
+  constructor(private readonly configService: ConfigService) {
     super({
       clientID: configService.get('FORTYTWO_CLIENT_ID'),
       clientSecret: configService.get('FORTYTWO_CLIENT_SECRET'),
-      callbackURL: `${configService.get('APP_URL')}/auth/42/callback`,
+      callbackURL: `${configService.get('APP_URL')}/${configService.get('CALLBACK')}`,
     });
   }
 
@@ -26,7 +25,7 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
 			image: image.link,
 			accessToken: accessToken
 		};
-		return this.authService.findOrCreate(user);
+		done(null, user);
 	  }
 	  catch (err) {
 		done(err, false);

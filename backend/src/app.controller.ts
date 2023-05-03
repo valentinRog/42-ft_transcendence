@@ -9,7 +9,7 @@ export class AppController {
   	getHello(@Req() request): string {
 		const user = request.session.user;
 		if (user) {
-			return user.username;
+			return user;
 		}
 		else {
 			return "no user";
