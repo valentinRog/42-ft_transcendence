@@ -7,7 +7,7 @@ export class AppController {
 
   	@Get()
   	getHello(@Req() request, @Session() session): string {
-		const user = session.user;
+	const user = session.user;
 		if (user) {
 			return user;
 		}

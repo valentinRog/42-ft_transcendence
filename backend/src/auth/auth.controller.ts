@@ -17,8 +17,8 @@ export class AuthController {
 	async fortyTwoAuthCallback(@Req() request, @Res() response, @Session() session) {
 		try {
 			const user = await this.authService.findOrCreate(request.user);
-			console.log(user);
 			session.user = user;
+			console.log(request.user);
 			response.redirect('/');
 		}
 		catch (err) {

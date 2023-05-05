@@ -15,9 +15,8 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, 'login_guard') 
 
   async validate(accessToken: string, refreshToken: string, profile: any, done: any) {
     try {
-		const { id, login, image, phone } = profile._json;
+		const { login, image, phone } = profile._json;
 		const user = {
-			id: id,
 			login: login,
 			image: image.link,
 			phone: phone,

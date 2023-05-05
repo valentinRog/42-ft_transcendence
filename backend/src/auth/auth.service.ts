@@ -9,7 +9,7 @@ export class AuthService {
 
 	async findOrCreate(user: any): Promise<User> {
 
-		const prisma_user = await this.prisma.user.findUnique({ where: { id: user.id } });
+		const prisma_user = await this.prisma.findUser(user);
 
 		if (!prisma_user) {
 			return this.signup(user);
@@ -22,14 +22,7 @@ export class AuthService {
 
 	signup(user: any): Promise<User> {
 		try {
-			return this.prisma.user.create({ data: {
-				id: user.id,
-				createdAt: new Date(),
-				updatedAt: new Date(),
-				login: user.login,
-				phone: user.phone,
-				image: user.image,
-			  } });
+			return this.prisma.createUser(user);
 		}
 		catch (error) {
 			if (error instanceof PrismaClientKnownRequestError) {
@@ -41,10 +34,4 @@ export class AuthService {
 		}
 	}
 
-	update(user: any): Promise<User> {
-		return this.prisma.user.update({ where: { id: user.id }, data: {
-			updatedAt: new Date(),
-			phone: user.phone,
-		} });
-	}
 }
