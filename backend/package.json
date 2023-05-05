@@ -6,11 +6,10 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-	"start:docker": "sudo service docker start && prisma generate",
-    "prisma:dev:deploy": "prisma migrate deploy",
+    "prisma:dev:deploy": "prisma migrate deploy && prisma generate",
     "db:dev:rm": "docker-compose down",
     "db:dev:up": "docker-compose up -d dev-db",
-    "db:dev:restart": "npm run db:dev:rm && npm run db:dev:up",
+    "db:dev:restart": "sudo service docker start && npm run db:dev:rm && npm run db:dev:up",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",

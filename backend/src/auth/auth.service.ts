@@ -26,10 +26,7 @@ export class AuthService {
 				id: user.id,
 				createdAt: new Date(),
 				updatedAt: new Date(),
-				username: user.userName,
-				email: user.email,
-				firstName: user.firstName,
-				lastName: user.lastName,
+				login: user.login,
 				phone: user.phone,
 				image: user.image,
 			  } });
