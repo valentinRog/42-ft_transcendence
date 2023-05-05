@@ -34,6 +34,7 @@ export class PrismaService extends PrismaClient {
 			image: user.image || null,
 			status: user.status,
 			twoFactorEnabled: user.twoFactorEnabled,
+			twoFactorAuthSecret : user.twoFactorAuthSecret || null,
 			friends: user.friends || [],
 		  };
 		return prismaUser;

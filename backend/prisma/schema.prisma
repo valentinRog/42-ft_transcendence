@@ -17,6 +17,7 @@ model User {
   image            String?
   status           String   @default("active")
   twoFactorEnabled Boolean  @default(false)
+  twoFactorAuthSecret  String?
   friends          Int[]    @default([])
   stats            Stat?
 }
