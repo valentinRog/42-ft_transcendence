@@ -8,12 +8,10 @@ import {
 	  data: string | undefined,
 	  ctx: ExecutionContext,
 	) => {
-	  const request: Express.Request = ctx
-		.switchToHttp()
-		.getRequest();
-	  if (data) {
-		return request.user[data];
-	  }
-	  return request.user;
+		const request: Express.Request = ctx.switchToHttp().getRequest();
+		if (data) {
+			return request.user[data];
+		}
+	return request.user;
 	},
   );

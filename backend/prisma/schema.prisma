@@ -9,14 +9,13 @@ datasource db {
 
 model User {
   id               Int      @id @default(autoincrement())
+  login            String   @unique
+  username         String   @unique
   hash             String?
   logFrom42        Boolean  @default(false)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
-  login            String   @unique
-  username         String   @unique
-  phone            String?
-  image            String?
+  avatar            String?
   status           String   @default("active")
   twoFactorEnabled Boolean  @default(false)
   twoFactorAuthSecret  String?

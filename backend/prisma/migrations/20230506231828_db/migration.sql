@@ -1,14 +1,16 @@
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
+    "login" TEXT NOT NULL,
+    "username" TEXT NOT NULL,
+    "hash" TEXT,
+    "logFrom42" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "login" TEXT NOT NULL,
-    "username" TEXT NOT NULL DEFAULT '',
-    "phone" TEXT,
-    "image" TEXT,
+    "avatar" TEXT,
     "status" TEXT NOT NULL DEFAULT 'active',
     "twoFactorEnabled" BOOLEAN NOT NULL DEFAULT false,
+    "twoFactorAuthSecret" TEXT,
     "friends" INTEGER[] DEFAULT ARRAY[]::INTEGER[],
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")

@@ -10,7 +10,19 @@ export class AuthDto {
 
 	@IsString()
 	@IsNotEmpty()
+	password: string;
+
+	@IsString()
+	@IsNotEmpty()
 	username: string;
+
+	avatar: string;
+}
+
+export class LogDto {
+	@IsString()
+	@IsNotEmpty()
+	login: string;
 
 	@IsString()
 	@IsNotEmpty()

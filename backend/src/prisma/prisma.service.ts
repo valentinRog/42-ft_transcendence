@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import { User } from '@prisma/client';
+import { AuthDto } from './../auth/dto';
 
 @Injectable()
 export class PrismaService extends PrismaClient {
@@ -11,33 +12,32 @@ export class PrismaService extends PrismaClient {
 		);
 	}
 
-	async createUser(user: any): Promise<User> {
-		return await this.user.create({ data: this.convertToPrismaUser(user)});
+	async createUser(dto: AuthDto): Promise<User> {
+		return await this.user.create({ data: this.convertToPrismaUser(dto)});
 	}
 
-	async update(user: any): Promise<User> {
-		return this.user.update({ where: { login: user.login}, data: this.convertToPrismaUser(user) });
+	async update(dto: AuthDto): Promise<User> {
+		return this.user.update({ where: { login: dto.login}, data: this.convertToPrismaUser(dto) });
 	}
 
-	async findUser(user: any): Promise<User> {
-		return this.user.findUnique({ where: { login: user.login } });
+	async findUser(login: string): Promise<User> {
+		return this.user.findUnique({ where: { login: login } });
 	}
 
-	convertToPrismaUser(user: any): User {
+	convertToPrismaUser(dto: any): User {
 		const prismaUser: User = {
-			id: user.id,
-			hash: user.hash,
-			logFrom42: user.logFrom42,
-			createdAt: user.createdAt,
-			updatedAt: user.updatedAt,
-			login: user.login,
-			username: user.username,
-			phone: user.phone || null,
-			image: user.image || null,
-			status: user.status,
-			twoFactorEnabled: user.twoFactorEnabled,
-			twoFactorAuthSecret : user.twoFactorAuthSecret || null,
-			friends: user.friends || [],
+			id: dto.id,
+			hash: dto.hash,
+			logFrom42: dto.logFrom42,
+			createdAt: dto.createdAt,
+			updatedAt: dto.updatedAt,
+			login: dto.login,
+			username: dto.username,
+			avatar: dto.avatar || null,
+			status: dto.status,
+			twoFactorEnabled: dto.twoFactorEnabled,
+			twoFactorAuthSecret : dto.twoFactorAuthSecret || null,
+			friends: dto.friends || [],
 		  };
 		return prismaUser;
 	}
