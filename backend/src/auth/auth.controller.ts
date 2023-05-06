@@ -3,17 +3,18 @@ import { AuthService} from './auth.service';
 import { LoginGuard } from './guard';
 import { AuthDto } from './dto';
 
-@UseGuards(LoginGuard)
 @Controller('auth')
 export class AuthController {
 	constructor(private readonly authService: AuthService) {}
 
+	@UseGuards(LoginGuard)
 	@Get('42login')
 	async fortyTwoAuth(@Req() req) {
 		// this will not be called, since the authentication is handled by Passport
 		return;
 	}
 
+	@UseGuards(LoginGuard)
 	@Get('42login/callback')
 	async fortyTwoAuthCallback(@Req() request, @Res() response, @Session() session) {
 		try {
@@ -31,7 +32,7 @@ export class AuthController {
 
 	@Post('signup')
 	signup(@Body() dto: AuthDto) {
-	  return this.authService.signup(dto);
+		return this.authService.signup(dto);
 	}
 
 	@HttpCode(HttpStatus.OK)

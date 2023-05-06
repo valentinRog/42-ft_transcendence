@@ -14,7 +14,7 @@ model User {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
   login            String   @unique
-  username         String   @unique @default("")
+  username         String   @unique
   phone            String?
   image            String?
   status           String   @default("active")

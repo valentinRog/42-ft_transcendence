@@ -8,7 +8,6 @@ export class AppController {
 	@Get()
 	getHome(@Req() req, @Session() session) {
 		if (session.user) {
-
 			return 'Welcome back, ' + session.user.login;
 		} else {
 			return 'Please log in to continue';

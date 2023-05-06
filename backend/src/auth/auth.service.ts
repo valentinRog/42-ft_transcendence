@@ -18,13 +18,50 @@ export class AuthService {
 		const prisma_user = await this.prisma.findUser(user);
 
 		if (!prisma_user) {
-			return this.signup(user);
+			return this.signup42(user);
 		}
 		//else {
 		//	return this.update(user);
 		//}
 		return prisma_user;
 	  }
+
+	signup42(user: any): Promise<User> {
+		try {
+			return this.prisma.createUser(user);
+		}
+		catch (error) {
+			if (error instanceof PrismaClientKnownRequestError) {
+				if ( error.code == 'P2002') {
+					throw new ForbiddenException('user already exists');
+				}
+			}
+			throw error;
+		}
+	}
+
+	async signup(dto: AuthDto) {
+		// generate the password hash
+		const hash = await argon.hash(dto.password);
+		// save the new user in the db
+		try {
+		  const user = await this.prisma.user.create({
+			data: {
+			  login: dto.login,
+			  username: dto.username,
+			  hash,
+			},
+		  });
+		  return this.signToken(user.id, user.login);
+		} catch (error) {
+		  if ( error instanceof PrismaClientKnownRequestError) {
+			if (error.code === 'P2002') {
+			  throw new ForbiddenException('credentials taken');
+			}
+		  }
+		  throw error;
+		}
+	}
 
 	  async signin(dto: AuthDto) {
 		const user = await this.prisma.user.findUnique({ where: { login: dto.login} });
@@ -43,20 +80,6 @@ export class AuthService {
 		  );
 		return this.signToken(user.id, user.login);
 	  }
-
-	signup(user: any): Promise<User> {
-		try {
-			return this.prisma.createUser(user);
-		}
-		catch (error) {
-			if (error instanceof PrismaClientKnownRequestError) {
-				if ( error.code == 'P2002') {
-					throw new ForbiddenException('user already exists');
-				}
-			}
-			throw error;
-		}
-	}
 
 	async signToken( userId: number, login: string): Promise<{ access_token: string }> {
 		const payload = {
