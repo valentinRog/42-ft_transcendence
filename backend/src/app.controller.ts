@@ -5,14 +5,13 @@ import { AppService } from './app.service';
 export class AppController {
 	constructor(private readonly appService: AppService) {}
 
-  	@Get()
-  	getHello(@Req() request, @Session() session): string {
-	const user = session.user;
-		if (user) {
-			return user;
-		}
-		else {
-			return "no user";
+	@Get()
+	getHome(@Req() req, @Session() session) {
+		if (session.user) {
+
+			return 'Welcome back, ' + session.user.login;
+		} else {
+			return 'Please log in to continue';
 		}
 	}
 }

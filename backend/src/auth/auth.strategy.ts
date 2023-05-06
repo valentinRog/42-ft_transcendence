@@ -18,6 +18,7 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, 'login_guard') 
 		const { login, image, phone } = profile._json;
 		const user = {
 			login: login,
+			logFrom42: true,
 			image: image.link,
 			phone: phone,
 			accesstoken: accessToken

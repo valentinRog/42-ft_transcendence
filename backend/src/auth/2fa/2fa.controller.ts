@@ -1,14 +1,15 @@
 import { Controller, Post, UseGuards, Request } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import * as speakeasy from 'speakeasy';
-import { LoginGuard } from './../guard';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { LoginGuard } from '../guard';
 
 @Controller('2fa')
 export class TwoFactorController {
 	constructor(private readonly prisma : PrismaService) {}
 
 	@Post('enable')
-	@UseGuards(LoginGuard)
+	@UseGuards(AuthGuard('jwt'))
 	async enableTwoFactorAuth(@Request() req) {
 		// 1. Generate a 2FA secret key
 		const secret = speakeasy.generateSecret();

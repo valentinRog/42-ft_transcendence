@@ -26,6 +26,8 @@ export class PrismaService extends PrismaClient {
 	convertToPrismaUser(user: any): User {
 		const prismaUser: User = {
 			id: user.id,
+			hash: user.hash,
+			logFrom42: user.logFrom42,
 			createdAt: user.createdAt,
 			updatedAt: user.updatedAt,
 			login: user.login,
