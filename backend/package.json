@@ -6,11 +6,15 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+	"docker:start": "sudo service docker start",
     "prisma:dev:deploy": "prisma migrate deploy && prisma generate",
     "db:dev:rm": "docker-compose down",
     "db:dev:up": "docker-compose up -d dev-db",
-    "docker:start": "sudo service docker start",
     "db:dev:restart": "npm run db:dev:rm && npm run db:dev:up",
+
+    "test-db:dev:up": "docker-compose up -d test-dev-db",
+    "test-db:dev:restart": "npm run db:dev:rm && npm run test-db:dev:up",
+
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -22,7 +26,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --watch --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@nestjs/axios": "^2.0.0",
@@ -39,6 +43,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "express-session": "^1.17.3",
+    "pactum": "^3.4.0",
     "passport": "^0.6.0",
     "passport-42": "^1.2.6",
     "passport-auth0": "^1.4.3",
