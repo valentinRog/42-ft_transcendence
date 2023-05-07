@@ -1,4 +1,4 @@
-import { Controller, Get, Post, UseGuards, Req, Res, Body, HttpCode, HttpStatus, Session} from '@nestjs/common';
+import { Controller, Get, Post, UseGuards, Req, Res, Body, HttpCode, HttpStatus, Redirect  } from '@nestjs/common';
 import { AuthService} from './auth.service';
 import { LoginGuard } from './guard';
 import { AuthDto, LogDto } from './dto';
@@ -16,14 +16,12 @@ export class AuthController {
 
 	@UseGuards(LoginGuard)
 	@Get('42login/callback')
-	async fortyTwoAuthCallback(@Req() request, @Res() response, @Session() session) {
+	async fortyTwoAuthCallback(@Req() request, @Res() response) {
 		try {
 			const user = await this.authService.findOrCreate(request.user);
-			session.user = user;
 			console.log(request.user);
 			const token = await this.authService.signToken(user.id, user.login);
-			response.cookie('Authorization', `Bearer ${token.access_token}`, { httpOnly: true });
-			response.redirect('/');
+			response.redirect('http://localhost:3000/home' + '?token=' + token.access_token);
 		}
 		catch (err) {
 			// Handle the error

@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Session } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
 import { UseGuards } from '@nestjs/common';
 import { JwtGuard } from './auth/guard';
@@ -10,12 +10,14 @@ export class AppController {
 	constructor(private readonly appService: AppService) {}
 
 	@Get()
-	getHome(@Session() session) {
-		if (session.user) {
-			return 'Welcome back, ' + session.user.login;
-		} else {
-			return 'Please log in to continue';
-		}
+	getHome() {
+		return 'Please Log in';
+	}
+
+	@UseGuards(JwtGuard)
+	@Get('home')
+	getHomeLog(@GetUser() user: User) {
+		return 'Welcome back, ' + user.login;
 	}
 
 	@UseGuards(JwtGuard)
@@ -25,3 +27,6 @@ export class AppController {
 	}
 
 }
+
+
+
