@@ -12,8 +12,8 @@
     "db:dev:up": "docker-compose up -d dev-db",
     "db:dev:restart": "npm run db:dev:rm && npm run db:dev:up",
 
-    "test-db:dev:up": "docker-compose up -d test-dev-db",
-    "test-db:dev:restart": "npm run db:dev:rm && npm run test-db:dev:up",
+    "db:test:up": "docker-compose up -d test-db",
+    "db:test:restart": "npm run db:dev:rm && npm run db:test:up",
 
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",

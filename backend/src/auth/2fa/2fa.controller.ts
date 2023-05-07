@@ -1,6 +1,6 @@
 import { Controller, Post, UseGuards, Req, HttpCode, HttpStatus } from '@nestjs/common';
 import * as speakeasy from 'speakeasy';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from './../../prisma/prisma.service';
 import { JwtGuard} from '../guard';
 import { GetUser } from '../decorator';
 import { User } from '@prisma/client';

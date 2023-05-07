@@ -16,7 +16,7 @@ export class AppController {
 
 	@UseGuards(JwtGuard)
 	@Get('home')
-	getHomeLog(@GetUser() user: User) {
+	getHomeLog(@GetUser() user: User) { // test get only login
 		return 'Welcome back, ' + user.login;
 	}
 

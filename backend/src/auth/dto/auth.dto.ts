@@ -1,6 +1,7 @@
 import {
 	IsNotEmpty,
 	IsString,
+	IsOptional,
   } from 'class-validator';
 
 export class AuthDto {
@@ -16,7 +17,9 @@ export class AuthDto {
 	@IsNotEmpty()
 	username: string;
 
-	avatar: string;
+	@IsString()
+	@IsOptional()
+	avatar?: string;
 }
 
 export class LogDto {
@@ -29,5 +32,6 @@ export class LogDto {
 	password: string;
 
 	@IsString()
-	twoFactor: string;
+	@IsOptional()
+	twoFactor?: string;
 }
