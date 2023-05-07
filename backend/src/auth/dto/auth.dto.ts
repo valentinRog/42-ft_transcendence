@@ -27,4 +27,7 @@ export class LogDto {
 	@IsString()
 	@IsNotEmpty()
 	password: string;
+
+	@IsString()
+	twoFactor: string;
 }

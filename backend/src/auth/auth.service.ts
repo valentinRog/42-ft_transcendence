@@ -6,6 +6,8 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
 import { AuthDto, LogDto } from './dto';
+import * as speakeasy from 'speakeasy';
+import { UnauthorizedException } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
@@ -41,7 +43,6 @@ export class AuthService {
 	}
 
 	async signup(dto: AuthDto) {
-		// generate the password hash
 		const hash = await argon.hash(dto.password);
 		try {
 		  const user = await this.prisma.user.create({
@@ -64,18 +65,24 @@ export class AuthService {
 	async signin(dto: LogDto) {
 		const user = await this.prisma.user.findUnique({ where: { login: dto.login} });
 		if (!user)
-			throw new ForbiddenException('credentials incorrect');
-
+			throw new ForbiddenException('please signup first');
+		if (user.logFrom42)
+			throw new ForbiddenException('please login with 42');
 		const pwMatches = await argon.verify(user.hash, dto.password);
 		if (!pwMatches)
 			throw new ForbiddenException('credentials incorrect');
+		if (user.twoFactorEnabled)
+			return this.is2faCodeValid(user, dto.twoFactor);
 		return this.signToken(user.id, user.login);
 	}
 
-	async signToken( userId: number, login: string): Promise<{ access_token: string }> {
+	async signToken( userId: number, login: string, twoFactor : boolean = false, isTwoFactorAuthenticated : boolean = false):
+		Promise<{ access_token: string }> {
 		const payload = {
 		  sub: userId,
 		  login,
+		  twoFactor,
+		  isTwoFactorAuthenticated,
 		};
 		const token = await this.jwt.signAsync(
 		  payload,
@@ -87,4 +94,18 @@ export class AuthService {
 		console.log('token', token);
 		return { access_token: token};
 	}
+
+	async is2faCodeValid(user : User, code : String) {
+		const isCodeValid = speakeasy.totp.verify({
+			secret: user.twoFactorAuthSecret,
+			encoding: 'base32',
+			token: code, // the user's 2FA code entered in the frontend
+			window: 1 // optional: number of 30-second windows to check before/after the current time
+		});
+		if (!isCodeValid) {
+			throw new UnauthorizedException('Wrong authentication code');
+		}
+		return await this.signToken(user.id, user.login, true, true);
+	}
+
 }

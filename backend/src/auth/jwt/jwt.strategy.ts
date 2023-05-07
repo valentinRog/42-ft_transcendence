@@ -14,10 +14,17 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   super({ jwtFromRequest:
 	ExtractJwt.fromExtractors([
 		ExtractJwt.fromAuthHeaderAsBearerToken(),
-		ExtractJwt.fromUrlQueryParameter('token')]),secretOrKey: config.get('JWT_SECRET') , });
+		ExtractJwt.fromUrlQueryParameter('token')]),secretOrKey: config.get('JWT_SECRET')});
 	}
 
-  async validate(payload: { sub: number; login: string; }) {
-    return await this.prisma.user.findUnique({ where: { login: payload.login}});
+  async validate(payload: { sub: number; login: string; isTwoFactorAuthenticated: boolean; }) {
+    const user = await this.prisma.user.findUnique({ where: { login: payload.login}});
+
+	if (!user.twoFactorEnabled) {
+		return user;
+	}
+	if (payload.isTwoFactorAuthenticated) {
+		return user;
+	}
   }
 }
