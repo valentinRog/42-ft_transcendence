@@ -5,10 +5,11 @@ import { FortyTwoStrategy } from './auth.strategy';
 import { TwoFactorController } from './2fa/2fa.controller';
 import { JwtStrategy } from './jwt/jwt.strategy';
 import { JwtModule } from '@nestjs/jwt';
+import { UserService } from '../user/user.service';
 
 @Module({
   imports: [JwtModule.register({})],
   controllers: [AuthController, TwoFactorController],
-  providers: [AuthService, FortyTwoStrategy, JwtStrategy],
+  providers: [AuthService, FortyTwoStrategy, JwtStrategy, UserService],
 })
 export class AuthModule {}

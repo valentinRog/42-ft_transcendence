@@ -15,8 +15,11 @@ export class UserService {
         ...dto,
       },
     });
-
     delete user.hash;
     return user;
+  }
+
+  async findUser(login: string) {
+    return this.prisma.user.findUnique({ where: { login: login } });
   }
 }

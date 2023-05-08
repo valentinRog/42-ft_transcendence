@@ -8,6 +8,7 @@ import * as argon from 'argon2';
 import { AuthDto, LogDto } from './dto';
 import * as speakeasy from 'speakeasy';
 import { UnauthorizedException } from '@nestjs/common';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
@@ -15,10 +16,11 @@ export class AuthService {
     private prisma: PrismaService,
     private config: ConfigService,
     private jwt: JwtService,
+    private userService: UserService,
   ) {}
 
   async findOrCreate(user: any) {
-    const prisma_user = await this.prisma.findUser(user.login);
+    const prisma_user = await this.userService.findUser(user.login);
 
     if (!prisma_user) {
       return this.signup42(user);
@@ -70,15 +72,15 @@ export class AuthService {
   }
 
   async signin(dto: LogDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { login: dto.login },
-    });
-    if (!user) throw new ForbiddenException('please signup first');
-    if (user.logFrom42) throw new ForbiddenException('please login with 42');
-    const pwMatches = await argon.verify(user.hash, dto.password);
+    const prisma_user = await this.userService.findUser(dto.login);
+    if (!prisma_user) throw new ForbiddenException('please signup first');
+    if (prisma_user.logFrom42)
+      throw new ForbiddenException('please login with 42');
+    const pwMatches = await argon.verify(prisma_user.hash, dto.password);
     if (!pwMatches) throw new ForbiddenException('credentials incorrect');
-    if (user.twoFactorEnabled) return this.is2faCodeValid(user, dto.twoFactor);
-    return this.signToken(user.id, user.login);
+    if (prisma_user.twoFactorEnabled)
+      return this.is2faCodeValid(prisma_user, dto.twoFactor);
+    return this.signToken(prisma_user.id, prisma_user.login);
   }
 
   async signToken(
