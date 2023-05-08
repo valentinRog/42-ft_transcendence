@@ -7,26 +7,23 @@ import { User } from '@prisma/client';
 
 @Controller()
 export class AppController {
-	constructor(private readonly appService: AppService) { }
+  constructor(private readonly appService: AppService) {}
 
-	@Get()
-	getHome() {
-		return 'Please Log in';
-	}
+  @Get()
+  getHome() {
+    return 'Please Log in';
+  }
 
-	@UseGuards(JwtGuard)
-	@Get('home')
-	getHomeLog(@GetUser() user: User) { // test get only login
-		return 'Welcome back, ' + user.login;
-	}
+  @UseGuards(JwtGuard)
+  @Get('home')
+  getHomeLog(@GetUser() user: User) {
+    // test get only login
+    return 'Welcome back, ' + user.login;
+  }
 
-	@UseGuards(JwtGuard)
-	@Get('me')
-	getMe(@GetUser() user: User) {
-		return user;
-	}
-
+  @UseGuards(JwtGuard)
+  @Get('me')
+  getMe(@GetUser() user: User) {
+    return user;
+  }
 }
-
-
-
