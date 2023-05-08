@@ -30,7 +30,6 @@ export class FortyTwoStrategy extends PassportStrategy(
         login: login,
         username: login,
         avatar: image.link,
-        accesstoken: accessToken,
       };
       done(null, user);
     } catch (err) {

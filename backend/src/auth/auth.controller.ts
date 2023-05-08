@@ -29,7 +29,6 @@ export class AuthController {
   async fortyTwoAuthCallback(@Req() request, @Res() response) {
     try {
       const user = await this.authService.findOrCreate(request.user);
-      console.log(request.user);
       const token = await this.authService.signToken(user.id, user.login);
       response.redirect(
         'http://localhost:3000/home' + '?token=' + token.access_token,

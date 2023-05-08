@@ -30,11 +30,15 @@ export class AuthService {
 
   async signup42(dto: AuthDto) {
     try {
+      const avatar_path = await this.userService.saveImageFromUrl(
+        dto.avatar,
+        dto.login,
+      );
       return await this.prisma.user.create({
         data: {
           login: dto.login,
           username: dto.username,
-          avatar: dto.avatar,
+          avatar: avatar_path,
           logFrom42: true,
         },
       });

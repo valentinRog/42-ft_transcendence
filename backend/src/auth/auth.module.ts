@@ -6,9 +6,10 @@ import { TwoFactorController } from './2fa/2fa.controller';
 import { JwtStrategy } from './jwt/jwt.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [JwtModule.register({})],
+  imports: [JwtModule.register({}), HttpModule],
   controllers: [AuthController, TwoFactorController],
   providers: [AuthService, FortyTwoStrategy, JwtStrategy, UserService],
 })
