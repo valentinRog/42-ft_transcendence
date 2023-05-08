@@ -11,9 +11,9 @@ import { UnauthorizedException } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
-	constructor( private prisma: PrismaService,
-				 private config: ConfigService,
-				 private jwt: JwtService ) {}
+	constructor(private prisma: PrismaService,
+		private config: ConfigService,
+		private jwt: JwtService) { }
 
 	async findOrCreate(user: any): Promise<User> {
 
@@ -26,7 +26,7 @@ export class AuthService {
 		//	return this.update(user);
 		//}
 		return prisma_user;
-	  }
+	}
 
 	async signup42(dto: AuthDto): Promise<User> {
 		try {
@@ -34,7 +34,7 @@ export class AuthService {
 		}
 		catch (error) {
 			if (error instanceof PrismaClientKnownRequestError) {
-				if ( error.code == 'P2002') {
+				if (error.code == 'P2002') {
 					throw new ForbiddenException('user already exists');
 				}
 			}
@@ -45,25 +45,25 @@ export class AuthService {
 	async signup(dto: AuthDto) {
 		const hash = await argon.hash(dto.password);
 		try {
-		  const user = await this.prisma.user.create({
-			data: {
-			  login: dto.login,
-			  username: dto.username,
-			  avatar: dto.avatar,
-			  hash : hash,
-			},
-		  });
-		  return this.signToken(user.id, user.login);
+			const user = await this.prisma.user.create({
+				data: {
+					login: dto.login,
+					username: dto.username,
+					avatar: dto.avatar,
+					hash: hash,
+				},
+			});
+			return this.signToken(user.id, user.login);
 		} catch (error) {
-		  if ( error instanceof PrismaClientKnownRequestError && error.code === 'P2002') {
-			  throw new ForbiddenException('credentials taken');
+			if (error instanceof PrismaClientKnownRequestError && error.code === 'P2002') {
+				throw new ForbiddenException('credentials taken');
 			}
 			throw error;
 		}
 	}
 
 	async signin(dto: LogDto) {
-		const user = await this.prisma.user.findUnique({ where: { login: dto.login} });
+		const user = await this.prisma.user.findUnique({ where: { login: dto.login } });
 		if (!user)
 			throw new ForbiddenException('please signup first');
 		if (user.logFrom42)
@@ -76,26 +76,26 @@ export class AuthService {
 		return this.signToken(user.id, user.login);
 	}
 
-	async signToken( userId: number, login: string, twoFactor : boolean = false, isTwoFactorAuthenticated : boolean = false):
+	async signToken(userId: number, login: string, twoFactor: boolean = false, isTwoFactorAuthenticated: boolean = false):
 		Promise<{ access_token: string }> {
 		const payload = {
-		  sub: userId,
-		  login,
-		  twoFactor,
-		  isTwoFactorAuthenticated,
+			sub: userId,
+			login,
+			twoFactor,
+			isTwoFactorAuthenticated,
 		};
 		const token = await this.jwt.signAsync(
-		  payload,
-		  {
-			expiresIn: '1d',
-			secret: this.config.get('JWT_SECRET'),
-		  },
+			payload,
+			{
+				expiresIn: '1d',
+				secret: this.config.get('JWT_SECRET'),
+			},
 		);
 		console.log('token', token);
-		return { access_token: token};
+		return { access_token: token };
 	}
 
-	async is2faCodeValid(user : User, code : String) {
+	async is2faCodeValid(user: User, code: String) {
 		const isCodeValid = speakeasy.totp.verify({
 			secret: user.twoFactorAuthSecret,
 			encoding: 'base32',

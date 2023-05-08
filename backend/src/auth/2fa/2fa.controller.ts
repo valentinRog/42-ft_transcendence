@@ -1,13 +1,13 @@
 import { Controller, Post, UseGuards, Req, HttpCode, HttpStatus } from '@nestjs/common';
 import * as speakeasy from 'speakeasy';
 import { PrismaService } from './../../prisma/prisma.service';
-import { JwtGuard} from '../guard';
+import { JwtGuard } from '../guard';
 import { GetUser } from '../decorator';
 import { User } from '@prisma/client';
 
 @Controller('2fa')
 export class TwoFactorController {
-	constructor(private readonly prisma : PrismaService) {}
+	constructor(private readonly prisma: PrismaService) { }
 
 	@Post('enable')
 	@UseGuards(JwtGuard)
@@ -31,7 +31,7 @@ export class TwoFactorController {
 
 		// 5. Update the user's account record in the database
 		user.twoFactorEnabled = true;
-		await this.prisma.user.update({ where: { login: user.login}, data: user });
+		await this.prisma.user.update({ where: { login: user.login }, data: user });
 		return user;
 	}
 

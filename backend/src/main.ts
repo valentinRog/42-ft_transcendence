@@ -5,13 +5,13 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
-	app.useGlobalPipes(new ValidationPipe( { whitelist: true }));
+	app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 	app.use(
-	session({
-		secret: 'my-secret-key',
-		resave: false,
-		saveUninitialized: false
-	}),
+		session({
+			secret: 'my-secret-key',
+			resave: false,
+			saveUninitialized: false
+		}),
 	);
 
 	await app.listen(3000);

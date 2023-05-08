@@ -8,16 +8,16 @@ import { AuthDto } from './../auth/dto';
 export class PrismaService extends PrismaClient {
 	constructor(private readonly configService: ConfigService) {
 		super(
-			{ datasources : { db : { url : configService.get('DATABASE_URL') } } }
+			{ datasources: { db: { url: configService.get('DATABASE_URL') } } }
 		);
 	}
 
 	async createUser(dto: AuthDto): Promise<User> {
-		return await this.user.create({ data: this.convertToPrismaUser(dto)});
+		return await this.user.create({ data: this.convertToPrismaUser(dto) });
 	}
 
 	async update(dto: AuthDto): Promise<User> {
-		return this.user.update({ where: { login: dto.login}, data: this.convertToPrismaUser(dto) });
+		return this.user.update({ where: { login: dto.login }, data: this.convertToPrismaUser(dto) });
 	}
 
 	async findUser(login: string): Promise<User> {
@@ -36,16 +36,16 @@ export class PrismaService extends PrismaClient {
 			avatar: dto.avatar || null,
 			status: dto.status,
 			twoFactorEnabled: dto.twoFactorEnabled,
-			twoFactorAuthSecret : dto.twoFactorAuthSecret || null,
+			twoFactorAuthSecret: dto.twoFactorAuthSecret || null,
 			friends: dto.friends || [],
-		  };
+		};
 		return prismaUser;
 	}
 
 	cleanDb() {
 		return this.$transaction([
-		  this.stat.deleteMany(),
-		  this.user.deleteMany(),
+			this.stat.deleteMany(),
+			this.user.deleteMany(),
 		]);
-	  }
+	}
 }
