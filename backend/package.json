@@ -6,15 +6,14 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-	"docker:start": "sudo service docker start",
+    "docker:start": "sudo service docker start",
     "prisma:dev:deploy": "prisma migrate deploy && prisma generate",
     "db:dev:rm": "docker-compose down",
     "db:dev:up": "docker-compose up -d dev-db",
     "db:dev:restart": "npm run db:dev:rm && npm run db:dev:up",
-
+    "prisma:test:deploy": "dotenv -e .env.test -- prisma migrate deploy && prisma generate",
     "db:test:up": "docker-compose up -d test-db",
     "db:test:restart": "npm run db:dev:rm && npm run db:test:up",
-
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -26,7 +25,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --watch --config ./test/jest-e2e.json"
+    "test:e2e": "dotenv -e .env.test -- jest --watch --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@nestjs/axios": "^2.0.0",
@@ -42,6 +41,9 @@
     "axios": "^1.4.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
+    "cli": "^1.0.1",
+    "dotenv": "^16.0.3",
+    "dotenv-cli": "^7.2.1",
     "express-session": "^1.17.3",
     "pactum": "^3.4.0",
     "passport": "^0.6.0",
