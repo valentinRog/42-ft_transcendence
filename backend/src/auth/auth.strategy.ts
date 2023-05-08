@@ -25,13 +25,11 @@ export class FortyTwoStrategy extends PassportStrategy(
     done: any,
   ) {
     try {
-      const { login, image, phone } = profile._json;
+      const { login, image } = profile._json;
       const user = {
         login: login,
-        logFrom42: true,
         username: login,
         avatar: image.link,
-        phone: phone,
         accesstoken: accessToken,
       };
       done(null, user);

@@ -17,21 +17,25 @@ export class AuthService {
     private jwt: JwtService,
   ) {}
 
-  async findOrCreate(user: any): Promise<User> {
+  async findOrCreate(user: any) {
     const prisma_user = await this.prisma.findUser(user.login);
 
     if (!prisma_user) {
       return this.signup42(user);
     }
-    //else {
-    //	return this.update(user);
-    //}
     return prisma_user;
   }
 
-  async signup42(dto: AuthDto): Promise<User> {
+  async signup42(dto: AuthDto) {
     try {
-      return this.prisma.createUser(dto);
+      return await this.prisma.user.create({
+        data: {
+          login: dto.login,
+          username: dto.username,
+          avatar: dto.avatar,
+          logFrom42: true,
+        },
+      });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code == 'P2002') {
