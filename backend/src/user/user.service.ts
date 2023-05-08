@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EditUserDto } from './dto';
-import * as axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { createWriteStream } from 'fs';
 import { HttpService } from '@nestjs/axios';
