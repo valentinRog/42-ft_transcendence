@@ -1,5 +1,15 @@
 <script lang="ts">
-    import '$lib/style/style.scss'
+	import '$lib/style/style.scss';
+	import { token } from '$lib/stores/stores';
 </script>
 
-<slot></slot>
+{#if $token}
+	<p>{$token}</p>
+{:else}
+	<a href="login">login / signup</a>
+{/if}
+
+<slot />
+
+<style lang="scss">
+</style>
