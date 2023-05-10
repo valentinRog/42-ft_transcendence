@@ -9,6 +9,9 @@
 	<a href="login">login / signup</a>
 {/if}
 
+<a href="/">home</a>
+<a href="lrondia">louise</a>
+
 <slot />
 
 <style lang="scss">
