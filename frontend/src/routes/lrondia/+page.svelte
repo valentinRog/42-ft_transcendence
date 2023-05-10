@@ -1,8 +1,6 @@
 <h1>louise</h1>
 
 <style lang="scss">
-	@import '$lib/style/var';
-
 	:global(body) {
 		background-color: $background;
 	}
