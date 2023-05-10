@@ -37,7 +37,8 @@
 	<input type="submit" value="Sign Up" />
 </form>
 
-<form on:submit={handleSubmit}
+<form
+	on:submit={handleSubmit}
 	action="http://localhost:3000/auth/signin"
 	method="post"
 	enctype="application/x-www-form-urlencoded"

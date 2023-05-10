@@ -1,1 +1,1 @@
-console.log('Hello from +layout.ts')
+console.log('Hello from +layout.ts');
