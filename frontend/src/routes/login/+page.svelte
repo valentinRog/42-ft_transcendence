@@ -2,6 +2,17 @@
 	import { token } from '$lib/stores/stores';
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
+
+	onMount(() => {
+		if ($token) goto('/');
+		if ($page.url.searchParams.get('token')) {
+			$token = $page.url.searchParams.get('token');
+			if (browser) localStorage.setItem('token', $token!);
+			goto('/');
+		}
+	});
 
 	function handleSubmit(event: Event) {
 		const form = event.target as HTMLFormElement;

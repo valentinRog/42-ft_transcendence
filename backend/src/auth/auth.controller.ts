@@ -31,7 +31,7 @@ export class AuthController {
       const user = await this.authService.findOrCreate(request.user);
       const token = await this.authService.signToken(user.id, user.login);
       response.redirect(
-        'http://localhost:5173/home' + '?token=' + token.access_token,
+        'http://localhost:5173/login' + '?token=' + token.access_token,
       );
     } catch (err) {
       // Handle the error
