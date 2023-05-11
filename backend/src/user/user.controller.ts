@@ -29,16 +29,8 @@ export class UserController {
     return this.userService.editUser(userId, dto);
   }
 
+  @UseInterceptors(FileInterceptor('file'))
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
-
-    this.userService.saveImageFromBuffer(file, file.originalname);
-  }
-
-  @UseInterceptors(FileInterceptor('file'))
-  @Post('upload/pass-validation')
   uploadFileAndPassValidation(
     @GetUser('login') login,
     @UploadedFile(
