@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Post,
-  UseGuards,
-  Req,
-  HttpCode,
-  HttpStatus,
-} from '@nestjs/common';
+import { Controller, Post, UseGuards } from '@nestjs/common';
 import * as speakeasy from 'speakeasy';
 import { PrismaService } from './../../prisma/prisma.service';
 import { JwtGuard } from '../guard';
