@@ -38,33 +38,42 @@
 				margin-left: 0.3rem;
 
 				& > a {
-					background-color: white;
+					background-color: rgb(192,192,192);
 					color: inherit;
 					font-size: 1.2rem;
 					margin-right: 0.5rem;
 					text-decoration: none;
 					display: inline-block;
-					padding: 0.3rem 2.5rem;
+					padding: 0.2rem 2.5rem;
 					position: relative; // Ajoutez une position relative pour positionner l'ombre
-					
+					border-style: solid;
+					border-right-color: black;
+					border-bottom-color: black;
+					border-left-color: white;
+					border-top-color: white;
+					border-right-width: 0.2rem;
+					border-bottom-width: 0.2rem;
+					border-left-width: 0.2rem;
+					border-top-width: 0.2rem;
+					// border: 0.2rem solid red;
+					// border-width: 0.2rem 0 0 0.2rem;
+
 					&:hover {
 						text-decoration: underline;
 					}
-
-					&::before {
-						content: '';
-						position: absolute;
-						bottom: -0.1rem;
-						right: 0rem;
-						width: 100%;
-						height: 0.15rem;
-						background-color: rgb(0, 0, 0);
-					}
-					
+					// &::before {
+					// 	content: '';
+					// 	position: absolute;
+					// 	bottom: -0.1rem;
+					// 	right: 0rem;
+					// 	width: 100%;
+					// 	height: 0.15rem;
+					// 	background-color: rgb(0, 0, 0);
+					// }
 					&::after {
 						content: '';
 						position: absolute;
-						bottom: 0.05rem;
+						bottom: 0;
 						right: 0;
 						width: 100%;
 						height: 0.15rem;
