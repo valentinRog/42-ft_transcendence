@@ -53,3 +53,5 @@
 	<input type="password" id="password" name="password" placeholder="password" />
 	<input type="submit" value="Signin" />
 </form>
+
+<a href="http://localhost:3000/auth/42login">login with 42</a>
