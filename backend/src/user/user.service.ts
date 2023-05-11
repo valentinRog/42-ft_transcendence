@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UploadedFile } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EditUserDto } from './dto';
 import { ConfigService } from '@nestjs/config';
 import { createWriteStream } from 'fs';
 import { HttpService } from '@nestjs/axios';
 import UPLOAD_PATH from '../../config/upload-path';
+import * as fs from 'fs';
 
 @Injectable()
 export class UserService {
@@ -52,5 +53,22 @@ export class UserService {
         reject(`Failed to download image from ${url}`);
       });
     });
+  }
+
+  async saveImageFromBuffer(
+    @UploadedFile() file: Express.Multer.File,
+    fileName: string,
+  ) {
+    const fileNamePath = fileName;
+    await fs.promises.writeFile(UPLOAD_PATH + fileNamePath, file.buffer);
+
+    return {
+      message: 'File uploaded successfully',
+      file: {
+        originalName: file.originalname,
+        size: file.size,
+        fileName: fileNamePath,
+      },
+    };
   }
 }

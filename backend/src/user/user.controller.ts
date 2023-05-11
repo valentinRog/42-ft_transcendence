@@ -7,6 +7,9 @@ import {
   Post,
   UploadedFile,
   UseInterceptors,
+  ParseFilePipe,
+  FileTypeValidator,
+  MaxFileSizeValidator,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { GetUser } from '../auth/decorator';
@@ -34,5 +37,32 @@ export class UserController {
   @UseInterceptors(FileInterceptor('file'))
   uploadFile(@UploadedFile() file: Express.Multer.File) {
     console.log(file);
+
+    this.userService.saveImageFromBuffer(file, file.originalname);
+  }
+
+  @UseInterceptors(FileInterceptor('file'))
+  @Post('upload/pass-validation')
+  uploadFileAndPassValidation(
+    @GetUser('login') login,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 10000000 }),
+          new FileTypeValidator({ fileType: /(jpg|jpeg|png)$/ }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    return this.userService.saveImageFromBuffer(file, login + '.png');
+    //return {
+    //  message: 'File uploaded successfully',
+    //  file: {
+    //    originalName: file.originalname,
+    //    size: file.size,
+    //    filePath: file.path,
+    //  },
+    //};
   }
 }
