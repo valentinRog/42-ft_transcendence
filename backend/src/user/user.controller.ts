@@ -25,10 +25,6 @@ import { PrismaClient } from '@prisma/client';
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService, private prisma: PrismaClient) {}
-  @Get('me')
-  getMe(@GetUser() user: User) {
-    return user;
-  }
 
   @Patch()
   editUser(@GetUser('id') userId: number, @Body() dto: EditUserDto) {
@@ -70,5 +66,17 @@ export class UserController {
     if (!prisma_friend) throw new ForbiddenException('User not found');
 
     return this.userService.addFriend(userName, prisma_friend.id);
+  }
+
+  @Patch('remove-friend')
+  async removeFriend(@GetUser('username') userName, @Body() friendBody) {
+    if (userName == friendBody.friend)
+      throw new ForbiddenException('You cannot remove yourself as a friend');
+    const prisma_friend = await this.prisma.user.findUnique({
+      where: { username: friendBody.friend },
+    });
+    if (!prisma_friend) throw new ForbiddenException('User not found');
+
+    return this.userService.removeFriend(userName, prisma_friend.id);
   }
 }

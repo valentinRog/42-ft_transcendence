@@ -32,16 +32,41 @@ export class UserService {
     return this.prisma.user.findUnique({ where: { login: login } });
   }
 
-  async addFriend(userName: string, friendId: number) {
-    let user = await this.prisma.user.findUnique({
+  async findFriend(userName: string, friendId: number): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({
       where: { username: userName },
     });
-    if (user.friends.includes(friendId)) {
+    return user.friends.includes(friendId);
+  }
+
+  async addFriend(userName: string, friendId: number) {
+    if (await this.findFriend(userName, friendId)) {
       throw new ForbiddenException('User already in friends list');
     }
-    user = await this.prisma.user.update({
+    const user = await this.prisma.user.update({
       where: { username: userName },
       data: { friends: { push: friendId } },
+    });
+    delete user.hash;
+    return user;
+  }
+
+  async removeFriend(userName: string, friendId: number) {
+    if (!(await this.findFriend(userName, friendId))) {
+      throw new ForbiddenException('User not in friends list');
+    }
+    const user = await this.prisma.user.update({
+      where: { username: userName },
+      data: {
+        friends: {
+          set: (
+            await this.prisma.user.findUnique({
+              where: { username: userName },
+              select: { friends: true },
+            })
+          ).friends.filter((id) => id !== friendId),
+        },
+      },
     });
     delete user.hash;
     return user;
