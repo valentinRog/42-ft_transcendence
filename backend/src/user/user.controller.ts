@@ -10,6 +10,7 @@ import {
   ParseFilePipe,
   FileTypeValidator,
   MaxFileSizeValidator,
+  ForbiddenException,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { GetUser } from '../auth/decorator';
@@ -18,11 +19,12 @@ import { EditUserDto } from './dto';
 import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
+import { PrismaClient } from '@prisma/client';
 
 @UseGuards(JwtGuard)
 @Controller('users')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private prisma: PrismaClient) {}
   @Get('me')
   getMe(@GetUser() user: User) {
     return user;
@@ -56,13 +58,17 @@ export class UserController {
     file: Express.Multer.File,
   ) {
     return this.userService.saveImageFromBuffer(file, login + '.png');
-    //return {
-    //  message: 'File uploaded successfully',
-    //  file: {
-    //    originalName: file.originalname,
-    //    size: file.size,
-    //    filePath: file.path,
-    //  },
-    //};
+  }
+
+  @Patch('add-friend')
+  async addFriend(@GetUser('username') userName, @Body() friendBody) {
+    if (userName == friendBody.friend)
+      throw new ForbiddenException('You cannot add yourself as a friend');
+    const prisma_friend = await this.prisma.user.findUnique({
+      where: { username: friendBody.friend },
+    });
+    if (!prisma_friend) throw new ForbiddenException('User not found');
+
+    return this.userService.addFriend(userName, prisma_friend.id);
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable, UploadedFile } from '@nestjs/common';
+import { Injectable, UploadedFile, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EditUserDto } from './dto';
 import { ConfigService } from '@nestjs/config';
@@ -30,6 +30,21 @@ export class UserService {
 
   async findUser(login: string) {
     return this.prisma.user.findUnique({ where: { login: login } });
+  }
+
+  async addFriend(userName: string, friendId: number) {
+    let user = await this.prisma.user.findUnique({
+      where: { username: userName },
+    });
+    if (user.friends.includes(friendId)) {
+      throw new ForbiddenException('User already in friends list');
+    }
+    user = await this.prisma.user.update({
+      where: { username: userName },
+      data: { friends: { push: friendId } },
+    });
+    delete user.hash;
+    return user;
   }
 
   async saveImageFromUrl(url: string, fileName: string): Promise<string> {
