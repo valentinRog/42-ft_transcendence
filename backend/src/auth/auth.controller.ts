@@ -27,18 +27,14 @@ export class AuthController {
   @UseGuards(LoginGuard)
   @Get('42login/callback')
   async fortyTwoAuthCallback(@GetUser() user, @Res() response) {
-    try {
-      const prisma_user = await this.authService.findOrCreate(user);
-      const token = await this.authService.signToken(
-        prisma_user.id,
-        prisma_user.login,
-      );
-      response.redirect(
-        'http://localhost:3000/home' + '?token=' + token.access_token,
-      );
-    } catch (error) {
-      throw error;
-    }
+    const prisma_user = await this.authService.findOrCreate(user);
+    const token = await this.authService.signToken(
+      prisma_user.id,
+      prisma_user.login,
+    );
+    response.redirect(
+      'http://localhost:3000/home' + '?token=' + token.access_token,
+    );
   }
 
   @Post('signup')
