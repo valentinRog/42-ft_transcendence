@@ -17,4 +17,11 @@ body {
 	background-color: $background;
 	font-family: $font;
 	color: $font-color;
+	width: 100vw;
+	height: 100vh;
+	cursor: url('/mouse2.png'), auto;
+}
+
+a:hover {
+	cursor: url('/click2.png'), auto;
 }
