@@ -10,6 +10,7 @@ import {
   FileTypeValidator,
   MaxFileSizeValidator,
   ForbiddenException,
+  Get,
 } from '@nestjs/common';
 import { GetUser } from '../auth/decorator';
 import { JwtGuard } from '../auth/guard';
@@ -24,7 +25,12 @@ import { PrismaClient } from '@prisma/client';
 export class UserController {
   constructor(private userService: UserService, private prisma: PrismaClient) {}
 
-  @Patch()
+  @Get('me')
+  getMe(@GetUser() user) {
+    return user;
+  }
+
+  @Patch('edit')
   editUser(@GetUser('id') userId: number, @Body() dto: EditUserDto) {
     return this.userService.editUser(userId, dto);
   }

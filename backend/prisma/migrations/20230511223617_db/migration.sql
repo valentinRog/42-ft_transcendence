@@ -8,7 +8,7 @@ CREATE TABLE "User" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "avatar" TEXT,
-    "status" TEXT NOT NULL DEFAULT 'active',
+    "status" TEXT NOT NULL DEFAULT 'online',
     "twoFactorEnabled" BOOLEAN NOT NULL DEFAULT false,
     "twoFactorAuthSecret" TEXT,
     "friends" INTEGER[] DEFAULT ARRAY[]::INTEGER[],
