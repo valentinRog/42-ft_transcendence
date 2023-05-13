@@ -1,4 +1,7 @@
-<svelte:head>
+
+<h1>louise</h1>
+<p>hellooooooooooo</p>
+<!-- <svelte:head>
 	<style lang="scss">
 		body {
 			background-color: $background;
@@ -28,7 +31,10 @@
 				<img src="/pong.png" alt="pong">	
 				Pong
 			</a>
-			<a href="/lrondia">Contact</a>
+			<a href="/lrondia">
+				<img src="/mail.png" alt="chat">	
+				Chat
+			</a>
 		</div>
 	</div>
 </nav>
@@ -47,18 +53,12 @@
 		width: 100%;
 		display: flex;
 		align-items: center;
-		border-style: solid;
-		border-width: $line-width 0 0 0;
-		border-top-color: $light-grey;
 
-		&::after {
-			content: '';
-			position: absolute;
-			top: 0rem;
-			right: 0rem;
-			width: 100%;
-			height: 0.1rem;
-			background-color: white;
+		//navbar grey border
+		@include nav-border;
+
+		&::after { //white line under grey border (a bit too thin ?)
+			@include nav-top-line;
 		}
 
 		.navbar-menu {
@@ -75,55 +75,32 @@
 					width: 15rem;
 					padding: 0.2rem 0.8rem;
 					position: relative;
-					border-style: solid;
-					border-right-color: black;
-					border-bottom-color: black;
-					border-left-color: white;
-					border-top-color: white;
-					border-right-width: $line-width;
-					border-bottom-width: $line-width;
-					border-left-width: $line-width;
-					border-top-width: $line-width;
+
+					//border around the navbar element in outside mode
+					@include tab-outside-border;
 					
-					&:active {
-						border-right-color: white;
-						border-bottom-color: white;
-						border-left-color: black;
-						border-top-color: black;
+					&:active { //inverts colors when clicked on
+						@include tab-inside-border;
 					}
 
-					&::before {
-						content: '';
-						position: absolute;
-						top: 0rem;
-						right: 0rem;
-						width: 100%;
-						height: $line-width;
-						background-color: $light-grey;
+					&::before { // line that's light grey nex to the white border when in outside mode
+						@include tab-outside-top-line;
 					}
-
-					&:active::before {
-						background-color: $dark-grey;
+					
+					&:active::before { // changes color when clicked on
+						@include tab-inside-top-line;
 					}
-
-					&::after {
-						content: '';
-						position: absolute;
-						bottom: 0;
-						right: 0;
-						width: 100%;
-						height: $line-width;
-						background-color: $dark-grey;
+					
+					&::after { // line that's dark grey next to the black border when in outside mode
+						@include tab-outside-bottom-line;
 					}
-
-					&:active::after {
-						background-color: $light-grey;
+				
+					&:active::after { //changes color when clicked on
+						@include tab-inside-bottom-line;
 					}
 
 					img {
-						width: 1.4rem;
-						vertical-align: sub;
-						margin-right: 0.4rem;
+						@include tab-logo;
 					}
 				}
 
@@ -156,4 +133,4 @@
 		}
 	}
 
-</style>
+</style> -->
