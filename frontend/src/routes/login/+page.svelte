@@ -1,9 +1,20 @@
 <script lang="ts">
 	import { token } from '$lib/stores/stores';
 	import { browser } from '$app/environment';
+	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
+
+	onMount(() => {
+		if ($token) goto('/');
+		if ($page.url.searchParams.get('token')) {
+			$token = $page.url.searchParams.get('token');
+			if (browser) localStorage.setItem('token', $token!);
+			goto('/');
+		}
+	});
 
 	function handleSubmit(event: Event) {
-		event.preventDefault();
 		const form = event.target as HTMLFormElement;
 		const data = new FormData(form);
 		const body = new URLSearchParams(data);
@@ -20,13 +31,14 @@
 				if (!res.access_token) return;
 				$token = res.access_token;
 				if (browser) localStorage.setItem('token', res.access_token);
+				goto('/');
 			})
 			.catch((err) => console.log(err));
 	}
 </script>
 
 <form
-	on:submit={handleSubmit}
+	on:submit|preventDefault={handleSubmit}
 	action="http://localhost:3000/auth/signup"
 	method="post"
 	enctype="application/x-www-form-urlencoded"
@@ -41,7 +53,7 @@
 </form>
 
 <form
-	on:submit={handleSubmit}
+	on:submit|preventDefault={handleSubmit}
 	action="http://localhost:3000/auth/signin"
 	method="post"
 	enctype="application/x-www-form-urlencoded"
@@ -52,3 +64,5 @@
 	<input type="password" id="password" name="password" placeholder="password" />
 	<input type="submit" value="Signin" />
 </form>
+
+<a href="http://localhost:3000/auth/42login">login with 42</a>

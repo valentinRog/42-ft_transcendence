@@ -59,7 +59,6 @@ export class AuthService {
         data: {
           login: dto.login,
           username: dto.username,
-          avatar: dto.avatar,
           hash: hash,
         },
       });
