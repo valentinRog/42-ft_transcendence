@@ -6,63 +6,38 @@
 	border-top-color: $light-grey;
 }
 
-@mixin nav-top-line {
-	content: '';
-	position: absolute;
-	top: 0rem;
-	right: 0rem;
-	width: 100%;
-	height: 0.1rem;
-	background-color: white;
-}
-
 // --------------- TAB ------------------
 
-@mixin tab-outside-border {
+@mixin tab-border($right-bottom: black, $left-top: white) {
 	border-style: solid;
-	border-right-color: black;
-	border-bottom-color: black;
-	border-left-color: white;
-	border-top-color: white;
+	border-right-color: $right-bottom;
+	border-bottom-color: $right-bottom;
+	border-left-color: $left-top;
+	border-top-color: $left-top;
 	border-right-width: $line-width;
 	border-bottom-width: $line-width;
 	border-left-width: $line-width;
 	border-top-width: $line-width;
 }
 
-@mixin tab-inside-border {
-	border-right-color: white;
-	border-bottom-color: white;
-	border-left-color: black;
-	border-top-color: black;
-}
-
-@mixin tab-outside-top-line {
+@mixin tab-top-line($color: $light-grey) {
 	content: '';
 	position: absolute;
 	top: 0rem;
 	right: 0rem;
 	width: 100%;
 	height: $line-width;
-	background-color: $light-grey;
+	background-color: $color;
 }
 
-@mixin tab-inside-top-line {
-	background-color: $dark-grey;
-}
-
-@mixin tab-outside-bottom-line {
+@mixin tab-bottom-line($color: $dark-grey) {
 	content: '';
 	position: absolute;
 	bottom: 0;
 	right: 0;
 	width: 100%;
 	height: $line-width;
-	background-color: $dark-grey;
-}
-					
-@mixin tab-inside-bottom-line {
-	background-color: $light-grey;
+	background-color: $color;
 }
 
 @mixin tab-logo {

@@ -49,8 +49,8 @@
 <svelte:head>
 	<style lang="scss">
 		
-		$navbar-height: 2.7rem;
-		$line-width: 0.15rem;
+		$navbar-height: 2.5rem;
+		$line-width: 0.1rem;
 		
 	body {
 		background-color: $background;
@@ -69,8 +69,8 @@
 		//navbar grey border
 		@include nav-border;
 
-		&::after { //white line under grey border (a bit too thin ?)
-			@include nav-top-line;
+		&::after {
+			@include tab-top-line(white);
 		}
 
 		.navbar-menu {
@@ -89,26 +89,26 @@
 					position: relative;
 
 					//border around the navbar element in outside mode
-					@include tab-outside-border;
+					@include tab-border(black, white);
 					
 					&:active { //inverts colors when clicked on
-						@include tab-inside-border;
+						@include tab-border(white, black);
 					}
 
 					&::before { // line that's light grey nex to the white border when in outside mode
-						@include tab-outside-top-line;
+						@include tab-top-line($light-grey);
 					}
 					
 					&:active::before { // changes color when clicked on
-						@include tab-inside-top-line;
+						@include tab-top-line($dark-grey);
 					}
 					
 					&::after { // line that's dark grey next to the black border when in outside mode
-						@include tab-outside-bottom-line;
+						@include tab-bottom-line($dark-grey);
 					}
 				
 					&:active::after { //changes color when clicked on
-						@include tab-inside-bottom-line;
+						@include tab-bottom-line($light-grey);
 					}
 
 					img {
