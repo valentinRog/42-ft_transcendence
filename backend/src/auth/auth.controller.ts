@@ -33,7 +33,7 @@ export class AuthController {
       prisma_user.login,
     );
     response.redirect(
-      'http://localhost:5173/home' + '?token=' + token.access_token,
+      'http://localhost:5173/login' + '?token=' + token.access_token,
     );
   }
 
