@@ -18,7 +18,7 @@
 <ul>
 	<li><a href="/">home</a></li>
 	<li><a href="lrondia">louise</a></li>
-	<li><a href="drag">drag</a></li>
+	<li><a href="desktop">desktop</a></li>
 </ul>
 
 <slot />

@@ -27,7 +27,6 @@
 		})
 			.then((res) => res.json())
 			.then((res) => {
-				console.log(res);
 				if (!res.access_token) return;
 				$token = res.access_token;
 				if (browser) localStorage.setItem('token', res.access_token);
