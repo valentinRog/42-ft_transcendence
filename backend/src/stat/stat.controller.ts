@@ -1,4 +1,4 @@
-import { Controller, Patch, Body } from '@nestjs/common';
+import { Controller, Patch, Body, Get } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
 import { UseGuards } from '@nestjs/common';
 import { GetUser } from '../auth/decorator';
@@ -13,5 +13,10 @@ export class StatController {
   @Patch('update-stats')
   updateStats(@GetUser('id') userId: number, @Body() dto: UpdateStatDto) {
     return this.statService.updateStat(userId, dto);
+  }
+
+  @Get('get-history')
+  getHistory(@GetUser('id') userId: number) {
+    return this.statService.getHistory(userId);
   }
 }

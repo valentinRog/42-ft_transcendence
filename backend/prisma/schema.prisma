@@ -21,7 +21,17 @@ model User {
   twoFactorAuthSecret  String?
   friends          Int[]    @default([])
   stat             Stat?
-  //matches          Match[]
+  matchesAsWinner  Match[]   @relation("Winner")
+  matchesAsLoser   Match[]   @relation("Loser")
+}
+
+model Match {
+  id         Int       @id @default(autoincrement())
+  createdAt  DateTime  @default(now())
+  winner     User      @relation("Winner", fields: [winnerId], references: [id])
+  loser      User      @relation("Loser", fields: [loserId], references: [id])
+  winnerId   Int
+  loserId    Int
 }
 
 model Stat {
@@ -34,22 +44,3 @@ model Stat {
   userId Int  @unique
   user   User @relation(fields: [userId], references: [id])
 }
-
-//model Match {
-//  id         Int     @id @default(autoincrement())
-//  createdAt  DateTime @default(now())
-//  winnerId   Int
-//  loserId    Int
-//  winner     User    @relation(fields: [winnerId], references: [id])
-//  loser      User    @relation(fields: [loserId], references: [id])
-//  //players    User[]  @relation("Player", fields: [winnerId, loserId])
-//}
-
-//model MatchHistory {
-//  id        Int     @id @default(autoincrement())
-//  matchId   Int
-//  playerId  Int
-//  outcome   String
-//  match     Match   @relation(fields: [matchId], references: [id])
-//  player    User    @relation("Player", fields: [playerId], references: [id])
-//}

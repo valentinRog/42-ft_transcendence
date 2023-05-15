@@ -56,6 +56,38 @@ export class StatService {
       },
     });
 
+    if (dto.result === 1) {
+      await this.prisma.match.create({
+        data: {
+          winnerId: userId,
+          loserId: playerB.id,
+        },
+      });
+    } else if (dto.result === 0) {
+      await this.prisma.match.create({
+        data: {
+          winnerId: playerB.id,
+          loserId: userId,
+        },
+      });
+    }
     return updatedStat;
+  }
+
+  async getHistory(playerId: number) {
+    const playerMatchHistory = await this.prisma.match.findMany({
+      where: {
+        OR: [{ winnerId: playerId }, { loserId: playerId }],
+      },
+      include: {
+        winner: true,
+        loser: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return playerMatchHistory;
   }
 }
