@@ -124,7 +124,7 @@ describe('App e2e', () => {
         };
         return pactum
           .spec()
-          .patch('/users')
+          .patch('/users/edit')
           .withHeaders({
             Authorization: 'Bearer $S{userAt}',
           })
