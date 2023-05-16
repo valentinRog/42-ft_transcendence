@@ -9,8 +9,30 @@
 	</div>
 </div>
 
+<!-- NAVBAR -->
+
+<nav class="navbar">
+	<div class="navbar-menu">
+		<div class="navbar-start">
+			
+			<a class="start" href="/">
+				<img src="/start.png" alt="start">	
+				Start
+			</a>
+			<a href="/">
+				<img src="/pong.png" alt="pong">	
+				Pong
+			</a>
+			<a href="/">
+				<img src="/mail.png" alt="chat">	
+				Chat
+			</a>
+		</div>
+	</div>
+</nav>
+
 <style lang="scss">
-	
+
 	.icons {
 		display: flex;
 		align-items: left;
@@ -29,5 +51,7 @@
 			}
 		}
 	}
+
+	@include navbar;
 
 </style>
