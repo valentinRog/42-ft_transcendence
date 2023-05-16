@@ -1,9 +1,3 @@
-<!-- <div class="icons">
-	<div class="icon">
-		<img src="/pong.png" alt="pong">
-		<span>Pong</span>
-	</div>
-</div> -->
 <script lang="ts">
 	import Window from '$lib/components/Window.svelte';
 	import Pong from '$lib/components/game/Pong.svelte';
@@ -15,9 +9,9 @@
 	};
 	const elements: Element[] = [
 		{ component: Square, props: { color: 'yellow' } },
-		{ component: Pong, props: {} },
 		{ component: Square, props: { color: 'red' } },
-		{ component: Square, props: { color: 'green' } }
+		{ component: Square, props: { color: 'green' } },
+		{ component: Pong, props: {} },
 	];
 
 	let zstack = elements.map((_, i) => i);
@@ -35,6 +29,12 @@
 <!-- ICONES DE BUREAU -->
 
 <div class="desktop" bind:clientWidth={width} bind:clientHeight={height}>
+	<div class="icons">
+	<div class="icon">
+		<img src="/pong.png" alt="pong">
+		<span>Pong</span>
+	</div>
+</div>
 	{#each elements as { component, props }, i}
 		<div on:mousedown={() => putOnTop(i)}>
 			<Window parentWidth={width} parentHeight={height} z={zstack.indexOf(i)}>
