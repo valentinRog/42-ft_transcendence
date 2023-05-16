@@ -1,1 +1,27 @@
-@import 'var';
+@import 'header';
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+@font-face {
+	font-family: 'W95';
+	src: url('/fonts/w95fa.woff2') format('woff2');
+	font-weight: normal;
+	font-style: normal;
+}
+
+body {
+	background-color: $background;
+	font-family: $font;
+	color: $font-color;
+	width: 100vw;
+	height: 100vh;
+	cursor: url('/mouse2.png'), auto;
+}
+
+a:hover {
+	cursor: url('/click2.png'), auto;
+}

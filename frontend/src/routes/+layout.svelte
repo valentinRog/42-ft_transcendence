@@ -23,5 +23,8 @@
 
 <slot />
 
-<style lang="scss">
-</style>
+
+<svelte:head>
+	<style lang="scss">
+	</style>
+</svelte:head>
