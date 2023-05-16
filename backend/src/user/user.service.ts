@@ -80,14 +80,12 @@ export class UserService {
       method: 'GET',
       responseType: 'stream',
     });
-
     response.data.pipe(writer);
 
     return new Promise((resolve, reject) => {
       writer.on('finish', () => {
         resolve(fileNamePath);
       });
-
       writer.on('error', (error) => {
         console.error(`Error downloading image from ${url}:`, error);
         reject(`Failed to download image from ${url}`);

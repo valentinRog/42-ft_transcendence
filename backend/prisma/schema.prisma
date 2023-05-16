@@ -20,7 +20,19 @@ model User {
   twoFactorEnabled Boolean  @default(false)
   twoFactorAuthSecret  String?
   friends          Int[]    @default([])
-  stats            Stat?
+  stat             Stat     @relation(fields: [statId], references: [id])
+  statId           Int      @unique
+  matchesAsWinner  Match[]  @relation("Winner")
+  matchesAsLoser   Match[]  @relation("Loser")
+}
+
+model Match {
+  id         Int       @id @default(autoincrement())
+  createdAt  DateTime  @default(now())
+  winner     User      @relation("Winner", fields: [winnerId], references: [id])
+  loser      User      @relation("Loser", fields: [loserId], references: [id])
+  winnerId   Int
+  loserId    Int
 }
 
 model Stat {
@@ -28,6 +40,7 @@ model Stat {
   wins   Int  @default(0)
   losses Int  @default(0)
   elo    Int  @default(1000)
-  userId Int  @unique
-  user   User @relation(fields: [userId], references: [id])
+  ladder String @default("bronze")
+
+  user      User?
 }
