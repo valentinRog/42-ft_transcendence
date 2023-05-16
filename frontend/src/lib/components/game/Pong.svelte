@@ -200,7 +200,7 @@
 	onMount(() => {
 		let url = window.location.origin;
 		url = url.substring(0, url.lastIndexOf(':'));
-		const socket = ioClient(url + ':4000');
+		const socket = ioClient(url + ':3000');
 		const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 		const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 		canvas.width = dimensions.width;
