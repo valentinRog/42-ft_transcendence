@@ -1,15 +1,18 @@
 <script lang="ts">
-	export let left = 0;
-	export let top = 0;
+	import {onMount} from "svelte";
 	export let z = 0;
-
+	
 	export let parentWidth: number;
 	export let parentHeight: number;
+
+	export let top = parentHeight / 2;
+	export let left = parentWidth / 2;
 
 	let width: number;
 	let height: number;
 
 	let moving = false;
+	onMount(() => { top -= height / 2; left -= width / 2; })
 
 	function onMouseMove(e: MouseEvent) {
 		if (!moving) return;
@@ -44,8 +47,8 @@
 <style lang="scss">
 	section {
 		position: absolute;
-		top: 0;
-		left: 0;
+		top: 5rem;
+		left: 5rem;
 		border: 0.2rem solid black;
 		user-select: none;
 

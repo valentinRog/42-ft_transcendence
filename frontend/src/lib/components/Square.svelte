@@ -1,5 +1,6 @@
 <script lang="ts">
 	export let color: string;
+	export const url = '/prout.png';
 </script>
 
 <div style="background-color: {color};" />

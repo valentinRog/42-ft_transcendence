@@ -49,7 +49,52 @@
 	margin-right: 0.4rem;
 }
 
+// ------------------------------------------------
+// --------------------- TAB ----------------------
+// ------------------------------------------------
+
+@mixin tab {
+	a {
+		background-color: $grey;
+		color: inherit;
+		font-size: 1.2rem;
+		margin-right: 0.25rem;
+		text-decoration: none;
+		display: inline-block;
+		width: 15rem;
+		padding: 0.2rem 0.8rem;
+		position: relative;
+
+		@include tab-border(black, white); //border around the navbar element in outside mode
+		&:active {
+			//inverts colors when clicked on
+			@include tab-border(white, black);
+		}
+		&::before {
+			// line that's light grey nex to the white border when in outside mode
+			@include tab-top-line($light-grey);
+		}
+		&:active::before {
+			// changes color when clicked on
+			@include tab-top-line($dark-grey);
+		}
+		&::after {
+			// line that's dark grey next to the black border when in outside mode
+			@include tab-bottom-line($dark-grey);
+		}
+		&:active::after {
+			//changes color when clicked on
+			@include tab-bottom-line($light-grey);
+		}
+		img {
+			@include tab-logo;
+		}
+	}
+}
+
+// ------------------------------------------------
 // --------------- THE WHOLE NAVBAR ---------------
+// ------------------------------------------------
 
 @mixin navbar {
 	.navbar {
@@ -61,7 +106,7 @@
 		width: 100%;
 		display: flex;
 		align-items: center;
-		
+
 		@include nav-border; //navbar grey border
 		&::after {
 			@include tab-top-line(white);
@@ -70,39 +115,9 @@
 			.navbar-start {
 				margin-left: 0.3rem;
 
-				& > a {
-					background-color: $grey;
-					color: inherit;
-					font-size: 1.2rem;
-					margin-right: 0.25rem;
-					text-decoration: none;
-					display: inline-block;
-					width: 15rem;
-					padding: 0.2rem 0.8rem;
-					position: relative;
-
-					@include tab-border(black, white); //border around the navbar element in outside mode
-					&:active { //inverts colors when clicked on
-						@include tab-border(white, black);
-					}
-					&::before { // line that's light grey nex to the white border when in outside mode
-						@include tab-top-line($light-grey);
-					}
-					&:active::before { // changes color when clicked on
-						@include tab-top-line($dark-grey);
-					}
-					&::after { // line that's dark grey next to the black border when in outside mode
-						@include tab-bottom-line($dark-grey);
-					}
-					&:active::after { //changes color when clicked on
-						@include tab-bottom-line($light-grey);
-					}
-					img {
-						@include tab-logo;
-					}
-				}
+				@include tab;
 				.start {
-					width:auto;
+					width: auto;
 					font-weight: 800;
 				}
 			}

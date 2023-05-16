@@ -2,19 +2,17 @@
 	import Window from '$lib/components/Window.svelte';
 	import Pong from '$lib/components/game/Pong.svelte';
 	import Square from '$lib/components/Square.svelte';
+	import Tab from '$lib/components/Tab.svelte';
+	import { missing_component } from 'svelte/internal';
 
-	type Element = {
-		component: any;
-		props: any;
-	};
-	const elements: Element[] = [
-		{ component: Square, props: { color: 'yellow' } },
-		{ component: Square, props: { color: 'red' } },
-		{ component: Square, props: { color: 'green' } },
-		{ component: Pong, props: {} },
+	let windows: any[] = [
+		// { component: Square, props: { color: 'yellow' }, me: {} },
+		// { component: Square, props: { color: 'red' }, me: {} },
+		// { component: Square, props: { color: 'green' }, me: {} }
+		// { component: Pong, props: {}, me: {} },
 	];
 
-	let zstack = elements.map((_, i) => i);
+	let zstack = windows.map((_, i) => i);
 
 	function putOnTop(id: number) {
 		zstack = [...zstack.filter((z) => z !== id), id];
@@ -22,24 +20,33 @@
 
 	let width: number;
 	let height: number;
-</script>
 
-<!-- <h1>Yo</h1> -->
+	function handleDoubleClickIcon(componentType: any) {
+		zstack.push(zstack.length);
+		windows = [...windows, { component: componentType, props: { color: 'purple' }, me: {} }];
+	}
+</script>
 
 <!-- ICONES DE BUREAU -->
 
 <div class="desktop" bind:clientWidth={width} bind:clientHeight={height}>
 	<div class="icons">
-	<div class="icon">
-		<img src="/pong.png" alt="pong">
-		<span>Pong</span>
+		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Pong)}>
+			<img src="/pong.png" alt="pong" />
+			<span>Pong</span>
+		</div>
+		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Square)}>
+			<img src="/mail.png" alt="chat" />
+			<span>Chat</span>
+		</div>
 	</div>
-</div>
-	{#each elements as { component, props }, i}
+
+	{#each windows as { component, props, me }, i}
 		<div on:mousedown={() => putOnTop(i)}>
 			<Window parentWidth={width} parentHeight={height} z={zstack.indexOf(i)}>
-				<svelte:component this={component} {...props} />
+				<svelte:component this={component} bind:this={me} {...props} />
 			</Window>
+			<span>{me.url}</span>
 		</div>
 	{/each}
 </div>
@@ -66,7 +73,6 @@
 </nav>
 
 <style lang="scss">
-
 	.icons {
 		display: flex;
 		align-items: left;
