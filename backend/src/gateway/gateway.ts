@@ -84,7 +84,7 @@ export class GameGateway
   player1: Socket | null = null;
   player2: Socket | null = null;
 
-  private state: GameState = {
+  state: GameState = {
     ball: {
       x: dimensions.width / 2 - dimensions.ballWidth / 2,
       y: dimensions.height / 2 - dimensions.ballWidth / 2,
