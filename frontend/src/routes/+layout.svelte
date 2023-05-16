@@ -8,7 +8,7 @@
 	}
 </script>
 
-{#if $token}
+<!-- {#if $token}
 	<p>{$token}</p>
 	<button on:click={logout}>logout</button>
 {:else}
@@ -19,9 +19,12 @@
 	<li><a href="/">home</a></li>
 	<li><a href="lrondia">louise</a></li>
 	<li><a href="desktop">desktop</a></li>
-</ul>
+</ul> -->
 
 <slot />
 
-<style lang="scss">
-</style>
+
+<svelte:head>
+	<style lang="scss">
+	</style>
+</svelte:head>
