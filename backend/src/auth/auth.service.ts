@@ -40,6 +40,9 @@ export class AuthService {
           username: dto.username,
           avatar: avatar_path,
           logFrom42: true,
+          stat: {
+            create: {},
+          },
         },
       });
     } catch (error) {
@@ -52,6 +55,13 @@ export class AuthService {
     }
   }
 
+  //  stat = await this.prisma.stat.create({
+  //	data: {
+  //	  user: { connect: { id: user.id } },
+  //	}
+
+  //	)};
+
   async signup(dto: AuthDto) {
     const hash = await argon.hash(dto.password);
     try {
@@ -60,7 +70,13 @@ export class AuthService {
           login: dto.login,
           username: dto.username,
           hash: hash,
+          stat: {
+            create: {},
+          },
         },
+        //include: {
+        //  stat: true,
+        //},
       });
       return this.signToken(user.id, user.login);
     } catch (error) {
