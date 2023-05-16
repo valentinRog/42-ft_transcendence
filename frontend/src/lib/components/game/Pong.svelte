@@ -1,4 +1,6 @@
 <script lang="ts">
+	export const url = '/pong.png';
+	export const name = 'Pong';
 	import { onMount } from 'svelte';
 	import ioClient from 'socket.io-client';
 

@@ -23,7 +23,7 @@
 
 	function handleDoubleClickIcon(componentType: any) {
 		zstack.push(zstack.length);
-		windows = [...windows, { component: componentType, props: { color: 'purple' }, me: {} }];
+		windows = [...windows, { component: componentType, props: { color: 'purple', visible : true }, me: {} }];
 	}
 </script>
 
@@ -42,12 +42,13 @@
 	</div>
 
 	{#each windows as { component, props, me }, i}
-		<div on:mousedown={() => putOnTop(i)}>
+		{#if props.visible}
+			<div on:mousedown={() => putOnTop(i)}>
 			<Window parentWidth={width} parentHeight={height} z={zstack.indexOf(i)}>
 				<svelte:component this={component} bind:this={me} {...props} />
 			</Window>
-			<span>{me.url}</span>
 		</div>
+		{/if}
 	{/each}
 </div>
 
@@ -60,14 +61,11 @@
 				<img src="/start.png" alt="start" />
 				Start
 			</a>
-			<a href="/">
-				<img src="/pong.png" alt="pong" />
-				Pong
-			</a>
-			<a href="/">
-				<img src="/mail.png" alt="chat" />
-				Chat
-			</a>
+			{#each windows as { component, props, me }, i}
+				<Tab route={me.url} name={me.name} bind:visible={props.visible} >
+					<svelte:component this={component} bind:this={me} {...props} />
+				</Tab>
+			{/each}
 		</div>
 	</div>
 </nav>

@@ -14,6 +14,8 @@
 	let moving = false;
 	onMount(() => { top -= height / 2; left -= width / 2; })
 
+	export let windowVisible = true;
+
 	function onMouseMove(e: MouseEvent) {
 		if (!moving) return;
 		if (left + e.movementX < 0) {
