@@ -1,20 +1,25 @@
 <script lang="ts">
-	import {onMount} from "svelte";
+	import { onMount } from 'svelte';
+	import { createEventDispatcher } from 'svelte';
+
+	const dispatch = createEventDispatcher();
+
 	export let z = 0;
-	
+
 	export let parentWidth: number;
 	export let parentHeight: number;
 
-	export let top = parentHeight / 2;
-	export let left = parentWidth / 2;
+	let top = parentHeight / 2;
+	let left = parentWidth / 2;
 
 	let width: number;
 	let height: number;
 
 	let moving = false;
-	onMount(() => { top -= height / 2; left -= width / 2; })
-
-	export let windowVisible = true;
+	onMount(() => {
+		top -= height / 2;
+		left -= width / 2;
+	});
 
 	function onMouseMove(e: MouseEvent) {
 		if (!moving) return;
@@ -40,7 +45,10 @@
 	bind:offsetWidth={width}
 	bind:offsetHeight={height}
 >
-	<div on:mousedown={() => (moving = true)} />
+	<div on:mousedown={() => (moving = true)}>
+		<button on:click={() => dispatch('minimize')}>-</button>
+		<button on:click={() => dispatch('close')}>x</button>
+	</div>
 	<slot />
 </section>
 
@@ -61,6 +69,10 @@
 			&:hover {
 				cursor: grab;
 			}
+		}
+
+		button {
+			font-size: 1.3rem;
 		}
 	}
 </style>
