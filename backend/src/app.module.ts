@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { StatModule } from './stat/stat.module';
 import { GatewayModule } from './gateway/gateway.module';
+import { MatchmakingModule } from './matchmaking/matchmaking.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { GatewayModule } from './gateway/gateway.module';
     UserModule,
     StatModule,
     GatewayModule,
+    MatchmakingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
