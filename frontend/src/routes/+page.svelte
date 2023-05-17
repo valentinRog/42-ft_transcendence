@@ -19,12 +19,19 @@
 	let width: number;
 	let height: number;
 
+	let gid = 0;
 	function handleDoubleClickIcon(componentType: any) {
 		zstack = [...zstack, zstack.length];
 		const n = Math.floor(Math.random() * 2);
 		windows = [
 			...windows,
-			{ component: componentType, props: { color: ['purple', 'yellow'][n] }, me: {}, visible: true }
+			{
+				component: componentType,
+				props: { color: ['purple', 'yellow'][n] },
+				me: {},
+				visible: true,
+				id: gid++
+			}
 		];
 	}
 </script>
@@ -43,7 +50,7 @@
 		</div>
 	</div>
 
-	{#each windows as { component, props, me, visible }, i}
+	{#each windows as { component, props, me, visible, id }, i (id)}
 		<div on:mousedown={() => putOnTop(i)} style="visibility: {visible ? 'visible' : 'hidden'};">
 			<Window
 				parentWidth={width}
@@ -69,7 +76,7 @@
 				<img src="/start.png" alt="start" />
 				Start
 			</a>
-			{#each windows as { component, props, me, visible }, i (i)}
+			{#each windows as { component, props, me, visible, id }, i (id)}
 				<Tab route={me.url} name={me.name} on:click={() => (visible = !visible)}>
 					<svelte:component this={component} bind:this={me} {...props} />
 				</Tab>
