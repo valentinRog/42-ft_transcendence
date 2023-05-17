@@ -70,7 +70,7 @@ type Input = {
     origin: '*',
   },
 })
-export class GameGateway
+export class PongGateway
   implements OnModuleInit, OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer()
