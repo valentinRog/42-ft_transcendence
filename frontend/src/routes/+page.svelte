@@ -3,27 +3,36 @@
 	import Pong from '$lib/components/game/Pong.svelte';
 	import Square from '$lib/components/Square.svelte';
 	import Tab from '$lib/components/Tab.svelte';
-	import { missing_component } from 'svelte/internal';
 
-	let windows: any[] = [
-		// { component: Square, props: { color: 'yellow' }, me: {} },
-		// { component: Square, props: { color: 'red' }, me: {} },
-		// { component: Square, props: { color: 'green' }, me: {} }
-		// { component: Pong, props: {}, me: {} },
-	];
-
-	let zstack = windows.map((_, i) => i);
+	let windows: any[] = [];
+	let zstack: number[] = [];
 
 	function putOnTop(id: number) {
 		zstack = [...zstack.filter((z) => z !== id), id];
 	}
 
+	function remove(id: number) {
+		windows = windows.filter((_, i) => i !== id);
+		zstack = zstack.filter((z) => z !== id).map((z) => (z > id ? z - 1 : z));
+	}
+
 	let width: number;
 	let height: number;
 
+	let gid = 0;
 	function handleDoubleClickIcon(componentType: any) {
-		zstack.push(zstack.length);
-		windows = [...windows, { component: componentType, props: { color: 'purple', visible : true }, me: {} }];
+		zstack = [...zstack, zstack.length];
+		const n = Math.floor(Math.random() * 2);
+		windows = [
+			...windows,
+			{
+				component: componentType,
+				props: { color: ['purple', 'yellow'][n] },
+				me: {},
+				visible: true,
+				id: gid++
+			}
+		];
 	}
 </script>
 
@@ -41,14 +50,20 @@
 		</div>
 	</div>
 
-	{#each windows as { component, props, me }, i}
-		{#if props.visible}
-			<div on:mousedown={() => putOnTop(i)}>
-			<Window parentWidth={width} parentHeight={height} z={zstack.indexOf(i)}>
+	{#each windows as { component, props, me, visible, id }, i (id)}
+		<div on:mousedown={() => putOnTop(i)} style="visibility: {visible ? 'visible' : 'hidden'};">
+			<Window
+				parentWidth={width}
+				parentHeight={height}
+				z={zstack.indexOf(i)}
+				on:minimize={() => (visible = !visible)}
+				on:close={() => {
+					remove(i);
+				}}
+			>
 				<svelte:component this={component} bind:this={me} {...props} />
 			</Window>
 		</div>
-		{/if}
 	{/each}
 </div>
 
@@ -61,8 +76,8 @@
 				<img src="/start.png" alt="start" />
 				Start
 			</a>
-			{#each windows as { component, props, me }, i}
-				<Tab route={me.url} name={me.name} bind:visible={props.visible} >
+			{#each windows as { component, props, me, visible, id }, i (id)}
+				<Tab route={me.url} name={me.name} on:click={() => (visible = !visible)}>
 					<svelte:component this={component} bind:this={me} {...props} />
 				</Tab>
 			{/each}
