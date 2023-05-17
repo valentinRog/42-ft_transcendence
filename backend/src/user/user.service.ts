@@ -109,4 +109,13 @@ export class UserService {
       },
     };
   }
+
+  async getQueueUsers() {
+    const users = await this.prisma.user.findMany({
+      where: {
+        status: 'queue',
+      },
+    });
+    return users;
+  }
 }
