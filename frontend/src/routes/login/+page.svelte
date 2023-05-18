@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { token } from '$lib/stores/stores';
+	import { token, socket } from '$lib/stores/stores';
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
+	import ioClient from 'socket.io-client';
 
 	onMount(() => {
 		if ($token) goto('/');
@@ -30,6 +31,9 @@
 				if (!res.access_token) return;
 				$token = res.access_token;
 				if (browser) localStorage.setItem('token', res.access_token);
+				let url = window.location.origin;
+				url = url.substring(0, url.lastIndexOf(':'));
+				$socket = ioClient(url + ':3000');
 				goto('/');
 			})
 			.catch((err) => console.log(err));

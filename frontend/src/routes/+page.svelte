@@ -77,7 +77,7 @@
 				Start
 			</a>
 			{#each windows as { component, props, me, visible, id }, i (id)}
-				<Tab route={me.url} name={me.name} on:click={() => (visible = !visible)}>
+				<Tab route={me.url} name={me.name} on:click={() => {putOnTop(i);visible = !visible}}>
 					<svelte:component this={component} bind:this={me} {...props} />
 				</Tab>
 			{/each}

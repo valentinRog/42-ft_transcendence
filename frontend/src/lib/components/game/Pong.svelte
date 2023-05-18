@@ -2,7 +2,7 @@
 	export const url = '/pong.png';
 	export const name = 'Pong';
 	import { onMount } from 'svelte';
-	import ioClient from 'socket.io-client';
+	import { socket } from '$lib/stores/stores';
 
 	let ping = 0;
 	let serverDelta = 0;
@@ -198,9 +198,6 @@
 	let down = false;
 
 	onMount(() => {
-		let url = window.location.origin;
-		url = url.substring(0, url.lastIndexOf(':'));
-		const socket = ioClient(url + ':3000');
 		const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 		const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 		canvas.width = dimensions.width;
@@ -221,7 +218,7 @@
 			}
 		});
 
-		socket.on('state', (s: GameState) => {
+		$socket.on('state', (s: GameState) => {
 			if (state.id === 0) {
 				state = s;
 				state.time -= serverDelta;
@@ -242,7 +239,7 @@
 			state = s;
 		});
 
-		socket.on('index', (i: number) => {
+		$socket.on('index', (i: number) => {
 			index = i;
 		});
 
@@ -254,7 +251,7 @@
 				up,
 				down
 			};
-			socket.emit('input', input);
+			$socket.emit('input', input);
 			inputs.push(input);
 			if (inputs.length > 100) {
 				inputs.shift();
@@ -264,11 +261,11 @@
 		gameLoop();
 
 		function pingLoop() {
-			socket.emit('ping', Date.now());
+			$socket.emit('ping', Date.now());
 			setTimeout(pingLoop, 1000 / 3);
 		}
 		pingLoop();
-		socket.on('ping', (data: [number, number]) => {
+		$socket.on('ping', (data: [number, number]) => {
 			ping = Date.now() - data[0];
 			serverDelta = data[1] - Date.now() + ping / 2;
 		});
