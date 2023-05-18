@@ -2,6 +2,7 @@
 	import Window from '$lib/components/Window.svelte';
 	import Pong from '$lib/components/game/Pong.svelte';
 	import Square from '$lib/components/Square.svelte';
+	import Contact from '$lib/components/Contact.svelte';
 	import Tab from '$lib/components/Tab.svelte';
 
 	let windows: any[] = [];
@@ -47,6 +48,10 @@
 		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Square)}>
 			<img src="/mail.png" alt="chat" />
 			<span>Chat</span>
+		</div>
+		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Contact)}>
+			<img src="/mail.png" alt="contact" />
+			<span>Contact</span>
 		</div>
 	</div>
 
