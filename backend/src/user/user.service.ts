@@ -47,6 +47,10 @@ export class UserService {
       where: { username: userName },
       data: { friends: { push: friendId } },
     });
+    await this.prisma.user.update({
+      where: { id: friendId },
+      data: { friends: { push: user.id } },
+    });
     delete user.hash;
     return user;
   }
