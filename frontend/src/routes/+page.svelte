@@ -17,6 +17,8 @@
 		zstack = zstack.filter((z) => z !== id).map((z) => (z > id ? z - 1 : z));
 	}
 
+	let selected: number | null = null;
+
 	let width: number;
 	let height: number;
 
@@ -34,6 +36,7 @@
 				id: gid++
 			}
 		];
+		selected = null;
 	}
 </script>
 
@@ -56,15 +59,19 @@
 	</div>
 
 	{#each windows as { component, props, me, visible, id }, i (id)}
-		<div on:mousedown={() => putOnTop(i)} style="visibility: {visible ? 'visible' : 'hidden'};">
+		<div
+			on:mousedown={() => {
+				putOnTop(i);
+				selected = i;
+			}}
+			style="visibility: {visible ? 'visible' : 'hidden'};"
+		>
 			<Window
 				parentWidth={width}
 				parentHeight={height}
 				z={zstack.indexOf(i)}
 				on:minimize={() => (visible = !visible)}
-				on:close={() => {
-					remove(i);
-				}}
+				on:close={() => remove(i)}
 			>
 				<svelte:component this={component} bind:this={me} {...props} />
 			</Window>
@@ -82,7 +89,23 @@
 				Start
 			</a>
 			{#each windows as { component, props, me, visible, id }, i (id)}
-				<Tab route={me.url} name={me.name} on:click={() => {putOnTop(i);visible = !visible}}>
+				<Tab
+					route={me.url}
+					name={me.name}
+					active={selected === i}
+					on:click={() => {
+						putOnTop(i);
+						if (visible && selected === i) {
+							visible = !visible;
+							selected = null;
+						} else if (visible) {
+							selected = i;
+						} else {
+							visible = !visible;
+							selected = i;
+						}
+					}}
+				>
 					<svelte:component this={component} bind:this={me} {...props} />
 				</Tab>
 			{/each}

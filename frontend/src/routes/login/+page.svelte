@@ -18,7 +18,10 @@
 	function handleSubmit(event: Event) {
 		const form = event.target as HTMLFormElement;
 		const data = new FormData(form);
-		const body = new URLSearchParams(data);
+		const body = new URLSearchParams();
+		for (const pair of data) {
+			body.append(pair[0], pair[1] as string);
+		}
 		fetch(form.action, {
 			method: form.method,
 			headers: {
