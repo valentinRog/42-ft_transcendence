@@ -44,7 +44,8 @@
 }
 
 @mixin tab-logo {
-	width: 1.4rem;
+	height: 1.4rem;
+	width: auto;
 	vertical-align: sub;
 	margin-right: 0.4rem;
 }
@@ -66,7 +67,8 @@
 		position: relative;
 
 		@include tab-border(black, white); //border around the navbar element in outside mode
-		&:active {
+		&:active,
+		&.active {
 			//inverts colors when clicked on
 			@include tab-border(white, black);
 		}
@@ -74,7 +76,8 @@
 			// line that's light grey nex to the white border when in outside mode
 			@include tab-top-line($light-grey);
 		}
-		&:active::before {
+		&:active::before,
+		&.active::before {
 			// changes color when clicked on
 			@include tab-top-line($dark-grey);
 		}
@@ -82,7 +85,8 @@
 			// line that's dark grey next to the black border when in outside mode
 			@include tab-bottom-line($dark-grey);
 		}
-		&:active::after {
+		&:active::after,
+		&.active::after {
 			//changes color when clicked on
 			@include tab-bottom-line($light-grey);
 		}
