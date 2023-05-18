@@ -1,10 +1,21 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { token } from '$lib/stores/stores';
+
 	export let color: string;
 	export const url = '/mail.png';
 	export const name = 'Chat';
+
+	function logout() {
+		localStorage.removeItem('token');
+		token.set(null);
+		goto('/login');
+	}
 </script>
 
-<div style="background-color: {color};" />
+<div style="background-color: {color};">
+	<button on:click={logout}>Logout</button>
+</div>
 
 <style lang="scss">
 	div {
