@@ -218,7 +218,7 @@
 			}
 		});
 
-		$socket.on('state', (s: GameState) => {
+		$socket!.on('state', (s: GameState) => {
 			if (state.id === 0) {
 				state = s;
 				state.time -= serverDelta;
@@ -239,7 +239,7 @@
 			state = s;
 		});
 
-		$socket.on('index', (i: number) => {
+		$socket!.on('index', (i: number) => {
 			index = i;
 		});
 
@@ -251,7 +251,7 @@
 				up,
 				down
 			};
-			$socket.emit('input', input);
+			$socket!.emit('input', input);
 			inputs.push(input);
 			if (inputs.length > 100) {
 				inputs.shift();
@@ -261,11 +261,11 @@
 		gameLoop();
 
 		function pingLoop() {
-			$socket.emit('ping', Date.now());
+			$socket!.emit('ping', Date.now());
 			setTimeout(pingLoop, 1000 / 3);
 		}
 		pingLoop();
-		$socket.on('ping', (data: [number, number]) => {
+		$socket!.on('ping', (data: [number, number]) => {
 			ping = Date.now() - data[0];
 			serverDelta = data[1] - Date.now() + ping / 2;
 		});
@@ -281,6 +281,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+
 		canvas {
 			border: 0.15rem solid white;
 			background-color: black;

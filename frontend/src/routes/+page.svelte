@@ -41,7 +41,12 @@
 
 <!-- ICONES DE BUREAU -->
 
-<div class="desktop" bind:clientWidth={width} bind:clientHeight={height}>
+<div
+	class="desktop"
+	bind:clientWidth={width}
+	bind:clientHeight={height}
+	on:mousedown={() => (selected = null)}
+>
 	<div class="icons">
 		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Pong)}>
 			<img src="/pong.png" alt="pong" />
@@ -68,7 +73,8 @@
 				selected = null;
 			}}
 			on:close={() => remove(i)}
-			on:mousedown={() => {
+			on:mousedown={(event) => {
+				event.stopPropagation();
 				putOnTop(i);
 				selected = i;
 			}}

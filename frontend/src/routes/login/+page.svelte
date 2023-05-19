@@ -10,7 +10,7 @@
 		if ($token) goto('/');
 		if ($page.url.searchParams.get('token')) {
 			$token = $page.url.searchParams.get('token');
-			if (browser) localStorage.setItem('token', $token!);
+			if (browser) sessionStorage.setItem('token', $token!);
 			goto('/');
 		}
 	});
@@ -33,7 +33,7 @@
 			.then((res) => {
 				if (!res.access_token) return;
 				$token = res.access_token;
-				if (browser) localStorage.setItem('token', res.access_token);
+				if (browser) sessionStorage.setItem('token', res.access_token);
 				let url = window.location.origin;
 				url = url.substring(0, url.lastIndexOf(':'));
 				$socket = ioClient(url + ':3000');

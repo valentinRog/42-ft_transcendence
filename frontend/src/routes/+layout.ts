@@ -4,7 +4,7 @@ import { token, socket } from '$lib/stores/stores';
 import ioClient from 'socket.io-client';
 
 if (browser && token.subscribe((val) => !val)) {
-	const tok = localStorage.getItem('token');
+	const tok = sessionStorage.getItem('token');
 	if (!tok) goto('/login');
 	token.set(tok);
 	let url = window.location.origin;

@@ -7,7 +7,7 @@
 	export const name = 'Chat';
 
 	function logout() {
-		localStorage.removeItem('token');
+		sessionStorage.removeItem('token');
 		token.set(null);
 		goto('/login');
 	}
