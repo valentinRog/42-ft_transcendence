@@ -1,5 +1,5 @@
 // matchmaking.events.ts
-import { PlayerDto } from './player.dto';
+import { PlayerDto } from './../matchmaking/dto';
 
 export class PlayerJoinedQueueEvent {
   constructor(public readonly player: PlayerDto) {}
