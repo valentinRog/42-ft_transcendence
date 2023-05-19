@@ -4,6 +4,9 @@
 
 	const dispatch = createEventDispatcher();
 
+	export let name: string;
+	export let icon: string;
+
 	export let z = 0;
 
 	export let parentWidth: number;
@@ -44,6 +47,8 @@
 	on:mousedown
 >
 	<div on:mousedown={() => (moving = true)}>
+		<img src="{icon}" />
+		<p>{name}</p>
 		<div class="buttons">
 			<button on:click={() => dispatch('minimize')}>_</button>
 			<button on:click={() => dispatch('close')}>X</button>
@@ -82,10 +87,22 @@
 			}
 		}
 		
+		img {
+			margin-left: 0.5rem;
+			height: 1rem;
+			width: auto;
+		}
+
+		p {
+			padding: 0.25rem;
+			color: $light-grey;
+			font-weight: bolder;
+		}
+
 		button {
-			padding: 0 0.25rem;
 			@include tab-contour;
 			@include tab-contour-active;
+			padding: 0 0.25rem;
 			background-color: $grey;
 		}
 	}

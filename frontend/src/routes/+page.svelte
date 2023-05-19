@@ -23,7 +23,7 @@
 	let height: number;
 
 	let gid = 0;
-	function handleDoubleClickIcon(componentType: any, props: Object = {}) {
+	function handleDoubleClickIcon(componentType: any, winProps: Object = {}, props: Object = {}) {
 		zstack = [...zstack, zstack.length];
 		windows = [
 			...windows,
@@ -32,7 +32,8 @@
 				props,
 				me: {},
 				visible: true,
-				id: gid++
+				id: gid++,
+				winProps
 			}
 		];
 		selected = null;
@@ -48,22 +49,23 @@
 	on:mousedown={() => (selected = null)}
 >
 	<div class="icons">
-		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Pong)}>
+		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Pong, { name:"Pong", icon:"/pong.png" })}>
 			<img src="/pong.png" alt="pong" />
 			<span>Pong</span>
 		</div>
-		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Square, { })}>
+		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Square, { name:"Chat", icon:"/mail.png" })}>
 			<img src="/mail.png" alt="chat" />
 			<span>Chat</span>
 		</div>
-		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Contact, { })}>
+		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Contact, { name:"Contact", icon:"/mail.png" })}>
 			<img src="/mail.png" alt="contact" />
 			<span>Contact</span>
 		</div>
 	</div>
 
-	{#each windows as { component, props, me, visible, id }, i (id)}
+	{#each windows as { component, props, me, visible, id, winProps }, i (id)}
 		<Window
+			{...winProps}
 			parentWidth={width}
 			parentHeight={height}
 			z={zstack.indexOf(i)}

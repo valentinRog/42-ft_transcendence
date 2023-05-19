@@ -2,7 +2,6 @@
 	import { goto } from '$app/navigation';
 	import { token } from '$lib/stores/stores';
 
-	export let color: string;
 	export const url = '/mail.png';
 	export const name = 'Chat';
 
@@ -13,7 +12,7 @@
 	}
 </script>
 
-<div style="background-color: {color};">
+<div>
 	<button on:click={logout}>Logout</button>
 </div>
 

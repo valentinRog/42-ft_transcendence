@@ -44,7 +44,7 @@
 
 @mixin tab-contour {
 	@include tab-border(black, white); //border around the navbar element in outside mode
-	&::before {
+	&::before { // & marche pas pour le contact ?
 		// line that's light grey nex to the white border when in outside mode
 		@include tab-top-line($light-grey);
 	}
