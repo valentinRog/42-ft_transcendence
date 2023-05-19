@@ -8,6 +8,7 @@ import { UserModule } from './user/user.module';
 import { StatModule } from './stat/stat.module';
 import { GatewayModule } from './gateway/gateway.module';
 import { MatchmakingModule } from './matchmaking/matchmaking.module';
+import { WebSocketModule } from './websocket/websocket.module';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { MatchmakingModule } from './matchmaking/matchmaking.module';
     ConfigModule.forRoot({ isGlobal: true }),
     UserModule,
     StatModule,
-    GatewayModule,
+    //GatewayModule,
+    WebSocketModule,
     MatchmakingModule,
   ],
   controllers: [AppController],

@@ -201,7 +201,14 @@
 	onMount(() => {
 		let url = window.location.origin;
 		url = url.substring(0, url.lastIndexOf(':'));
-		const socket = ioClient(url + ':3000');
+
+		const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImxvZ2luIjoibHJvbmRpYSIsInR3b0ZhY3RvciI6ZmFsc2UsImlzVHdvRmFjdG9yQXV0aGVudGljYXRlZCI6ZmFsc2UsImlhdCI6MTY4NDUyODQ2MSwiZXhwIjoxNjg0NjE0ODYxfQ.XN3OQXFD-2PGa0kL0k_7Ycz6UwMIb_qOWWzodfhN2mE';
+		const socket = ioClient(url + ':3000', {
+			query: {
+				token: token,
+			}
+		});
+
 		const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 		const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 		canvas.width = dimensions.width;

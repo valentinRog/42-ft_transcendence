@@ -71,8 +71,6 @@ type Input = {
 @WebSocketGateway({
   cors: {
     origin: 'http://localhost:5173',
-
-    //origin: '*',
   },
 })
 export class PongGateway
@@ -106,16 +104,12 @@ export class PongGateway
   };
 
   onModuleInit() {
-    //this.server.on('connection', (socket) => {
-    //  console.log(socket.id);
-    //  console.log('Connected');
-    //});
-
     this.gameLoop();
   }
 
   handleConnection(socket: Socket) {
     console.log(socket.id);
+	return;
     if (this.player1 === null) {
       this.player1 = socket;
       console.log('player1 connected');
@@ -150,7 +144,7 @@ export class PongGateway
     } else if (this.player2 !== null && input.clientId === this.player2.id) {
       this.inputs2.push(input);
       this.player2.emit('index', 1);
-    } else console.log('input from unknown player');
+    }
   }
 
   @SubscribeMessage('ping')

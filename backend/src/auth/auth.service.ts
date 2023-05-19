@@ -55,13 +55,6 @@ export class AuthService {
     }
   }
 
-  //  stat = await this.prisma.stat.create({
-  //	data: {
-  //	  user: { connect: { id: user.id } },
-  //	}
-
-  //	)};
-
   async signup(dto: AuthDto) {
     const hash = await argon.hash(dto.password);
     try {
@@ -74,9 +67,6 @@ export class AuthService {
             create: {},
           },
         },
-        //include: {
-        //  stat: true,
-        //},
       });
       return this.signToken(user.id, user.login);
     } catch (error) {
@@ -133,5 +123,20 @@ export class AuthService {
       throw new UnauthorizedException('Wrong authentication code');
     }
     return await this.signToken(user.id, user.login, true, true);
+  }
+
+  async validateToken(token: string) {
+    try {
+      const decodedToken = this.jwt.verify(token, {
+        secret: this.config.get('JWT_SECRET'),
+      });
+      const user = await this.prisma.user.findUnique({
+        where: { login: decodedToken.login },
+      });
+      delete user.hash;
+      return user;
+    } catch (error) {
+      return null; // Invalid token
+    }
   }
 }
