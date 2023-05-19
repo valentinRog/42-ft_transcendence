@@ -1,7 +1,9 @@
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class PlayerDto {
   @IsString()
-  @IsOptional()
-  login?: string;
+  username: string;
+
+  @IsNumber()
+  elo: number;
 }

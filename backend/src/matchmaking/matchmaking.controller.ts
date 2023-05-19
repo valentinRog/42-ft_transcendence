@@ -9,7 +9,12 @@ export class MatchmakingController {
   constructor(private matchmakingService: MatchmakingService) {}
 
   @Post('queue')
-  async queue(@GetUser('id') userId: number) {
-    return await this.matchmakingService.queue(userId);
+  async queue(@GetUser() user) {
+    const player = {
+      username: user.username,
+      elo: user.stats.elo,
+    };
+
+    return await this.matchmakingService.handlePlayerJoinedQueue(player);
   }
 }
