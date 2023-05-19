@@ -9,11 +9,20 @@
 	export let parentWidth: number;
 	export let parentHeight: number;
 
+	export let visible = true;
+
 	let top = parentHeight / 2;
 	let left = parentWidth / 2;
 
 	let width: number;
 	let height: number;
+
+	$: {
+		if (top + height > parentHeight) top = Math.max(parentHeight - height, 0);
+		if (left + width > parentWidth) left = Math.max(parentWidth - width, 0);
+		if (top < 0) top = 0;
+		if (left < 0) left = 0;
+	}
 
 	let moving = false;
 	onMount(() => {
@@ -23,27 +32,16 @@
 
 	function onMouseMove(e: MouseEvent) {
 		if (!moving) return;
-		if (left + e.movementX < 0) {
-			left = 0;
-		} else if (left + e.movementX > parentWidth - width) {
-			left = parentWidth - width;
-		} else {
-			left += e.movementX;
-		}
-		if (top + e.movementY < 0) {
-			top = 0;
-		} else if (top + e.movementY > parentHeight - height) {
-			top = parentHeight - height;
-		} else {
-			top += e.movementY;
-		}
+		left += e.movementX;
+		top += e.movementY;
 	}
 </script>
 
 <section
-	style="left: {left}px; top: {top}px; z-index: {z};"
+	style="left: {left}px; top: {top}px; z-index: {z};visibility: {visible ? 'visible' : 'hidden'};"
 	bind:offsetWidth={width}
 	bind:offsetHeight={height}
+	on:mousedown
 >
 	<div on:mousedown={() => (moving = true)}>
 		<button on:click={() => dispatch('minimize')}>-</button>

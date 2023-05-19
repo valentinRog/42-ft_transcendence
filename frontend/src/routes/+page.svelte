@@ -23,14 +23,13 @@
 	let height: number;
 
 	let gid = 0;
-	function handleDoubleClickIcon(componentType: any) {
+	function handleDoubleClickIcon(componentType: any, props: Object = {}) {
 		zstack = [...zstack, zstack.length];
-		const n = Math.floor(Math.random() * 2);
 		windows = [
 			...windows,
 			{
 				component: componentType,
-				props: { color: ['purple', 'yellow'][n] },
+				props,
 				me: {},
 				visible: true,
 				id: gid++
@@ -48,47 +47,47 @@
 			<img src="/pong.png" alt="pong" />
 			<span>Pong</span>
 		</div>
-		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Square)}>
+		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Square, { color: 'yellow' })}>
 			<img src="/mail.png" alt="chat" />
 			<span>Chat</span>
 		</div>
-		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Contact)}>
+		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Contact, { color: 'green' })}>
 			<img src="/mail.png" alt="contact" />
 			<span>Contact</span>
 		</div>
 	</div>
 
 	{#each windows as { component, props, me, visible, id }, i (id)}
-		<div
+		<Window
+			parentWidth={width}
+			parentHeight={height}
+			z={zstack.indexOf(i)}
+			{visible}
+			on:minimize={() => {
+				visible = !visible;
+				selected = null;
+			}}
+			on:close={() => remove(i)}
 			on:mousedown={() => {
 				putOnTop(i);
 				selected = i;
 			}}
-			style="visibility: {visible ? 'visible' : 'hidden'};"
 		>
-			<Window
-				parentWidth={width}
-				parentHeight={height}
-				z={zstack.indexOf(i)}
-				on:minimize={() => (visible = !visible)}
-				on:close={() => remove(i)}
-			>
-				<svelte:component this={component} bind:this={me} {...props} />
-			</Window>
-		</div>
+			<svelte:component this={component} bind:this={me} {...props} />
+		</Window>
 	{/each}
 </div>
 
 <!-- NAVBAR -->
 
-<nav class="navbar">
+<nav class="navbar" style="z-index: {zstack.length};">
 	<div class="navbar-menu">
 		<div class="navbar-start">
 			<a class="start" href="/">
 				<img src="/start.png" alt="start" />
 				Start
 			</a>
-			{#each windows as { component, props, me, visible, id }, i (id)}
+			{#each windows as { me, visible, id }, i (id)}
 				<Tab
 					route={me.url}
 					name={me.name}
@@ -105,9 +104,7 @@
 							selected = i;
 						}
 					}}
-				>
-					<svelte:component this={component} bind:this={me} {...props} />
-				</Tab>
+				/>
 			{/each}
 		</div>
 	</div>
