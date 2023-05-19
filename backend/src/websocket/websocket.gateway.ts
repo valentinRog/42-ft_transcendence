@@ -51,9 +51,7 @@ export class WebsocketsGateway
   }
 
   handleDisconnect(socket: Socket) {
-    throw new Error('Method not implemented.');
-    //const clientId = socket.id;
-    //this.webSocketService.removeSocket(clientId);
+    console.log('user disconnected');
 
     // Additional logic for handling disconnections
   }

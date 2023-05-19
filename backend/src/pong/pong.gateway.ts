@@ -1,9 +1,5 @@
-import { OnModuleInit } from '@nestjs/common';
 import {
   WebSocketGateway,
-  WebSocketServer,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
   SubscribeMessage,
   MessageBody,
 } from '@nestjs/websockets';
@@ -76,11 +72,12 @@ type Input = {
 export class PongGateway {
   private tickRate = 30;
 
+  private player1: Socket | null = null;
+  private player2: Socket | null = null;
+  private server: Server | null = null;
+
   private inputs1: Input[] = [];
   private inputs2: Input[] = [];
-
-  //  player1: Socket | null = null;
-  //  player2: Socket | null = null;
 
   private state: GameState = {
     ball: {
@@ -98,14 +95,16 @@ export class PongGateway {
     missed: false,
   };
 
-  constructor(
-    private readonly player1: Socket,
-    private readonly player2: Socket,
-    private readonly server: Server,
-  ) {
+  constructor(player1: Socket, player2: Socket, server: Server) {
     console.log('game started');
+    this.player1 = player1;
+    this.player2 = player2;
+    this.server = server;
     this.gameLoop();
   }
+
+  //  player1: Socket | null = null;
+  //  player2: Socket | null = null;
 
   @SubscribeMessage('events')
   handleEvent(@MessageBody() data: unknown) {
@@ -115,6 +114,7 @@ export class PongGateway {
 
   @SubscribeMessage('input')
   handleInput(@MessageBody() input: Input) {
+    console.log('input', input);
     if (this.player1 !== null && input.clientId === this.player1.id) {
       this.inputs1.push(input);
       this.player1.emit('index', 0);

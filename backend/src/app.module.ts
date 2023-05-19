@@ -9,6 +9,7 @@ import { StatModule } from './stat/stat.module';
 import { PongModule } from './pong/pong.module';
 import { MatchmakingModule } from './matchmaking/matchmaking.module';
 import { WebSocketModule } from './websocket/websocket.module';
+import { PongGateway } from './pong/pong.gateway';
 
 @Module({
   imports: [
@@ -17,8 +18,8 @@ import { WebSocketModule } from './websocket/websocket.module';
     ConfigModule.forRoot({ isGlobal: true }),
     UserModule,
     StatModule,
-    //PongModule,
-    WebSocketModule,
+    PongModule,
+    //WebSocketModule,
     MatchmakingModule,
   ],
   controllers: [AppController],
