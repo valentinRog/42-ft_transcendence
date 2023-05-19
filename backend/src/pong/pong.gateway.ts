@@ -73,21 +73,16 @@ type Input = {
     origin: 'http://localhost:5173',
   },
 })
-export class PongGateway
-  implements OnModuleInit, OnGatewayConnection, OnGatewayDisconnect
-{
-  @WebSocketServer()
-  server: Server;
+export class PongGateway {
+  private tickRate = 30;
 
-  tickRate = 30;
+  private inputs1: Input[] = [];
+  private inputs2: Input[] = [];
 
-  inputs1: Input[] = [];
-  inputs2: Input[] = [];
+  //  player1: Socket | null = null;
+  //  player2: Socket | null = null;
 
-  player1: Socket | null = null;
-  player2: Socket | null = null;
-
-  state: GameState = {
+  private state: GameState = {
     ball: {
       x: dimensions.width / 2 - dimensions.ballWidth / 2,
       y: dimensions.height / 2 - dimensions.ballWidth / 2,
@@ -103,31 +98,13 @@ export class PongGateway
     missed: false,
   };
 
-  onModuleInit() {
+  constructor(
+    private readonly player1: Socket,
+    private readonly player2: Socket,
+    private readonly server: Server,
+  ) {
+    console.log('game started');
     this.gameLoop();
-  }
-
-  handleConnection(socket: Socket) {
-    console.log(socket.id);
-	return;
-    if (this.player1 === null) {
-      this.player1 = socket;
-      console.log('player1 connected');
-    } else if (this.player2 === null) {
-      this.player2 = socket;
-      console.log('player2 connected');
-    }
-  }
-
-  handleDisconnect(socket: Socket) {
-    console.log('handleDisconnect');
-    if (socket === this.player1) {
-      this.player1 = null;
-      console.log('player1 disconnected');
-    } else if (socket === this.player2) {
-      this.player2 = null;
-      console.log('player1 disconnected');
-    }
   }
 
   @SubscribeMessage('events')

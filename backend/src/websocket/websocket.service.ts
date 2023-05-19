@@ -20,4 +20,8 @@ export class WebSocketService {
   getAllSockets(): Map<number, Socket> {
     return this.websockets;
   }
+
+  getSize(): number {
+    return this.websockets.size;
+  }
 }

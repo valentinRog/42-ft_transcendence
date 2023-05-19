@@ -2,12 +2,12 @@ import {
   WebSocketGateway,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  WebSocketServer,
 } from '@nestjs/websockets';
-import { Socket } from 'socket.io';
+import { Socket, Server } from 'socket.io';
 import { WebSocketService } from './websocket.service';
 import { AuthService } from 'src/auth/auth.service';
-import { UnauthorizedException } from '@nestjs/common';
-
+import { PongGatewayFactory } from 'src/pong/pong.gateway.factory';
 @WebSocketGateway({
   cors: {
     origin: 'http://localhost:5173',
@@ -16,9 +16,13 @@ import { UnauthorizedException } from '@nestjs/common';
 export class WebsocketsGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
+  @WebSocketServer()
+  server: Server;
+
   constructor(
     private readonly webSocketService: WebSocketService,
     private readonly authService: AuthService,
+    private readonly pongGatewayFactory: PongGatewayFactory,
   ) {}
 
   async handleConnection(socket: Socket) {
@@ -36,7 +40,14 @@ export class WebsocketsGateway
     console.log('user', user);
     this.webSocketService.addSocket(user.id, socket);
 
-    //this.webSocketService.addSocket(clientId, socket);
+    if (this.webSocketService.getSize() == 2) {
+      console.log('2 players joined');
+      const gameGateway = this.pongGatewayFactory.createGameGateway(
+        this.webSocketService.getAllSockets().get(0),
+        this.webSocketService.getAllSockets().get(1),
+        this.server,
+      );
+    }
   }
 
   handleDisconnect(socket: Socket) {

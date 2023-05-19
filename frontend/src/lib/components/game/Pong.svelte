@@ -202,7 +202,7 @@
 		let url = window.location.origin;
 		url = url.substring(0, url.lastIndexOf(':'));
 
-		const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImxvZ2luIjoibHJvbmRpYSIsInR3b0ZhY3RvciI6ZmFsc2UsImlzVHdvRmFjdG9yQXV0aGVudGljYXRlZCI6ZmFsc2UsImlhdCI6MTY4NDUyODQ2MSwiZXhwIjoxNjg0NjE0ODYxfQ.XN3OQXFD-2PGa0kL0k_7Ycz6UwMIb_qOWWzodfhN2mE';
+		const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImxvZ2luIjoiYnBlcnJhdWQiLCJ0d29GYWN0b3IiOmZhbHNlLCJpc1R3b0ZhY3RvckF1dGhlbnRpY2F0ZWQiOmZhbHNlLCJpYXQiOjE2ODQ1MzY4MjMsImV4cCI6MTY4NDYyMzIyM30.Bt5wCbW2nZruzZtMtw_uvfIRFMUKtclGmcWpA0y4nzY';
 		const socket = ioClient(url + ':3000', {
 			query: {
 				token: token,
