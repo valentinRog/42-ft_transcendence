@@ -39,7 +39,7 @@
 		<input type="text" id="friend" name="friend" />
 		<input type="submit" value="Add Friend" />
 	</form>
-	<button on:click={getMe}>show friend in explorer(temp)</button>
+	<button on:click={getMe}>Show friend in explorer (temp)</button>
 </div>
 
 <style lang="scss">
@@ -47,4 +47,22 @@
 		width: 15rem;
 		height: 15rem;
 	}
+
+	button, input[type="submit"] {
+		margin: 0.25rem 0 0rem 0.5rem;
+		padding: 0.15rem 0.25rem;
+	}
+
+	label {
+		margin: 0.5rem;
+	}
+
+	#friend {
+		background-color: $light-grey;
+
+		&:focus {
+			outline: none;
+		}
+	}
+
 </style>

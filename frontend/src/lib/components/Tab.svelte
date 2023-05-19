@@ -10,5 +10,8 @@
 </a>
 
 <style lang="scss">
-	@include tab;
+	a {
+		@include tab;
+		margin-right: 0.5rem;
+	}
 </style>

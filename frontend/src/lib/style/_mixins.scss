@@ -1,12 +1,4 @@
-//---------------------------------------
-// --------------- NAVBAR ---------------
-//---------------------------------------
 
-@mixin nav-border {
-	border-style: solid;
-	border-width: $line-width 0 0 0;
-	border-top-color: $light-grey;
-}
 //---------------------------------------
 // --------------- TAB ------------------
 //---------------------------------------
@@ -44,61 +36,80 @@
 }
 
 @mixin tab-logo {
-	height: 1.4rem;
+	height: 1.25rem;
 	width: auto;
 	vertical-align: sub;
 	margin-right: 0.4rem;
 }
 
-// ------------------------------------------------
-// --------------------- TAB ----------------------
-// ------------------------------------------------
+@mixin tab-contour {
+	@include tab-border(black, white); //border around the navbar element in outside mode
+	&::before {
+		// line that's light grey nex to the white border when in outside mode
+		@include tab-top-line($light-grey);
+	}
+	&::after {
+		// line that's dark grey next to the black border when in outside mode
+		@include tab-bottom-line($dark-grey);
+	}
+}
+
+@mixin tab-contour-hollow {
+	@include tab-border(white, black); //border around the navbar element in outside mode
+	&::before {
+		// line that's light grey nex to the white border when in outside mode
+		@include tab-top-line($dark-grey);
+	}
+	&::after {
+		// line that's dark grey next to the black border when in outside mode
+		@include tab-bottom-line($light-grey);
+	}
+}
+
+@mixin tab-contour-active {
+	&:active,
+	&.active {
+		@include tab-border(white, black);
+	}
+	&:active::before,
+	&.active::before {
+		@include tab-top-line($dark-grey);
+	}
+	&:active::after,
+	&.active::after {
+		@include tab-bottom-line($light-grey);
+	}
+	
+}
 
 @mixin tab {
-	a {
-		background-color: $grey;
-		color: inherit;
-		font-size: 1.2rem;
-		margin-right: 0.25rem;
-		text-decoration: none;
-		display: inline-block;
-		width: 15rem;
-		padding: 0.2rem 0.8rem;
-		position: relative;
-
-		@include tab-border(black, white); //border around the navbar element in outside mode
-		&:active,
-		&.active {
-			//inverts colors when clicked on
-			@include tab-border(white, black);
-		}
-		&::before {
-			// line that's light grey nex to the white border when in outside mode
-			@include tab-top-line($light-grey);
-		}
-		&:active::before,
-		&.active::before {
-			// changes color when clicked on
-			@include tab-top-line($dark-grey);
-		}
-		&::after {
-			// line that's dark grey next to the black border when in outside mode
-			@include tab-bottom-line($dark-grey);
-		}
-		&:active::after,
-		&.active::after {
-			//changes color when clicked on
-			@include tab-bottom-line($light-grey);
-		}
-		img {
+	
+	background-color: $grey;
+	color: inherit;
+	font-size: 1.2rem;
+	text-decoration: none;
+	display: inline-block;
+	height: $tab-height;
+	width: 15rem;
+	padding: 0.2rem 0.8rem;
+	position: relative;
+	
+	@include tab-contour;
+	@include tab-contour-active;
+	img {
 			@include tab-logo;
-		}
 	}
 }
 
 // ------------------------------------------------
-// --------------- THE WHOLE NAVBAR ---------------
+// -------------------- NAVBAR --------------------
 // ------------------------------------------------
+
+@mixin nav-border {
+	border-style: solid;
+	border-width: $line-width 0 0 0;
+	border-top-color: $light-grey;
+}
 
 @mixin navbar {
 	.navbar {
@@ -119,7 +130,10 @@
 			.navbar-start {
 				margin-left: 0.3rem;
 
-				@include tab;
+				a {
+					@include tab;
+					margin-right: 0.25rem;
+				}
 				.start {
 					width: auto;
 					font-weight: 800;

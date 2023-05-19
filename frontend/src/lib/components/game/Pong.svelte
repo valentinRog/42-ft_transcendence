@@ -283,7 +283,7 @@
 		align-items: center;
 
 		canvas {
-			border: 0.15rem solid white;
+			margin: 0.2rem;
 			background-color: black;
 		}
 	}

@@ -52,11 +52,11 @@
 			<img src="/pong.png" alt="pong" />
 			<span>Pong</span>
 		</div>
-		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Square, { color: 'yellow' })}>
+		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Square, { })}>
 			<img src="/mail.png" alt="chat" />
 			<span>Chat</span>
 		</div>
-		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Contact, { color: 'green' })}>
+		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Contact, { })}>
 			<img src="/mail.png" alt="contact" />
 			<span>Contact</span>
 		</div>
