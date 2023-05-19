@@ -38,14 +38,16 @@
 </script>
 
 <section
-	style="left: {left}px; top: {top}px; z-index: {z};visibility: {visible ? 'visible' : 'hidden'};"
+	style="left: {left}px; top: {top}px; z-index: {z}; visibility: {visible ? 'visible' : 'hidden'};"
 	bind:offsetWidth={width}
 	bind:offsetHeight={height}
 	on:mousedown
 >
 	<div on:mousedown={() => (moving = true)}>
-		<button on:click={() => dispatch('minimize')}>-</button>
-		<button on:click={() => dispatch('close')}>x</button>
+		<div class="buttons">
+			<button on:click={() => dispatch('minimize')}>_</button>
+			<button on:click={() => dispatch('close')}>X</button>
+		</div>
 	</div>
 	<slot />
 </section>
@@ -59,18 +61,32 @@
 		left: 5rem;
 		border: 0.2rem solid black;
 		user-select: none;
-
+		@include tab-contour;
+		background-color: $grey;
 		& > div {
-			height: 2rem;
-			background-color: blue;
-
+			
+			display: flex;
+			height: 1.5rem;
+			margin: 0.2rem 0.2rem;
+			background-color: $dark-grey;
+			align-items: center;
+		
 			&:hover {
 				cursor: grab;
 			}
-		}
 
+			.buttons {
+				margin-left: auto;
+				margin-right: 0.2rem;
+
+			}
+		}
+		
 		button {
-			font-size: 1.3rem;
+			padding: 0 0.25rem;
+			@include tab-contour;
+			@include tab-contour-active;
+			background-color: $grey;
 		}
 	}
 </style>

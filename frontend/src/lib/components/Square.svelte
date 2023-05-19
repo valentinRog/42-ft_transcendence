@@ -21,5 +21,9 @@
 	div {
 		width: 15rem;
 		height: 15rem;
+
+		button {
+			margin-left: 0.25rem;
+		}
 	}
 </style>
