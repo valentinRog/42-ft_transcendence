@@ -54,6 +54,7 @@
 	}
 
 	type Input = {
+		clientId: string;
 		stateId: number;
 		clientTime: number;
 		serverTime: number;
@@ -248,6 +249,7 @@
 
 		function gameLoop() {
 			const input: Input = {
+				clientId: socket.id,
 				stateId: state.id + delay,
 				clientTime: Date.now() + delay,
 				serverTime: Date.now() + delay + serverDelta,
