@@ -95,16 +95,22 @@ export class PongGateway {
     missed: false,
   };
 
-  constructor(player1: Socket, player2: Socket, server: Server) {
+  startGame() {
     console.log('game started');
-    this.player1 = player1;
-    this.player2 = player2;
-    this.server = server;
     this.gameLoop();
   }
 
-  //  player1: Socket | null = null;
-  //  player2: Socket | null = null;
+  setPlayer1(player1: Socket) {
+    this.player1 = player1;
+  }
+
+  setPlayer2(player2: Socket) {
+    this.player2 = player2;
+  }
+
+  setServer(server: Server) {
+    this.server = server;
+  }
 
   @SubscribeMessage('events')
   handleEvent(@MessageBody() data: unknown) {
@@ -114,7 +120,6 @@ export class PongGateway {
 
   @SubscribeMessage('input')
   handleInput(@MessageBody() input: Input) {
-    console.log('input', input);
     if (this.player1 !== null && input.clientId === this.player1.id) {
       this.inputs1.push(input);
       this.player1.emit('index', 0);

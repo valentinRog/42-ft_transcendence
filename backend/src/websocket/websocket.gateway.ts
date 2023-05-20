@@ -7,7 +7,7 @@ import {
 import { Socket, Server } from 'socket.io';
 import { WebSocketService } from './websocket.service';
 import { AuthService } from 'src/auth/auth.service';
-import { PongGatewayFactory } from 'src/pong/pong.gateway.factory';
+import { PongGateway } from 'src/pong/pong.gateway';
 @WebSocketGateway({
   cors: {
     origin: 'http://localhost:5173',
@@ -22,7 +22,6 @@ export class WebsocketsGateway
   constructor(
     private readonly webSocketService: WebSocketService,
     private readonly authService: AuthService,
-    private readonly pongGatewayFactory: PongGatewayFactory,
   ) {}
 
   async handleConnection(socket: Socket) {
@@ -42,11 +41,12 @@ export class WebsocketsGateway
 
     if (this.webSocketService.getSize() == 2) {
       console.log('2 players joined');
-      const gameGateway = this.pongGatewayFactory.createGameGateway(
-        this.webSocketService.getAllSockets().get(0),
-        this.webSocketService.getAllSockets().get(1),
-        this.server,
-      );
+      const gameGateway = new PongGateway();
+      gameGateway.setPlayer1(this.webSocketService.getAllSockets().get(1));
+      gameGateway.setPlayer2(this.webSocketService.getAllSockets().get(2));
+      gameGateway.setServer(this.server);
+      gameGateway.startGame();
+      this.webSocketService.addSocket(0, socket);
     }
   }
 
