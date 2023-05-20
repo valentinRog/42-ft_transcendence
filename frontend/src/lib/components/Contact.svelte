@@ -1,8 +1,6 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { token } from '$lib/stores/stores';
 
-	export let color: string;
 	export const url = '/mail.png';
 	export const name = 'Contact';
 
@@ -33,7 +31,7 @@
 	}
 </script>
 
-<div style="background-color: {color};">
+<div>
 	<form on:submit|preventDefault={addFriend}>
 		<label for="friend">Add Friend:</label>
 		<input type="text" id="friend" name="friend" />
@@ -48,7 +46,8 @@
 		height: 15rem;
 	}
 
-	button, input[type="submit"] {
+	button,
+	input[type='submit'] {
 		margin: 0.25rem 0 0rem 0.5rem;
 		padding: 0.15rem 0.25rem;
 	}
@@ -64,5 +63,4 @@
 			outline: none;
 		}
 	}
-
 </style>

@@ -49,15 +49,24 @@
 	on:mousedown={() => (selected = null)}
 >
 	<div class="icons">
-		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Pong, { name:"Pong", icon:"/pong.png" })}>
+		<div
+			class="icon"
+			on:dblclick={() => handleDoubleClickIcon(Pong, { name: 'Pong', icon: '/pong.png' })}
+		>
 			<img src="/pong.png" alt="pong" />
 			<span>Pong</span>
 		</div>
-		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Square, { name:"Chat", icon:"/mail.png" })}>
+		<div
+			class="icon"
+			on:dblclick={() => handleDoubleClickIcon(Square, { name: 'Chat', icon: '/mail.png' })}
+		>
 			<img src="/mail.png" alt="chat" />
 			<span>Chat</span>
 		</div>
-		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Contact, { name:"Contact", icon:"/mail.png" })}>
+		<div
+			class="icon"
+			on:dblclick={() => handleDoubleClickIcon(Contact, { name: 'Contact', icon: '/mail.png' })}
+		>
 			<img src="/mail.png" alt="contact" />
 			<span>Contact</span>
 		</div>
@@ -88,7 +97,7 @@
 
 <!-- NAVBAR -->
 
-<nav class="navbar" style="z-index: {zstack.length};">
+<nav class="navbar" style:z-index={zstack.length}>
 	<div class="navbar-menu">
 		<div class="navbar-start">
 			<a class="start" href="/">

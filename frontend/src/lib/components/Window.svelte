@@ -41,13 +41,16 @@
 </script>
 
 <section
-	style="left: {left}px; top: {top}px; z-index: {z}; visibility: {visible ? 'visible' : 'hidden'};"
+	style:left={`${left}px`}
+	style:top={`${top}px`}
+	style:z-index={z}
+	style:visibility={visible ? 'visible' : 'hidden'}
 	bind:offsetWidth={width}
 	bind:offsetHeight={height}
 	on:mousedown
 >
 	<div on:mousedown={() => (moving = true)}>
-		<img src="{icon}" />
+		<img src={icon} />
 		<p>{name}</p>
 		<div class="buttons">
 			<button on:click={() => dispatch('minimize')}>_</button>
@@ -69,13 +72,12 @@
 		@include tab-contour;
 		background-color: $grey;
 		& > div {
-			
 			display: flex;
 			height: 1.5rem;
 			margin: 0.2rem 0.2rem;
 			background-color: $dark-grey;
 			align-items: center;
-		
+
 			&:hover {
 				cursor: grab;
 			}
@@ -83,10 +85,9 @@
 			.buttons {
 				margin-left: auto;
 				margin-right: 0.2rem;
-
 			}
 		}
-		
+
 		img {
 			margin-left: 0.5rem;
 			height: 1rem;
