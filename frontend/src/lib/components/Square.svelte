@@ -2,9 +2,6 @@
 	import { goto } from '$app/navigation';
 	import { token } from '$lib/stores/stores';
 
-	export const url = '/mail.png';
-	export const name = 'Chat';
-
 	function logout() {
 		sessionStorage.removeItem('token');
 		token.set(null);

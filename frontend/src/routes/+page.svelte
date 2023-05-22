@@ -1,19 +1,61 @@
 <script lang="ts">
 	import Window from '$lib/components/Window.svelte';
-	import Pong from '$lib/components/game/Pong.svelte';
+	import Pong from '$lib/components/pong/Pong.svelte';
 	import Square from '$lib/components/Square.svelte';
 	import Contact from '$lib/components/Contact.svelte';
 	import Tab from '$lib/components/Tab.svelte';
 
-	let windows: any[] = [];
+	const components = {
+		Pong: Pong,
+		Square: Square,
+		Contact: Contact
+	};
+	Object.freeze(components);
+
+	type App = keyof typeof components;
+
+	interface AppProps {
+		readonly name: string;
+		readonly icon: string;
+	}
+	const apps: Record<App, AppProps> = {
+		Pong: { name: 'Pong', icon: '/pong.png' },
+		Square: { name: 'Chat', icon: '/mail.png' },
+		Contact: { name: 'Contact', icon: '/mail.png' }
+	};
+	Object.freeze(apps);
+
+	interface AppInstance {
+		readonly componentType: App;
+		readonly component: any;
+		visible: boolean;
+		readonly id: number;
+	}
+
+	let instances: AppInstance[] = [];
 	let zstack: number[] = [];
+
+	let gid = 0;
+	function addInstance(componentType: string) {
+		zstack = [...zstack, zstack.length];
+		instances = [
+			...instances,
+			{
+				componentType: componentType as App,
+				component: components[componentType as App],
+				visible: true,
+				id: gid++
+			}
+		];
+		selected = null;
+	}
 
 	function putOnTop(id: number) {
 		zstack = [...zstack.filter((z) => z !== id), id];
 	}
 
 	function remove(id: number) {
-		windows = windows.filter((_, i) => i !== id);
+		instances = instances.filter((_, i) => i !== id);
 		zstack = zstack.filter((z) => z !== id).map((z) => (z > id ? z - 1 : z));
 	}
 
@@ -21,26 +63,7 @@
 
 	let width: number;
 	let height: number;
-
-	let gid = 0;
-	function handleDoubleClickIcon(componentType: any, winProps: Object = {}, props: Object = {}) {
-		zstack = [...zstack, zstack.length];
-		windows = [
-			...windows,
-			{
-				component: componentType,
-				props,
-				me: {},
-				visible: true,
-				id: gid++,
-				winProps
-			}
-		];
-		selected = null;
-	}
 </script>
-
-<!-- ICONES DE BUREAU -->
 
 <div
 	class="desktop"
@@ -49,35 +72,20 @@
 	on:mousedown={() => (selected = null)}
 >
 	<div class="icons">
-		<div
-			class="icon"
-			on:dblclick={() => handleDoubleClickIcon(Pong, { name: 'Pong', icon: '/pong.png' })}
-		>
-			<img src="/pong.png" alt="pong" />
-			<span>Pong</span>
-		</div>
-		<div
-			class="icon"
-			on:dblclick={() => handleDoubleClickIcon(Square, { name: 'Chat', icon: '/mail.png' })}
-		>
-			<img src="/mail.png" alt="chat" />
-			<span>Chat</span>
-		</div>
-		<div
-			class="icon"
-			on:dblclick={() => handleDoubleClickIcon(Contact, { name: 'Contact', icon: '/mail.png' })}
-		>
-			<img src="/mail.png" alt="contact" />
-			<span>Contact</span>
-		</div>
+		{#each Object.entries(apps) as [k, v]}
+			<div class="icon" on:dblclick={() => addInstance(k)}>
+				<img src={v.icon} alt={v.name} />
+				<span>{v.name}</span>
+			</div>
+		{/each}
 	</div>
 
-	{#each windows as { component, props, me, visible, id, winProps }, i (id)}
+	{#each instances as { componentType, component, visible, id }, i (id)}
 		<Window
-			{...winProps}
+			{...apps[componentType]}
 			parentWidth={width}
 			parentHeight={height}
-			z={zstack.indexOf(i)}
+			z={zstack.indexOf(i) ?? 0}
 			{visible}
 			on:minimize={() => {
 				visible = !visible;
@@ -90,7 +98,7 @@
 				selected = i;
 			}}
 		>
-			<svelte:component this={component} bind:this={me} {...props} />
+			<svelte:component this={component} />
 		</Window>
 	{/each}
 </div>
@@ -104,10 +112,9 @@
 				<img src="/start.png" alt="start" />
 				Start
 			</a>
-			{#each windows as { me, visible, id }, i (id)}
+			{#each instances as { componentType, visible, id }, i (id)}
 				<Tab
-					route={me.url}
-					name={me.name}
+					{...apps[componentType]}
 					active={selected === i}
 					on:click={() => {
 						putOnTop(i);

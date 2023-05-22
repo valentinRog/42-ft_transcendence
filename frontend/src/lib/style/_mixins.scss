@@ -1,4 +1,3 @@
-
 //---------------------------------------
 // --------------- TAB ------------------
 //---------------------------------------
@@ -44,7 +43,8 @@
 
 @mixin tab-contour {
 	@include tab-border(black, white); //border around the navbar element in outside mode
-	&::before { // & marche pas pour le contact ?
+	&::before {
+		// & marche pas pour le contact ?
 		// line that's light grey nex to the white border when in outside mode
 		@include tab-top-line($light-grey);
 	}
@@ -79,11 +79,9 @@
 	&.active::after {
 		@include tab-bottom-line($light-grey);
 	}
-	
 }
 
 @mixin tab {
-	
 	background-color: $grey;
 	color: inherit;
 	font-size: 1.2rem;
@@ -93,11 +91,11 @@
 	width: 15rem;
 	padding: 0.2rem 0.8rem;
 	position: relative;
-	
+
 	@include tab-contour;
 	@include tab-contour-active;
 	img {
-			@include tab-logo;
+		@include tab-logo;
 	}
 }
 

@@ -4,7 +4,7 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import ioClient from 'socket.io-client';
+	import { connectSocket } from '$lib/scripts/connect';
 
 	onMount(() => {
 		if ($token) goto('/');
@@ -34,9 +34,7 @@
 				if (!res.access_token) return;
 				$token = res.access_token;
 				if (browser) sessionStorage.setItem('token', res.access_token);
-				let url = window.location.origin;
-				url = url.substring(0, url.lastIndexOf(':'));
-				$socket = ioClient(url + ':3000');
+				connectSocket();
 				goto('/');
 			})
 			.catch((err) => console.log(err));

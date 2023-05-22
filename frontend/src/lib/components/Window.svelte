@@ -21,8 +21,8 @@
 	let height: number;
 
 	$: {
-		if (top + height > parentHeight) top = Math.max(parentHeight - height, 0);
-		if (left + width > parentWidth) left = Math.max(parentWidth - width, 0);
+		if (top + height > parentHeight) top = parentHeight - height;
+		if (left + width > parentWidth) left = parentWidth - width;
 		if (top < 0) top = 0;
 		if (left < 0) left = 0;
 	}

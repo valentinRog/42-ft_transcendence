@@ -1,9 +1,6 @@
 <script lang="ts">
 	import { token } from '$lib/stores/stores';
 
-	export const url = '/mail.png';
-	export const name = 'Contact';
-
 	interface Friend {
 		id: string;
 		username: string;
@@ -40,18 +37,18 @@
 	}
 
 	async function removeFriend(friendUsername: string) {
-    	const res = await fetch('http://localhost:3000/users/remove-friend', {
-      		method: 'PATCH',
-      		headers: {
-        	Authorization: `Bearer ${$token}`,
-        	'Content-Type': 'application/json'
-      	},
-      	body: JSON.stringify({ friend: friendUsername })
-    });
-    const data = await res.json();
-    getFriends();
-    return data;
-  	}
+		const res = await fetch('http://localhost:3000/users/remove-friend', {
+			method: 'PATCH',
+			headers: {
+				Authorization: `Bearer ${$token}`,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ friend: friendUsername })
+		});
+		const data = await res.json();
+		getFriends();
+		return data;
+	}
 	getFriends();
 </script>
 
