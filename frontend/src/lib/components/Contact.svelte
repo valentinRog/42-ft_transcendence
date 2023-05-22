@@ -32,7 +32,7 @@
 			}
 		});
 		const data = await res.json();
-		friends = data;
+		friends = data || [];
 		return data;
 	}
 
