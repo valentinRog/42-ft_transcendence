@@ -17,4 +17,9 @@ export class MatchmakingController {
 
     return await this.matchmakingService.handlePlayerJoinedQueue(player);
   }
+
+  @Post('spectate')
+  async spectate(@GetUser() user, room: string) {
+    return await this.matchmakingService.joinSpectate(user.username, room);
+  }
 }

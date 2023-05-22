@@ -45,4 +45,19 @@ export class WebSocketService {
 
     return room;
   }
+
+  joinRoom(player: string, room: string) {
+    console.log('joinRoom', player, room);
+
+    const socketPlayer = this.getSocket(player);
+
+    if (!socketPlayer) {
+      return 'player socket not find';
+    }
+
+    socketPlayer.join(room);
+    socketPlayer.emit('enter-room', room);
+
+    return room;
+  }
 }

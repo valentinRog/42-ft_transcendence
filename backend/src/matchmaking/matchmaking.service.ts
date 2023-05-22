@@ -71,4 +71,21 @@ export class MatchmakingService {
       players[1].username,
     );
   }
+
+  async joinSpectate(userName: string, room: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { username: userName },
+    });
+
+    if (user.status !== 'online') {
+      return 'User is not ready';
+    }
+
+    this.prisma.user.update({
+      where: { username: userName },
+      data: { status: 'spectate' },
+    });
+
+    return await this.socketService.joinRoom(userName, room);
+  }
 }
