@@ -45,7 +45,9 @@ export abstract class SocketGateway
 
   handleDisconnect(client: Socket) {
     console.log(`user ${client.id} disconnected`);
-    //this.userService.updateUserStatus(user.username, 'offline');
+    const username = this.webSocketService.getClientName(client);
+
+    this.userService.updateUserStatus(username, 'offline');
     // Additional logic for handling disconnections
   }
 }

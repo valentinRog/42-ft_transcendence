@@ -4,17 +4,27 @@ import { Socket } from 'socket.io';
 @Injectable()
 export class WebSocketService {
   private websockets: Map<string, Socket> = new Map();
+  private reverseMap: Map<string, string> = new Map();
 
   addSocket(clientName: string, socket: Socket): void {
     this.websockets.set(clientName, socket);
+    this.reverseMap.set(socket.id, clientName);
   }
 
   removeSocket(clientName: string): void {
-    this.websockets.delete(clientName);
+    const socket = this.websockets.get(clientName);
+    if (socket) {
+      this.websockets.delete(clientName);
+      this.reverseMap.delete(socket.id);
+    }
   }
 
   getSocket(clientName: string): Socket | undefined {
     return this.websockets.get(clientName);
+  }
+
+  getClientName(socket: Socket): string | undefined {
+    return this.reverseMap.get(socket.id);
   }
 
   getAllSockets(): Map<string, Socket> {
