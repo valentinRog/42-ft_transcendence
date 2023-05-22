@@ -9,6 +9,6 @@ import { UserService } from 'src/user/user.service';
 
 @Module({
   imports: [JwtModule.register({}), HttpModule, UserModule],
-  providers: [WebsocketsGateway, WebSocketService, AuthService, UserService],
+  providers: [WebSocketService, AuthService, UserService],
 })
 export class WebSocketModule {}

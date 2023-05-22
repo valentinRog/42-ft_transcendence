@@ -202,11 +202,17 @@
 		let url = window.location.origin;
 		url = url.substring(0, url.lastIndexOf(':'));
 
-		const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImxvZ2luIjoiYnBlcnJhdWQiLCJ0d29GYWN0b3IiOmZhbHNlLCJpc1R3b0ZhY3RvckF1dGhlbnRpY2F0ZWQiOmZhbHNlLCJpYXQiOjE2ODQ1NDA3NjEsImV4cCI6MTY4NDYyNzE2MX0.sj6psQavac4oJgQzCxh_0RnnKtTIBzBwDH5wxuBi1Qg';
+		const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImxvZ2luIjoibHJvbmRpYSIsInR3b0ZhY3RvciI6ZmFsc2UsImlzVHdvRmFjdG9yQXV0aGVudGljYXRlZCI6ZmFsc2UsImlhdCI6MTY4NDc1OTgwNywiZXhwIjoxNjg0ODQ2MjA3fQ.Cp6m73wcZdlps54nkTi3EkdJV_4hJaWf0X53hftdNFU';
 		const socket = ioClient(url + ':3000', {
 			query: {
 				token: token,
 			}
+		});
+
+		socket.emit('room', 'test');
+
+		socket.on('join', () => {
+			console.log('joined room');
 		});
 
 		const canvas = document.querySelector('canvas') as HTMLCanvasElement;
@@ -230,6 +236,7 @@
 		});
 
 		socket.on('state', (s: GameState) => {
+			console.log('GameState');
 			if (state.id === 0) {
 				state = s;
 				state.time -= serverDelta;

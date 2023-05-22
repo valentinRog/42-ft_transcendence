@@ -13,7 +13,7 @@ import { PongGateway } from 'src/pong/pong.gateway';
     origin: 'http://localhost:5173',
   },
 })
-export class WebsocketsGateway
+export abstract class WebsocketsGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer()
@@ -36,22 +36,32 @@ export class WebsocketsGateway
       return false;
     }
 
-    console.log('user', user);
+    //console.log('user', user);
+    console.log('socket.id', socket.id);
+
+    //const pongNamespace = this.server.of('/pong');
+    //pongNamespace.on('connection', (pongSocket) => {
+    //  // Handle events specific to the "/pong" namespace
+    //});
+
+    // You can emit events to the "/pong" namespace
+    //pongNamespace.emit('pongEvent', 'Data for pong event');
+
     this.webSocketService.addSocket(user.id, socket);
 
     if (this.webSocketService.getSize() == 2) {
       console.log('2 players joined');
-      const gameGateway = new PongGateway();
-      gameGateway.setPlayer1(this.webSocketService.getAllSockets().get(1));
-      gameGateway.setPlayer2(this.webSocketService.getAllSockets().get(2));
-      gameGateway.setServer(this.server);
-      gameGateway.startGame();
+
+      // create room for 2 players
+      const room = this.server.to('room1');
+      room.emit('room', 'room1');
+
       this.webSocketService.addSocket(0, socket);
     }
   }
 
   handleDisconnect(socket: Socket) {
-    console.log('user disconnected');
+    console.log('user disconnected from websockets');
 
     // Additional logic for handling disconnections
   }
