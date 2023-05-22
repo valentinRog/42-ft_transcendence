@@ -44,7 +44,7 @@
 @mixin tab-contour {
 	@include tab-border(black, white); //border around the navbar element in outside mode
 	&::before {
-		// & marche pas pour le contact ?
+		//. & marche pas pour le contact ?
 		// line that's light grey nex to the white border when in outside mode
 		@include tab-top-line($light-grey);
 	}
@@ -119,23 +119,39 @@
 		width: 100%;
 		display: flex;
 		align-items: center;
-
+		
 		@include nav-border; //navbar grey border
 		&::after {
 			@include tab-top-line(white);
 		}
-		.navbar-menu {
-			.navbar-start {
-				margin-left: 0.3rem;
-
-				a {
-					@include tab;
-					margin-right: 0.25rem;
-				}
-				.start {
-					width: auto;
-					font-weight: 800;
-				}
+		.navbar-start {
+			margin: 0 0.25rem;
+			.start {
+				@include tab;
+				width: 7rem;
+				font-weight: 800;
+			}
+		}
+		.navbar-tabs {
+			width: calc(100% - 15.05rem);
+			margin-left: 0.3rem;
+			display: flex;
+			justify-content: flex-start;
+			flex-wrap: nowrap;
+			a {
+				@include tab;
+				width: 15%;
+				margin-right: 0.25rem;
+			}
+		}
+		.navbar-clock {
+			margin: 0 0.25rem;
+			margin-left: auto;
+			p {
+				@include tab-contour-hollow;
+				padding: 0.25rem;
+				height: $tab-height;
+				width: 7rem;
 			}
 		}
 	}

@@ -106,31 +106,34 @@
 <!-- NAVBAR -->
 
 <nav class="navbar" style:z-index={zstack.length}>
-	<div class="navbar-menu">
-		<div class="navbar-start">
-			<a class="start" href="/">
-				<img src="/start.png" alt="start" />
-				Start
-			</a>
-			{#each instances as { componentType, visible, id }, i (id)}
-				<Tab
-					{...apps[componentType]}
-					active={selected === i}
-					on:click={() => {
-						putOnTop(i);
-						if (visible && selected === i) {
-							visible = !visible;
-							selected = null;
-						} else if (visible) {
-							selected = i;
-						} else {
-							visible = !visible;
-							selected = i;
-						}
-					}}
-				/>
-			{/each}
-		</div>
+	<div class="navbar-start">
+		<a class="start" href="/">
+			<img src="/start.png" alt="start" />
+			Start
+		</a>
+	</div>
+	<div class="navbar-tabs">
+		{#each instances as { componentType, visible, id }, i (id)}
+			<Tab
+				{...apps[componentType]}
+				active={selected === i}
+				on:click={() => {
+					putOnTop(i);
+					if (visible && selected === i) {
+						visible = !visible;
+						selected = null;
+					} else if (visible) {
+						selected = i;
+					} else {
+						visible = !visible;
+						selected = i;
+					}
+				}}
+			/>
+		{/each}
+	</div>
+	<div class="navbar-clock">
+		<p> heure </p>
 	</div>
 </nav>
 
