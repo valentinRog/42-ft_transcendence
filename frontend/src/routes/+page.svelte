@@ -3,12 +3,14 @@
 	import Pong from '$lib/components/pong/Pong.svelte';
 	import Square from '$lib/components/Square.svelte';
 	import Contact from '$lib/components/Contact.svelte';
+	import Profile from '$lib/components/Profile.svelte';
 	import Tab from '$lib/components/Tab.svelte';
 
 	const components = {
 		Pong: Pong,
 		Square: Square,
-		Contact: Contact
+		Contact: Contact,
+		Profile: Profile
 	};
 	Object.freeze(components);
 
@@ -21,7 +23,8 @@
 	const apps: Record<App, AppProps> = {
 		Pong: { name: 'Pong', icon: '/pong.png' },
 		Square: { name: 'Chat', icon: '/mail.png' },
-		Contact: { name: 'Contact', icon: '/mail.png' }
+		Contact: { name: 'Contact', icon: '/mail.png' },
+		Profile: { name: 'Profile', icon: '/mail.png' }
 	};
 	Object.freeze(apps);
 
@@ -85,7 +88,7 @@
 			{...apps[componentType]}
 			parentWidth={width}
 			parentHeight={height}
-			z={zstack.indexOf(i) ?? 0}
+			z={zstack.indexOf(i)}
 			{visible}
 			on:minimize={() => {
 				visible = !visible;
