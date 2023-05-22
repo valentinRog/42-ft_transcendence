@@ -45,7 +45,7 @@ export class PongGateway {
   }
 
   @SubscribeMessage('room')
-  handleRoom(client: Socket, @MessageBody() room: string) {
+  handleRoom(client: Socket, room: string) {
     console.log('room', room);
 
     if (!client) {
@@ -72,7 +72,7 @@ export class PongGateway {
   }
 
   @SubscribeMessage('input')
-  handleInput(client: Socket, @MessageBody() input: Input) {
+  handleInput(client: Socket, input: Input) {
     // Iterate through the rooms to find the game room
 
     if (!client) return;
