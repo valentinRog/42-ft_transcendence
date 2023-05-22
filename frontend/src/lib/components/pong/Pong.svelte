@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { socket } from '$lib/stores/stores';
+	import { socket, token } from '$lib/stores/stores';
 	import type { GameState, Input } from './pong';
 	import { update, dimensions } from './pong';
 
@@ -64,6 +64,22 @@
 	let down = false;
 
 	onMount(() => {
+		async function connectToRoom() {
+			const res = await fetch('http://localhost:3000/matchmaking/queue', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${$token}`
+				},
+				body: JSON.stringify({ token: $token })
+			});
+			console.log(res);
+			const data = await res.text();
+			console.log(data);
+		}
+
+		connectToRoom();
+
 		$socket!.on('enter-room', (room: string) => {
 			console.log('enter-room', room);
 			$socket!.emit('enter-room', room);
