@@ -2,9 +2,8 @@ import {
   WebSocketGateway,
   SubscribeMessage,
   MessageBody,
-  ConnectedSocket,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Socket } from 'socket.io';
 import { SocketGateway } from '../websocket/websocket.gateway';
 import { PongGame } from './pong.class';
 
