@@ -20,7 +20,6 @@ type Input = {
 
 @WebSocketGateway({
   cors: {
-    namespace: 'pong',
     origin: 'http://localhost:5173',
   },
 })
@@ -48,11 +47,6 @@ export class PongGateway {
   handleRoom(client: Socket, room: string) {
     console.log('room', room);
 
-    if (!client) {
-      console.log('No client');
-      return 'No client';
-    }
-
     client.join(room);
 
     if (!this.games[room]) {
@@ -65,7 +59,7 @@ export class PongGateway {
       client.emit('index', 0);
     } else if (!this.games[room].getPlayer2()) {
       this.games[room].setPlayer2(client);
-      client.emit('index', 0);
+      client.emit('index', 1);
     }
 
     //this.server.to(room).emit('room');
@@ -74,15 +68,7 @@ export class PongGateway {
   @SubscribeMessage('input')
   handleInput(client: Socket, input: Input) {
     // Iterate through the rooms to find the game room
-
-    if (!client) return;
-
     const rooms = client.rooms;
-
-    if (!rooms) {
-      console.log('No rooms');
-      return;
-    }
 
     let gameRoom: string | null = null;
     rooms.forEach((room: string) => {
@@ -94,7 +80,7 @@ export class PongGateway {
 
     if (gameRoom) {
       // Use the game room for further processing
-      console.log('Game room:', gameRoom);
+      //console.log('Game room:', gameRoom);
       // ...
     }
 

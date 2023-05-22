@@ -259,6 +259,7 @@
 
 		socket.on('index', (i: number) => {
 			index = i;
+			console.log('index', index);
 		});
 
 		function gameLoop() {
