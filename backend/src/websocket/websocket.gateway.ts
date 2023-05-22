@@ -9,7 +9,6 @@ import {
 import { Socket, Server } from 'socket.io';
 import { WebSocketService } from './websocket.service';
 import { AuthService } from 'src/auth/auth.service';
-import { PongGame } from 'src/pong/pong.class';
 
 @WebSocketGateway({
   cors: {
@@ -21,8 +20,6 @@ export abstract class SocketGateway
 {
   @WebSocketServer()
   server: Server;
-
-  private games: { [room: string]: PongGame } = {};
 
   constructor(
     private readonly webSocketService: WebSocketService,

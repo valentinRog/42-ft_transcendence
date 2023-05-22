@@ -61,6 +61,12 @@ type Input = {
 };
 
 export class PongGame {
+  constructor(server: Server, room: string) {
+    this.server = server;
+    this.room = room;
+    this.startGame();
+  }
+  private server: Server;
   private tickRate = 30;
   private room: string;
   private player1: Socket | null = null;
@@ -83,10 +89,10 @@ export class PongGame {
     missed: false,
   };
 
-  constructor(room: string) {
-    this.room = room;
-    this.startGame();
-  }
+  //  constructor(room: string) {
+  //    this.room = room;
+  //    this.startGame();
+  //  }
 
   private startGame() {
     console.log(`Game in room ${this.room} started`);
@@ -237,7 +243,7 @@ export class PongGame {
       this.state.paddles[1].down = input.down;
     }
 
-    //this.server.emit('state', this.state);
+    this.server.emit('state', this.state);
     setTimeout(this.gameLoop.bind(this), 1000 / this.tickRate);
   }
 }

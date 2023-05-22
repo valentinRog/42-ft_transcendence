@@ -23,20 +23,8 @@ type Input = {
     origin: 'http://localhost:5173',
   },
 })
-export class PongGateway {
-  // extends SocketGateway {
+export class PongGateway extends SocketGateway {
   private games: { [room: string]: PongGame } = {};
-
-  //  @SubscribeMessage('input')
-  //  handleInput(@MessageBody() input: Input) {
-  //    if (this.player1 !== null && input.clientId === this.player1.id) {
-  //      this.inputs1.push(input);
-  //      this.player1.emit('index', 0);
-  //    } else if (this.player2 !== null && input.clientId === this.player2.id) {
-  //      this.inputs2.push(input);
-  //      this.player2.emit('index', 1);
-  //    }
-  //  }
 
   @SubscribeMessage('ping')
   handlePing(@MessageBody() data: number) {
@@ -50,7 +38,7 @@ export class PongGateway {
     client.join(room);
 
     if (!this.games[room]) {
-      const game = new PongGame(room);
+      const game = new PongGame(this.server, room);
       this.games[room] = game;
     }
 
@@ -62,7 +50,7 @@ export class PongGateway {
       client.emit('index', 1);
     }
 
-    //this.server.to(room).emit('room');
+    this.server.to(room).emit('room');
   }
 
   @SubscribeMessage('input')
