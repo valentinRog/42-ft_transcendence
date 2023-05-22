@@ -3,8 +3,6 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
   WebSocketServer,
-  SubscribeMessage,
-  MessageBody,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { WebSocketService } from './websocket.service';
@@ -38,16 +36,7 @@ export abstract class SocketGateway
       return false;
     }
 
-    //console.log('user', user);
     console.log('socket.id', socket.id);
-
-    //const pongNamespace = this.server.of('/pong');
-    //pongNamespace.on('connection', (pongSocket) => {
-    //  // Handle events specific to the "/pong" namespace
-    //});
-
-    // You can emit events to the "/pong" namespace
-    //pongNamespace.emit('pongEvent', 'Data for pong event');
 
     this.webSocketService.addSocket(user.id, socket);
 

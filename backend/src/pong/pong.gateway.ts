@@ -31,10 +31,9 @@ export class PongGateway extends SocketGateway {
     return [data, Date.now()];
   }
 
-  @SubscribeMessage('room')
+  @SubscribeMessage('enter-room')
   handleRoom(client: Socket, room: string) {
-    console.log('room', room);
-
+    console.log('enter-room', room);
     client.join(room);
 
     if (!this.games[room]) {
@@ -49,17 +48,12 @@ export class PongGateway extends SocketGateway {
       this.games[room].setPlayer2(client);
       client.emit('index', 1);
     }
-
-    this.server.to(room).emit('room');
   }
 
   @SubscribeMessage('input')
   handleInput(client: Socket, input: Input) {
-    // Iterate through the rooms to find the game room
-    const rooms = client.rooms;
-
     let gameRoom: string | null = null;
-    rooms.forEach((room: string) => {
+    client.rooms.forEach((room: string) => {
       if (room !== client.id) {
         // Exclude the default room, which has the same ID as the client
         gameRoom = room;
@@ -67,14 +61,10 @@ export class PongGateway extends SocketGateway {
     });
 
     if (gameRoom) {
-      // Use the game room for further processing
-      //console.log('Game room:', gameRoom);
-      // ...
-    }
-
-    const game = this.games[gameRoom];
-    if (game) {
-      game.handleInput(input);
+      const game = this.games[gameRoom];
+      if (game) {
+        game.handleInput(input);
+      }
     }
   }
 }

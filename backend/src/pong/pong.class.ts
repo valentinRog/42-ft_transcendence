@@ -89,11 +89,6 @@ export class PongGame {
     missed: false,
   };
 
-  //  constructor(room: string) {
-  //    this.room = room;
-  //    this.startGame();
-  //  }
-
   private startGame() {
     console.log(`Game in room ${this.room} started`);
     this.gameLoop();
@@ -243,7 +238,7 @@ export class PongGame {
       this.state.paddles[1].down = input.down;
     }
 
-    this.server.emit('state', this.state);
+    this.server.to(this.room).emit('state', this.state);
     setTimeout(this.gameLoop.bind(this), 1000 / this.tickRate);
   }
 }

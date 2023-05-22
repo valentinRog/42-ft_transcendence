@@ -202,6 +202,8 @@
 		let url = window.location.origin;
 		url = url.substring(0, url.lastIndexOf(':'));
 
+		const room = 'test';
+
 		const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImxvZ2luIjoibHJvbmRpYSIsInR3b0ZhY3RvciI6ZmFsc2UsImlzVHdvRmFjdG9yQXV0aGVudGljYXRlZCI6ZmFsc2UsImlhdCI6MTY4NDc1OTgwNywiZXhwIjoxNjg0ODQ2MjA3fQ.Cp6m73wcZdlps54nkTi3EkdJV_4hJaWf0X53hftdNFU';
 		const socket = ioClient(url + ':3000', {
 			query: {
@@ -209,11 +211,7 @@
 			}
 		});
 
-		socket.emit('room', 'test');
-
-		socket.on('room', () => {
-			console.log('joined room');
-		});
+		socket.emit('enter-room', room);
 
 		const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 		const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
