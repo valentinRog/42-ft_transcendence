@@ -6,10 +6,11 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { HttpModule } from '@nestjs/axios';
 import { JwtModule } from '@nestjs/jwt';
 import { WebSocketService } from 'src/websocket/websocket.service';
+import { WebSocketModule } from 'src/websocket/websocket.module';
 
 @Module({
-  imports: [JwtModule.register({}), HttpModule],
+  imports: [JwtModule.register({}), HttpModule, WebSocketModule],
   controllers: [MatchmakingController],
-  providers: [MatchmakingService, UserService, PrismaService, WebSocketService],
+  providers: [MatchmakingService, UserService, PrismaService],
 })
 export class MatchmakingModule {}

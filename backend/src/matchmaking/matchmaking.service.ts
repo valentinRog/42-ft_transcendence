@@ -29,14 +29,16 @@ export class MatchmakingService {
   private queue: MatchmakingQueue;
 
   constructor(
-    private userService: UserService,
-    private prisma: PrismaService,
-    private socketService: WebSocketService,
+    private readonly userService: UserService,
+    private readonly prisma: PrismaService,
+    private readonly socketService: WebSocketService,
   ) {
     this.queue = new MatchmakingQueue();
   }
 
   async handlePlayerJoinedQueue(player: PlayerDto) {
+    console.log(this.socketService.getAllSockets());
+
     const user = await this.prisma.user.findUnique({
       where: { username: player.username },
     });
@@ -63,9 +65,6 @@ export class MatchmakingService {
   }
 
   async handleMatchFound(players: PlayerDto[]): Promise<string> {
-    this.userService.updateUserStatus(players[0].username, 'in-game');
-    this.userService.updateUserStatus(players[1].username, 'in-game');
-
     return this.socketService.createRoom(
       players[0].username,
       players[1].username,

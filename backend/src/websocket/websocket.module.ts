@@ -7,6 +7,7 @@ import { UserModule } from 'src/user/user.module';
 import { UserService } from 'src/user/user.service';
 
 @Module({
+  exports: [WebSocketService],
   imports: [JwtModule.register({}), HttpModule, UserModule],
   providers: [WebSocketService, AuthService, UserService],
 })
