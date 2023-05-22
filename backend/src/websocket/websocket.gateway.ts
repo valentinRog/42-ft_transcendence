@@ -3,21 +3,34 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
   WebSocketServer,
+  SubscribeMessage,
+  MessageBody,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { WebSocketService } from './websocket.service';
 import { AuthService } from 'src/auth/auth.service';
+import { PongGame } from 'src/pong/pong.class';
+
+type Input = {
+  clientId: string;
+  stateId: number;
+  idDelta: number;
+  up: boolean;
+  down: boolean;
+  clientTime: number;
+  serverTime: number;
+};
 
 @WebSocketGateway({
   cors: {
     origin: 'http://localhost:5173',
   },
 })
-export abstract class SocketGateway
-  implements OnGatewayConnection, OnGatewayDisconnect
-{
+export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
+
+  private games: { [room: string]: PongGame } = {};
 
   constructor(
     private readonly webSocketService: WebSocketService,
@@ -64,5 +77,70 @@ export abstract class SocketGateway
     console.log('user disconnected from websockets');
 
     // Additional logic for handling disconnections
+  }
+
+  @SubscribeMessage('ping')
+  handlePing(@MessageBody() data: number) {
+    return [data, Date.now()];
+  }
+
+  @SubscribeMessage('room')
+  handleRoom(client: Socket, room: string) {
+    console.log('room', room);
+
+    if (!client) {
+      console.log('No client');
+      return 'No client';
+    }
+
+    client.join(room);
+
+    if (!this.games[room]) {
+      const game = new PongGame(room);
+      this.games[room] = game;
+    }
+
+    if (!this.games[room].getPlayer1()) {
+      this.games[room].setPlayer1(client);
+      client.emit('index', 0);
+    } else if (!this.games[room].getPlayer2()) {
+      this.games[room].setPlayer2(client);
+      client.emit('index', 0);
+    }
+
+    this.server.to(room).emit('room');
+  }
+
+  @SubscribeMessage('input')
+  handleInput(client: Socket, @MessageBody() input: Input) {
+    // Iterate through the rooms to find the game room
+
+    if (!client) return;
+
+    const rooms = client.rooms;
+
+    if (!rooms) {
+      console.log('No rooms');
+      return;
+    }
+
+    let gameRoom: string | null = null;
+    rooms.forEach((room: string) => {
+      if (room !== client.id) {
+        // Exclude the default room, which has the same ID as the client
+        gameRoom = room;
+      }
+    });
+
+    if (gameRoom) {
+      // Use the game room for further processing
+      console.log('Game room:', gameRoom);
+      // ...
+    }
+
+    const game = this.games[gameRoom];
+    if (game) {
+      game.handleInput(input);
+    }
   }
 }

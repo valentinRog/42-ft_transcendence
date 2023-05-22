@@ -9,6 +9,7 @@ import { StatModule } from './stat/stat.module';
 import { PongModule } from './pong/pong.module';
 import { MatchmakingModule } from './matchmaking/matchmaking.module';
 import { WebSocketModule } from './websocket/websocket.module';
+import { SocketGateway } from './websocket/websocket.gateway';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { WebSocketModule } from './websocket/websocket.module';
     UserModule,
     StatModule,
     WebSocketModule,
-    PongModule,
+    //PongModule,
     MatchmakingModule,
   ],
   controllers: [AppController],

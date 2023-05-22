@@ -2,6 +2,7 @@ import {
   WebSocketGateway,
   SubscribeMessage,
   MessageBody,
+  ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { SocketGateway } from '../websocket/websocket.gateway';
@@ -19,11 +20,12 @@ type Input = {
 
 @WebSocketGateway({
   cors: {
-    namespace: '/pong', // Set the namespace to '/pong'
+    namespace: 'pong',
     origin: 'http://localhost:5173',
   },
 })
-export class PongGateway extends SocketGateway {
+export class PongGateway {
+  // extends SocketGateway {
   private games: { [room: string]: PongGame } = {};
 
   //  @SubscribeMessage('input')
@@ -45,6 +47,12 @@ export class PongGateway extends SocketGateway {
   @SubscribeMessage('room')
   handleRoom(client: Socket, @MessageBody() room: string) {
     console.log('room', room);
+
+    if (!client) {
+      console.log('No client');
+      return 'No client';
+    }
+
     client.join(room);
 
     if (!this.games[room]) {
@@ -60,14 +68,24 @@ export class PongGateway extends SocketGateway {
       client.emit('index', 0);
     }
 
-    this.server.to(room).emit('join');
+    //this.server.to(room).emit('room');
   }
 
   @SubscribeMessage('input')
   handleInput(client: Socket, @MessageBody() input: Input) {
     // Iterate through the rooms to find the game room
+
+    if (!client) return;
+
+    const rooms = client.rooms;
+
+    if (!rooms) {
+      console.log('No rooms');
+      return;
+    }
+
     let gameRoom: string | null = null;
-    client.rooms.forEach((room: string) => {
+    rooms.forEach((room: string) => {
       if (room !== client.id) {
         // Exclude the default room, which has the same ID as the client
         gameRoom = room;

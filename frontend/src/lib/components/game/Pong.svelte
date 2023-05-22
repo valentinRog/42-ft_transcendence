@@ -211,7 +211,7 @@
 
 		socket.emit('room', 'test');
 
-		socket.on('join', () => {
+		socket.on('room', () => {
 			console.log('joined room');
 		});
 
