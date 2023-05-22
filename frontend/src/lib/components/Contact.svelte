@@ -4,6 +4,14 @@
 	export const url = '/mail.png';
 	export const name = 'Contact';
 
+	interface Friend {
+		id: string;
+		username: string;
+		status: string;
+	}
+
+	let friends: Friend[] = [];
+
 	async function addFriend(event: Event) {
 		const form = (event.target as HTMLFormElement).friend.value;
 		console.log(form);
@@ -15,35 +23,63 @@
 			},
 			body: JSON.stringify({ friend: form })
 		});
+		getFriends();
 		return await res.json();
 	}
 
-	async function getMe() {
-		const res = await fetch('http://localhost:3000/users/me', {
+	async function getFriends() {
+		const res = await fetch('http://localhost:3000/users/me/friends', {
 			method: 'GET',
 			headers: {
 				Authorization: `Bearer ${$token}`
 			}
 		});
 		const data = await res.json();
-		console.log(data);
+		friends = data;
 		return data;
 	}
+
+	async function removeFriend(friendUsername: string) {
+    	const res = await fetch('http://localhost:3000/users/remove-friend', {
+      		method: 'PATCH',
+      		headers: {
+        	Authorization: `Bearer ${$token}`,
+        	'Content-Type': 'application/json'
+      	},
+      	body: JSON.stringify({ friend: friendUsername })
+    });
+    const data = await res.json();
+    getFriends();
+    return data;
+  	}
+	getFriends();
 </script>
 
-<div>
+<div id="box">
 	<form on:submit|preventDefault={addFriend}>
 		<label for="friend">Add Friend:</label>
 		<input type="text" id="friend" name="friend" />
-		<input type="submit" value="Add Friend" />
+		<input type="submit" value="+" />
 	</form>
-	<button on:click={getMe}>Show friend in explorer (temp)</button>
+	<div id="friend-list">
+		{#each friends as friend (friend.id)}
+			<div class="friend">
+				<p>{friend.username}</p>
+				<p>{friend.status}</p>
+				{#if friend.status === 'online'}
+					<button>Invite Game</button>
+				{/if}
+				<button>Chat</button>
+				<button on:click={() => removeFriend(friend.username)}>Remove Friend</button>
+			</div>
+		{/each}
+	</div>
 </div>
 
 <style lang="scss">
-	div {
-		width: 15rem;
-		height: 15rem;
+	#box {
+		width: 15.5rem;
+		height: 20rem;
 	}
 
 	button,
