@@ -84,13 +84,12 @@
 @mixin tab {
 	background-color: $grey;
 	color: inherit;
-	font-size: 1.2rem;
 	text-decoration: none;
+	font-size: 1.2rem;
 	display: inline-block;
 	height: $tab-height;
-	width: 15rem;
 	padding: 0.2rem 0.8rem;
-	position: relative;
+	margin-right: 0.25rem;
 
 	@include tab-contour;
 	@include tab-contour-active;
@@ -118,7 +117,9 @@
 		bottom: 0;
 		width: 100%;
 		display: flex;
+		flex-wrap: nowrap;
 		align-items: center;
+		overflow-x: auto; 
 		
 		@include nav-border; //navbar grey border
 		&::after {
@@ -133,16 +134,19 @@
 			}
 		}
 		.navbar-tabs {
-			width: calc(100% - 15.05rem);
+			flex-basis: calc(100% - 15.05rem);
+			flex-shrink: 1;
 			margin-left: 0.3rem;
 			display: flex;
 			justify-content: flex-start;
 			flex-wrap: nowrap;
-			a {
-				@include tab;
-				width: 15%;
-				margin-right: 0.25rem;
-			}
+			overflow: hidden;
+			// a {
+				// @include tab;
+				// width: 15%;
+				// margin-right: 0.25rem;
+				// flex-shrink: 1;
+			// }
 		}
 		.navbar-clock {
 			margin: 0 0.25rem;
