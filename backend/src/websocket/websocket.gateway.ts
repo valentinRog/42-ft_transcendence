@@ -33,32 +33,16 @@ export abstract class SocketGateway
 
     if (!user) {
       socket.disconnect();
-      return false;
+      return;
     }
 
     console.log('socket.id', socket.id);
-
-    this.webSocketService.addSocket(user.id, socket);
-
-    if (this.webSocketService.getSize() == 2) {
-      console.log('2 players joined');
-
-      // create room for 2 players
-      const room = this.server.to('room1');
-      room.emit('room', 'room1');
-
-      this.webSocketService.addSocket(0, socket);
-    }
+    this.webSocketService.addSocket(user.username, socket);
   }
 
-  handleDisconnect(socket: Socket) {
-    console.log('user disconnected from websockets');
+  handleDisconnect(client: Socket) {
+    console.log(`user ${client.id} disconnected`);
 
     // Additional logic for handling disconnections
   }
-
-  //  @SubscribeMessage('ping')
-  //  handlePing(@MessageBody() data: number) {
-  //    return [data, Date.now()];
-  //  }
 }

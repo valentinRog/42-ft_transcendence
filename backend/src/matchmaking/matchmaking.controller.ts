@@ -12,7 +12,7 @@ export class MatchmakingController {
   async queue(@GetUser() user) {
     const player = {
       username: user.username,
-      elo: user.stats.elo,
+      elo: user.stat.elo,
     };
 
     return await this.matchmakingService.handlePlayerJoinedQueue(player);

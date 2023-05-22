@@ -1,7 +1,6 @@
 import { Injectable, UploadedFile, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EditUserDto } from './dto';
-import { ConfigService } from '@nestjs/config';
 import { createWriteStream } from 'fs';
 import { HttpService } from '@nestjs/axios';
 import UPLOAD_PATH from '../../config/upload-path';
@@ -11,7 +10,6 @@ import * as fs from 'fs';
 export class UserService {
   constructor(
     private prisma: PrismaService,
-    private config: ConfigService,
     private httpService: HttpService,
   ) {}
 
@@ -121,5 +119,17 @@ export class UserService {
       },
     });
     return users;
+  }
+
+  async updateUserStatus(userName: string, status: string) {
+    const user = await this.prisma.user.update({
+      where: {
+        username: userName,
+      },
+      data: {
+        status: status,
+      },
+    });
+    return user;
   }
 }
