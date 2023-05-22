@@ -2,13 +2,9 @@ import {
   WebSocketGateway,
   SubscribeMessage,
   MessageBody,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
-  WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-
-import { WebsocketsGateway } from '../websocket/websocket.gateway';
+import { SocketGateway } from '../websocket/websocket.gateway';
 
 interface Dimensions {
   readonly width: number;
@@ -75,28 +71,11 @@ type Input = {
     origin: 'http://localhost:5173',
   },
 })
-//implements OnGatewayConnection, OnGatewayDisconnect
-export class PongGateway extends WebsocketsGateway {
-  //  @WebSocketServer()
-  //  server: Server;
-
-  //  handleConnection(socket: Socket) {
-  //    console.log('user connected');
-  //    console.log(socket.id);
-  //    socket.disconnect();
-  //  }
-
-  //  handleDisconnect(socket: Socket) {
-  //    console.log('user disconnected');
-  //    console.log(socket.id);
-  //    // Additional logic for handling disconnections
-  //  }
-
+export class PongGateway extends SocketGateway {
   private tickRate = 30;
 
   private player1: Socket | null = null;
   private player2: Socket | null = null;
-  //private server: Server | null = null;
 
   private inputs1: Input[] = [];
   private inputs2: Input[] = [];
@@ -132,16 +111,11 @@ export class PongGateway extends WebsocketsGateway {
     console.log('player2', player2.id);
   }
 
-  setServer(server: Server) {
-    this.server = server;
-  }
-
   @SubscribeMessage('room')
   handleRoom(@MessageBody() room: string) {
     console.log('room', room);
-    //this.server.socketsJoin(room);
+    this.server.socketsJoin(room);
     this.server.emit('join');
-    console.log(this.server);
   }
 
   @SubscribeMessage('events')

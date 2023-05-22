@@ -7,13 +7,13 @@ import {
 import { Socket, Server } from 'socket.io';
 import { WebSocketService } from './websocket.service';
 import { AuthService } from 'src/auth/auth.service';
-import { PongGateway } from 'src/pong/pong.gateway';
+
 @WebSocketGateway({
   cors: {
     origin: 'http://localhost:5173',
   },
 })
-export abstract class WebsocketsGateway
+export abstract class SocketGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer()
