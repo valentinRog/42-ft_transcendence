@@ -7,6 +7,7 @@ import {
 import { Socket, Server } from 'socket.io';
 import { WebSocketService } from './websocket.service';
 import { AuthService } from 'src/auth/auth.service';
+import { UserService } from 'src/user/user.service';
 
 @WebSocketGateway({
   cors: {
@@ -22,6 +23,7 @@ export abstract class SocketGateway
   constructor(
     private readonly webSocketService: WebSocketService,
     private readonly authService: AuthService,
+    private readonly userService: UserService,
   ) {}
 
   async handleConnection(socket: Socket) {
@@ -38,11 +40,12 @@ export abstract class SocketGateway
 
     console.log('socket.id', socket.id);
     this.webSocketService.addSocket(user.username, socket);
+    this.userService.updateUserStatus(user.username, 'online');
   }
 
   handleDisconnect(client: Socket) {
     console.log(`user ${client.id} disconnected`);
-
+    //this.userService.updateUserStatus(user.username, 'offline');
     // Additional logic for handling disconnections
   }
 }
