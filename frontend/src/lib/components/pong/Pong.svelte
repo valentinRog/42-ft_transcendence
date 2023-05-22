@@ -64,6 +64,11 @@
 	let down = false;
 
 	onMount(() => {
+		$socket!.on('enter-room', (room: string) => {
+			console.log('enter-room', room);
+			$socket!.emit('enter-room', room);
+		});
+
 		const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 		const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 		canvas.width = dimensions.width;
