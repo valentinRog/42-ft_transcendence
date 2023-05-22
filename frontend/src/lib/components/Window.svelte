@@ -4,16 +4,28 @@
 
 	const dispatch = createEventDispatcher();
 
+	export let name: string;
+	export let icon: string;
+
 	export let z = 0;
 
 	export let parentWidth: number;
 	export let parentHeight: number;
+
+	export let visible = true;
 
 	let top = parentHeight / 2;
 	let left = parentWidth / 2;
 
 	let width: number;
 	let height: number;
+
+	$: {
+		if (top + height > parentHeight) top = parentHeight - height;
+		if (left + width > parentWidth) left = parentWidth - width;
+		if (top < 0) top = 0;
+		if (left < 0) left = 0;
+	}
 
 	let moving = false;
 	onMount(() => {
@@ -23,31 +35,27 @@
 
 	function onMouseMove(e: MouseEvent) {
 		if (!moving) return;
-		if (left + e.movementX < 0) {
-			left = 0;
-		} else if (left + e.movementX > parentWidth - width) {
-			left = parentWidth - width;
-		} else {
-			left += e.movementX;
-		}
-		if (top + e.movementY < 0) {
-			top = 0;
-		} else if (top + e.movementY > parentHeight - height) {
-			top = parentHeight - height;
-		} else {
-			top += e.movementY;
-		}
+		left += e.movementX;
+		top += e.movementY;
 	}
 </script>
 
 <section
-	style="left: {left}px; top: {top}px; z-index: {z};"
+	style:left={`${left}px`}
+	style:top={`${top}px`}
+	style:z-index={z}
+	style:visibility={visible ? 'visible' : 'hidden'}
 	bind:offsetWidth={width}
 	bind:offsetHeight={height}
+	on:mousedown
 >
 	<div on:mousedown={() => (moving = true)}>
-		<button on:click={() => dispatch('minimize')}>-</button>
-		<button on:click={() => dispatch('close')}>x</button>
+		<img src={icon} />
+		<p>{name}</p>
+		<div class="buttons">
+			<button on:click={() => dispatch('minimize')}>_</button>
+			<button on:click={() => dispatch('close')}>X</button>
+		</div>
 	</div>
 	<slot />
 </section>
@@ -61,18 +69,42 @@
 		left: 5rem;
 		border: 0.2rem solid black;
 		user-select: none;
-
+		@include tab-contour;
+		background-color: $grey;
 		& > div {
-			height: 2rem;
-			background-color: blue;
+			display: flex;
+			height: 1.5rem;
+			margin: 0.2rem 0.2rem;
+			background-color: $dark-grey;
+			align-items: center;
 
 			&:hover {
 				cursor: grab;
 			}
+
+			.buttons {
+				margin-left: auto;
+				margin-right: 0.2rem;
+			}
+		}
+
+		img {
+			margin-left: 0.5rem;
+			height: 1rem;
+			width: auto;
+		}
+
+		p {
+			padding: 0.25rem;
+			color: $light-grey;
+			font-weight: bolder;
 		}
 
 		button {
-			font-size: 1.3rem;
+			@include tab-contour;
+			@include tab-contour-active;
+			padding: 0 0.25rem;
+			background-color: $grey;
 		}
 	}
 </style>

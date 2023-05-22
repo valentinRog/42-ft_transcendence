@@ -1,13 +1,4 @@
 //---------------------------------------
-// --------------- NAVBAR ---------------
-//---------------------------------------
-
-@mixin nav-border {
-	border-style: solid;
-	border-width: $line-width 0 0 0;
-	border-top-color: $light-grey;
-}
-//---------------------------------------
 // --------------- TAB ------------------
 //---------------------------------------
 
@@ -44,57 +35,80 @@
 }
 
 @mixin tab-logo {
-	width: 1.4rem;
+	height: 1.25rem;
+	width: auto;
 	vertical-align: sub;
 	margin-right: 0.4rem;
 }
 
-// ------------------------------------------------
-// --------------------- TAB ----------------------
-// ------------------------------------------------
+@mixin tab-contour {
+	@include tab-border(black, white); //border around the navbar element in outside mode
+	&::before {
+		//. & marche pas pour le contact ?
+		// line that's light grey nex to the white border when in outside mode
+		@include tab-top-line($light-grey);
+	}
+	&::after {
+		// line that's dark grey next to the black border when in outside mode
+		@include tab-bottom-line($dark-grey);
+	}
+}
+
+@mixin tab-contour-hollow {
+	@include tab-border(white, black); //border around the navbar element in outside mode
+	&::before {
+		// line that's light grey nex to the white border when in outside mode
+		@include tab-top-line($dark-grey);
+	}
+	&::after {
+		// line that's dark grey next to the black border when in outside mode
+		@include tab-bottom-line($light-grey);
+	}
+}
+
+@mixin tab-contour-active {
+	&:active,
+	&.active {
+		@include tab-border(white, black);
+	}
+	&:active::before,
+	&.active::before {
+		@include tab-top-line($dark-grey);
+	}
+	&:active::after,
+	&.active::after {
+		@include tab-bottom-line($light-grey);
+	}
+}
 
 @mixin tab {
+	background-color: $grey;
+	display: inline-block;
+	height: $tab-height;
+	padding: 0.2rem 0.8rem;
+	margin-right: 0.25rem;
+	
+	@include tab-contour;
+	@include tab-contour-active;
 	a {
-		background-color: $grey;
 		color: inherit;
-		font-size: 1.2rem;
-		margin-right: 0.25rem;
 		text-decoration: none;
-		display: inline-block;
-		width: 15rem;
-		padding: 0.2rem 0.8rem;
-		position: relative;
-
-		@include tab-border(black, white); //border around the navbar element in outside mode
-		&:active {
-			//inverts colors when clicked on
-			@include tab-border(white, black);
-		}
-		&::before {
-			// line that's light grey nex to the white border when in outside mode
-			@include tab-top-line($light-grey);
-		}
-		&:active::before {
-			// changes color when clicked on
-			@include tab-top-line($dark-grey);
-		}
-		&::after {
-			// line that's dark grey next to the black border when in outside mode
-			@include tab-bottom-line($dark-grey);
-		}
-		&:active::after {
-			//changes color when clicked on
-			@include tab-bottom-line($light-grey);
-		}
-		img {
-			@include tab-logo;
-		}
+		font-size: 1.2rem;
+	}
+	img {
+		@include tab-logo;
 	}
 }
 
 // ------------------------------------------------
-// --------------- THE WHOLE NAVBAR ---------------
+// -------------------- NAVBAR --------------------
 // ------------------------------------------------
+
+@mixin nav-border {
+	border-style: solid;
+	border-width: $line-width 0 0 0;
+	border-top-color: $light-grey;
+}
 
 @mixin navbar {
 	.navbar {
@@ -105,21 +119,39 @@
 		bottom: 0;
 		width: 100%;
 		display: flex;
+		flex-wrap: nowrap;
 		align-items: center;
-
-		@include nav-border; //navbar grey border
+		overflow-x: auto; 
+		
+		@include nav-border;
 		&::after {
 			@include tab-top-line(white);
 		}
-		.navbar-menu {
-			.navbar-start {
-				margin-left: 0.3rem;
-
-				@include tab;
-				.start {
-					width: auto;
-					font-weight: 800;
-				}
+		.navbar-start {
+			margin: 0 0.25rem;
+			@include tab;
+			.start {
+				width: 7rem;
+				font-weight: 800;
+			}
+		}
+		.navbar-tabs {
+			flex-basis: calc(100% - 14.5rem);
+			flex-shrink: 1;
+			margin-left: 0.3rem;
+			display: flex;
+			justify-content: flex-start;
+			flex-wrap: nowrap;
+			overflow: hidden;
+		}
+		.navbar-clock {
+			margin: 0 0.25rem;
+			margin-left: auto;
+			p {
+				@include tab-contour-hollow;
+				padding: 0.25rem;
+				height: $tab-height;
+				width: 7rem;
 			}
 		}
 	}

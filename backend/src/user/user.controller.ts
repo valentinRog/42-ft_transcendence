@@ -11,6 +11,8 @@ import {
   MaxFileSizeValidator,
   ForbiddenException,
   Get,
+  Param,
+  NotFoundException
 } from '@nestjs/common';
 import { GetUser } from '../auth/decorator';
 import { JwtGuard } from '../auth/guard';
@@ -29,6 +31,18 @@ export class UserController {
   getMe(@GetUser() user) {
     return user;
   }
+
+  @UseGuards(JwtGuard)
+  @Get('me/friends')
+  async getUserFriends(@GetUser('id') userId: number) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+      if (!user || !user.friends) throw new NotFoundException('User or friends not found');
+      const friends = await this.prisma.user.findMany({
+      where: { id: { in: user.friends } },
+    });
+    return friends;
+  }
+
 
   @Patch('edit')
   editUser(@GetUser('id') userId: number, @Body() dto: EditUserDto) {

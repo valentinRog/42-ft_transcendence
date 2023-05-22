@@ -4,6 +4,7 @@
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
+	font-family: $font;
 }
 
 @font-face {
@@ -20,6 +21,13 @@ body {
 	width: 100vw;
 	height: 100vh;
 	cursor: url('/mouse2.png'), auto;
+}
+
+button,
+input[type='submit'] {
+	@include tab-contour;
+	@include tab-contour-active;
+	padding: 0.15rem 0.25rem; //p-e pas laisser ici
 }
 
 a:hover {

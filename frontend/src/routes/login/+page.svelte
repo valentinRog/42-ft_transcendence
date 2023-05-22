@@ -1,15 +1,16 @@
 <script lang="ts">
-	import { token } from '$lib/stores/stores';
+	import { token, socket } from '$lib/stores/stores';
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
+	import { connectSocket } from '$lib/scripts/connect';
 
 	onMount(() => {
 		if ($token) goto('/');
 		if ($page.url.searchParams.get('token')) {
 			$token = $page.url.searchParams.get('token');
-			if (browser) localStorage.setItem('token', $token!);
+			if (browser) sessionStorage.setItem('token', $token!);
 			goto('/');
 		}
 	});
@@ -17,7 +18,10 @@
 	function handleSubmit(event: Event) {
 		const form = event.target as HTMLFormElement;
 		const data = new FormData(form);
-		const body = new URLSearchParams(data);
+		const body = new URLSearchParams();
+		for (const pair of data) {
+			body.append(pair[0], pair[1] as string);
+		}
 		fetch(form.action, {
 			method: form.method,
 			headers: {
@@ -29,7 +33,8 @@
 			.then((res) => {
 				if (!res.access_token) return;
 				$token = res.access_token;
-				if (browser) localStorage.setItem('token', res.access_token);
+				if (browser) sessionStorage.setItem('token', res.access_token);
+				connectSocket();
 				goto('/');
 			})
 			.catch((err) => console.log(err));

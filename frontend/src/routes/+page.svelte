@@ -1,87 +1,142 @@
 <script lang="ts">
 	import Window from '$lib/components/Window.svelte';
-	import Pong from '$lib/components/game/Pong.svelte';
+	import Pong from '$lib/components/pong/Pong.svelte';
 	import Square from '$lib/components/Square.svelte';
+	import Contact from '$lib/components/Contact.svelte';
+	import Profile from '$lib/components/Profile.svelte';
 	import Tab from '$lib/components/Tab.svelte';
 
-	let windows: any[] = [];
+	const components = {
+		Pong: Pong,
+		Square: Square,
+		Contact: Contact,
+		Profile: Profile
+	};
+	Object.freeze(components);
+
+	type App = keyof typeof components;
+
+	interface AppProps {
+		readonly name: string;
+		readonly icon: string;
+	}
+	const apps: Record<App, AppProps> = {
+		Pong: { name: 'Pong', icon: '/pong.png' },
+		Square: { name: 'Chat', icon: '/mail.png' },
+		Contact: { name: 'Contact', icon: '/mail.png' },
+		Profile: { name: 'Profile', icon: '/mail.png' }
+	};
+	Object.freeze(apps);
+
+	interface AppInstance {
+		readonly componentType: App;
+		readonly component: any;
+		visible: boolean;
+		readonly id: number;
+	}
+
+	let instances: AppInstance[] = [];
 	let zstack: number[] = [];
+
+	let gid = 0;
+	function addInstance(componentType: string) {
+		zstack = [...zstack, zstack.length];
+		instances = [
+			...instances,
+			{
+				componentType: componentType as App,
+				component: components[componentType as App],
+				visible: true,
+				id: gid++
+			}
+		];
+		selected = null;
+	}
 
 	function putOnTop(id: number) {
 		zstack = [...zstack.filter((z) => z !== id), id];
 	}
 
 	function remove(id: number) {
-		windows = windows.filter((_, i) => i !== id);
+		instances = instances.filter((_, i) => i !== id);
 		zstack = zstack.filter((z) => z !== id).map((z) => (z > id ? z - 1 : z));
 	}
 
+	let selected: number | null = null;
+
 	let width: number;
 	let height: number;
-
-	let gid = 0;
-	function handleDoubleClickIcon(componentType: any) {
-		zstack = [...zstack, zstack.length];
-		const n = Math.floor(Math.random() * 2);
-		windows = [
-			...windows,
-			{
-				component: componentType,
-				props: { color: ['purple', 'yellow'][n] },
-				me: {},
-				visible: true,
-				id: gid++
-			}
-		];
-	}
 </script>
 
-<!-- ICONES DE BUREAU -->
-
-<div class="desktop" bind:clientWidth={width} bind:clientHeight={height}>
+<div
+	class="desktop"
+	bind:clientWidth={width}
+	bind:clientHeight={height}
+	on:mousedown={() => (selected = null)}
+>
 	<div class="icons">
-		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Pong)}>
-			<img src="/pong.png" alt="pong" />
-			<span>Pong</span>
-		</div>
-		<div class="icon" on:dblclick={() => handleDoubleClickIcon(Square)}>
-			<img src="/mail.png" alt="chat" />
-			<span>Chat</span>
-		</div>
+		{#each Object.entries(apps) as [k, v]}
+			<div class="icon" on:dblclick={() => addInstance(k)}>
+				<img src={v.icon} alt={v.name} />
+				<span>{v.name}</span>
+			</div>
+		{/each}
 	</div>
 
-	{#each windows as { component, props, me, visible, id }, i (id)}
-		<div on:mousedown={() => putOnTop(i)} style="visibility: {visible ? 'visible' : 'hidden'};">
-			<Window
-				parentWidth={width}
-				parentHeight={height}
-				z={zstack.indexOf(i)}
-				on:minimize={() => (visible = !visible)}
-				on:close={() => {
-					remove(i);
-				}}
-			>
-				<svelte:component this={component} bind:this={me} {...props} />
-			</Window>
-		</div>
+	{#each instances as { componentType, component, visible, id }, i (id)}
+		<Window
+			{...apps[componentType]}
+			parentWidth={width}
+			parentHeight={height}
+			z={zstack.indexOf(i)}
+			{visible}
+			on:minimize={() => {
+				visible = !visible;
+				selected = null;
+			}}
+			on:close={() => remove(i)}
+			on:mousedown={(event) => {
+				event.stopPropagation();
+				putOnTop(i);
+				selected = i;
+			}}
+		>
+			<svelte:component this={component} />
+		</Window>
 	{/each}
 </div>
 
 <!-- NAVBAR -->
 
-<nav class="navbar">
-	<div class="navbar-menu">
-		<div class="navbar-start">
-			<a class="start" href="/">
-				<img src="/start.png" alt="start" />
-				Start
-			</a>
-			{#each windows as { component, props, me, visible, id }, i (id)}
-				<Tab route={me.url} name={me.name} on:click={() => (visible = !visible)}>
-					<svelte:component this={component} bind:this={me} {...props} />
-				</Tab>
-			{/each}
-		</div>
+<nav class="navbar" style:z-index={zstack.length}>
+	<div class="navbar-start">
+		<a class="start" href="/">
+			<img src="/start.png" alt="start" />
+			Start
+		</a>
+	</div>
+	<div class="navbar-tabs">
+		{#each instances as { componentType, visible, id }, i (id)}
+			<Tab
+				{...apps[componentType]}
+				active={selected === i}
+				on:click={() => {
+					putOnTop(i);
+					if (visible && selected === i) {
+						visible = !visible;
+						selected = null;
+					} else if (visible) {
+						selected = i;
+					} else {
+						visible = !visible;
+						selected = i;
+					}
+				}}
+			/>
+		{/each}
+	</div>
+	<div class="navbar-clock">
+		<p> heure </p>
 	</div>
 </nav>
 

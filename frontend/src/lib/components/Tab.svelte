@@ -1,13 +1,30 @@
 <script lang="ts">
-	export let route: string;
+	export let icon: string;
 	export let name: string;
+	export let active: boolean;
 </script>
 
-<a href="/" on:click>
-	<img src={route} alt={name} />
-	{name}
-</a>
+<div class="tab" on:click class:active>
+	<img src={icon} alt={name} />
+	<a href="/">
+		{name}
+	</a>
+</div>
 
 <style lang="scss">
-	@include tab;
+	.tab {
+		@include tab;
+		
+		display: flex;
+		flex-basis: 15rem;
+		flex-shrink: 1;
+		flex-wrap: nowrap;
+		overflow: hidden;
+
+		a {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+	}
 </style>
