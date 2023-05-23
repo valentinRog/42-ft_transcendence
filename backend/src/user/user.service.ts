@@ -1,4 +1,9 @@
-import { Injectable, UploadedFile, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  UploadedFile,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EditUserDto } from './dto';
 import { createWriteStream } from 'fs';
@@ -14,25 +19,29 @@ export class UserService {
   ) {}
 
   async editUser(userId: number, dto: EditUserDto) {
-    const user = await this.prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        ...dto,
-      },
-    });
-    delete user.hash;
-    return user;
+    try {
+      const user = await this.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          ...dto,
+        },
+      });
+      delete user.hash;
+      return user;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async findUser(login: string) {
     return this.prisma.user.findUnique({ where: { login: login } });
   }
 
-  async findFriend(userName: string, friendId: number): Promise<boolean> {
+  async findFriend(username: string, friendId: number): Promise<boolean> {
     const user = await this.prisma.user.findUnique({
-      where: { username: userName },
+      where: { username: username },
     });
     return user.friends.includes(friendId);
   }
@@ -41,37 +50,45 @@ export class UserService {
     if (await this.findFriend(userName, friendId)) {
       throw new ForbiddenException('User already in friends list');
     }
-    const user = await this.prisma.user.update({
-      where: { username: userName },
-      data: { friends: { push: friendId } },
-    });
-    await this.prisma.user.update({
-      where: { id: friendId },
-      data: { friends: { push: user.id } },
-    });
-    delete user.hash;
-    return user;
+    try {
+      const user = await this.prisma.user.update({
+        where: { username: userName },
+        data: { friends: { push: friendId } },
+      });
+      await this.prisma.user.update({
+        where: { id: friendId },
+        data: { friends: { push: user.id } },
+      });
+      delete user.hash;
+      return user;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async removeFriend(userName: string, friendId: number) {
     if (!(await this.findFriend(userName, friendId))) {
       throw new ForbiddenException('User not in friends list');
     }
-    const user = await this.prisma.user.update({
-      where: { username: userName },
-      data: {
-        friends: {
-          set: (
-            await this.prisma.user.findUnique({
-              where: { username: userName },
-              select: { friends: true },
-            })
-          ).friends.filter((id) => id !== friendId),
+    try {
+      const user = await this.prisma.user.update({
+        where: { username: userName },
+        data: {
+          friends: {
+            set: (
+              await this.prisma.user.findUnique({
+                where: { username: userName },
+                select: { friends: true },
+              })
+            ).friends.filter((id) => id !== friendId),
+          },
         },
-      },
-    });
-    delete user.hash;
-    return user;
+      });
+      delete user.hash;
+      return user;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async saveImageFromUrl(url: string, fileName: string): Promise<string> {
@@ -121,21 +138,26 @@ export class UserService {
     return users;
   }
 
-  async updateUserStatus(userName: string, status: string) {
+  async updateUserStatus(username: string, status: string) {
     try {
       const user = await this.prisma.user.update({
         where: {
-          username: userName,
+          username: username,
         },
         data: {
           status: status,
         },
       });
+
+      if (!user) {
+        throw new NotFoundException(
+          `User with username '${username}' not found.`,
+        );
+      }
       delete user.hash;
       return user;
-    } catch (e) {
-      console.log(e);
-      return { error: e };
+    } catch (error) {
+      throw error;
     }
   }
 }

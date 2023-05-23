@@ -22,4 +22,9 @@ export class MatchmakingController {
   async spectate(@GetUser() user, room: string) {
     return await this.matchmakingService.joinSpectate(user.username, room);
   }
+
+  @Post('match')
+  async match(@GetUser() user, opponent: string) {
+    return await this.matchmakingService.createMatch(user.username, opponent);
+  }
 }

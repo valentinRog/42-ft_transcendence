@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
+import { NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class WebSocketService {
@@ -44,8 +45,7 @@ export class WebSocketService {
     const socketPlayer2 = this.getSocket(player2);
 
     if (!socketPlayer1 || !socketPlayer2) {
-      console.log('player socket not find');
-      return;
+      throw new NotFoundException('user socket not connected');
     }
 
     socketPlayer1.join(room);
@@ -54,10 +54,7 @@ export class WebSocketService {
     socketPlayer1.emit('enter-room', { room: room, index: 0 });
     socketPlayer2.emit('enter-room', { room: room, index: 1 });
 
-    //this.userService.updateUserStatus(players[0].username, 'in-game');
-    //this.userService.updateUserStatus(players[1].username, 'in-game');
-
-    return room;
+    return { player1: player1, player2: player2, room: room };
   }
 
   joinRoom(player: string, room: string) {
@@ -66,12 +63,12 @@ export class WebSocketService {
     const socketPlayer = this.getSocket(player);
 
     if (!socketPlayer) {
-      return 'player socket not find';
+      throw new NotFoundException('user socket not connected');
     }
 
     socketPlayer.join(room);
     socketPlayer.emit('enter-room', room);
 
-    return room;
+    return { spectator: player, room: room };
   }
 }

@@ -8,6 +8,11 @@
 	let serverDelta = 0;
 	const tickRate = 30;
 	const delay = 20;
+	let index = 0;
+	let inputs = new Array<Input>();
+	let up = false;
+	let down = false;
+	let room = '';
 
 	let state: GameState = {
 		ball: {
@@ -36,10 +41,6 @@
 		missed: false
 	};
 
-	let index = 0;
-
-	let inputs = new Array<Input>();
-
 	function draw(ctx: CanvasRenderingContext2D) {
 		const s = update(state, Date.now() - state.time);
 		ctx.clearRect(0, 0, dimensions.width, dimensions.height);
@@ -60,9 +61,6 @@
 		requestAnimationFrame(() => draw(ctx));
 	}
 
-	let up = false;
-	let down = false;
-
 	onMount(() => {
 		async function connectToRoom() {
 			const res = await fetch('http://localhost:3000/matchmaking/queue', {
@@ -82,6 +80,7 @@
 
 		$socket!.on('enter-room', (data: { room: string; index: number }) => {
 			console.log('enter-room', data.room, data.index);
+			room = data.room;
 			$socket!.emit('enter-room', data);
 		});
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { PlayerDto } from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -11,7 +11,15 @@ class MatchmakingQueue {
     this.queue.push(player);
   }
 
-  public dequeue(): PlayerDto | undefined {
+  public dequeue_player(player: PlayerDto): PlayerDto | undefined {
+    const index = this.queue.findIndex((p) => p.username === player.username);
+    if (index !== -1) {
+      return this.queue.splice(index, 1)[0];
+    }
+    return undefined;
+  }
+
+  public dequeue_last(): PlayerDto | undefined {
     return this.queue.shift();
   }
 
@@ -29,7 +37,6 @@ export class MatchmakingService {
   private queue: MatchmakingQueue;
 
   constructor(
-    private readonly userService: UserService,
     private readonly prisma: PrismaService,
     private readonly socketService: WebSocketService,
   ) {
@@ -53,16 +60,18 @@ export class MatchmakingService {
     this.queue.enqueue(player);
 
     if (this.queue.getSize() >= 2) {
-      const players = [this.queue.dequeue(), this.queue.dequeue()];
-      await this.handleMatchFound(players);
+      const players = [this.queue.dequeue_last(), this.queue.dequeue_last()];
+      return await this.handleMatchFound(players);
     }
+
+    return { response: 'Player added to queue' };
   }
 
-  async handlePlayerLeftQueue(player: PlayerDto): Promise<void> {
-    this.queue.dequeue();
+  handlePlayerLeftQueue(player: PlayerDto) {
+    return this.queue.dequeue_player(player);
   }
 
-  async handleMatchFound(players: PlayerDto[]): Promise<string> {
+  handleMatchFound(players: PlayerDto[]) {
     return this.socketService.createRoom(
       players[0].username,
       players[1].username,
@@ -75,7 +84,7 @@ export class MatchmakingService {
     });
 
     if (user.status !== 'online') {
-      return 'User is not ready';
+      throw new ForbiddenException('User is not ready');
     }
 
     this.prisma.user.update({
@@ -83,6 +92,26 @@ export class MatchmakingService {
       data: { status: 'spectate' },
     });
 
-    return await this.socketService.joinRoom(userName, room);
+    return this.socketService.joinRoom(userName, room);
+  }
+
+  async createMatch(userName: string, opponent: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { username: userName },
+    });
+
+    if (user.status !== 'online') {
+      throw new ForbiddenException('User is not ready');
+    }
+
+    const friend = await this.prisma.user.findUnique({
+      where: { username: opponent },
+    });
+
+    if (friend.status !== 'online') {
+      throw new ForbiddenException('Friend is not ready');
+    }
+
+    return this.socketService.createRoom(userName, opponent);
   }
 }
