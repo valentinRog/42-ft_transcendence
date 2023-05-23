@@ -37,8 +37,6 @@ export class MatchmakingService {
   }
 
   async handlePlayerJoinedQueue(player: PlayerDto) {
-    console.log(this.socketService.getAllSockets());
-
     const user = await this.prisma.user.findUnique({
       where: { username: player.username },
     });
