@@ -5,7 +5,8 @@
 	import Contact from '$lib/components/Contact.svelte';
 	import Profile from '$lib/components/Profile.svelte';
 	import Tab from '$lib/components/Tab.svelte';
-
+	import { time } from '$lib/stores/stores.ts';
+	
 	const components = {
 		Pong: Pong,
 		Square: Square,
@@ -66,6 +67,20 @@
 
 	let width: number;
 	let height: number;
+
+	// CLOCK
+	
+	const formatter = new Intl.DateTimeFormat(
+		'en',
+		{
+			hour12: false,
+			hour: 'numeric',
+			minute: '2-digit'
+		}
+	);
+	
+	let soundOn: boolean = true;
+
 </script>
 
 <div
@@ -136,7 +151,16 @@
 		{/each}
 	</div>
 	<div class="navbar-clock">
-		<p> heure </p>
+		<p> 
+			{#if soundOn}
+				<img on:mousedown={() => { soundOn = !soundOn; }}
+					src="/sound-on.png" alt="sound on" >
+			{:else}
+				<img on:mousedown={() => { soundOn = !soundOn; }}
+					src="/sound-off.png" alt="sound on" >
+			{/if}
+			{formatter.format($time)} 
+		</p>
 	</div>
 </nav>
 

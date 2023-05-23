@@ -20,7 +20,7 @@ body {
 	color: $font-color;
 	width: 100vw;
 	height: 100vh;
-	cursor: url('/mouse2.png'), auto;
+	cursor: url('/mouse.png'), auto;
 }
 
 button,
@@ -31,5 +31,5 @@ input[type='submit'] {
 }
 
 a:hover {
-	cursor: url('/click2.png'), auto;
+	cursor: url('/click.png'), auto;
 }
