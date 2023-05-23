@@ -1,5 +1,4 @@
 import { Server, Socket } from 'socket.io';
-import { SocketGateway } from '../websocket/websocket.gateway';
 
 interface Dimensions {
   readonly width: number;
@@ -96,12 +95,10 @@ export class PongGame {
 
   setPlayer1(player1: Socket) {
     this.player1 = player1;
-    console.log('player1', player1.id);
   }
 
   setPlayer2(player2: Socket) {
     this.player2 = player2;
-    console.log('player2', player2.id);
   }
 
   getPlayer1() {

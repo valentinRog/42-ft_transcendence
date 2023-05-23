@@ -106,6 +106,7 @@
 		});
 
 		$socket!.on('state', (s: GameState) => {
+			console.log('state', s);
 			if (state.id === 0) {
 				state = s;
 				state.time -= serverDelta;
@@ -133,6 +134,7 @@
 
 		function gameLoop() {
 			const input: Input = {
+				clientId: $socket!.id,
 				stateId: state.id + delay,
 				clientTime: Date.now() + delay,
 				serverTime: Date.now() + delay + serverDelta,

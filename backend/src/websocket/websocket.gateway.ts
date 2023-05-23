@@ -26,20 +26,19 @@ export abstract class SocketGateway
     private readonly userService: UserService,
   ) {}
 
-  async handleConnection(socket: Socket) {
-    const token = Array.isArray(socket.handshake.query.token)
-      ? socket.handshake.query.token[0]
-      : socket.handshake.query.token;
+  async handleConnection(client: Socket) {
+    const token = Array.isArray(client.handshake.query.token)
+      ? client.handshake.query.token[0]
+      : client.handshake.query.token;
 
     const user = await this.authService.validateToken(token);
 
     if (!user) {
-      socket.disconnect();
+      client.disconnect();
       return;
     }
-
-    console.log('socket.id', socket.id);
-    this.webSocketService.addSocket(user.username, socket);
+    console.log(`user ${client.id} connected`);
+    this.webSocketService.addSocket(user.username, client);
     this.userService.updateUserStatus(user.username, 'online');
   }
 
