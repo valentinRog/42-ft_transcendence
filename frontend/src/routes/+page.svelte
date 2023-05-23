@@ -5,6 +5,7 @@
 	import Contact from '$lib/components/Contact.svelte';
 	import Profile from '$lib/components/Profile.svelte';
 	import Tab from '$lib/components/Tab.svelte';
+	import Start from '$lib/components/Start.svelte';
 
 	const components = {
 		Pong: Pong,
@@ -77,7 +78,7 @@
 	<div class="icons">
 		{#each Object.entries(apps) as [k, v]}
 			<div class="icon" on:dblclick={() => addInstance(k)}>
-				<img src={v.icon} alt={v.name} />
+				<img src={v.icon} alt={v.name} draggable="false"/>
 				<span>{v.name}</span>
 			</div>
 		{/each}
@@ -109,12 +110,7 @@
 <!-- NAVBAR -->
 
 <nav class="navbar" style:z-index={zstack.length}>
-	<div class="navbar-start">
-		<a class="start" href="/">
-			<img src="/start.png" alt="start" />
-			Start
-		</a>
-	</div>
+	<Start />
 	<div class="navbar-tabs">
 		{#each instances as { componentType, visible, id }, i (id)}
 			<Tab
@@ -136,7 +132,7 @@
 		{/each}
 	</div>
 	<div class="navbar-clock">
-		<p> heure </p>
+		<p>heure</p>
 	</div>
 </nav>
 
