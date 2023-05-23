@@ -25,6 +25,6 @@ export class MatchmakingController {
 
   @Post('match')
   async match(@GetUser() user, opponent: string) {
-    return await this.matchmakingService.createMatch(user.username, opponent);
+    //return await this.matchmakingService.createMatch(user.username, opponent);
   }
 }

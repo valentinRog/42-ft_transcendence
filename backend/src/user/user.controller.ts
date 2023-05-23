@@ -12,7 +12,7 @@ import {
   ForbiddenException,
   Get,
   Param,
-  NotFoundException
+  NotFoundException,
 } from '@nestjs/common';
 import { GetUser } from '../auth/decorator';
 import { JwtGuard } from '../auth/guard';
@@ -34,15 +34,16 @@ export class UserController {
 
   @UseGuards(JwtGuard)
   @Get('me/friends')
-  async getUserFriends(@GetUser('id') userId: number) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-      if (!user || !user.friends) throw new NotFoundException('User or friends not found');
+  async getUserFriends(@GetUser() user) {
+    try {
       const friends = await this.prisma.user.findMany({
-      where: { id: { in: user.friends } },
-    });
-    return friends;
+        where: { id: { in: user.friends } },
+      });
+      return friends;
+    } catch (error) {
+      throw new NotFoundException('friends not found or empty');
+    }
   }
-
 
   @Patch('edit')
   editUser(@GetUser('id') userId: number, @Body() dto: EditUserDto) {

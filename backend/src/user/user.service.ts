@@ -84,6 +84,20 @@ export class UserService {
           },
         },
       });
+      // Remove the user from the friend's friend list
+      await this.prisma.user.update({
+        where: { id: friendId },
+        data: {
+          friends: {
+            set: (
+              await this.prisma.user.findUnique({
+                where: { id: friendId },
+                select: { friends: true },
+              })
+            ).friends.filter((id) => id !== user.id),
+          },
+        },
+      });
       delete user.hash;
       return user;
     } catch (error) {

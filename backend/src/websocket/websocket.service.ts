@@ -38,7 +38,6 @@ export class WebSocketService {
 
   createRoom(player1: string, player2: string) {
     const room = `${player1}-${player2}`;
-
     console.log('createRoom', room);
 
     const socketPlayer1 = this.getSocket(player1);
@@ -50,7 +49,6 @@ export class WebSocketService {
 
     socketPlayer1.join(room);
     socketPlayer2.join(room);
-
     socketPlayer1.emit('enter-room', { room: room, index: 0 });
     socketPlayer2.emit('enter-room', { room: room, index: 1 });
 
@@ -58,8 +56,6 @@ export class WebSocketService {
   }
 
   joinRoom(player: string, room: string) {
-    console.log('joinRoom', player, room);
-
     const socketPlayer = this.getSocket(player);
 
     if (!socketPlayer) {
