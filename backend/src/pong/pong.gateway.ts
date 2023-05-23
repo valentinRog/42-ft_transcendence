@@ -53,7 +53,7 @@ export class PongGateway extends SocketGateway {
   handleInput(client: Socket, input: Input) {
     let gameRoom: string | null = null;
     client.rooms.forEach((room: string) => {
-      if (room !== client.id) {
+      if (room !== client.id && !gameRoom) {
         // Exclude the default room, which has the same ID as the client
         gameRoom = room;
       }
@@ -62,6 +62,7 @@ export class PongGateway extends SocketGateway {
     if (gameRoom) {
       const game = this.games[gameRoom];
       if (game) {
+        console.log('game find');
         game.handleInput(input);
       }
     }
