@@ -63,7 +63,7 @@
 
 	onMount(() => {
 		async function connectToRoom() {
-			const res = await fetch('http://localhost:3000/matchmaking/queue', {
+			await fetch('http://localhost:3000/matchmaking/queue', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -71,9 +71,6 @@
 				},
 				body: JSON.stringify({ token: $token })
 			});
-			console.log(res);
-			const data = await res.text();
-			console.log(data);
 		}
 
 		connectToRoom();

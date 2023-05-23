@@ -1,5 +1,4 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { UserService } from 'src/user/user.service';
 import { PlayerDto } from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { WebSocketService } from 'src/websocket/websocket.service';
@@ -47,18 +46,15 @@ export class MatchmakingService {
     const user = await this.prisma.user.findUnique({
       where: { username: player.username },
     });
-
     if (user.status !== 'online') {
       return 'User is not ready';
     }
-
     this.prisma.user.update({
       where: { username: player.username },
       data: { status: 'queue' },
     });
 
     this.queue.enqueue(player);
-
     if (this.queue.getSize() >= 2) {
       const players = [this.queue.dequeue_last(), this.queue.dequeue_last()];
       return await this.handleMatchFound(players);
@@ -82,11 +78,9 @@ export class MatchmakingService {
     const user = await this.prisma.user.findUnique({
       where: { username: userName },
     });
-
     if (user.status !== 'online') {
       throw new ForbiddenException('User is not ready');
     }
-
     this.prisma.user.update({
       where: { username: userName },
       data: { status: 'spectate' },
@@ -99,15 +93,12 @@ export class MatchmakingService {
     const user = await this.prisma.user.findUnique({
       where: { username: userName },
     });
-
     if (user.status !== 'online') {
       throw new ForbiddenException('User is not ready');
     }
-
     const friend = await this.prisma.user.findUnique({
       where: { username: opponent },
     });
-
     if (friend.status !== 'online') {
       throw new ForbiddenException('Friend is not ready');
     }

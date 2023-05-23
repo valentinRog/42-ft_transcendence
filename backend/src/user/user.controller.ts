@@ -11,7 +11,6 @@ import {
   MaxFileSizeValidator,
   ForbiddenException,
   Get,
-  Param,
   NotFoundException,
 } from '@nestjs/common';
 import { GetUser } from '../auth/decorator';

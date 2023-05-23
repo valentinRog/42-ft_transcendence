@@ -101,7 +101,7 @@ export class UserService {
       delete user.hash;
       return user;
     } catch (error) {
-      throw error;
+      throw new ForbiddenException('Fail to update in database');
     }
   }
 
