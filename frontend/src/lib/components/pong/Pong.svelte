@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { socket, token } from '$lib/stores/stores';
 	import type { GameState, Input } from './pong';
 	import { update, dimensions } from './pong';
@@ -158,6 +158,10 @@
 			ping = Date.now() - data[0];
 			serverDelta = data[1] - Date.now() + ping / 2;
 		});
+	});
+
+	onDestroy(() => {
+		$socket!.emit('leave-room');
 	});
 </script>
 

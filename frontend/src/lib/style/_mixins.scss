@@ -87,6 +87,7 @@
 	height: $tab-height;
 	padding: 0.2rem 0.8rem;
 	margin-right: 0.25rem;
+	align-items: center;
 
 	@include tab-contour;
 	@include tab-contour-active;
@@ -128,7 +129,7 @@
 			@include tab-top-line(white);
 		}
 		.navbar-tabs {
-			flex-basis: calc(100% - 14.5rem);
+			flex-basis: calc(100% - 13.25rem); // 7 +  5.5 + 0.25 * 4 (1)
 			flex-shrink: 1;
 			margin-left: 0.3rem;
 			display: flex;
@@ -139,11 +140,19 @@
 		.navbar-clock {
 			margin: 0 0.25rem;
 			margin-left: auto;
+			display: flex;
+			align-items: center;
+			vertical-align: auto;
+			@include tab-contour-hollow;
 			p {
-				@include tab-contour-hollow;
+				img {
+					margin-left: 0.5rem;
+					@include tab-logo;
+				}
+				font-size: large;
+				margin-left: auto;
 				padding: 0.25rem;
-				height: $tab-height;
-				width: 7rem;
+				width: 5.5rem;
 			}
 		}
 	}
