@@ -41,9 +41,13 @@ export class PongGateway extends SocketGateway {
 
     if (data.index === 0 && this.games[data.room]) {
       this.games[data.room].setPlayer1(client);
+      const p1 = this.webSocketService.getClientName(client);
+      this.userService.updateUserStatus(p1, 'in-game');
       client.emit('index', 0);
     } else if (data.index === 1 && this.games[data.room]) {
       this.games[data.room].setPlayer2(client);
+      const p2 = this.webSocketService.getClientName(client);
+      this.userService.updateUserStatus(p2, 'in-game');
       client.emit('index', 1);
     }
   }

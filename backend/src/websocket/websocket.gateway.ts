@@ -21,9 +21,9 @@ export abstract class SocketGateway
   server: Server;
 
   constructor(
-    private readonly webSocketService: WebSocketService,
-    private readonly authService: AuthService,
-    private readonly userService: UserService,
+    protected readonly webSocketService: WebSocketService,
+    protected readonly authService: AuthService,
+    protected readonly userService: UserService,
   ) {}
 
   async handleConnection(client: Socket) {
@@ -45,8 +45,6 @@ export abstract class SocketGateway
   handleDisconnect(client: Socket) {
     console.log(`user ${client.id} disconnected`);
     const username = this.webSocketService.getClientName(client);
-
-    //this.userService.updateUserStatus(username, 'offline');
-    // Additional logic for handling disconnections
+    if (username) this.userService.updateUserStatus(username, 'offline');
   }
 }

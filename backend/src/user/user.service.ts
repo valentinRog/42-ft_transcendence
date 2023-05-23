@@ -122,14 +122,20 @@ export class UserService {
   }
 
   async updateUserStatus(userName: string, status: string) {
-    const user = await this.prisma.user.update({
-      where: {
-        username: userName,
-      },
-      data: {
-        status: status,
-      },
-    });
-    return user;
+    try {
+      const user = await this.prisma.user.update({
+        where: {
+          username: userName,
+        },
+        data: {
+          status: status,
+        },
+      });
+      delete user.hash;
+      return user;
+    } catch (e) {
+      console.log(e);
+      return { error: e };
+    }
   }
 }
