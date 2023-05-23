@@ -29,6 +29,11 @@ class MatchmakingQueue {
   public isEmpty(): boolean {
     return this.queue.length === 0;
   }
+
+  public isPlayerInQueue(player: PlayerDto): boolean {
+    const index = this.queue.findIndex((p) => p.username === player.username);
+    return index !== -1;
+  }
 }
 
 @Injectable()
@@ -54,17 +59,23 @@ export class MatchmakingService {
       data: { status: 'queue' },
     });
 
+    if (this.queue.isPlayerInQueue(player)) {
+      throw new ForbiddenException('Player already in queue');
+    }
     this.queue.enqueue(player);
+    console.log(this.queue);
+
     if (this.queue.getSize() >= 2) {
       const players = [this.queue.dequeue_last(), this.queue.dequeue_last()];
       return await this.handleMatchFound(players);
     }
-
     return { response: 'Player added to queue' };
   }
 
   handlePlayerLeftQueue(player: PlayerDto) {
-    return this.queue.dequeue_player(player);
+    const queue = this.queue.dequeue_player(player);
+    console.log(this.queue);
+    return queue;
   }
 
   handleMatchFound(players: PlayerDto[]) {

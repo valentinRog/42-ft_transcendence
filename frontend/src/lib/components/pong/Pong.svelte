@@ -78,31 +78,28 @@
 		$socket!.on('enter-room', (data: { room: string; index: number }) => {
 			console.log('enter-room', data.room, data.index);
 			room = data.room;
+			index = data.index;
 			$socket!.emit('enter-room', data);
 		});
 
-		const canvas = document.querySelector('canvas') as HTMLCanvasElement;
-		const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-		canvas.width = dimensions.width;
-		canvas.height = dimensions.height;
+		$socket!.on('index', (i: number) => {
+			index = i;
+		});
 
-		window.addEventListener('keydown', (e: KeyboardEvent) => {
-			if (e.key === 'ArrowUp') {
-				up = true;
-			} else if (e.key === 'ArrowDown') {
-				down = true;
+		$socket!.on('game-over', (winner: number) => {
+			if (winner === 0) {
+				alert('Player 1 wins!');
+			} else {
+				alert('Player 2 wins!');
 			}
 		});
-		window.addEventListener('keyup', (e: KeyboardEvent) => {
-			if (e.key === 'ArrowUp') {
-				up = false;
-			} else if (e.key === 'ArrowDown') {
-				down = false;
-			}
+
+		$socket!.on('ping', (data: [number, number]) => {
+			ping = Date.now() - data[0];
+			serverDelta = data[1] - Date.now() + ping / 2;
 		});
 
 		$socket!.on('state', (s: GameState) => {
-			console.log('state', s);
 			if (state.id === 0) {
 				state = s;
 				state.time -= serverDelta;
@@ -123,9 +120,24 @@
 			state = s;
 		});
 
-		$socket!.on('index', (i: number) => {
-			console.log('index', i);
-			index = i;
+		const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+		const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+		canvas.width = dimensions.width;
+		canvas.height = dimensions.height;
+
+		window.addEventListener('keydown', (e: KeyboardEvent) => {
+			if (e.key === 'ArrowUp') {
+				up = true;
+			} else if (e.key === 'ArrowDown') {
+				down = true;
+			}
+		});
+		window.addEventListener('keyup', (e: KeyboardEvent) => {
+			if (e.key === 'ArrowUp') {
+				up = false;
+			} else if (e.key === 'ArrowDown') {
+				down = false;
+			}
 		});
 
 		function gameLoop() {
@@ -151,14 +163,21 @@
 			setTimeout(pingLoop, 1000 / 3);
 		}
 		pingLoop();
-		$socket!.on('ping', (data: [number, number]) => {
-			ping = Date.now() - data[0];
-			serverDelta = data[1] - Date.now() + ping / 2;
-		});
 	});
 
 	onDestroy(() => {
-		$socket!.emit('leave-room');
+		if (room !== '')
+			$socket!.emit('leave-room', { room: room, index: index });
+		else {
+			fetch('http://localhost:3000/matchmaking/unqueue', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${$token}`
+				},
+				body: JSON.stringify({ token: $token })
+			});
+		}
 	});
 </script>
 

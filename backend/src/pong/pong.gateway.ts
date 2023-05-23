@@ -69,4 +69,21 @@ export class PongGateway extends SocketGateway {
       }
     }
   }
+
+  @SubscribeMessage('leave-room')
+  handleLeaveRoom(client: Socket, data: { room: string; index: number }) {
+    console.log('leave-room', data);
+
+    client.leave(data.room);
+    const game = this.games[data.room];
+    if (game) {
+      if (data.index === 0 || data.index === 1) {
+        game.stopGame();
+        delete this.games[data.room];
+        console.log(data.index);
+        console.log(data.index ? 0 : 1);
+        this.server.to(data.room).emit('game-over', data.index ? 0 : 1);
+      }
+    }
+  }
 }

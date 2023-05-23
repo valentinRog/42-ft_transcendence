@@ -18,6 +18,16 @@ export class MatchmakingController {
     return await this.matchmakingService.handlePlayerJoinedQueue(player);
   }
 
+  @Post('unqueue')
+  async unqueue(@GetUser() user) {
+    const player = {
+      username: user.username,
+      elo: user.stat.elo,
+    };
+
+    return this.matchmakingService.handlePlayerLeftQueue(player);
+  }
+
   @Post('spectate')
   async spectate(@GetUser() user, room: string) {
     return await this.matchmakingService.joinSpectate(user.username, room);
