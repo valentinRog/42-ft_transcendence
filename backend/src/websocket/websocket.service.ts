@@ -53,8 +53,12 @@ export class WebSocketService {
 
     socketPlayer1.join(room);
     socketPlayer2.join(room);
-    socketPlayer1.emit('enter-room', room, 0);
-    socketPlayer2.emit('enter-room', room, 1);
+
+    const p1 = { room: room, index: 0 };
+    const p2 = { room: room, index: 1 };
+
+    socketPlayer1.emit('enter-room', p1);
+    socketPlayer2.emit('enter-room', p2);
 
     //this.userService.updateUserStatus(players[0].username, 'in-game');
     //this.userService.updateUserStatus(players[1].username, 'in-game');

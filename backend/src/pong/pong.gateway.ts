@@ -31,20 +31,21 @@ export class PongGateway extends SocketGateway {
   }
 
   @SubscribeMessage('enter-room')
-  handleRoom(client: Socket, room: string, index: number) {
-    console.log('enter-room', room);
-    client.join(room);
+  handleRoom(client: Socket, data: { room: string; index: number }) {
+    console.log('enter-room', data.room, data.index);
+    client.join(data.room);
 
-    if (!this.games[room]) {
-      const game = new PongGame(this.server, room);
-      this.games[room] = game;
+    if (data.index === 0 && !this.games[data.room]) {
+      const game = new PongGame(this.server, data.room);
+      console.log('game created in map');
+      this.games[data.room] = game;
     }
 
-    if (index === 0 && !this.games[room].getPlayer1()) {
-      this.games[room].setPlayer1(client);
+    if (data.index === 0 && !this.games[data.room].getPlayer1()) {
+      this.games[data.room].setPlayer1(client);
       client.emit('index', 0);
-    } else if (index === 1 && !this.games[room].getPlayer1()) {
-      this.games[room].setPlayer2(client);
+    } else if (data.index === 1 && !this.games[data.room].getPlayer2()) {
+      this.games[data.room].setPlayer2(client);
       client.emit('index', 1);
     }
   }
@@ -62,7 +63,6 @@ export class PongGateway extends SocketGateway {
     if (gameRoom) {
       const game = this.games[gameRoom];
       if (game) {
-        console.log('game find');
         game.handleInput(input);
       }
     }

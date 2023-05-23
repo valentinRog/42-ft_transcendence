@@ -80,9 +80,9 @@
 
 		connectToRoom();
 
-		$socket!.on('enter-room', (room: string, index: number) => {
-			console.log('enter-room', room, index);
-			$socket!.emit('enter-room', room, index);
+		$socket!.on('enter-room', (data: { room: string; index: number }) => {
+			console.log('enter-room', data.room, data.index);
+			$socket!.emit('enter-room', data);
 		});
 
 		const canvas = document.querySelector('canvas') as HTMLCanvasElement;
