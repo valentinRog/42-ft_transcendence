@@ -147,7 +147,6 @@
 		{/each}
 	</div>
 	<div class="navbar-clock">
-<<<<<<< HEAD
 		<p> 
 			{#if soundOn}
 				<img on:mousedown={() => { soundOn = !soundOn; }}
@@ -158,9 +157,6 @@
 			{/if}
 			{formatter.format($time)} 
 		</p>
-=======
-		<p>heure</p>
->>>>>>> a8df339e4abd7f07e8fb9d8278244fc8b5eea1e8
 	</div>
 </nav>
 
