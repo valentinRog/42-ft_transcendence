@@ -1,7 +1,6 @@
 import { Injectable, UploadedFile, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EditUserDto } from './dto';
-import { ConfigService } from '@nestjs/config';
 import { createWriteStream } from 'fs';
 import { HttpService } from '@nestjs/axios';
 import UPLOAD_PATH from '../../config/upload-path';
@@ -11,7 +10,6 @@ import * as fs from 'fs';
 export class UserService {
   constructor(
     private prisma: PrismaService,
-    private config: ConfigService,
     private httpService: HttpService,
   ) {}
 
@@ -46,6 +44,10 @@ export class UserService {
     const user = await this.prisma.user.update({
       where: { username: userName },
       data: { friends: { push: friendId } },
+    });
+    await this.prisma.user.update({
+      where: { id: friendId },
+      data: { friends: { push: user.id } },
     });
     delete user.hash;
     return user;
@@ -108,5 +110,32 @@ export class UserService {
         fileName: fileNamePath,
       },
     };
+  }
+
+  async getQueueUsers() {
+    const users = await this.prisma.user.findMany({
+      where: {
+        status: 'queue',
+      },
+    });
+    return users;
+  }
+
+  async updateUserStatus(userName: string, status: string) {
+    try {
+      const user = await this.prisma.user.update({
+        where: {
+          username: userName,
+        },
+        data: {
+          status: status,
+        },
+      });
+      delete user.hash;
+      return user;
+    } catch (e) {
+      console.log(e);
+      return { error: e };
+    }
   }
 }

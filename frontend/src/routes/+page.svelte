@@ -5,8 +5,9 @@
 	import Contact from '$lib/components/Contact.svelte';
 	import Profile from '$lib/components/Profile.svelte';
 	import Tab from '$lib/components/Tab.svelte';
+	import Start from '$lib/components/Start.svelte';
 	import { time } from '$lib/stores/stores.ts';
-	
+
 	const components = {
 		Pong: Pong,
 		Square: Square,
@@ -92,7 +93,7 @@
 	<div class="icons">
 		{#each Object.entries(apps) as [k, v]}
 			<div class="icon" on:dblclick={() => addInstance(k)}>
-				<img src={v.icon} alt={v.name} />
+				<img src={v.icon} alt={v.name} draggable="false"/>
 				<span>{v.name}</span>
 			</div>
 		{/each}
@@ -124,12 +125,7 @@
 <!-- NAVBAR -->
 
 <nav class="navbar" style:z-index={zstack.length}>
-	<div class="navbar-start">
-		<a class="start" href="/">
-			<img src="/start.png" alt="start" />
-			Start
-		</a>
-	</div>
+	<Start />
 	<div class="navbar-tabs">
 		{#each instances as { componentType, visible, id }, i (id)}
 			<Tab
@@ -151,6 +147,7 @@
 		{/each}
 	</div>
 	<div class="navbar-clock">
+<<<<<<< HEAD
 		<p> 
 			{#if soundOn}
 				<img on:mousedown={() => { soundOn = !soundOn; }}
@@ -161,6 +158,9 @@
 			{/if}
 			{formatter.format($time)} 
 		</p>
+=======
+		<p>heure</p>
+>>>>>>> a8df339e4abd7f07e8fb9d8278244fc8b5eea1e8
 	</div>
 </nav>
 

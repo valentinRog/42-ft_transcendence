@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { socket } from '$lib/stores/stores';
+	import { socket, token } from '$lib/stores/stores';
 	import type { GameState, Input } from './pong';
 	import { update, dimensions } from './pong';
 
@@ -64,6 +64,27 @@
 	let down = false;
 
 	onMount(() => {
+		async function connectToRoom() {
+			const res = await fetch('http://localhost:3000/matchmaking/queue', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${$token}`
+				},
+				body: JSON.stringify({ token: $token })
+			});
+			console.log(res);
+			const data = await res.text();
+			console.log(data);
+		}
+
+		connectToRoom();
+
+		$socket!.on('enter-room', (data: { room: string; index: number }) => {
+			console.log('enter-room', data.room, data.index);
+			$socket!.emit('enter-room', data);
+		});
+
 		const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 		const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 		canvas.width = dimensions.width;
@@ -85,6 +106,7 @@
 		});
 
 		$socket!.on('state', (s: GameState) => {
+			console.log('state', s);
 			if (state.id === 0) {
 				state = s;
 				state.time -= serverDelta;
@@ -106,11 +128,13 @@
 		});
 
 		$socket!.on('index', (i: number) => {
+			console.log('index', i);
 			index = i;
 		});
 
 		function gameLoop() {
 			const input: Input = {
+				clientId: $socket!.id,
 				stateId: state.id + delay,
 				clientTime: Date.now() + delay,
 				serverTime: Date.now() + delay + serverDelta,

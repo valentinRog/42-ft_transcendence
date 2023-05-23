@@ -43,6 +43,7 @@ export interface GameState {
 }
 
 export type Input = {
+	clientId: string;
 	stateId: number;
 	clientTime: number;
 	serverTime: number;

@@ -1,10 +1,3 @@
-import { OnModuleInit } from '@nestjs/common';
-import {
-  WebSocketGateway,
-  WebSocketServer,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
-} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
 interface Dimensions {
@@ -57,6 +50,7 @@ interface GameState {
 }
 
 type Input = {
+  clientId: string;
   stateId: number;
   idDelta: number;
   up: boolean;
@@ -65,26 +59,20 @@ type Input = {
   serverTime: number;
 };
 
-@WebSocketGateway({
-  cors: {
-    origin: '*',
-  },
-})
-export class PongGateway
-  implements OnModuleInit, OnGatewayConnection, OnGatewayDisconnect
-{
-  @WebSocketServer()
-  server: Server;
-
-  tickRate = 30;
-
-  inputs1: Input[] = [];
-  inputs2: Input[] = [];
-
-  player1: Socket | null = null;
-  player2: Socket | null = null;
-
-  state: GameState = {
+export class PongGame {
+  constructor(server: Server, room: string) {
+    this.server = server;
+    this.room = room;
+    this.startGame();
+  }
+  private server: Server;
+  private tickRate = 30;
+  private room: string;
+  private player1: Socket | null = null;
+  private player2: Socket | null = null;
+  private inputs1: Input[] = [];
+  private inputs2: Input[] = [];
+  private state: GameState = {
     ball: {
       x: dimensions.width / 2 - dimensions.ballWidth / 2,
       y: dimensions.height / 2 - dimensions.ballWidth / 2,
@@ -100,13 +88,33 @@ export class PongGateway
     missed: false,
   };
 
-  onModuleInit() {
-    this.server.on('connection', (socket) => {
-      console.log(socket.id);
-      console.log('Connected');
-    });
-
+  private startGame() {
+    console.log(`Game in room ${this.room} started`);
     this.gameLoop();
+  }
+
+  setPlayer1(player1: Socket) {
+    this.player1 = player1;
+  }
+
+  setPlayer2(player2: Socket) {
+    this.player2 = player2;
+  }
+
+  getPlayer1() {
+    return this.player1;
+  }
+
+  getPlayer2() {
+    return this.player2;
+  }
+
+  handleInput(input: Input) {
+    if (this.player1 !== null && input.clientId === this.player1.id) {
+      this.inputs1.push(input);
+    } else if (this.player2 !== null && input.clientId === this.player2.id) {
+      this.inputs2.push(input);
+    }
   }
 
   update(state: GameState, delta: number): GameState {
@@ -227,40 +235,7 @@ export class PongGateway
       this.state.paddles[1].down = input.down;
     }
 
-    this.server.emit('state', this.state);
+    this.server.to(this.room).emit('state', this.state);
     setTimeout(this.gameLoop.bind(this), 1000 / this.tickRate);
-  }
-
-  handleConnection(socket: Socket) {
-    if (this.player1 === null) {
-      this.player1 = socket;
-      socket.on('input', (input: Input) => {
-        this.inputs1.push(input);
-        socket.emit('index', 0);
-      });
-      socket.on('disconnect', () => {
-        this.player1 = null;
-      });
-    } else if (this.player2 === null) {
-      this.player2 = socket;
-      socket.on('input', (input: Input) => {
-        this.inputs2.push(input);
-        socket.emit('index', 1);
-      });
-      socket.on('disconnect', () => {
-        this.player2 = null;
-      });
-    }
-    socket.on('ping', (data: number) => {
-      socket.emit('ping', [data, Date.now()]);
-    });
-  }
-
-  handleDisconnect(socket: Socket) {
-    if (socket === this.player1) {
-      this.player1 = null;
-    } else if (socket === this.player2) {
-      this.player2 = null;
-    }
   }
 }

@@ -6,7 +6,9 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { StatModule } from './stat/stat.module';
-import { GatewayModule } from './gateway/gateway.module';
+import { PongModule } from './pong/pong.module';
+import { MatchmakingModule } from './matchmaking/matchmaking.module';
+import { WebSocketModule } from './websocket/websocket.module';
 
 @Module({
   imports: [
@@ -15,7 +17,9 @@ import { GatewayModule } from './gateway/gateway.module';
     ConfigModule.forRoot({ isGlobal: true }),
     UserModule,
     StatModule,
-    GatewayModule,
+    //WebSocketModule,
+    PongModule,
+    MatchmakingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

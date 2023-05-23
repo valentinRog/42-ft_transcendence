@@ -1,5 +1,6 @@
 import { token, socket } from '$lib/stores/stores';
 import ioClient from 'socket.io-client';
+import { goto } from '$app/navigation';
 
 export function connectSocket() {
 	let url = window.location.origin;
@@ -13,4 +14,10 @@ export function connectSocket() {
 	});
 	unsub();
 	socket.set(s);
+}
+
+export function logout() {
+	sessionStorage.removeItem('token');
+	token.set(null);
+	goto('/login');
 }
