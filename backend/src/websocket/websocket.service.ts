@@ -53,8 +53,8 @@ export class WebSocketService {
 
     socketPlayer1.join(room);
     socketPlayer2.join(room);
-    socketPlayer1.emit('enter-room', room);
-    socketPlayer2.emit('enter-room', room);
+    socketPlayer1.emit('enter-room', room, 0);
+    socketPlayer2.emit('enter-room', room, 1);
 
     //this.userService.updateUserStatus(players[0].username, 'in-game');
     //this.userService.updateUserStatus(players[1].username, 'in-game');

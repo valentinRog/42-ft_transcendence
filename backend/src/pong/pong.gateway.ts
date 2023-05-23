@@ -31,7 +31,7 @@ export class PongGateway extends SocketGateway {
   }
 
   @SubscribeMessage('enter-room')
-  handleRoom(client: Socket, room: string) {
+  handleRoom(client: Socket, room: string, index: number) {
     console.log('enter-room', room);
     client.join(room);
 
@@ -40,10 +40,10 @@ export class PongGateway extends SocketGateway {
       this.games[room] = game;
     }
 
-    if (!this.games[room].getPlayer1()) {
+    if (index === 0 && !this.games[room].getPlayer1()) {
       this.games[room].setPlayer1(client);
       client.emit('index', 0);
-    } else if (!this.games[room].getPlayer2()) {
+    } else if (index === 1 && !this.games[room].getPlayer1()) {
       this.games[room].setPlayer2(client);
       client.emit('index', 1);
     }
