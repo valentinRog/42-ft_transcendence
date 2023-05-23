@@ -50,7 +50,7 @@
 	on:mousedown
 >
 	<div on:mousedown={() => (moving = true)}>
-		<img src={icon} />
+		<img src={icon} draggable="false"/>
 		<p>{name}</p>
 		<div class="buttons">
 			<button on:click={() => dispatch('minimize')}>_</button>
