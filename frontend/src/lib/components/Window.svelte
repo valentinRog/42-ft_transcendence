@@ -5,7 +5,8 @@
 	const dispatch = createEventDispatcher();
 
 	export let name: string;
-	export let icon: string;
+	export let tabIcon: string;
+	export let desktopIcon: string;
 
 	export let z = 0;
 
@@ -50,7 +51,7 @@
 	on:mousedown
 >
 	<div on:mousedown={() => (moving = true)}>
-		<img src={icon} draggable="false"/>
+		<img src={tabIcon} draggable="false"/>
 		<p>{name}</p>
 		<div class="buttons">
 			<button on:click={() => dispatch('minimize')}>_</button>

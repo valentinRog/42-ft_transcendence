@@ -87,6 +87,7 @@
 	height: $tab-height;
 	padding: 0.2rem 0.8rem;
 	margin-right: 0.25rem;
+	align-items: center;
 
 	@include tab-contour;
 	@include tab-contour-active;

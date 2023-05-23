@@ -20,13 +20,14 @@
 
 	interface AppProps {
 		readonly name: string;
-		readonly icon: string;
+		readonly tabIcon: string;
+		readonly desktopIcon: string;
 	}
 	const apps: Record<App, AppProps> = {
-		Pong: { name: 'Pong', icon: '/pong.png' },
-		Square: { name: 'Chat', icon: '/mail.png' },
-		Contact: { name: 'Contact', icon: '/mail.png' },
-		Profile: { name: 'Profile', icon: '/mail.png' }
+		Pong: { name: 'Pong', desktopIcon: '/big-pong.png', tabIcon: '/pong.png' },
+		Square: { name: 'Chat', desktopIcon: '/big-mail.png', tabIcon: '/mail3.png' },
+		Contact: { name: 'Contact', desktopIcon: '/phone.png', tabIcon: '/phone.png' },
+		Profile: { name: 'Profile', desktopIcon: '/computer.png', tabIcon: '/computer.png' }
 	};
 	Object.freeze(apps);
 
@@ -93,7 +94,7 @@
 	<div class="icons">
 		{#each Object.entries(apps) as [k, v]}
 			<div class="icon" on:dblclick={() => addInstance(k)}>
-				<img src={v.icon} alt={v.name} draggable="false"/>
+				<img src={v.desktopIcon} alt={v.name} draggable="false"/>
 				<span>{v.name}</span>
 			</div>
 		{/each}
