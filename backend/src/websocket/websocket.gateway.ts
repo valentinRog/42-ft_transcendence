@@ -53,14 +53,18 @@ export abstract class SocketGateway
 
   @SubscribeMessage('sendMessage')
   async handleMessage(
-    @MessageBody() message: { to: string, content: string },
-    @ConnectedSocket() client: Socket
+    @MessageBody() message: { to: string; content: string },
+    @ConnectedSocket() client: Socket,
   ) {
     const recipientSocket = this.webSocketService.getSocket(message.to);
     if (!recipientSocket) {
       // User is not connected
       return;
     }
-    recipientSocket.emit('message', { from: this.webSocketService.getClientName(client), to: message.to, content: message.content });
+    recipientSocket.emit('message', {
+      from: this.webSocketService.getClientName(client),
+      to: message.to,
+      content: message.content,
+    });
   }
 }

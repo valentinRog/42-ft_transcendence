@@ -10,10 +10,12 @@ import { createWriteStream } from 'fs';
 import { HttpService } from '@nestjs/axios';
 import UPLOAD_PATH from '../../config/upload-path';
 import * as fs from 'fs';
+import { WebSocketService } from 'src/websocket/websocket.service';
 
 @Injectable()
 export class UserService {
   constructor(
+    private socketService: WebSocketService,
     private prisma: PrismaService,
     private httpService: HttpService,
   ) {}
@@ -61,6 +63,24 @@ export class UserService {
       });
       delete user.hash;
       return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async notifyFriend(username: string, friend: string) {
+    if ((await this.getUserStatus(friend)) != 'offline') {
+      this.socketService.sendToUser(friend, username, 'friend-request');
+    }
+  }
+
+  async getUserStatus(username: string) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { username: username },
+        select: { status: true },
+      });
+      return user.status;
     } catch (error) {
       throw error;
     }

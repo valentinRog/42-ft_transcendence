@@ -67,26 +67,27 @@ export class UserController {
   }
 
   @Patch('add-friend')
-  async addFriend(@GetUser('username') userName, @Body() dto: FriendDto) {
-    if (userName == dto.friend)
+  async addFriend(@GetUser('username') username, @Body() dto: FriendDto) {
+    if (username == dto.friend)
       throw new ForbiddenException('You cannot add yourself as a friend');
     const prisma_friend = await this.prisma.user.findUnique({
       where: { username: dto.friend },
     });
     if (!prisma_friend) throw new ForbiddenException('User not found');
 
-    return this.userService.addFriend(userName, prisma_friend.id);
+    this.userService.notifyFriend(prisma_friend.username, username);
+    //return this.userService.addFriend(username, prisma_friend.id);
   }
 
   @Patch('remove-friend')
-  async removeFriend(@GetUser('username') userName, @Body() dto: FriendDto) {
-    if (userName == dto.friend)
+  async removeFriend(@GetUser('username') username, @Body() dto: FriendDto) {
+    if (username == dto.friend)
       throw new ForbiddenException('You cannot remove yourself as a friend');
     const prisma_friend = await this.prisma.user.findUnique({
       where: { username: dto.friend },
     });
     if (!prisma_friend) throw new ForbiddenException('User not found');
 
-    return this.userService.removeFriend(userName, prisma_friend.id);
+    return this.userService.removeFriend(username, prisma_friend.id);
   }
 }
