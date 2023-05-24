@@ -3,6 +3,8 @@ import type { Socket } from 'socket.io-client';
 
 export const token = writable<string | null>(null);
 export const socket = writable<Socket | null>(null);
+export const openChatWindow = writable(false);
+export const chatRecipient = writable('');
 
 import { readable } from 'svelte/store';
 

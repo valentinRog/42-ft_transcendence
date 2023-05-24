@@ -1,16 +1,24 @@
 <script lang="ts">
 	import Window from '$lib/components/Window.svelte';
 	import Pong from '$lib/components/pong/Pong.svelte';
-	import Square from '$lib/components/Square.svelte';
+	import ChatWindow from '$lib/components/ChatWindow.svelte';
 	import Contact from '$lib/components/Contact.svelte';
 	import Profile from '$lib/components/Profile.svelte';
 	import Tab from '$lib/components/Tab.svelte';
 	import Start from '$lib/components/Start.svelte';
+	import { openChatWindow } from '$lib/stores/stores';
 	import { time } from '$lib/stores/stores.ts';
+
+	$: {
+		if ($openChatWindow) {
+			addInstance('ChatWindow');
+			openChatWindow.set(false);
+		}
+	}
 
 	const components = {
 		Pong: Pong,
-		Square: Square,
+		ChatWindow: ChatWindow,
 		Contact: Contact,
 		Profile: Profile
 	};
@@ -25,7 +33,7 @@
 	}
 	const apps: Record<App, AppProps> = {
 		Pong: { name: 'Pong', desktopIcon: '/big-pong.png', tabIcon: '/pong.png' },
-		Square: { name: 'Chat', desktopIcon: '/big-mail.png', tabIcon: '/mail3.png' },
+		ChatWindow: { name: 'Chat', desktopIcon: '/big-mail.png', tabIcon: '/mail3.png' },
 		Contact: { name: 'Contact', desktopIcon: '/phone.png', tabIcon: '/phone.png' },
 		Profile: { name: 'Profile', desktopIcon: '/computer.png', tabIcon: '/computer.png' }
 	};
@@ -40,20 +48,26 @@
 
 	let instances: AppInstance[] = [];
 	let zstack: number[] = [];
+	let openChats: string[] = [];
 
 	let gid = 0;
-	function addInstance(componentType: string) {
-		zstack = [...zstack, zstack.length];
-		instances = [
-			...instances,
-			{
-				componentType: componentType as App,
-				component: components[componentType as App],
-				visible: true,
-				id: gid++
-			}
-		];
-		selected = null;
+	function addInstance(componentType: string, chatRecipient?: string) {
+		if (componentType === "ChatWindow" && chatRecipient && !openChats.includes(chatRecipient)) {
+			openChats.push(chatRecipient);
+		}
+		else {
+			zstack = [...zstack, zstack.length];
+			instances = [
+				...instances,
+				{
+					componentType: componentType as App,
+					component: components[componentType as App],
+					visible: true,
+					id: gid++
+				}
+			];
+			selected = null;
+		}
 	}
 
 	function putOnTop(id: number) {

@@ -3,6 +3,9 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
   WebSocketServer,
+  SubscribeMessage,
+  MessageBody,
+  ConnectedSocket,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { WebSocketService } from './websocket.service';
@@ -46,5 +49,18 @@ export abstract class SocketGateway
     console.log(`user ${client.id} disconnected`);
     const username = this.webSocketService.getClientName(client);
     if (username) this.userService.updateUserStatus(username, 'offline');
+  }
+
+  @SubscribeMessage('sendMessage')
+  async handleMessage(
+    @MessageBody() message: { to: string, content: string },
+    @ConnectedSocket() client: Socket
+  ) {
+    const recipientSocket = this.webSocketService.getSocket(message.to);
+    if (!recipientSocket) {
+      // User is not connected
+      return;
+    }
+    recipientSocket.emit('message', { from: this.webSocketService.getClientName(client), to: message.to, content: message.content });
   }
 }

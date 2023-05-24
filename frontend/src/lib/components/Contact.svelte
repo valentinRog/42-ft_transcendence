@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { token } from '$lib/stores/stores';
+	import { openChatWindow } from '$lib/stores/stores';
+	import { chatRecipient } from '$lib/stores/stores';
 
 	interface Friend {
 		id: string;
@@ -49,6 +51,12 @@
 		getFriends();
 		return data;
 	}
+
+	function startChat(friendUsername: string) {
+		$openChatWindow = true;
+		chatRecipient.set(friendUsername);
+	}
+
 	getFriends();
 </script>
 
@@ -66,7 +74,7 @@
 				{#if friend.status === 'online'}
 					<button>Invite Game</button>
 				{/if}
-				<button>Chat</button>
+				<button on:click={() => startChat(friend.username)}>Chat</button>
 				<button on:click={() => removeFriend(friend.username)}>Remove Friend</button>
 			</div>
 		{/each}
