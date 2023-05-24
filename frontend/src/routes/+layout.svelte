@@ -2,7 +2,6 @@
 	import { token } from '$lib/stores/stores';
 	import { page } from '$app/stores';
 	import '$lib/style/style.scss';
-	console.log($page)
 </script>
 
 <svelte:head>

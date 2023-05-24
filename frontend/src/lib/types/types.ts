@@ -5,4 +5,5 @@ export interface AppInstance {
 	readonly component: any;
 	visible: boolean;
 	readonly id: number;
+	readonly props: Record<string, any>;
 }

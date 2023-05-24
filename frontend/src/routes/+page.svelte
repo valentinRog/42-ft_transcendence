@@ -2,14 +2,15 @@
 	import Window from '$lib/components/Window.svelte';
 	import Tab from '$lib/components/Tab.svelte';
 	import Start from '$lib/components/Start.svelte';
-	import { openChatWindow , time, appInstances, zstack} from '$lib/stores/stores';
+	import { openChatWindow , time, appInstances, zstack, selected} from '$lib/stores/stores';
 	import type {App, AppInstance} from '$lib/types/types';
 	import { addInstance, removeInstance, putOnTop } from '$lib/scripts/appinstance';
+	import { compute_rest_props } from 'svelte/internal';
 
 	$: {
 		if ($openChatWindow) {
 			addInstance('ChatWindow');
-			selected = null;
+			$selected = null;
 			openChatWindow.set(false);
 		}
 	}
@@ -19,19 +20,17 @@
 		readonly tabName: string;
 		readonly desktopIcon: string;
 		readonly tabIcon: string;
-		readonly username?: string;
 	}
 
 	const apps: Record<App, AppProps> = {
 		Pong: { desktopName: 'Pong', tabName: 'Pong', desktopIcon: '/big-pong.png', tabIcon: '/pong.png'},
 		ChatWindow: { desktopName: 'MSN', tabName: 'MSN', desktopIcon: '/big-mail.png', tabIcon: '/mail3.png' },
-		Contact: { desktopName: 'Contact', tabName: 'Friends of lrondia', desktopIcon: '/phone.png', tabIcon: '/phone.png' },
-		Profile: { desktopName: 'Profile', tabName: 'Profile of lrondia', desktopIcon: '/computer.png', tabIcon: '/computer.png' }
+		Contact: { desktopName: 'Contact', tabName: 'Contact', desktopIcon: '/phone.png', tabIcon: '/phone.png' },
+		Profile: { desktopName: 'Profile', tabName: 'Profile', desktopIcon: '/computer.png', tabIcon: '/computer.png' }
 	};
 	
 	Object.freeze(apps);
 
-	let selected: number | null = null;
 	let width: number;
 	let height: number;
 
@@ -54,33 +53,34 @@
 	class="desktop"
 	bind:clientWidth={width}
 	bind:clientHeight={height}
-	on:mousedown={() => (selected = null)}
+	on:mousedown={() => ($selected = null)}
 >
 	<div class="icons">
 		{#each Object.entries(apps) as [k, v]}
-			<div class="icon" on:dblclick={() => { addInstance(k); selected = null;}}>
+			<div class="icon" on:dblclick={() => { addInstance(k); $selected = null;}}>
 				<img src={v.desktopIcon} alt={v.desktopName} draggable="false"/>
 				<span>{v.desktopName}</span>
 			</div>
 		{/each}
 	</div>
 
-	{#each $appInstances as { componentType, component, visible, id }, i (id)}
+	{#each $appInstances as { componentType, component, visible, id, props }, i (id)}
 		<Window
 			{...apps[componentType]}
+			{props}
 			parentWidth={width}
 			parentHeight={height}
 			z={$zstack.indexOf(i)}
 			{visible}
 			on:minimize={() => {
 				visible = !visible;
-				selected = null;
+				$selected = null;
 			}}
 			on:close={() => removeInstance(i)}
 			on:mousedown={(event) => {
 				event.stopPropagation();
 				putOnTop(i);
-				selected = i;
+				$selected = i;
 			}}
 		>
 			<svelte:component this={component} />
@@ -96,17 +96,17 @@
 		{#each $appInstances as { componentType, visible, id }, i (id)}
 			<Tab
 				{...apps[componentType]}
-				active={selected === i}
+				active={$selected === i}
 				on:click={() => {
 					putOnTop(i);
-					if (visible && selected === i) {
+					if (visible && $selected === i) {
 						visible = !visible;
-						selected = null;
+						$selected = null;
 					} else if (visible) {
-						selected = i;
+						$selected = i;
 					} else {
 						visible = !visible;
-						selected = i;
+						$selected = i;
 					}
 				}}
 			/>

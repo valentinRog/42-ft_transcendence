@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { token } from '$lib/stores/stores';
-	import { openChatWindow } from '$lib/stores/stores';
-	import { chatRecipient } from '$lib/stores/stores';
+	import { token, openChatWindow, chatRecipient, selected } from '$lib/stores/stores';
+	import { addInstance } from '$lib/scripts/appinstance';
 
 	interface Friend {
 		id: string;
@@ -69,7 +68,7 @@
 	<div id="friend-list">
 		{#each friends as friend (friend.id)}
 			<div class="friend">
-				<p>{friend.username}</p>
+				<p on:dblclick={() => { addInstance('Contact', {username: friend.username}); $selected = null;} }>{friend.username}</p>
 				<p>{friend.status}</p>
 				{#if friend.status === 'online'}
 					<button>Invite Game</button>

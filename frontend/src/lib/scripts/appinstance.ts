@@ -1,7 +1,7 @@
 import type { App, AppInstance } from '$lib/types/types';
 import { appInstances, components, gid, zstack } from '$lib/stores/stores';
 
-export function addInstance(componentType: string) {
+export function addInstance(componentType: string, props : Record<string, any> = {}) {
 	let instances: AppInstance[] = [];
 	appInstances.subscribe((val) => {
 		instances = val;
@@ -21,7 +21,8 @@ export function addInstance(componentType: string) {
 			componentType: componentType as App,
 			component: comps[componentType as App],
 			visible: true,
-			id: id++
+			id: id++,
+			props
 		}
 	];
 	appInstances.set(instances);

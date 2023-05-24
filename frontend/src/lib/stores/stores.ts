@@ -29,6 +29,7 @@ export const time = readable(new Date(), function start(set) {
 export const appInstances = writable<AppInstance[]>([]);
 export const zstack = writable<number[]>([]);
 export const gid = writable(0);
+export const selected = writable<number | null>(0);
 
 // COMPONENTS
 

@@ -4,10 +4,10 @@
 
 	const dispatch = createEventDispatcher();
 
-	export let desktopName: string;
+	export let props: Record<string, any>;
+
 	export let tabName: string;
 	export let tabIcon: string;
-	export let desktopIcon: string;
 
 	export let z = 0;
 
@@ -54,8 +54,14 @@
 >
 	<div on:mousedown={() => {moving = true}}>
 		<img src={tabIcon} draggable="false"/>
-		<p>{tabName}</p>
-		<div class="buttons">
+		{#if tabName === 'Profile' && props.username }
+			<p>{tabName}{props.username}</p>
+		{:else if tabName === 'Profile'}
+			<p>My {tabName}</p>
+		{:else}
+			<p>{tabName}</p>
+		{/if}
+			<div class="buttons">
 			<button on:click={() => dispatch('minimize')}>_</button>
 			<button on:click={() => dispatch('close')}>X</button>
 		</div>
