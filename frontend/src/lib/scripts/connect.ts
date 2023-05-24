@@ -19,5 +19,8 @@ export function connectSocket() {
 export function logout() {
 	sessionStorage.removeItem('token');
 	token.set(null);
+	socket.subscribe((val) => {
+		val?.close();
+	});
 	goto('/login');
 }

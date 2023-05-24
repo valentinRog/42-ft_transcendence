@@ -11,7 +11,6 @@
 		if ($page.url.searchParams.get('token')) {
 			$token = $page.url.searchParams.get('token');
 			if (browser) sessionStorage.setItem('token', $token!);
-			connectSocket();
 			goto('/');
 		}
 	});
