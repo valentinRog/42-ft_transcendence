@@ -4,7 +4,6 @@ import { UserService } from './user.service';
 import { HttpModule } from '@nestjs/axios';
 import { PrismaClient } from '@prisma/client';
 import { WebSocketModule } from '../websocket/websocket.module';
-import { WebSocketService } from '../websocket/websocket.service';
 
 @Module({
   imports: [HttpModule , forwardRef(() => WebSocketModule)],

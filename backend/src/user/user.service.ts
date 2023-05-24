@@ -15,7 +15,7 @@ import { WebSocketService } from 'src/websocket/websocket.service';
 @Injectable()
 export class UserService {
   constructor(
-    //private socketService: WebSocketService,
+    private socketService: WebSocketService,
     private prisma: PrismaService,
     private httpService: HttpService,
   ) {}
@@ -68,9 +68,9 @@ export class UserService {
     }
   }
 
-  async notifyFriend(userName: string, friend: string) {
-    if ((await this.getUserStatus(friend)) == 'online') {
-      //this.socketService.sendToUser(friend, userName, 'friend-request');
+  async notifyFriend(username: string, friend: string) {
+    if ((await this.getUserStatus(friend)) != 'offline') {
+      this.socketService.sendToUser(friend, username, 'friend-request');
     }
   }
 
