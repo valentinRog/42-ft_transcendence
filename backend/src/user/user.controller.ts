@@ -18,7 +18,6 @@ import { JwtGuard } from '../auth/guard';
 import { EditUserDto, FriendDto } from './dto';
 import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Express } from 'express';
 import { PrismaClient } from '@prisma/client';
 
 @UseGuards(JwtGuard)
@@ -75,7 +74,7 @@ export class UserController {
     });
     if (!prisma_friend) throw new ForbiddenException('User not found');
 
-    this.userService.notifyFriend(prisma_friend.username, username);
+    this.userService.notifyEvent(prisma_friend.username, username, 'addfriend');
     //return this.userService.addFriend(username, prisma_friend.id);
   }
 
