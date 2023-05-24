@@ -67,4 +67,9 @@ export class WebSocketService {
 
     return { spectator: player, room: room };
   }
+
+  sendToUser(client: string, friend: string, message: string) {
+    const socket = this.getSocket(friend);
+    socket?.emit('message', { from: client, to: friend, content: message });
+  }
 }
