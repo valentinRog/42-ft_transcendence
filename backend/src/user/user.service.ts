@@ -68,9 +68,9 @@ export class UserService {
     }
   }
 
-  async notifyFriend(username: string, friend: string) {
+  async notifyEvent(username: string, friend: string, message: string) {
     if ((await this.getUserStatus(friend)) != 'offline') {
-      this.socketService.sendToUser(friend, username, 'friend-request');
+      this.socketService.sendToUser(friend, username, message);
     }
   }
 
