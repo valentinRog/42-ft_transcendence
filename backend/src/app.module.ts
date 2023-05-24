@@ -19,6 +19,7 @@ import { NotificationModule } from './notification/notification.module';
     UserModule,
     StatModule,
     //WebSocketModule,
+	NotificationModule,
     PongModule,
     MatchmakingModule,
     NotificationModule,

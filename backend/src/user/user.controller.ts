@@ -65,19 +65,6 @@ export class UserController {
     return this.userService.saveImageFromBuffer(file, login + '.png');
   }
 
-  @Patch('add-friend')
-  async addFriend(@GetUser('username') username, @Body() dto: FriendDto) {
-    if (username == dto.friend)
-      throw new ForbiddenException('You cannot add yourself as a friend');
-    const prisma_friend = await this.prisma.user.findUnique({
-      where: { username: dto.friend },
-    });
-    if (!prisma_friend) throw new ForbiddenException('User not found');
-
-    this.userService.notifyEvent(prisma_friend.username, username, 'addfriend');
-    //return this.userService.addFriend(username, prisma_friend.id);
-  }
-
   @Patch('remove-friend')
   async removeFriend(@GetUser('username') username, @Body() dto: FriendDto) {
     if (username == dto.friend)
