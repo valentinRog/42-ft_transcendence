@@ -14,7 +14,7 @@
 	border-top-width: $line-width;
 }
 
-@mixin tab-top-line($color: $light-grey) {
+@mixin tab-top-line($color: $light-grey) { //probleme ici, elle se met beaucop trop haut
 	content: '';
 	position: absolute;
 	top: 0rem;
@@ -39,6 +39,18 @@
 	width: auto;
 	vertical-align: sub;
 	margin-right: 0.4rem;
+}
+
+@mixin no-border {
+	border: none;
+	&::before {
+		width: 0;
+		height: 0;
+	}
+	&::after {
+		width: 0;
+		height: 0;
+	}
 }
 
 @mixin tab-contour {

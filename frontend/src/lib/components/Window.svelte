@@ -4,7 +4,8 @@
 
 	const dispatch = createEventDispatcher();
 
-	export let name: string;
+	export let desktopName: string;
+	export let tabName: string;
 	export let tabIcon: string;
 	export let desktopIcon: string;
 
@@ -39,6 +40,7 @@
 		left += e.movementX;
 		top += e.movementY;
 	}
+	console.log('yo');
 </script>
 
 <section
@@ -50,9 +52,9 @@
 	bind:offsetHeight={height}
 	on:mousedown
 >
-	<div on:mousedown={() => (moving = true)}>
+	<div on:mousedown={() => {moving = true}}>
 		<img src={tabIcon} draggable="false"/>
-		<p>{name}</p>
+		<p>{tabName}</p>
 		<div class="buttons">
 			<button on:click={() => dispatch('minimize')}>_</button>
 			<button on:click={() => dispatch('close')}>X</button>
@@ -80,7 +82,7 @@
 			align-items: center;
 
 			&:hover {
-				cursor: grab;
+				cursor: url($grab), auto;
 			}
 
 			.buttons {

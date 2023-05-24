@@ -1,13 +1,14 @@
 <script lang="ts">
+	export let desktopName: string;
+	export let tabName: string;
 	export let tabIcon: string;
-	export let name: string;
 	export let active: boolean;
 </script>
 
 <div class="tab" on:click class:active>
-	<img src={tabIcon} alt={name} />
+	<img src={tabIcon} alt={tabName} />
 	<a href="/">
-		{name}
+		{tabName}
 	</a>
 </div>
 
