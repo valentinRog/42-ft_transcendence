@@ -1,86 +1,37 @@
 <script lang="ts">
 	import Window from '$lib/components/Window.svelte';
-	import Pong from '$lib/components/pong/Pong.svelte';
-	import ChatWindow from '$lib/components/ChatWindow.svelte';
-	import Contact from '$lib/components/Contact.svelte';
-	import Profile from '$lib/components/Profile.svelte';
 	import Tab from '$lib/components/Tab.svelte';
 	import Start from '$lib/components/Start.svelte';
-	import { openChatWindow } from '$lib/stores/stores';
-	import { time } from '$lib/stores/stores.ts';
+	import { openChatWindow , time, appInstances, zstack} from '$lib/stores/stores';
+	import type {App, AppInstance} from '$lib/types/types';
+	import { addInstance, removeInstance, putOnTop } from '$lib/scripts/appinstance';
 
 	$: {
 		if ($openChatWindow) {
 			addInstance('ChatWindow');
+			selected = null;
 			openChatWindow.set(false);
 		}
 	}
 
-	const components = {
-		Pong: Pong,
-		ChatWindow: ChatWindow,
-		Contact: Contact,
-		Profile: Profile
-	};
-	Object.freeze(components);
-
-	type App = keyof typeof components;
-
 	interface AppProps {
-		readonly name: string;
-		readonly tabIcon: string;
+		readonly desktopName: string;
+		readonly tabName: string;
 		readonly desktopIcon: string;
+		readonly tabIcon: string;
+		readonly username?: string;
 	}
+
 	const apps: Record<App, AppProps> = {
-		Pong: { name: 'Pong', desktopIcon: '/big-pong.png', tabIcon: '/pong.png' },
-		ChatWindow: { name: 'Chat', desktopIcon: '/big-mail.png', tabIcon: '/mail3.png' },
-		Contact: { name: 'Contact', desktopIcon: '/phone.png', tabIcon: '/phone.png' },
-		Profile: { name: 'Profile', desktopIcon: '/computer.png', tabIcon: '/computer.png' }
+		Pong: { desktopName: 'Pong', tabName: 'Pong', desktopIcon: '/big-pong.png', tabIcon: '/pong.png'},
+		ChatWindow: { desktopName: 'MSN', tabName: 'MSN', desktopIcon: '/big-mail.png', tabIcon: '/mail3.png' },
+		Contact: { desktopName: 'Contact', tabName: 'Friends of lrondia', desktopIcon: '/phone.png', tabIcon: '/phone.png' },
+		Profile: { desktopName: 'Profile', tabName: 'Profile of lrondia', desktopIcon: '/computer.png', tabIcon: '/computer.png' }
 	};
+	
 	Object.freeze(apps);
 
-	interface AppInstance {
-		readonly componentType: App;
-		readonly component: any;
-		visible: boolean;
-		readonly id: number;
-	}
-
-	let instances: AppInstance[] = [];
-	let zstack: number[] = [];
-	let openChats: string[] = [];
-
-	let gid = 0;
-	function addInstance(componentType: string, chatRecipient?: string) {
-		if (componentType === "ChatWindow" && chatRecipient && !openChats.includes(chatRecipient)) {
-			openChats.push(chatRecipient);
-		}
-		else {
-			zstack = [...zstack, zstack.length];
-			instances = [
-				...instances,
-				{
-					componentType: componentType as App,
-					component: components[componentType as App],
-					visible: true,
-					id: gid++
-				}
-			];
-			selected = null;
-		}
-	}
-
-	function putOnTop(id: number) {
-		zstack = [...zstack.filter((z) => z !== id), id];
-	}
-
-	function remove(id: number) {
-		instances = instances.filter((_, i) => i !== id);
-		zstack = zstack.filter((z) => z !== id).map((z) => (z > id ? z - 1 : z));
-	}
-
 	let selected: number | null = null;
-
 	let width: number;
 	let height: number;
 
@@ -107,25 +58,25 @@
 >
 	<div class="icons">
 		{#each Object.entries(apps) as [k, v]}
-			<div class="icon" on:dblclick={() => addInstance(k)}>
-				<img src={v.desktopIcon} alt={v.name} draggable="false"/>
-				<span>{v.name}</span>
+			<div class="icon" on:dblclick={() => { addInstance(k); selected = null;}}>
+				<img src={v.desktopIcon} alt={v.desktopName} draggable="false"/>
+				<span>{v.desktopName}</span>
 			</div>
 		{/each}
 	</div>
 
-	{#each instances as { componentType, component, visible, id }, i (id)}
+	{#each $appInstances as { componentType, component, visible, id }, i (id)}
 		<Window
 			{...apps[componentType]}
 			parentWidth={width}
 			parentHeight={height}
-			z={zstack.indexOf(i)}
+			z={$zstack.indexOf(i)}
 			{visible}
 			on:minimize={() => {
 				visible = !visible;
 				selected = null;
 			}}
-			on:close={() => remove(i)}
+			on:close={() => removeInstance(i)}
 			on:mousedown={(event) => {
 				event.stopPropagation();
 				putOnTop(i);
@@ -139,10 +90,10 @@
 
 <!-- NAVBAR -->
 
-<nav class="navbar" style:z-index={zstack.length}>
+<nav class="navbar" style:z-index={$zstack.length}>
 	<Start />
 	<div class="navbar-tabs">
-		{#each instances as { componentType, visible, id }, i (id)}
+		{#each $appInstances as { componentType, visible, id }, i (id)}
 			<Tab
 				{...apps[componentType]}
 				active={selected === i}

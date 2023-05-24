@@ -79,12 +79,12 @@
 	</a>
 </button>
 <div class="menu" class:hidden={!active}>
-	<Dropdown {...tree} />
-	<Dropdown {...tree} />
-	<Dropdown {...tree} />
-	<Dropdown {...tree} />
-	<Dropdown {...tree} />
-	<Dropdown {...tree} />
+		<Dropdown {...tree} />
+		<Dropdown {...tree} />
+		<Dropdown {...tree} />
+		<Dropdown {...tree} />
+		<Dropdown {...tree} />
+		<Dropdown {...tree} />
 </div>
 
 <style lang="scss">
@@ -97,10 +97,10 @@
 		}
 	}
 	div.menu {
+		@include tab-contour;
 		&.hidden {
 			display: none;
 		}
-
 		position: absolute;
 		bottom: $navbar-height;
 		left: 0;
