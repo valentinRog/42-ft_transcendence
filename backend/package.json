@@ -54,6 +54,7 @@
     "elo-js": "^1.0.1",
     "express-session": "^1.17.3",
     "multer": "^1.4.5-lts.1",
+    "nest": "^0.1.6",
     "pactum": "^3.4.0",
     "passport": "^0.6.0",
     "passport-42": "^1.2.6",

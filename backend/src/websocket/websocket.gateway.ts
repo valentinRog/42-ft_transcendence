@@ -67,4 +67,5 @@ export abstract class SocketGateway
       content: message.content,
     });
   }
+
 }
