@@ -26,7 +26,7 @@ export function addInstance(componentType: string) {
 	];
 	appInstances.set(instances);
 	zstack.set(zs);
-	gid.set(id);
+	gid.set(id); 
 }
 
 export function removeInstance(id: number) {
