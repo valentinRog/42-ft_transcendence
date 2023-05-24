@@ -7,7 +7,7 @@ import { WebSocketModule } from '../websocket/websocket.module';
 import { WebSocketService } from '../websocket/websocket.service';
 
 @Module({
-  imports: [HttpModule] , //forwardRef(() => WebSocketModule)],
+  imports: [HttpModule , forwardRef(() => WebSocketModule)],
   controllers: [UserController],
   providers: [UserService, PrismaClient],
 })

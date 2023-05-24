@@ -7,9 +7,10 @@ import { JwtStrategy } from './jwt/jwt.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { HttpModule } from '@nestjs/axios';
+import { UserModule } from '../user/user.module';
 
 @Module({
-  imports: [JwtModule.register({}), HttpModule],
+  imports: [JwtModule.register({}), HttpModule], //UserModule],
   controllers: [AuthController, TwoFactorController],
   providers: [AuthService, FortyTwoStrategy, JwtStrategy, UserService],
 })
