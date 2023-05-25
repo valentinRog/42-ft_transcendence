@@ -81,7 +81,7 @@ export class UserController {
     if (!prisma_friend) throw new ForbiddenException('User not found');
 
     this.userService.notifyEvent(prisma_friend.username, username, 'addfriend');
-    //return this.userService.addFriend(username, prisma_friend.id);
+    return this.userService.addFriend(username, prisma_friend.id);
   }
 
   @Patch('remove-friend')
