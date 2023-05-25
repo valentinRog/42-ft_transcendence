@@ -70,7 +70,7 @@
 			<div class="friend">
 				<p
 					on:dblclick={() => {
-						addInstance('Contact', { username: friend.username });
+						addInstance('Profile', { username: friend.username });
 						$selected = null;
 					}}
 				>

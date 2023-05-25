@@ -42,4 +42,4 @@ export const components = readable({
 
 // USER
 
-export const user = writable<{ username: string; login: string } | null>(null);
+export const user = writable<{ username: string; login: string, photo: string | 'none', friends: string[] } | null>(null);

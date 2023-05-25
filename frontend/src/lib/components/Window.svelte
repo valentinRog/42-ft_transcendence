@@ -59,7 +59,7 @@
 	>
 		<img src={tabIcon} draggable="false" />
 		{#if tabName === 'Profile' && props.username}
-			<p>{tabName}{props.username}</p>
+			<p>{tabName} of {props.username}</p>
 		{:else if tabName === 'Profile'}
 			<p>My {tabName}</p>
 		{:else}
