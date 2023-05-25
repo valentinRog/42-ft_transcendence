@@ -80,9 +80,11 @@ export class PongGateway extends SocketGateway {
       if (data.index === 0 || data.index === 1) {
         game.stopGame();
         delete this.games[data.room];
-        console.log(data.index);
-        console.log(data.index ? 0 : 1);
         this.server.to(data.room).emit('game-over', data.index ? 0 : 1);
+        const p1 = this.webSocketService.getClientName(game.getPlayer1());
+        const p2 = this.webSocketService.getClientName(game.getPlayer2());
+        this.userService.updateUserStatus(p1, 'online');
+        this.userService.updateUserStatus(p2, 'online');
       }
     }
   }

@@ -2,15 +2,11 @@ import { Controller, Post, UseGuards } from '@nestjs/common';
 import { JwtGuard } from 'src/auth/guard';
 import { GetUser } from 'src/auth/decorator';
 import { MatchmakingService } from './matchmaking.service';
-import { UserService } from '../user/user.service';
 
 @UseGuards(JwtGuard)
 @Controller('matchmaking')
 export class MatchmakingController {
-  constructor(
-    private matchmakingService: MatchmakingService,
-    private userService: UserService,
-  ) {}
+  constructor(private matchmakingService: MatchmakingService) {}
 
   @Post('queue')
   async queue(@GetUser() user) {
@@ -35,11 +31,5 @@ export class MatchmakingController {
   @Post('spectate')
   async spectate(@GetUser() user, room: string) {
     return await this.matchmakingService.joinSpectate(user.username, room);
-  }
-
-  @Post('match')
-  async match(@GetUser() user, opponent: string) {
-    return await this.userService.notifyEvent(user.username, opponent, 'match');
-    //return await this.matchmakingService.createMatch(user.username, opponent);
   }
 }

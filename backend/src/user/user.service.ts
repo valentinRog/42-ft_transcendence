@@ -10,12 +10,10 @@ import { createWriteStream } from 'fs';
 import { HttpService } from '@nestjs/axios';
 import UPLOAD_PATH from '../../config/upload-path';
 import * as fs from 'fs';
-import { WebSocketService } from 'src/websocket/websocket.service';
 
 @Injectable()
 export class UserService {
   constructor(
-    private socketService: WebSocketService,
     private prisma: PrismaService,
     private httpService: HttpService,
   ) {}
@@ -65,12 +63,6 @@ export class UserService {
       return user;
     } catch (error) {
       throw error;
-    }
-  }
-
-  async notifyEvent(friend: string, username: string, message: string) {
-    if ((await this.getUserStatus(friend)) != 'offline') {
-      this.socketService.sendToUser(friend, username, message);
     }
   }
 
