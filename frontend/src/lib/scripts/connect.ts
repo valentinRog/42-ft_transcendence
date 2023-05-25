@@ -23,7 +23,7 @@ export function getUser() {
 export function connectSocket() {
 	let url = window.location.origin;
 	url = url.substring(0, url.lastIndexOf(':'));
-	const s = ioClient(url + ':3000', {
+	const s = ioClient("localhost" + ':3000', {
 		query: {
 			token: get(token)
 		}
