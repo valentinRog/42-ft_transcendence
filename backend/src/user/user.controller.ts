@@ -12,6 +12,7 @@ import {
   ForbiddenException,
   Get,
   NotFoundException,
+  Param
 } from '@nestjs/common';
 import { GetUser } from '../auth/decorator';
 import { JwtGuard } from '../auth/guard';
@@ -24,6 +25,21 @@ import { PrismaClient } from '@prisma/client';
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService, private prisma: PrismaClient) {}
+
+//   @Get(':id')
+//   async getUserById(@Param('id') id: number) {
+//   try {
+//     const user = await this.prisma.user.findUnique({
+//       where: { id: id },
+//     });
+//     if (!user) {
+//       throw new NotFoundException(`User with ID ${id} not found`);
+//     }
+//     return user;
+//   } catch (error) {
+//     throw new NotFoundException(`User with ID ${id} not found`);
+//   }
+// }
 
   @Get('me')
   getMe(@GetUser() user) {
