@@ -26,20 +26,20 @@ import { PrismaClient } from '@prisma/client';
 export class UserController {
   constructor(private userService: UserService, private prisma: PrismaClient) {}
 
-//   @Get(':id')
-//   async getUserById(@Param('id') id: number) {
-//   try {
-//     const user = await this.prisma.user.findUnique({
-//       where: { id: id },
-//     });
-//     if (!user) {
-//       throw new NotFoundException(`User with ID ${id} not found`);
-//     }
-//     return user;
-//   } catch (error) {
-//     throw new NotFoundException(`User with ID ${id} not found`);
-//   }
-// }
+  @Get(':id')
+  async getUserById(@Param('id') id: number) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: id },
+      });
+      if (!user) {
+        throw new NotFoundException(`User with ID ${id} not found`);
+      }
+      return user;
+    } catch (error) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+  }
 
   @Get('me')
   getMe(@GetUser() user) {
@@ -47,8 +47,9 @@ export class UserController {
   }
 
   @Get('info/:id')
-  getInfo(@Param('id') id: number) {
-    return this.prisma.user.findUnique({ where: { id: id } });
+  getInfo(@Param('id') id: string) {
+	const parseId = parseInt(id.toString());
+    return this.prisma.user.findUnique({ where: { id: parseId } });
   }
 
   @UseGuards(JwtGuard)
