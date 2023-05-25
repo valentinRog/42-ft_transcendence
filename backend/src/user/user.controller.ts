@@ -12,6 +12,7 @@ import {
   ForbiddenException,
   Get,
   NotFoundException,
+  Param,
 } from '@nestjs/common';
 import { GetUser } from '../auth/decorator';
 import { JwtGuard } from '../auth/guard';
@@ -28,6 +29,11 @@ export class UserController {
   @Get('me')
   getMe(@GetUser() user) {
     return user;
+  }
+
+  @Get('info/:id')
+  getInfo(@Param('id') id: number) {
+    return this.prisma.user.findUnique({ where: { id: id } });
   }
 
   @UseGuards(JwtGuard)
