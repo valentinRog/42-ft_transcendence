@@ -68,4 +68,15 @@ export abstract class SocketGateway
     });
   }
 
+  @SubscribeMessage('acceptFriend')
+  async handleAcceptFriend(
+    @MessageBody() data: { response: boolean; friend: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const user = this.webSocketService.getClientName(client);
+    if (!user) return;
+    if (data.response) {
+      this.userService.addFriend(user, data.friend);
+    }
+  }
 }
