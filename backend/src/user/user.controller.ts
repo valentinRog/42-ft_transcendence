@@ -33,18 +33,14 @@ export class UserController {
   @UseGuards(JwtGuard)
   @Get('me/friends')
   async getUserFriends(@GetUser() user) {
-    try {
-      const friends = await this.prisma.user.findMany({
-        where: { id: { in: user.friends } },
-      });
-      return friends;
-    } catch (error) {
-      throw new NotFoundException('friends not found or empty');
-    }
+    const friends = await this.prisma.user.findMany({
+      where: { id: { in: user.friends } },
+    });
+    return friends;
   }
 
   @Patch('edit')
-  editUser(@GetUser('id') userId: number, @Body() dto: EditUserDto) {
+  asynceditUser(@GetUser('id') userId: number, @Body() dto: EditUserDto) {
     return this.userService.editUser(userId, dto);
   }
 
@@ -74,6 +70,6 @@ export class UserController {
     });
     if (!prisma_friend) throw new ForbiddenException('User not found');
 
-    return this.userService.removeFriend(username, prisma_friend.id);
+    return await this.userService.removeFriend(username, prisma_friend.id);
   }
 }

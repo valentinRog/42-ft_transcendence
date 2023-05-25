@@ -40,10 +40,14 @@ export class UserService {
   }
 
   async findFriend(username: string, friendId: number): Promise<boolean> {
-    const user = await this.prisma.user.findUnique({
-      where: { username: username },
-    });
-    return user.friends.includes(friendId);
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { username: username },
+      });
+      return user.friends.includes(friendId);
+    } catch (error) {
+      return false;
+    }
   }
 
   async addFriend(userName: string, friendId: number) {
