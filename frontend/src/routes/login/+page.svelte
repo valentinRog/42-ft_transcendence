@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { token, socket } from '$lib/stores/stores';
+	import { token } from '$lib/stores/stores';
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
@@ -34,7 +34,6 @@
 				if (!res.access_token) return;
 				$token = res.access_token;
 				if (browser) sessionStorage.setItem('token', res.access_token);
-				connectSocket();
 				goto('/');
 			})
 			.catch((err) => console.log(err));
