@@ -5,6 +5,9 @@
 	import { openChatWindow, time, appInstances, zstack, selected, user } from '$lib/stores/stores';
 	import type { App } from '$lib/types/types';
 	import { addInstance, removeInstance, putOnTop } from '$lib/scripts/appinstance';
+	import { onMount } from 'svelte';
+	import { connectSocket, getUser } from '$lib/scripts/connect';
+	import { connect } from 'socket.io-client';
 
 	$: {
 		if ($openChatWindow) {
@@ -47,7 +50,6 @@
 			tabIcon: '/computer.png'
 		}
 	};
-
 	Object.freeze(apps);
 
 	let width: number;
@@ -62,6 +64,11 @@
 	});
 
 	let soundOn: boolean = true;
+
+	onMount(() => {
+		getUser();
+		connectSocket();
+	});
 </script>
 
 <div
