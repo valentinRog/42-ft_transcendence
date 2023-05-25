@@ -42,7 +42,7 @@
 
 <form
 	on:submit|preventDefault={handleSubmit}
-	action="http://38.242.214.243:3000/auth/signup"
+	action="http://localhost:3000/auth/signup"
 	method="post"
 	enctype="application/x-www-form-urlencoded"
 >
@@ -57,7 +57,7 @@
 
 <form
 	on:submit|preventDefault={handleSubmit}
-	action="http://38.242.214.243:3000/auth/signin"
+	action="http://localhost:3000/auth/signin"
 	method="post"
 	enctype="application/x-www-form-urlencoded"
 >
@@ -68,4 +68,4 @@
 	<input type="submit" value="Signin" />
 </form>
 
-<a href="http://38.242.214.243:3000/auth/42login">login with 42</a>
+<a href="http://localhost:3000/auth/42login">login with 42</a>

@@ -2,7 +2,11 @@ import type { App } from '$lib/types/types';
 import { appInstances, components, gid, zstack } from '$lib/stores/stores';
 import { get } from 'svelte/store';
 
-export function addInstance(componentType: string, props: Record<string, any> = {}) {
+export function addInstance(
+	componentType: string,
+	propsWin: Record<string, any> = {},
+	props: Record<string, any> = {}
+) {
 	zstack.set([...get(zstack), get(zstack).length]);
 	appInstances.set([
 		...get(appInstances),
@@ -11,6 +15,7 @@ export function addInstance(componentType: string, props: Record<string, any> = 
 			component: get(components)[componentType as App],
 			visible: true,
 			id: get(gid),
+			propsWin,
 			props
 		}
 	]);

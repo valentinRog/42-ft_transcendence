@@ -10,7 +10,7 @@
 	let messageContent = '';
 
 	onMount(() => {
-		socket = io('http://38.242.214.243:3000', {
+		socket = io('http://localhost:3000', {
 			query: { token: $token }
 		});
 

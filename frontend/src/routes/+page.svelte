@@ -92,10 +92,10 @@
 		{/each}
 	</div>
 	{JSON.stringify($user)}
-	{#each $appInstances as { componentType, component, visible, id, props }, i (id)}
+	{#each $appInstances as { componentType, component, visible, id, propsWin, props }, i (id)}
 		<Window
 			{...apps[componentType]}
-			{props}
+			props={propsWin}
 			parentWidth={width}
 			parentHeight={height}
 			z={$zstack.indexOf(i)}
@@ -111,7 +111,7 @@
 				$selected = i;
 			}}
 		>
-			<svelte:component this={component} />
+			<svelte:component this={component} {...props} />
 		</Window>
 	{/each}
 </div>
