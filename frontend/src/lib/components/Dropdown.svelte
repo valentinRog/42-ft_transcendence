@@ -32,7 +32,7 @@
 		display: block;
 		width: 10rem;
 	}
-	
+
 	.dropdown-button {
 		width: 100%;
 		padding: 0.4rem 0.6rem;
@@ -43,7 +43,7 @@
 		font-size: medium;
 	}
 
-	.dropdown-button:hover{
+	.dropdown-button:hover {
 		background-color: $blue;
 		color: white;
 	}
@@ -51,8 +51,8 @@
 		background-color: $grey;
 		padding: 0.15rem 0.25rem;
 	}
-	
-	.dropdown-div:hover{
+
+	.dropdown-div:hover {
 		background-color: $blue;
 		color: white;
 	}

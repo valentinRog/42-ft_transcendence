@@ -68,7 +68,14 @@
 	<div id="friend-list">
 		{#each friends as friend (friend.id)}
 			<div class="friend">
-				<p on:dblclick={() => { addInstance('Contact', {username: friend.username}); $selected = null;} }>{friend.username}</p>
+				<p
+					on:dblclick={() => {
+						addInstance('Contact', { username: friend.username });
+						$selected = null;
+					}}
+				>
+					{friend.username}
+				</p>
 				<p>{friend.status}</p>
 				{#if friend.status === 'online'}
 					<button>Invite Game</button>

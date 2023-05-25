@@ -5,7 +5,7 @@ import ChatWindow from '$lib/components/ChatWindow.svelte';
 import Contact from '$lib/components/Contact.svelte';
 import Profile from '$lib/components/Profile.svelte';
 
-// TIME 
+// TIME
 export const token = writable<string | null>(null);
 export const socket = writable<Socket | null>(null);
 export const openChatWindow = writable(false);
@@ -33,9 +33,13 @@ export const selected = writable<number | null>(0);
 
 // COMPONENTS
 
-export const components = readable( {
+export const components = readable({
 	Pong: Pong,
 	ChatWindow: ChatWindow,
 	Contact: Contact,
 	Profile: Profile
 });
+
+// USER
+
+export const user = writable<{ username: string; login: string } | null>(null);

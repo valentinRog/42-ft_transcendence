@@ -15,7 +15,7 @@
 <style lang="scss">
 	.tab {
 		@include tab;
-		
+
 		display: flex;
 		flex-basis: 15rem;
 		flex-shrink: 1;

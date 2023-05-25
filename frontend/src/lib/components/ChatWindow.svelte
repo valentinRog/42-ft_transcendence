@@ -14,11 +14,11 @@
 			query: { token: $token }
 		});
 
-		socket.on('message', message => {
+		socket.on('message', (message) => {
 			if (message.from === friendUsername) {
-    			messages.push(message.from + ": " + message.content);
-    			messages = messages;
-  			}
+				messages.push(message.from + ': ' + message.content);
+				messages = messages;
+			}
 		});
 	});
 
@@ -27,7 +27,7 @@
 		if (socket) {
 			console.log(`Sending message to ${friendUsername}: ${messageContent}`);
 			socket.emit('sendMessage', { to: friendUsername, content: messageContent });
-			messages.push( "You: "+ messageContent);
+			messages.push('You: ' + messageContent);
 			messages = messages;
 			messageContent = '';
 		}
@@ -60,7 +60,7 @@
 	}
 
 	#chat-window {
-    height: 13rem;
-    overflow-y: auto;
-  	}
+		height: 13rem;
+		overflow-y: auto;
+	}
 </style>

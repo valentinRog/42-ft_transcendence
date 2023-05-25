@@ -2,10 +2,9 @@
 	import Window from '$lib/components/Window.svelte';
 	import Tab from '$lib/components/Tab.svelte';
 	import Start from '$lib/components/Start.svelte';
-	import { openChatWindow , time, appInstances, zstack, selected} from '$lib/stores/stores';
-	import type {App, AppInstance} from '$lib/types/types';
+	import { openChatWindow, time, appInstances, zstack, selected, user } from '$lib/stores/stores';
+	import type { App } from '$lib/types/types';
 	import { addInstance, removeInstance, putOnTop } from '$lib/scripts/appinstance';
-	import { compute_rest_props } from 'svelte/internal';
 
 	$: {
 		if ($openChatWindow) {
@@ -23,30 +22,46 @@
 	}
 
 	const apps: Record<App, AppProps> = {
-		Pong: { desktopName: 'Pong', tabName: 'Pong', desktopIcon: '/big-pong.png', tabIcon: '/pong.png'},
-		ChatWindow: { desktopName: 'MSN', tabName: 'MSN', desktopIcon: '/big-mail.png', tabIcon: '/mail3.png' },
-		Contact: { desktopName: 'Contact', tabName: 'Contact', desktopIcon: '/phone.png', tabIcon: '/phone.png' },
-		Profile: { desktopName: 'Profile', tabName: 'Profile', desktopIcon: '/computer.png', tabIcon: '/computer.png' }
+		Pong: {
+			desktopName: 'Pong',
+			tabName: 'Pong',
+			desktopIcon: '/big-pong.png',
+			tabIcon: '/pong.png'
+		},
+		ChatWindow: {
+			desktopName: 'MSN',
+			tabName: 'MSN',
+			desktopIcon: '/big-mail.png',
+			tabIcon: '/mail3.png'
+		},
+		Contact: {
+			desktopName: 'Contact',
+			tabName: 'Contact',
+			desktopIcon: '/phone.png',
+			tabIcon: '/phone.png'
+		},
+		Profile: {
+			desktopName: 'Profile',
+			tabName: 'Profile',
+			desktopIcon: '/computer.png',
+			tabIcon: '/computer.png'
+		}
 	};
-	
+
 	Object.freeze(apps);
 
 	let width: number;
 	let height: number;
 
 	// CLOCK
-	
-	const formatter = new Intl.DateTimeFormat(
-		'en',
-		{
-			hour12: false,
-			hour: 'numeric',
-			minute: '2-digit'
-		}
-	);
-	
-	let soundOn: boolean = true;
 
+	const formatter = new Intl.DateTimeFormat('en', {
+		hour12: false,
+		hour: 'numeric',
+		minute: '2-digit'
+	});
+
+	let soundOn: boolean = true;
 </script>
 
 <div
@@ -57,13 +72,19 @@
 >
 	<div class="icons">
 		{#each Object.entries(apps) as [k, v]}
-			<div class="icon" on:dblclick={() => { addInstance(k); $selected = null;}}>
-				<img src={v.desktopIcon} alt={v.desktopName} draggable="false"/>
+			<div
+				class="icon"
+				on:dblclick={() => {
+					addInstance(k);
+					$selected = null;
+				}}
+			>
+				<img src={v.desktopIcon} alt={v.desktopName} draggable="false" />
 				<span>{v.desktopName}</span>
 			</div>
 		{/each}
 	</div>
-
+	{JSON.stringify($user)}
 	{#each $appInstances as { componentType, component, visible, id, props }, i (id)}
 		<Window
 			{...apps[componentType]}
@@ -113,15 +134,25 @@
 		{/each}
 	</div>
 	<div class="navbar-clock">
-		<p> 
+		<p>
 			{#if soundOn}
-				<img on:mousedown={() => { soundOn = !soundOn; }}
-					src="/sound-on.png" alt="sound on" >
+				<img
+					on:mousedown={() => {
+						soundOn = !soundOn;
+					}}
+					src="/sound-on.png"
+					alt="sound on"
+				/>
 			{:else}
-				<img on:mousedown={() => { soundOn = !soundOn; }}
-					src="/sound-off.png" alt="sound on" >
+				<img
+					on:mousedown={() => {
+						soundOn = !soundOn;
+					}}
+					src="/sound-off.png"
+					alt="sound on"
+				/>
 			{/if}
-			{formatter.format($time)} 
+			{formatter.format($time)}
 		</p>
 	</div>
 </nav>

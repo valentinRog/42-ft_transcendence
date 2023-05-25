@@ -1,20 +1,29 @@
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
-import { token, socket } from '$lib/stores/stores';
+import { token, socket, user } from '$lib/stores/stores';
 import { connectSocket } from '$lib/scripts/connect';
-import type { Socket } from 'socket.io-client';
+import { get } from 'svelte/store';
 
-export function load() {
+export function load({ fetch }) {
 	if (browser) {
 		const tok = sessionStorage.getItem('token');
-		let sock: Socket | null = null;
-		socket.subscribe((val) => {
-			sock = val;
-		});
 		if (!tok) {
 			goto('/login');
-		} else if (sock === null) {
+		} else if (get(socket) === null) {
 			token.set(tok);
+			fetch('http://localhost:3000/users/me', {
+				method: 'GET',
+				headers: {
+					Authorization: `Bearer ${get(token)}`
+				}
+			})
+			.then((res) => res.json())
+			.then((data) => {
+				user.set({
+					username: data.username,
+					login: data.login
+				});
+			});
 			connectSocket();
 		}
 	}

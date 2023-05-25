@@ -166,8 +166,7 @@
 	});
 
 	onDestroy(() => {
-		if (room !== '')
-			$socket!.emit('leave-room', { room: room, index: index });
+		if (room !== '') $socket!.emit('leave-room', { room: room, index: index });
 		else {
 			fetch('http://localhost:3000/matchmaking/unqueue', {
 				method: 'POST',

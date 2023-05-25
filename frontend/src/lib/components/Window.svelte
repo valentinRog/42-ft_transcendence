@@ -52,16 +52,20 @@
 	bind:offsetHeight={height}
 	on:mousedown
 >
-	<div on:mousedown={() => {moving = true}}>
-		<img src={tabIcon} draggable="false"/>
-		{#if tabName === 'Profile' && props.username }
+	<div
+		on:mousedown={() => {
+			moving = true;
+		}}
+	>
+		<img src={tabIcon} draggable="false" />
+		{#if tabName === 'Profile' && props.username}
 			<p>{tabName}{props.username}</p>
 		{:else if tabName === 'Profile'}
 			<p>My {tabName}</p>
 		{:else}
 			<p>{tabName}</p>
 		{/if}
-			<div class="buttons">
+		<div class="buttons">
 			<button on:click={() => dispatch('minimize')}>_</button>
 			<button on:click={() => dispatch('close')}>X</button>
 		</div>

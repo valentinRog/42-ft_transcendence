@@ -14,7 +14,8 @@
 	border-top-width: $line-width;
 }
 
-@mixin tab-top-line($color: $light-grey) { //probleme ici, elle se met beaucop trop haut
+@mixin tab-top-line($color: $light-grey) {
+	//probleme ici, elle se met beaucop trop haut
 	content: '';
 	position: absolute;
 	top: 0rem;
