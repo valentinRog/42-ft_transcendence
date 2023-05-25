@@ -40,7 +40,6 @@
 		left += e.movementX;
 		top += e.movementY;
 	}
-	console.log('yo');
 </script>
 
 <section

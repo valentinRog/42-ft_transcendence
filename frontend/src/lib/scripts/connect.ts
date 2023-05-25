@@ -4,7 +4,7 @@ import { goto } from '$app/navigation';
 import { get } from 'svelte/store';
 
 export function getUser() {
-	fetch('http://localhost:3000/users/me', {
+	fetch('http://38.242.214.243:3000/users/me', {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${get(token)}`
@@ -12,6 +12,7 @@ export function getUser() {
 	})
 		.then((res) => res.json())
 		.then((data) => {
+			console.log(data);
 			user.set({
 				username: data.username,
 				login: data.login
@@ -22,7 +23,7 @@ export function getUser() {
 export function connectSocket() {
 	let url = window.location.origin;
 	url = url.substring(0, url.lastIndexOf(':'));
-	const s = ioClient(url + ':3000', {
+	const s = ioClient('38.242.214.243' + ':3000', {
 		query: {
 			token: get(token)
 		}

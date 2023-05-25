@@ -13,7 +13,7 @@
 	async function addFriend(event: Event) {
 		const form = (event.target as HTMLFormElement).friend.value;
 		console.log(form);
-		const res = await fetch('http://localhost:3000/users/add-friend', {
+		const res = await fetch('http://38.242.214.243:3000/users/add-friend', {
 			method: 'PATCH',
 			headers: {
 				Authorization: `Bearer ${$token}`,
@@ -26,7 +26,7 @@
 	}
 
 	async function getFriends() {
-		const res = await fetch('http://localhost:3000/users/me/friends', {
+		const res = await fetch('http://38.242.214.243:3000/users/me/friends', {
 			method: 'GET',
 			headers: {
 				Authorization: `Bearer ${$token}`
@@ -38,7 +38,7 @@
 	}
 
 	async function removeFriend(friendUsername: string) {
-		const res = await fetch('http://localhost:3000/users/remove-friend', {
+		const res = await fetch('http://38.242.214.243:3000/users/remove-friend', {
 			method: 'PATCH',
 			headers: {
 				Authorization: `Bearer ${$token}`,

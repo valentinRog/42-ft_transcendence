@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { token, user } from '$lib/stores/stores';
+	import { construct_svelte_component } from 'svelte/internal';
 
 	//display friend, copied from contact mais ca pourrait etre une fonction partagee non ?
 	interface Friend {
@@ -8,10 +9,23 @@
 		status: string;
 	}
 
+	let currentUser: {} | null;
 	let friends: Friend[] = [];
 
+	async function getUserById() {
+		const res = await fetch('http://38.242.214.243:3000/users/info/5', {
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${$token}`
+			}
+		});
+		const data = await res.json();
+		console.log(data);
+		return data;
+	}
+
 	async function getFriends() {
-		const res = await fetch('http://localhost:3000/users/me/friends', {
+		const res = await fetch('http://38.242.214.243:3000/users/me/friends', {
 			method: 'GET',
 			headers: {
 				Authorization: `Bearer ${$token}`
@@ -22,6 +36,7 @@
 		return data;
 	}
 	getFriends();
+	getUserById();
 </script>
 
 <div id="box">
