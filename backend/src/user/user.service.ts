@@ -10,6 +10,7 @@ import { createWriteStream } from 'fs';
 import { HttpService } from '@nestjs/axios';
 import UPLOAD_PATH from '../../config/upload-path';
 import * as fs from 'fs';
+import { WebSocketService } from 'src/websocket/websocket.service';
 
 @Injectable()
 export class UserService {

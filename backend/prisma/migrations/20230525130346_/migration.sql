@@ -13,8 +13,20 @@ CREATE TABLE "User" (
     "twoFactorAuthSecret" TEXT,
     "friends" INTEGER[] DEFAULT ARRAY[]::INTEGER[],
     "statId" INTEGER NOT NULL,
+    "notif_count" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Notification" (
+    "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "message" TEXT NOT NULL,
+    "sender" TEXT NOT NULL DEFAULT 'system',
+    "userId" INTEGER NOT NULL,
+
+    CONSTRAINT "Notification_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -34,7 +46,6 @@ CREATE TABLE "Stat" (
     "losses" INTEGER NOT NULL DEFAULT 0,
     "elo" INTEGER NOT NULL DEFAULT 1000,
     "ladder" TEXT NOT NULL DEFAULT 'bronze',
-    "userId" INTEGER NOT NULL,
 
     CONSTRAINT "Stat_pkey" PRIMARY KEY ("id")
 );
@@ -49,10 +60,13 @@ CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 CREATE UNIQUE INDEX "User_statId_key" ON "User"("statId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Stat_userId_key" ON "Stat"("userId");
+CREATE UNIQUE INDEX "Notification_sender_message_key" ON "Notification"("sender", "message");
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_statId_fkey" FOREIGN KEY ("statId") REFERENCES "Stat"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Match" ADD CONSTRAINT "Match_winnerId_fkey" FOREIGN KEY ("winnerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

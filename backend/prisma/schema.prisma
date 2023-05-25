@@ -22,6 +22,7 @@ model User {
   friends          Int[]    @default([])
   stat             Stat     @relation(fields: [statId], references: [id])
   statId           Int      @unique
+  notif_count 	   Int      @default(0)
   notifications    Notification[]
   matchesAsWinner  Match[]  @relation("Winner")
   matchesAsLoser   Match[]  @relation("Loser")
@@ -34,6 +35,7 @@ model Notification {
   user      User      @relation(fields: [userId], references: [id])
   sender    String    @default("system")
   userId   	Int
+  @@unique([userId, sender, message])
 }
 
 model Match {
