@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, Body } from '@nestjs/common';
+import { Controller, Post, UseGuards, Body, Get } from '@nestjs/common';
 import { JwtGuard } from 'src/auth/guard';
 import { GetUser } from 'src/auth/decorator';
 import { ForbiddenException } from '@nestjs/common';
@@ -23,7 +23,7 @@ export class NotificationController {
     });
     if (!prisma_friend) throw new ForbiddenException('User not found');
 
-    this.notifService.notifyEvent(
+    return await this.notifService.notifyEvent(
       prisma_friend.username,
       username,
       'addfriend',
@@ -40,6 +40,20 @@ export class NotificationController {
     });
     if (!prisma_friend) throw new ForbiddenException('User not found');
 
-    this.notifService.notifyEvent(prisma_friend.username, username, 'match');
+    return await this.notifService.notifyEvent(
+      prisma_friend.username,
+      username,
+      'match',
+    );
+  }
+
+  @Get('notifications')
+  async getNotifications(@GetUser('username') username) {
+    const prisma_user = await this.prisma.user.findUnique({
+      where: { username: username },
+      include: { notifications: true },
+    });
+    if (!prisma_user) throw new ForbiddenException('User not found');
+    return prisma_user.notifications;
   }
 }

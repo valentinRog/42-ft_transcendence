@@ -55,7 +55,7 @@ export class NotificationService {
           error instanceof Prisma.PrismaClientKnownRequestError &&
           error.code === 'P2002'
         ) {
-          return { error: 'Duplicate notification' };
+          throw new ForbiddenException('Duplicate notification');
         }
         throw error;
       }
