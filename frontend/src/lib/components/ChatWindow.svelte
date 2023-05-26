@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { token, chatRecipient } from '$lib/stores/stores';
+	import { token, chatRecipient, messagesStore } from '$lib/stores/stores';
 	import io, { Socket } from 'socket.io-client';
+	import { get } from 'svelte/store';
 
 	let friendUsername = $chatRecipient;
 
 	let socket: Socket | null = null;
-	let messages: string[] = [];
+	let messageStore = get(messagesStore);
 	let messageContent = '';
 
 	onMount(() => {
@@ -16,8 +17,13 @@
 
 		socket.on('message', (message) => {
 			if (message.from === friendUsername) {
-				messages.push(message.from + ': ' + message.content);
-				messages = messages;
+				messagesStore.update(currentMessages => {
+					if (!currentMessages[message.from]) {
+						currentMessages[message.from] = [];
+					}
+					currentMessages[message.from].push(message.from + ': ' + message.content);
+					return currentMessages;
+				});
 			}
 		});
 	});
@@ -27,8 +33,13 @@
 		if (socket) {
 			console.log(`Sending message to ${friendUsername}: ${messageContent}`);
 			socket.emit('sendMessage', { to: friendUsername, content: messageContent });
-			messages.push('You: ' + messageContent);
-			messages = messages;
+			messagesStore.update(currentMessages => {
+				if (!currentMessages[friendUsername]) {
+					currentMessages[friendUsername] = [];
+				}
+				currentMessages[friendUsername].push('You: ' + messageContent);
+				return currentMessages;
+			});
 			messageContent = '';
 		}
 	}
@@ -38,9 +49,11 @@
 	<div id="chat-window">
 		<h4>Chat with {friendUsername}</h4>
 		<ul>
-			{#each messages as message (message)}
-				<li>{message}</li>
-			{/each}
+			{#if $messagesStore[friendUsername]}
+				{#each $messagesStore[friendUsername] as message, i (i)}
+					<li>{message}</li>
+				{/each}
+			{/if}
 		</ul>
 	</div>
 	<div id="sendMessage-window">

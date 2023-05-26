@@ -9,7 +9,6 @@ import Profile from '$lib/components/Profile.svelte';
 export const token = writable<string | null>(null);
 export const socket = writable<Socket | null>(null);
 export const openChatWindow = writable(false);
-export const chatRecipient = writable('');
 
 import { readable } from 'svelte/store';
 import type { AppInstance } from '$lib/types/types';
@@ -43,3 +42,11 @@ export const components = readable({
 // USER
 
 export const user = writable<{ username: string; login: string } | null>(null);
+
+// CHAT
+export const chatRecipient = writable('');
+export const messagesStore = writable<MessagesStoreType>({});
+
+type MessagesStoreType = {
+    [key: string]: string[];
+};
