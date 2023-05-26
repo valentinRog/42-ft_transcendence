@@ -5,5 +5,9 @@ WORKDIR /app
 COPY . .
 
 RUN npm install
+RUN npx prisma generate
 
-CMD npx prisma migrate dev && npm run start
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT [ "/entrypoint.sh" ]
