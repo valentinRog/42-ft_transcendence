@@ -7,7 +7,4 @@ COPY . .
 RUN npm install
 RUN npx prisma generate
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-ENTRYPOINT [ "/entrypoint.sh" ]
+CMD npx prisma migrate deploy && npm run start
