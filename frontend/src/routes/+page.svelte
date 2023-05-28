@@ -84,6 +84,7 @@
     	if (response.ok) {
       		const allMessages = await response.json();
       		messagesStore.set(allMessages);
+			console.log(allMessages);
     	} else
       		console.error(`Error fetching all messages: ${response.statusText}`);
   	}

@@ -32,10 +32,12 @@
 		const response = await fetch('http://localhost:3000/chat/add-message', {
 			method: 'POST',
 			headers: {
-				'Authorization': `Bearer ${$token}`
+				'Authorization': `Bearer ${$token}`,
+				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({ recipientUsername, content })
 		});
+		console.log(JSON.stringify({ recipientUsername, content }));
 		if (!response.ok) {
 			console.error(`Error sending message: ${response.statusText}`);
     }
@@ -45,9 +47,7 @@
 		if (messageContent.trim() === '') return;
 		if (socket) {
 			socket.emit('sendMessage', { to: friendUsername, content: messageContent });
-
 			sendApiMessage(friendUsername, messageContent);
-
 			messagesStore.update(currentMessages => {
 				if (!currentMessages[friendUsername]) {
 					currentMessages[friendUsername] = [];
