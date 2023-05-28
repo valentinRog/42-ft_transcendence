@@ -28,11 +28,26 @@
 		});
 	});
 
+	async function sendApiMessage(recipientUsername: string, content: string) {
+		const response = await fetch('http://localhost:3000/chat/add-message', {
+			method: 'POST',
+			headers: {
+				'Authorization': `Bearer ${$token}`
+			},
+			body: JSON.stringify({ recipientUsername, content })
+		});
+		if (!response.ok) {
+			console.error(`Error sending message: ${response.statusText}`);
+    }
+}
+
 	function sendMessage() {
 		if (messageContent.trim() === '') return;
 		if (socket) {
-			console.log(`Sending message to ${friendUsername}: ${messageContent}`);
 			socket.emit('sendMessage', { to: friendUsername, content: messageContent });
+
+			sendApiMessage(friendUsername, messageContent);
+
 			messagesStore.update(currentMessages => {
 				if (!currentMessages[friendUsername]) {
 					currentMessages[friendUsername] = [];

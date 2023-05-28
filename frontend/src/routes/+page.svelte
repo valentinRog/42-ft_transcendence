@@ -2,7 +2,7 @@
 	import Window from '$lib/components/Window.svelte';
 	import Tab from '$lib/components/Tab.svelte';
 	import Start from '$lib/components/Start.svelte';
-	import { openChatWindow, time, appInstances, zstack, selected, user } from '$lib/stores/stores';
+	import { openChatWindow, time, appInstances, zstack, selected, user, token, messagesStore } from '$lib/stores/stores';
 	import type { App } from '$lib/types/types';
 	import { addInstance, removeInstance, putOnTop } from '$lib/scripts/appinstance';
 	import { onMount } from 'svelte';
@@ -65,10 +65,28 @@
 
 	let soundOn: boolean = true;
 
-	onMount(() => {
+
+
+	onMount(async () => {
 		getUser();
 		connectSocket();
+		await fetchAllMessages();
 	});
+
+	async function fetchAllMessages() {
+    	const response = await fetch('http://localhost:3000/chat/allMessages', {
+			method: 'GET',
+      		headers: {
+          		'Authorization': `Bearer ${$token}`,
+				'Content-Type': 'application/json'
+      		}
+    	});
+    	if (response.ok) {
+      		const allMessages = await response.json();
+      		messagesStore.set(allMessages);
+    	} else
+      		console.error(`Error fetching all messages: ${response.statusText}`);
+  	}
 </script>
 
 <div

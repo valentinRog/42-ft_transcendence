@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { StatModule } from './stat/stat.module';
 import { PongModule } from './pong/pong.module';
+import { ChatModule } from './chat/chat.module';
 import { MatchmakingModule } from './matchmaking/matchmaking.module';
 import { WebSocketModule } from './websocket/websocket.module';
 
@@ -19,6 +20,7 @@ import { WebSocketModule } from './websocket/websocket.module';
     StatModule,
     //WebSocketModule,
     PongModule,
+    ChatModule,
     MatchmakingModule,
   ],
   controllers: [AppController],

@@ -21,6 +21,7 @@ import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PrismaClient } from '@prisma/client';
 
+
 @UseGuards(JwtGuard)
 @Controller('users')
 export class UserController {
