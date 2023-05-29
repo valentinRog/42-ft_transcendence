@@ -16,7 +16,7 @@ export class ChatService {
     });
   
     let newMessage;
-  
+    
     if (existingChat) {
       newMessage = await this.prisma.message.create({
         data: {
@@ -105,5 +105,20 @@ export class ChatService {
       }
     });
     return chats;
+  }
+
+  async createChatGroup(groupName: string, memberUsernames: string[]) {
+    const newGroupChat = await this.prisma.chat.create({
+      data: {
+        isGroupChat: true,
+        name: groupName,
+        chatUsers: {
+          create: memberUsernames.map(username => ({
+            user: { connect: { username } }
+          }))
+        }
+      }
+    });
+    return newGroupChat;
   }
 }

@@ -1,4 +1,4 @@
-export type App = 'Pong' | 'ChatWindow' | 'Contact' | 'Profile';
+export type App = 'Pong' | 'ChatWindow' | 'Contact' | 'Profile' | 'Conversation';
 
 export interface AppInstance {
 	readonly componentType: App;

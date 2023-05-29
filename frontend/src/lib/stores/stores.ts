@@ -4,6 +4,7 @@ import Pong from '$lib/components/pong/Pong.svelte';
 import ChatWindow from '$lib/components/ChatWindow.svelte';
 import Contact from '$lib/components/Contact.svelte';
 import Profile from '$lib/components/Profile.svelte';
+import Conversation from '$lib/components/Conversation.svelte';
 
 // TIME
 export const token = writable<string | null>(null);
@@ -36,16 +37,25 @@ export const components = readable({
 	Pong: Pong,
 	ChatWindow: ChatWindow,
 	Contact: Contact,
-	Profile: Profile
+	Profile: Profile,
+	Conversation: Conversation
 });
 
 // USER
 
 export const user = writable<{id: number; username: string; login: string } | null>(null);
 
+// CONTACTS
+export const contacts = writable<Contact[]>([]);
+
+interface Contact {
+	id: number;
+	username: string;
+	status: string;
+}
+
 // CHAT
 export const friendInfo = writable<User | null>(null);
-
 export const chats = writable<Chat[]>([]);
 
 type Chat = {

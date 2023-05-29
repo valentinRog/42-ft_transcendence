@@ -35,4 +35,19 @@ export class ChatController {
     const messages = await this.chatService.getAllUserMessages(user.username);
     return messages;
   }
+  
+  @UseGuards(JwtGuard)
+  @Post('create-group-chat')
+  async createGroupChat(
+    @GetUser() user,
+    @Body('groupName') groupName: string,
+    @Body('memberUsernames') memberUsernames: string[]
+  ) {
+    if (!groupName || !memberUsernames || memberUsernames.length < 2) {
+      throw new BadRequestException('Group name and at least two member usernames are required');
+    }
+    const newGroupChat = await this.chatService.createChatGroup(groupName, memberUsernames);
+    return newGroupChat;
+  }
+
 }

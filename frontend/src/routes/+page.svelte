@@ -6,8 +6,9 @@
 	import type { App } from '$lib/types/types';
 	import { addInstance, removeInstance, putOnTop } from '$lib/scripts/appinstance';
 	import { onMount } from 'svelte';
-	import { connectSocket, getUser } from '$lib/scripts/connect';
+	import { connectSocket, getUser, getFriends, getAllUserChats } from '$lib/scripts/connect';
 	import { connect } from 'socket.io-client';
+	import { get } from 'svelte/store';
 
 	$: {
 		if ($openChatWindow) {
@@ -32,9 +33,13 @@
 			TabProps: { name: 'Pong', icon: '/pong.png' },
 			DesktopProps: { name: 'Pong', icon: '/big-pong.png' }
 		},
+		Conversation: {
+			TabProps: { name: 'Conversation', icon: '/mail3.png' },
+			DesktopProps: { name: 'Conversation', icon: '/big-mail.png' }
+		},
 		ChatWindow: {
-			TabProps: { name: 'MSN', icon: '/mail3.png' },
-			DesktopProps: { name: 'MSN', icon: '/big-mail.png' }
+			TabProps: { name: 'MSN(a enlevé)', icon: '/mail3.png' },
+			DesktopProps: { name: 'MSN(a enlevé)', icon: '/big-mail.png' }
 		},
 		Contact: {
 			TabProps: { name: 'Contact', icon: '/phone.png' },
@@ -64,24 +69,10 @@
 
 	onMount(async () => {
 		getUser();
+		getFriends();
 		connectSocket();
 		await getAllUserChats();
 	});
-
-	async function getAllUserChats() {
-		const response = await fetch('http://localhost:3000/chat/allUserChats', {
-			method: 'GET',
-      		headers: {
-          		'Authorization': `Bearer ${$token}`,
-				'Content-Type': 'application/json'
-      		}
-    	});
-		if (response.ok) {
-      		const allUserChats = await response.json();
-      		chats.set(allUserChats);
-    	} else
-      		console.error(`Error fetching all messages: ${response.statusText}`);
-	}
 </script>
 
 <div

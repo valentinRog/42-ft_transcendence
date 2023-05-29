@@ -1,4 +1,4 @@
-import { token, socket, user } from '$lib/stores/stores';
+import { token, socket, user, contacts, chats } from '$lib/stores/stores';
 import ioClient from 'socket.io-client';
 import { goto } from '$app/navigation';
 import { get } from 'svelte/store';
@@ -19,6 +19,33 @@ export function getUser() {
 				login: data.login
 			});
 		});
+}
+
+export async function getFriends() {
+    const res = await fetch('http://localhost:3000/users/me/friends', {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${get(token)}`
+        }
+    });
+    const data = await res.json();
+    contacts.set(data);
+    return data;
+}
+
+export async function getAllUserChats() {
+	const response = await fetch('http://localhost:3000/chat/allUserChats', {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${get(token)}`,
+			'Content-Type': 'application/json'
+		}
+	});
+	if (response.ok) {
+		  const allUserChats = await response.json();
+		  chats.set(allUserChats);
+	} else
+		  console.error(`Error fetching all messages: ${response.statusText}`);
 }
 
 export function connectSocket() {

@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { token, openChatWindow, friendInfo, selected } from '$lib/stores/stores';
+	import { token, openChatWindow, friendInfo, selected, contacts} from '$lib/stores/stores';
 	import { addInstance } from '$lib/scripts/appinstance';
+	import { getFriends } from '$lib/scripts/connect';
 
 	interface Friend {
 		id: number;
@@ -8,7 +9,8 @@
 		status: string;
 	}
 
-	let friends: Friend[] = [];
+	let groupChatMode = false;
+	let selectedFriends: string[] = [];
 
 	async function addFriend(event: Event) {
 		const form = (event.target as HTMLFormElement).friend.value;
@@ -22,18 +24,6 @@
 		});
 		getFriends();
 		return await res.json();
-	}
-
-	async function getFriends() {
-		const res = await fetch('http://localhost:3000/users/me/friends', {
-			method: 'GET',
-			headers: {
-				Authorization: `Bearer ${$token}`
-			}
-		});
-		const data = await res.json();
-		friends = data || [];
-		return data;
 	}
 
 	async function removeFriend(friendUsername: string) {
@@ -65,11 +55,28 @@
 			body: JSON.stringify({ friend: friendUsername })
 		});
 		const data = await res.json();
-		getFriends();
 		return data;
 	}
 
-	getFriends();
+	function toggleGroupChatMode() {
+		groupChatMode = !groupChatMode;
+		selectedFriends = [];
+	}
+
+	function selectFriend(event: MouseEvent) {
+		const friendUsername = (event.target as HTMLInputElement).value;
+		const index = selectedFriends.indexOf(friendUsername);
+    	if (index > -1)
+        	selectedFriends = [...selectedFriends.slice(0, index), ...selectedFriends.slice(index + 1)];
+    	else
+        	selectedFriends = [...selectedFriends, friendUsername];
+	}
+
+	async function createGroupChat() {
+		console.log(selectedFriends);
+
+		toggleGroupChatMode();
+	}
 </script>
 
 <div id="box">
@@ -78,9 +85,20 @@
 		<input type="text" id="friend" name="friend" />
 		<input type="submit" value="+" />
 	</form>
+	<button on:click={toggleGroupChatMode}>{groupChatMode ? 'Cancel' : 'Create Group Chat'}</button>
+	{#if groupChatMode && selectedFriends.length > 0}
+		<button on:click={createGroupChat}>Confirm</button>
+	{/if}
 	<div id="friend-list">
-		{#each friends as friend (friend.id)}
+		{#each $contacts as friend (friend.id)}
 			<div class="friend">
+				{#if groupChatMode}
+					<input	type="checkbox" 
+							checked={selectedFriends.includes(friend.username)} 
+							value={friend.username} 
+							on:click={selectFriend} 
+					/>
+				{/if}
 				<p
 					on:dblclick={() => {
 						addInstance('Profile', { username: friend.username }, {username: friend.id});
@@ -91,7 +109,7 @@
 				</p>
 				<p>{friend.status}</p>
 				{#if friend.status === 'online' || friend.status === 'in-game'}
-					<button>Invite Game</button>
+					<button on:click={() => askGame(friend.username)}>Invite Game</button>
 				{/if}
 				<button on:click={() => startChat(friend)}>Chat</button>
 				<button on:click={() => removeFriend(friend.username)}>Remove Friend</button>
@@ -99,6 +117,7 @@
 		{/each}
 	</div>
 </div>
+
 
 <style lang="scss">
 	#box {
