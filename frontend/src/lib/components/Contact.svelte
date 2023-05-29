@@ -12,7 +12,6 @@
 
 	async function addFriend(event: Event) {
 		const form = (event.target as HTMLFormElement).friend.value;
-		console.log(form);
 		const res = await fetch('http://localhost:3000/users/add-friend', {
 			method: 'PATCH',
 			headers: {

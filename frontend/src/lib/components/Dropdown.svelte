@@ -58,10 +58,10 @@
 	}
 
 	.dropdown-content {
-		@include tab-contour;
 		position: absolute;
 		bottom: 0;
 		left: 100%;
 		width: 100%;
+		@include tab-contour;
 	}
 </style>

@@ -2,28 +2,28 @@
 	import { token, user } from '$lib/stores/stores';
 	import { construct_svelte_component } from 'svelte/internal';
 
-	//display friend, copied from contact mais ca pourrait etre une fonction partagee non ?
 	interface Friend {
 		id: string;
 		username: string;
 		status: string;
 	}
 
-	export let username: string | null = null;
+	export let username: string | null | undefined = null;
 	let currentUser: any = {};
 	let friends: Friend[] = [];
 
 	async function getUserById() {
 		let res;
 		let url;
-		if (username === null)
+		if (username === null) {
 			res = await fetch('http://localhost:3000/users/me', {
 				method: 'GET',
 				headers: {
 					Authorization: `Bearer ${$token}`
 				}
 			});
-		else
+			username = $user?.username;
+		} else
 			res = await fetch(`http://localhost:3000/users/info/${username}`, {
 				method: 'GET',
 				headers: {
@@ -32,7 +32,6 @@
 			});
 		const data = await res.json();
 		currentUser = data;
-		console.log(currentUser);
 		return data;
 	}
 
@@ -52,9 +51,16 @@
 
 <div id="box">
 	<ul>
-		<li class="box">Username: {currentUser.username || ''}</li>
-		<li class="box">Login: {currentUser.login || ''}</li>
-		{#if username === $user?.username }
+		<div class="pic-username-login">
+			<div class="username-login">
+				<li class="box">Username: {currentUser.username || ''}</li>
+				<li class="box">Login: {currentUser.login || ''}</li>
+			</div>
+			<li class="pic">
+				<img class="profile-pic" src="/computer.png" alt="profile picture" />
+			</li>
+		</div>
+		{#if username === $user?.username}
 			<li class="box friends">
 				<p>My friends</p>
 				<ul id="friend-list">
@@ -85,6 +91,26 @@
 	#box {
 		width: 20rem;
 		height: 20rem;
+		.pic-username-login {
+			display: flex;
+			align-items: center;
+			.pic {
+				@include tab-contour-hollow;
+				padding: 0.15rem;
+				margin-right: 0.25rem;
+				margin-left: auto;
+				background-color: white;
+				height: 5rem;
+				width: 7.5rem;
+				display: flex;
+				img {
+					margin: 0 auto;
+					height: 4.5rem;
+					width: auto;
+					
+				}
+			}
+		}
 		li {
 			list-style: none;
 		}
