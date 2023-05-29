@@ -71,7 +71,7 @@
 			},
 			body: JSON.stringify({ token: $token })
 		});
-
+	}
 
 	onMount(() => {
 
