@@ -41,12 +41,37 @@ export const components = readable({
 
 // USER
 
-export const user = writable<{ username: string; login: string } | null>(null);
+export const user = writable<{username: string; login: string } | null>(null);
 
 // CHAT
-export const chatRecipient = writable('');
+export const chatRecipient = writable<User | null>(null);
 export const messagesStore = writable<MessagesStoreType>({});
 
 type MessagesStoreType = {
     [key: string]: string[];
 };
+
+export const chats = writable<Chat[]>([]);
+
+type Chat = {
+	chatUsers: ChatUser[];
+	createdAt: string;
+	id: number;
+	isGroupChat: boolean;
+	name: string;
+	updatedAt: string;
+};
+
+type ChatUser = {
+	chatId: number;
+	createdAt: string;
+	id: number;
+	lastReadMessageId: number | null;
+	user: User;
+	userId: number;
+  };
+
+interface User {
+	id: number;
+    username: string;
+}

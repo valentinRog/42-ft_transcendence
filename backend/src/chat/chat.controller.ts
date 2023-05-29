@@ -18,14 +18,21 @@ export class ChatController {
     if (!recipientUsername) {
       throw new BadRequestException('Recipient username is required');
     }
-    await this.chatService.sendMessage(user.username, recipientUsername, content);
-    return { message: "Message sent successfully" };
+    let newMessage = await this.chatService.sendMessage(user.username, recipientUsername, content);
+    return newMessage;
   }
 
   @UseGuards(JwtGuard)
-  @Get('allMessages')
+  @Get('allUserChats')
+  async getAllUserChats(@GetUser() user) {
+    const chats = await this.chatService.getAllUserChats(user.username);
+    return chats;
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('allUserMessages')
   async getAllMessages(@GetUser() user) {
-    const messages = await this.chatService.getAllMessages(user.username);
+    const messages = await this.chatService.getAllUserMessages(user.username);
     return messages;
   }
 }

@@ -14,9 +14,11 @@ export class ChatService {
         ]
       }
     });
-
+  
+    let newMessage;
+  
     if (existingChat) {
-      await this.prisma.message.create({
+      newMessage = await this.prisma.message.create({
         data: {
           content,
           user: { connect: { username: senderUsername } },
@@ -36,8 +38,8 @@ export class ChatService {
           }
         }
       });
-
-      await this.prisma.message.create({
+  
+      newMessage = await this.prisma.message.create({
         data: {
           content,
           user: { connect: { username: senderUsername } },
@@ -45,9 +47,10 @@ export class ChatService {
         }
       });
     }
+    return newMessage;
   }
 
-  async getAllMessages(username: string) {
+  async getAllUserMessages(username: string) {
     const chats = await this.prisma.chat.findMany({
       where: {
         chatUsers: {
@@ -69,7 +72,6 @@ export class ChatService {
         }
       }
     });
-
     const allMessages = chats.flatMap(chat => 
       chat.messages.map(message => ({
         chatId: chat.id,
@@ -80,5 +82,28 @@ export class ChatService {
     );
     allMessages.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
     return allMessages;
+  }
+
+  async getAllUserChats(username: string) {
+    const chats = await this.prisma.chat.findMany({
+      where: {
+        chatUsers: {
+          some: {
+            user: {
+              username: username
+            }
+          }
+        }
+      },
+      include: {
+        messages: true,
+        chatUsers: {
+          include: {
+            user: true
+          }
+        }
+      }
+    });
+    return chats;
   }
 }

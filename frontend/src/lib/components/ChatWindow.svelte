@@ -1,20 +1,27 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { token, chatRecipient, messagesStore } from '$lib/stores/stores';
+	import { token, chatRecipient, messagesStore, user, chats } from '$lib/stores/stores';
 	import io, { Socket } from 'socket.io-client';
 	import { get } from 'svelte/store';
 
-	let friendUsername = $chatRecipient;
-
+	let friend = $chatRecipient;
+	let friendUsername = '';
+	let friendId = 0;
 	let socket: Socket | null = null;
-	let messageStore = get(messagesStore);
 	let messageContent = '';
+	let chat: number | null = null;
+
+	if (friend) {
+    	friendUsername = friend.username;
+		friendId = friend.id;
+	}
 
 	onMount(() => {
 		socket = io('http://localhost:3000', {
 			query: { token: $token }
 		});
-
+		chat = findChat($user?.username || "defaultUserName", friendUsername);
+		console.log(chat);
 		socket.on('message', (message) => {
 			if (message.from === friendUsername) {
 				messagesStore.update(currentMessages => {
@@ -28,6 +35,20 @@
 		});
 	});
 
+	function findChat(user1: string, user2: string) {
+		let foundChat = null;
+
+		chats.subscribe(($chats) => {
+        $chats.forEach(chat => {
+            const users = chat.chatUsers.map(chatUser => chatUser.user.username);
+            if (users.includes(user1) && users.includes(user2)) {
+                foundChat = chat;
+            }
+        	});
+		});
+    	return foundChat;
+	}
+
 	async function sendApiMessage(recipientUsername: string, content: string) {
 		const response = await fetch('http://localhost:3000/chat/add-message', {
 			method: 'POST',
@@ -37,7 +58,6 @@
 			},
 			body: JSON.stringify({ recipientUsername, content })
 		});
-		console.log(JSON.stringify({ recipientUsername, content }));
 		if (!response.ok) {
 			console.error(`Error sending message: ${response.statusText}`);
     }
@@ -49,6 +69,7 @@
 			socket.emit('sendMessage', { to: friendUsername, content: messageContent });
 			sendApiMessage(friendUsername, messageContent);
 			messagesStore.update(currentMessages => {
+				currentMessages = { ...currentMessages };
 				if (!currentMessages[friendUsername]) {
 					currentMessages[friendUsername] = [];
 				}
@@ -57,6 +78,7 @@
 			});
 			messageContent = '';
 		}
+		console.log($messagesStore);
 	}
 </script>
 

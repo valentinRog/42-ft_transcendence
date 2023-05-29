@@ -3,7 +3,7 @@
 	import { addInstance } from '$lib/scripts/appinstance';
 
 	interface Friend {
-		id: string;
+		id: number;
 		username: string;
 		status: string;
 	}
@@ -12,7 +12,6 @@
 
 	async function addFriend(event: Event) {
 		const form = (event.target as HTMLFormElement).friend.value;
-		console.log(form);
 		const res = await fetch('http://localhost:3000/users/add-friend', {
 			method: 'PATCH',
 			headers: {
@@ -51,9 +50,9 @@
 		return data;
 	}
 
-	function startChat(friendUsername: string) {
+	function startChat(friend: Friend) {
 		$openChatWindow = true;
-		chatRecipient.set(friendUsername);
+		chatRecipient.set({ id: friend.id, username: friend.username });
 	}
 
 	getFriends();
@@ -77,10 +76,10 @@
 					{friend.username}
 				</p>
 				<p>{friend.status}</p>
-				{#if friend.status === 'online'}
+				{#if friend.status === 'online' || friend.status === 'in-game'}
 					<button>Invite Game</button>
 				{/if}
-				<button on:click={() => startChat(friend.username)}>Chat</button>
+				<button on:click={() => startChat(friend)}>Chat</button>
 				<button on:click={() => removeFriend(friend.username)}>Remove Friend</button>
 			</div>
 		{/each}
