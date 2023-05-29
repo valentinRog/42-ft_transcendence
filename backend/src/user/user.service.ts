@@ -18,6 +18,10 @@ export class UserService {
     private httpService: HttpService,
   ) {}
 
+  async getUser(username: string) {
+    return this.prisma.user.findUnique({ where: { username: username } });
+  }
+
   async editUser(userId: number, dto: EditUserDto) {
     try {
       const user = await this.prisma.user.update({
@@ -187,7 +191,9 @@ export class UserService {
       delete user.hash;
       return user;
     } catch (error) {
-      throw error;
+      throw new NotFoundException(
+        `User with username '${username}' not found.`,
+      );
     }
   }
 }

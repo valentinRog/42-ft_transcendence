@@ -61,8 +61,7 @@
 		requestAnimationFrame(() => draw(ctx));
 	}
 
-	onMount(() => {
-		async function connectToRoom() {
+	async function joinMatchmakingQueue() {
 			await fetch('http://localhost:3000/matchmaking/queue', {
 				method: 'POST',
 				headers: {
@@ -73,13 +72,20 @@
 			});
 		}
 
-		connectToRoom();
+	onMount(() => {
+
+		joinMatchmakingQueue();
 
 		$socket!.on('enter-room', (data: { room: string; index: number }) => {
 			console.log('enter-room', data.room, data.index);
 			room = data.room;
 			index = data.index;
 			$socket!.emit('enter-room', data);
+		});
+
+		$socket!.on('add-friend', (data: { message: string }) => {
+			console.log('add-friend', data.message);
+			$socket!.emit('accept-friend', { response: true, friend: data.message });
 		});
 
 		$socket!.on('index', (i: number) => {

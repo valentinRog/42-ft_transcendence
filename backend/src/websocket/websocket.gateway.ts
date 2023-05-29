@@ -68,15 +68,31 @@ export abstract class SocketGateway
     });
   }
 
-  @SubscribeMessage('acceptFriend')
+  @SubscribeMessage('accept-friend')
   async handleAcceptFriend(
     @MessageBody() data: { response: boolean; friend: string },
     @ConnectedSocket() client: Socket,
   ) {
-    const user = this.webSocketService.getClientName(client);
-    if (!user) return;
+    const username = this.webSocketService.getClientName(client);
+    const user = await this.userService.getUser(data.friend);
+    if (!user) return { error: 'User not found' };
     if (data.response) {
-      this.userService.addFriend(user, data.friend);
+      this.userService.addFriend(username, user.id);
+    }
+    client.emit('friend-accepted', data.friend);
+  }
+
+  @SubscribeMessage('match')
+  async handleMatch(
+    @MessageBody() data: { response: boolean; friend: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const username = this.webSocketService.getClientName(client);
+    const user = await this.userService.getUser(username);
+    if (!user) return { error: 'User not found' };
+    if (user.status !== 'online') return { error: 'User is not ready' };
+    if (data.response) {
+      this.webSocketService.createRoom(username, data.friend);
     }
   }
 }

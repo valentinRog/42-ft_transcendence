@@ -13,12 +13,11 @@ export class NotificationService {
   ) {}
 
   async notifyEvent(friend: string, username: string, message: string) {
-    console.log('notifyEvent');
     if ((await this.userService.getUserStatus(friend)) != 'offline') {
       this.socketService.sendToUser(friend, username, message);
     } else {
       if (message === 'match') {
-        return { message: `${friend} is offline` };
+        throw new ForbiddenException(`${friend} is offline`);
       }
       try {
         const notif = await this.prisma.notification.create({
