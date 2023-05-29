@@ -59,7 +59,7 @@
 			<li class="pic">
 				<img class="profile-pic" src="/computer.png" alt="profile picture" />
 			</li>
-		</div>
+		</div> 
 		{#if username === $user?.username}
 			<li class="box friends">
 				<p>My friends</p>
