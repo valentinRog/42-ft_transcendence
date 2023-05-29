@@ -11,7 +11,6 @@ import {
   MaxFileSizeValidator,
   ForbiddenException,
   Get,
-  NotFoundException,
   Param,
 } from '@nestjs/common';
 import { GetUser } from '../auth/decorator';
@@ -26,21 +25,6 @@ import { PrismaClient } from '@prisma/client';
 export class UserController {
   constructor(private userService: UserService, private prisma: PrismaClient) {}
 
-  // @Get(':id')
-  // async getUserById(@Param('id') id: number) {
-  //   try {
-  //     const user = await this.prisma.user.findUnique({
-  //       where: { id: id },
-  //     });
-  //     if (!user) {
-  //       throw new NotFoundException(`User with ID ${id} not found`);
-  //     }
-  //     return user;
-  //   } catch (error) {
-  //     throw new NotFoundException(`User with ID ${id} not found`);
-  //   }
-  // }
-
   @Get('me')
   getMe(@GetUser() user) {
     return user;
@@ -48,25 +32,21 @@ export class UserController {
 
   @Get('info/:id')
   getInfo(@Param('id') id: string) {
-	const parseId = parseInt(id.toString());
+    const parseId = parseInt(id.toString());
     return this.prisma.user.findUnique({ where: { id: parseId } });
   }
 
   @UseGuards(JwtGuard)
   @Get('me/friends')
   async getUserFriends(@GetUser() user) {
-    try {
-      const friends = await this.prisma.user.findMany({
-        where: { id: { in: user.friends } },
-      });
-      return friends;
-    } catch (error) {
-      throw new NotFoundException('friends not found or empty');
-    }
+    const friends = await this.prisma.user.findMany({
+      where: { id: { in: user.friends } },
+    });
+    return friends;
   }
 
   @Patch('edit')
-  editUser(@GetUser('id') userId: number, @Body() dto: EditUserDto) {
+  asynceditUser(@GetUser('id') userId: number, @Body() dto: EditUserDto) {
     return this.userService.editUser(userId, dto);
   }
 
@@ -87,19 +67,6 @@ export class UserController {
     return this.userService.saveImageFromBuffer(file, login + '.png');
   }
 
-  @Patch('add-friend')
-  async addFriend(@GetUser('username') username, @Body() dto: FriendDto) {
-    if (username == dto.friend)
-      throw new ForbiddenException('You cannot add yourself as a friend');
-    const prisma_friend = await this.prisma.user.findUnique({
-      where: { username: dto.friend },
-    });
-    if (!prisma_friend) throw new ForbiddenException('User not found');
-
-    this.userService.notifyEvent(prisma_friend.username, username, 'addfriend');
-    return this.userService.addFriend(username, prisma_friend.id);
-  }
-
   @Patch('remove-friend')
   async removeFriend(@GetUser('username') username, @Body() dto: FriendDto) {
     if (username == dto.friend)
@@ -109,6 +76,6 @@ export class UserController {
     });
     if (!prisma_friend) throw new ForbiddenException('User not found');
 
-    return this.userService.removeFriend(username, prisma_friend.id);
+    return await this.userService.removeFriend(username, prisma_friend.id);
   }
 }

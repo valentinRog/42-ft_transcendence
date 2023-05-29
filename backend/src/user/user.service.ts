@@ -10,15 +10,17 @@ import { createWriteStream } from 'fs';
 import { HttpService } from '@nestjs/axios';
 import UPLOAD_PATH from '../../config/upload-path';
 import * as fs from 'fs';
-import { WebSocketService } from 'src/websocket/websocket.service';
 
 @Injectable()
 export class UserService {
   constructor(
-    private socketService: WebSocketService,
     private prisma: PrismaService,
     private httpService: HttpService,
   ) {}
+
+  async getUser(username: string) {
+    return this.prisma.user.findUnique({ where: { username: username } });
+  }
 
   async editUser(userId: number, dto: EditUserDto) {
     try {
@@ -42,10 +44,14 @@ export class UserService {
   }
 
   async findFriend(username: string, friendId: number): Promise<boolean> {
-    const user = await this.prisma.user.findUnique({
-      where: { username: username },
-    });
-    return user.friends.includes(friendId);
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { username: username },
+      });
+      return user.friends.includes(friendId);
+    } catch (error) {
+      return false;
+    }
   }
 
   async addFriend(userName: string, friendId: number) {
@@ -65,12 +71,6 @@ export class UserService {
       return user;
     } catch (error) {
       throw error;
-    }
-  }
-
-  async notifyEvent(username: string, friend: string, message: string) {
-    if ((await this.getUserStatus(friend)) != 'offline') {
-      this.socketService.sendToUser(friend, username, message);
     }
   }
 
@@ -191,7 +191,9 @@ export class UserService {
       delete user.hash;
       return user;
     } catch (error) {
-      throw error;
+      throw new NotFoundException(
+        `User with username '${username}' not found.`,
+      );
     }
   }
 }

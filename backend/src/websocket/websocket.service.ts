@@ -25,7 +25,7 @@ export class WebSocketService {
   }
 
   getClientName(socket: Socket): string | undefined {
-    return this.reverseMap.get(socket.id);
+    return this.reverseMap.get(socket?.id);
   }
 
   getAllSockets(): Map<string, Socket> {

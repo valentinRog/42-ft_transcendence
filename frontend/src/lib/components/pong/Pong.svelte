@@ -61,9 +61,14 @@
 		requestAnimationFrame(() => draw(ctx));
 	}
 
+<<<<<<< HEAD
 	onMount(() => {
 		async function connectToRoom() {
 			await fetch('http://38.242.214.243:3000/matchmaking/queue', {
+=======
+	async function joinMatchmakingQueue() {
+			await fetch('http://localhost:3000/matchmaking/queue', {
+>>>>>>> notifications
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -73,7 +78,9 @@
 			});
 		}
 
-		connectToRoom();
+	onMount(() => {
+
+		joinMatchmakingQueue();
 
 		$socket!.on('enter-room', (data: { room: string; index: number }) => {
 			console.log('enter-room', data.room, data.index);
@@ -81,6 +88,16 @@
 			index = data.index;
 			$socket!.emit('enter-room', data);
 		});
+
+		//$socket!.on('add-friend', (data: { message: string }) => {
+		//	console.log('add-friend', data.message);
+		//	$socket!.emit('accept-friend', { response: true, friend: data.message });
+		//});
+
+		//$socket!.on('ask-game', (data: { message: string }) => {
+		//	console.log('accept-game', data.message);
+		//	$socket!.emit('accept-game', { response: true, friend: data.message });
+		//});
 
 		$socket!.on('index', (i: number) => {
 			index = i;
