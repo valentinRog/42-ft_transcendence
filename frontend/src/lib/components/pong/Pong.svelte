@@ -61,22 +61,17 @@
 		requestAnimationFrame(() => draw(ctx));
 	}
 
-<<<<<<< HEAD
-	onMount(() => {
-		async function connectToRoom() {
-			await fetch('http://38.242.214.243:3000/matchmaking/queue', {
-=======
+
 	async function joinMatchmakingQueue() {
-			await fetch('http://localhost:3000/matchmaking/queue', {
->>>>>>> notifications
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${$token}`
-				},
-				body: JSON.stringify({ token: $token })
-			});
-		}
+		await fetch('http://38.242.214.243:3000/matchmaking/queue', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${$token}`
+			},
+			body: JSON.stringify({ token: $token })
+		});
+
 
 	onMount(() => {
 
@@ -185,7 +180,7 @@
 	onDestroy(() => {
 		if (room !== '') $socket!.emit('leave-room', { room: room, index: index });
 		else {
-			fetch('http://38.242.214.243:3000/matchmaking/unqueue', {
+			fetch('http://localhost:3000/matchmaking/unqueue', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

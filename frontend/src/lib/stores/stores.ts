@@ -9,7 +9,6 @@ import Profile from '$lib/components/Profile.svelte';
 export const token = writable<string | null>(null);
 export const socket = writable<Socket | null>(null);
 export const openChatWindow = writable(false);
-export const chatRecipient = writable('');
 
 import { readable } from 'svelte/store';
 import type { AppInstance } from '$lib/types/types';
@@ -42,4 +41,42 @@ export const components = readable({
 
 // USER
 
-export const user = writable<{ username: string; login: string } | null>(null);
+export const user = writable<{id: number; username: string; login: string } | null>(null);
+
+// CHAT
+export const friendInfo = writable<User | null>(null);
+
+export const chats = writable<Chat[]>([]);
+
+type Chat = {
+	chatUsers: ChatUser[];
+	messages: Message[];
+	createdAt: string;
+	id: number;
+	isGroupChat: boolean;
+	name: string;
+	updatedAt: string;
+};
+
+type ChatUser = {
+	chatId: number;
+	createdAt: string;
+	id: number;
+	lastReadMessageId: number | null;
+	user: User;
+	userId: number;
+  };
+
+interface Message {
+	chatId: number;
+	content: string;
+	createdAt: string;
+	id: number;
+	updatedAt: string;
+	userId: number;
+}
+
+interface User {
+	id: number;
+    username: string;
+}

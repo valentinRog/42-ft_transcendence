@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+  frontend:
+    build: frontend
+    ports:
+      - 5173:5173
+    networks:
+      - net
+    restart: always
+
+  backend:
+    build: backend
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
+    networks:
+      - net
+    restart: always
+
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: nest
+    networks:
+      - net
+    restart: always
+
+networks:
+  net:
