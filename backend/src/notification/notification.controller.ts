@@ -29,8 +29,10 @@ export class NotificationController {
     );
   }
 
-  @Post('match')
+  @Post('ask-game')
   async match(@GetUser('username') username, @Body() dto: FriendDto) {
+    console.log('ask-game');
+
     if (username == dto.friend)
       throw new ForbiddenException('You cannot match yourself');
     const prisma_friend = await this.prisma.user.findUnique({
@@ -41,7 +43,7 @@ export class NotificationController {
     return await this.notifService.notifyEvent(
       prisma_friend.username,
       username,
-      'match',
+      'ask-game',
     );
   }
 

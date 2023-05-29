@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { token } from '$lib/stores/stores';
+	import { socket, token } from '$lib/stores/stores';
 	import { openChatWindow } from '$lib/stores/stores';
 	import { chatRecipient } from '$lib/stores/stores';
 
@@ -57,6 +57,20 @@
 		chatRecipient.set(friendUsername);
 	}
 
+	async function askGame(friendUsername: string) {
+		const res = await fetch('http://localhost:3000/notification/ask-game', {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${$token}`,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ friend: friendUsername })
+		});
+		const data = await res.json();
+		getFriends();
+		return data;
+	}
+
 	getFriends();
 </script>
 
@@ -72,7 +86,7 @@
 				<p>{friend.username}</p>
 				<p>{friend.status}</p>
 				{#if friend.status === 'online'}
-					<button>Invite Game</button>
+					<button on:click={() => askGame(friend.username)}>Invite Game</button>
 				{/if}
 				<button on:click={() => startChat(friend.username)}>Chat</button>
 				<button on:click={() => removeFriend(friend.username)}>Remove Friend</button>

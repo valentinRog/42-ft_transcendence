@@ -82,7 +82,7 @@ export abstract class SocketGateway
     client.emit('friend-accepted', data.friend);
   }
 
-  @SubscribeMessage('match')
+  @SubscribeMessage('accept-game')
   async handleMatch(
     @MessageBody() data: { response: boolean; friend: string },
     @ConnectedSocket() client: Socket,

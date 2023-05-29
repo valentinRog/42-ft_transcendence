@@ -28,7 +28,7 @@
 		Contact: { desktopName: 'Contact', tabName: 'Friends of lrondia', desktopIcon: '/phone.png', tabIcon: '/phone.png' },
 		Profile: { desktopName: 'Profile', tabName: 'Profile of lrondia', desktopIcon: '/computer.png', tabIcon: '/computer.png' }
 	};
-	
+
 	Object.freeze(apps);
 
 	let selected: number | null = null;
@@ -36,7 +36,7 @@
 	let height: number;
 
 	// CLOCK
-	
+
 	const formatter = new Intl.DateTimeFormat(
 		'en',
 		{
@@ -45,7 +45,7 @@
 			minute: '2-digit'
 		}
 	);
-	
+
 	let soundOn: boolean = true;
 
 </script>
@@ -113,7 +113,7 @@
 		{/each}
 	</div>
 	<div class="navbar-clock">
-		<p> 
+		<p>
 			{#if soundOn}
 				<img on:mousedown={() => { soundOn = !soundOn; }}
 					src="/sound-on.png" alt="sound on" >
@@ -121,7 +121,7 @@
 				<img on:mousedown={() => { soundOn = !soundOn; }}
 					src="/sound-off.png" alt="sound on" >
 			{/if}
-			{formatter.format($time)} 
+			{formatter.format($time)}
 		</p>
 	</div>
 </nav>
