@@ -1,14 +1,20 @@
 <script lang="ts">
-	export let desktopName: string;
-	export let tabName: string;
-	export let tabIcon: string;
+	export let name: string;
+	export let icon: string;
 	export let active: boolean;
+	export let props: Record<string, any>;
 </script>
 
 <div class="tab" on:click class:active>
-	<img src={tabIcon} alt={tabName} />
+	<img src={icon} alt={name} />
 	<a href="/">
-		{tabName}
+		{#if name === 'Profile' && props.username}
+			<p>{name} of {props.username}</p>
+		{:else if name === 'Profile'}
+			<p>My {name}</p>
+		{:else}
+			<p>{name}</p>
+		{/if}
 	</a>
 </div>
 

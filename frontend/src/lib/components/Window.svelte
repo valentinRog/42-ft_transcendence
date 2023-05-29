@@ -5,20 +5,15 @@
 	const dispatch = createEventDispatcher();
 
 	export let props: Record<string, any>;
-
-	export let tabName: string;
-	export let tabIcon: string;
-
+	export let name: string;
+	export let icon: string;
 	export let z = 0;
-
 	export let parentWidth: number;
 	export let parentHeight: number;
-
 	export let visible = true;
 
 	let top = parentHeight / 2;
 	let left = parentWidth / 2;
-
 	let width: number;
 	let height: number;
 
@@ -56,13 +51,13 @@
 			moving = true;
 		}}
 	>
-		<img src={tabIcon} draggable="false" />
-		{#if tabName === 'Profile' && props.username}
-			<p>{tabName} of {props.username}</p>
-		{:else if tabName === 'Profile'}
-			<p>My {tabName}</p>
+		<img src={icon} draggable="false" />
+		{#if name === 'Profile' && props.username}
+			<p>{name} of {props.username}</p>
+		{:else if name === 'Profile'}
+			<p>My {name}</p>
 		{:else}
-			<p>{tabName}</p>
+			<p>{name}</p>
 		{/if}
 		<div class="buttons">
 			<button on:click={() => dispatch('minimize')}>_</button>

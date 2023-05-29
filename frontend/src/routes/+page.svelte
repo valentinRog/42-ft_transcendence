@@ -17,39 +17,35 @@
 		}
 	}
 
+	interface Props {
+		readonly name: string;
+		readonly icon: string;
+	}
+
 	interface AppProps {
-		readonly desktopName: string;
-		readonly tabName: string;
-		readonly desktopIcon: string;
-		readonly tabIcon: string;
+		readonly TabProps: Props;
+		readonly DesktopProps: Props;
 	}
 
 	const apps: Record<App, AppProps> = {
 		Pong: {
-			desktopName: 'Pong',
-			tabName: 'Pong',
-			desktopIcon: '/big-pong.png',
-			tabIcon: '/pong.png'
+			TabProps: { name: 'Pong', icon: '/pong.png' },
+			DesktopProps: { name: 'Pong', icon: '/big-pong.png' }
 		},
 		ChatWindow: {
-			desktopName: 'MSN',
-			tabName: 'MSN',
-			desktopIcon: '/big-mail.png',
-			tabIcon: '/mail3.png'
+			TabProps: { name: 'MSN', icon: '/mail3.png' },
+			DesktopProps: { name: 'MSN', icon: '/big-mail.png' }
 		},
 		Contact: {
-			desktopName: 'Contact',
-			tabName: 'Contact',
-			desktopIcon: '/phone.png',
-			tabIcon: '/phone.png'
+			TabProps: { name: 'Contact', icon: '/phone.png' },
+			DesktopProps: { name: 'Contact', icon: '/phone.png' }
 		},
 		Profile: {
-			desktopName: 'Profile',
-			tabName: 'Profile',
-			desktopIcon: '/computer.png',
-			tabIcon: '/computer.png'
+			TabProps: { name: 'Profile', icon: '/computer.png' },
+			DesktopProps: { name: 'Profile', icon: '/computer.png' }
 		}
 	};
+
 	Object.freeze(apps);
 
 	let width: number;
@@ -103,15 +99,15 @@
 					$selected = null;
 				}}
 			>
-				<img src={v.desktopIcon} alt={v.desktopName} draggable="false" />
-				<span>{v.desktopName}</span>
+				<img src={v.DesktopProps.icon} alt={v.DesktopProps.name} draggable="false" />
+				<span>{v.DesktopProps.name}</span>
 			</div>
 		{/each}
 	</div>
 	{JSON.stringify($user)}
 	{#each $appInstances as { componentType, component, visible, id, propsWin, props }, i (id)}
 		<Window
-			{...apps[componentType]}
+			{...apps[componentType].TabProps}
 			props={propsWin}
 			parentWidth={width}
 			parentHeight={height}
@@ -138,9 +134,10 @@
 <nav class="navbar" style:z-index={$zstack.length}>
 	<Start />
 	<div class="navbar-tabs">
-		{#each $appInstances as { componentType, visible, id }, i (id)}
+		{#each $appInstances as { componentType, visible, id, propsWin }, i (id)}
 			<Tab
-				{...apps[componentType]}
+				{...apps[componentType].TabProps}
+				props={propsWin}
 				active={$selected === i}
 				on:click={() => {
 					putOnTop(i);
