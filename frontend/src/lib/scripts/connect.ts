@@ -14,6 +14,7 @@ export function getUser() {
 		.then((data) => {
 			console.log(data);
 			user.set({
+				id: data.id,
 				username: data.username,
 				login: data.login
 			});

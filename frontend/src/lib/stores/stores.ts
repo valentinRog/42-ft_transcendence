@@ -41,20 +41,16 @@ export const components = readable({
 
 // USER
 
-export const user = writable<{username: string; login: string } | null>(null);
+export const user = writable<{id: number; username: string; login: string } | null>(null);
 
 // CHAT
-export const chatRecipient = writable<User | null>(null);
-export const messagesStore = writable<MessagesStoreType>({});
-
-type MessagesStoreType = {
-    [key: string]: string[];
-};
+export const friendInfo = writable<User | null>(null);
 
 export const chats = writable<Chat[]>([]);
 
 type Chat = {
 	chatUsers: ChatUser[];
+	messages: Message[];
 	createdAt: string;
 	id: number;
 	isGroupChat: boolean;
@@ -70,6 +66,15 @@ type ChatUser = {
 	user: User;
 	userId: number;
   };
+
+interface Message {
+	chatId: number;
+	content: string;
+	createdAt: string;
+	id: number;
+	updatedAt: string;
+	userId: number;
+}
 
 interface User {
 	id: number;

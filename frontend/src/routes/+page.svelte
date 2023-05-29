@@ -2,7 +2,7 @@
 	import Window from '$lib/components/Window.svelte';
 	import Tab from '$lib/components/Tab.svelte';
 	import Start from '$lib/components/Start.svelte';
-	import { openChatWindow, time, appInstances, zstack, selected, user, token, messagesStore, chats } from '$lib/stores/stores';
+	import { openChatWindow, time, appInstances, zstack, selected, user, token, chats } from '$lib/stores/stores';
 	import type { App } from '$lib/types/types';
 	import { addInstance, removeInstance, putOnTop } from '$lib/scripts/appinstance';
 	import { onMount } from 'svelte';
@@ -83,7 +83,6 @@
 		if (response.ok) {
       		const allUserChats = await response.json();
       		chats.set(allUserChats);
-			console.log($chats);
     	} else
       		console.error(`Error fetching all messages: ${response.statusText}`);
 	}

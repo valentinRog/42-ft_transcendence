@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { token, openChatWindow, chatRecipient, selected } from '$lib/stores/stores';
+	import { token, openChatWindow, friendInfo, selected } from '$lib/stores/stores';
 	import { addInstance } from '$lib/scripts/appinstance';
 
 	interface Friend {
@@ -52,7 +52,7 @@
 
 	function startChat(friend: Friend) {
 		$openChatWindow = true;
-		chatRecipient.set({ id: friend.id, username: friend.username });
+		friendInfo.set({ id: friend.id, username: friend.username });
 	}
 
 	getFriends();
