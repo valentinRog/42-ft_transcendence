@@ -235,7 +235,6 @@ export class PongGame {
   }
 
   gameLoop() {
-    console.log('score', this.state.player1Score, this.state.player2Score);
     this.state = this.update(this.state, Date.now() - this.state.time);
     this.state.time = Date.now();
     this.state.id++;

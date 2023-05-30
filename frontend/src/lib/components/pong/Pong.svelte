@@ -38,7 +38,9 @@
 		id: 0,
 		inputed: false,
 		lastInputId: 0,
-		missed: false
+		missed: false,
+		player1Score: 0,
+    	player2Score: 0,
 	};
 
 	function draw(ctx: CanvasRenderingContext2D) {
@@ -58,6 +60,25 @@
 			dimensions.paddleWidth,
 			dimensions.paddleHeight
 		);
+
+		// Dessiner la ligne en pointillé
+		ctx.setLineDash([5, 5]); // Définit le motif de pointillé
+		ctx.strokeStyle = 'white';
+		ctx.beginPath();
+		ctx.moveTo(dimensions.width / 2, 0); // Déplace le point de départ de la ligne au milieu de l'écran
+		ctx.lineTo(dimensions.width / 2, dimensions.height); // Trace la ligne jusqu'au bas de l'écran
+		ctx.stroke();
+
+		// Draw player 1 score
+		ctx.font = '60px pong';
+		ctx.fillStyle = 'white';
+		ctx.fillText(s.player1Score.toString(), dimensions.width / 4 - 15, 60);
+
+		// Draw player 2 score
+		ctx.font = '60px pong';
+		ctx.fillStyle = 'white';
+		ctx.fillText(s.player2Score.toString(), 3 * dimensions.width / 4 - 15, 60);
+
 		requestAnimationFrame(() => draw(ctx));
 	}
 
