@@ -5,50 +5,50 @@ import { PrismaClient } from '@prisma/client';
 export class ChatService {
   constructor(private prisma: PrismaClient) {}
 
-  async sendMessage(senderUsername: string, recipientUsername: string, content: string) {
-    const existingChat = await this.prisma.chat.findFirst({
-      where: {
-        AND: [
-          { chatUsers: { some: { user: { username: senderUsername } } } },
-          { chatUsers: { some: { user: { username: recipientUsername } } } }
-        ]
-      }
-    });
-  
-    let newMessage;
-    
-    if (existingChat) {
-      newMessage = await this.prisma.message.create({
-        data: {
-          content,
-          user: { connect: { username: senderUsername } },
-          chat: { connect: { id: existingChat.id } }
-        }
-      });
+  async sendMessage(senderUsername: string, friendUsername: string, chatId: number | null, content: string) {
+    let chat;
+
+    if (chatId) {
+        chat = await this.prisma.chat.findUnique({
+            where: { id: chatId },
+        });
     } else {
-      const newChat = await this.prisma.chat.create({
-        data: {
-          isGroupChat: false,
-          name: `${senderUsername}-${recipientUsername}`,
-          chatUsers: {
-            create: [
-              { user: { connect: { username: senderUsername } } },
-              { user: { connect: { username: recipientUsername } } }
-            ]
-          }
-        }
-      });
-  
-      newMessage = await this.prisma.message.create({
-        data: {
-          content,
-          user: { connect: { username: senderUsername } },
-          chat: { connect: { id: newChat.id } }
-        }
-      });
+        chat = await this.prisma.chat.findFirst({
+            where: {
+                AND: [
+                    { chatUsers: { some: { user: { username: senderUsername } } } },
+                    { chatUsers: { some: { user: { username: friendUsername } } } }
+                ]
+            }
+        });
     }
+
+    if (!chat) {
+        chat = await this.prisma.chat.create({
+            data: {
+                isGroupChat: false,
+                name: `${senderUsername}-${friendUsername}`,
+                chatUsers: {
+                    create: [
+                        { user: { connect: { username: senderUsername } } },
+                        { user: { connect: { username: friendUsername } } }
+                    ]
+                }
+            }
+        });
+    }
+
+    const newMessage = await this.prisma.message.create({
+        data: {
+            content,
+            user: { connect: { username: senderUsername } },
+            chat: { connect: { id: chat.id } },
+        },
+    });
+
     return newMessage;
   }
+
 
   async getAllUserMessages(username: string) {
     const chats = await this.prisma.chat.findMany({

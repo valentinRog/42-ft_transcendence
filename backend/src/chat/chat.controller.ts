@@ -13,14 +13,17 @@ export class ChatController {
   async sendMessage(
     @GetUser() user,
     @Body('recipientUsername') recipientUsername: string,
+    @Body('chatId') chatId: number | null,
     @Body('content') content: string
   ) {
-    if (!recipientUsername) {
+    if (!recipientUsername)
       throw new BadRequestException('Recipient username is required');
-    }
-    let newMessage = await this.chatService.sendMessage(user.username, recipientUsername, content);
+    if (!content)
+      throw new BadRequestException('Message content is required');
+    let newMessage = await this.chatService.sendMessage(user.username, recipientUsername, chatId, content);
     return newMessage;
   }
+
 
   @UseGuards(JwtGuard)
   @Get('allUserChats')

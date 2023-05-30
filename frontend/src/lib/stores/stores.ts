@@ -48,7 +48,7 @@ export const user = writable<{id: number; username: string; login: string } | nu
 // CONTACTS
 export const contacts = writable<Contact[]>([]);
 
-interface Contact {
+export interface Contact {
 	id: number;
 	username: string;
 	status: string;
@@ -57,8 +57,9 @@ interface Contact {
 // CHAT
 export const friendInfo = writable<User | null>(null);
 export const chats = writable<Chat[]>([]);
+export const chatId = writable<number | null>(null);
 
-type Chat = {
+export type Chat = {
 	chatUsers: ChatUser[];
 	messages: Message[];
 	createdAt: string;

@@ -1,13 +1,8 @@
 <script lang="ts">
-	import { token, openChatWindow, friendInfo, selected, contacts} from '$lib/stores/stores';
+	import { token, openChatWindow, friendInfo, selected, contacts, chats, user, chatId} from '$lib/stores/stores';
+	import type {Contact} from '$lib/stores/stores';
 	import { addInstance } from '$lib/scripts/appinstance';
 	import { getFriends } from '$lib/scripts/connect';
-
-	interface Friend {
-		id: number;
-		username: string;
-		status: string;
-	}
 
 	let groupChatMode = false;
 	let selectedFriends: string[] = [];
@@ -77,14 +72,37 @@
 			body: JSON.stringify({ groupName: "GROUP", memberUsernames: selectedFriends })
 		});
 		if (res.ok) {
+			let data = await res.json();
+
+			$chatId = data.id;
 			toggleGroupChatMode();
+			$openChatWindow = true;
 		} else
 			console.error("Error creating group chat");
 	}
 
-	function startChat(friend: Friend) {
-		$openChatWindow = true;
+	function findChat(user1: string, user2: string) {
+		let foundChat;
+		chats.subscribe(($chats) => {
+        $chats.forEach(chat => {
+            const users = chat.chatUsers.map(chatUser => chatUser.user.username);
+            if (users.includes(user1) && users.includes(user2) && chat.isGroupChat === false) {
+                foundChat = chat;
+            }
+        	});
+		});
+    	return foundChat;
+	}
+
+	function startChat(friend: Contact) {
+		let chat: any;
+
+		if ($user)
+			chat = findChat($user?.username, friend.username);
+		$chatId = chat?.id;
+		console.log(chat);
 		friendInfo.set({ id: friend.id, username: friend.username });
+		$openChatWindow = true;
 	}
 </script>
 
