@@ -21,6 +21,7 @@
 			query: { token: $token }
 		});
 		chat = findChat($user?.username || "defaultUserName", friendUsername);
+		console.log(chat);
 		socket.on('message', (message) => {
     		if (message.from === friendUsername) {
         		chats.update(currentChats => {
@@ -41,7 +42,7 @@
 		chats.subscribe(($chats) => {
         $chats.forEach(chat => {
             const users = chat.chatUsers.map(chatUser => chatUser.user.username);
-            if (users.includes(user1) && users.includes(user2)) {
+            if (users.includes(user1) && users.includes(user2) && chat.isGroupChat === false) {
                 foundChat = chat;
             }
         	});

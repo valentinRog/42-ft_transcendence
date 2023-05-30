@@ -40,11 +40,6 @@
 		return data;
 	}
 
-	function startChat(friend: Friend) {
-		$openChatWindow = true;
-		friendInfo.set({ id: friend.id, username: friend.username });
-	}
-
 	async function askGame(friendUsername: string) {
 		const res = await fetch('http://38.242.214.243:3000/notification/ask-game', {
 			method: 'POST',
@@ -73,9 +68,23 @@
 	}
 
 	async function createGroupChat() {
-		console.log(selectedFriends);
+		const res = await fetch('http://localhost:3000/chat/create-group-chat', {
+			method: 'PATCH',
+			headers: {
+				Authorization: `Bearer ${$token}`,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ groupName: "GROUP", memberUsernames: selectedFriends })
+		});
+		if (res.ok) {
+			toggleGroupChatMode();
+		} else
+			console.error("Error creating group chat");
+	}
 
-		toggleGroupChatMode();
+	function startChat(friend: Friend) {
+		$openChatWindow = true;
+		friendInfo.set({ id: friend.id, username: friend.username });
 	}
 </script>
 
