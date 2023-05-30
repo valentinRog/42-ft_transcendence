@@ -47,6 +47,8 @@ interface GameState {
   inputed: boolean;
   lastInputId: number;
   missed: boolean;
+  player1Score: number;
+  player2Score: number;
 }
 
 type Input = {
@@ -87,6 +89,8 @@ export class PongGame {
     inputed: false,
     lastInputId: 0,
     missed: false,
+    player1Score: 0,
+    player2Score: 0,
   };
 
   private startGame() {
@@ -157,6 +161,7 @@ export class PongGame {
         ball.dx = 1;
         ball.dy = 0;
         s.missed = false;
+        s.player2Score++;
       } else {
         s.missed = true;
       }
@@ -185,6 +190,7 @@ export class PongGame {
         ball.dx = -1;
         ball.dy = 0;
         s.missed = false;
+        s.player1Score++;
       } else {
         s.missed = true;
       }
@@ -229,6 +235,7 @@ export class PongGame {
   }
 
   gameLoop() {
+    console.log('score', this.state.player1Score, this.state.player2Score);
     this.state = this.update(this.state, Date.now() - this.state.time);
     this.state.time = Date.now();
     this.state.id++;
