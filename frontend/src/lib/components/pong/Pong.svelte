@@ -70,10 +70,12 @@
 
 		ctx.font = '40px pong-score';
 		ctx.fillStyle = 'white';
-		let offset1 = 16 * (Math.floor(Math.log10(s.player1Score)) + 1);
-		if (s.player1Score === 0) offset1 = 16;
-		let offset2 = 16 * (Math.floor(Math.log10(s.player2Score)) + 1);
-		if (s.player2Score === 0) offset2 = 16;
+		const getPlayerScoreOffset = (score : number) => {
+			if (score === 0) return 12;
+			return 12 * (Math.floor(Math.log10(score)) + 1);
+		};
+		const offset1 = getPlayerScoreOffset(s.player1Score);
+		const offset2 = getPlayerScoreOffset(s.player2Score);
 		ctx.fillText(s.player1Score.toString(), dimensions.width / 4 - offset1, 60);
 		ctx.fillText(s.player2Score.toString(), 3 * dimensions.width / 4 - offset2, 60);
 
