@@ -68,7 +68,7 @@ export function update(state: GameState, delta: number): GameState {
 			ball.y + dimensions.ballWidth >= s.paddles[0].y &&
 			ball.y <= s.paddles[0].y + dimensions.paddleHeight
 		) {
-			const dyMax = 0.65;
+			const dyMax = 0.9;
 			const distToCenter =
 				ball.y + dimensions.ballWidth / 2 - s.paddles[0].y - dimensions.paddleHeight / 2;
 			const dy = dyMax * (distToCenter / (dimensions.paddleHeight / 2));
