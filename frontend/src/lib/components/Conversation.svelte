@@ -1,16 +1,12 @@
 <script lang="ts">
-
 </script>
 
 <div id="box">
-    <div id="chat-window">
-
-    </div>
+	<div id="chat-window" />
 </div>
 
 <style lang="scss">
-
-    #box {
+	#box {
 		width: 15rem;
 		height: 15rem;
 
@@ -23,5 +19,4 @@
 		height: 13rem;
 		overflow-y: auto;
 	}
-
 </style>

@@ -104,8 +104,6 @@
 			$socket!.emit('enter-room', data);
 		});
 
-		
-
 		$socket!.on('index', (i: number) => {
 			index = i;
 		});

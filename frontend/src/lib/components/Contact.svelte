@@ -1,6 +1,15 @@
 <script lang="ts">
-	import { token, openChatWindow, friendInfo, selected, contacts, chats, user, chatId} from '$lib/stores/stores';
-	import type {Contact} from '$lib/stores/stores';
+	import {
+		token,
+		openChatWindow,
+		friendInfo,
+		selected,
+		contacts,
+		chats,
+		user,
+		chatId
+	} from '$lib/stores/stores';
+	import type { Contact } from '$lib/stores/stores';
 	import { addInstance } from '$lib/scripts/appinstance';
 	import { getFriends } from '$lib/scripts/connect';
 
@@ -56,10 +65,9 @@
 	function selectFriend(event: MouseEvent) {
 		const friendUsername = (event.target as HTMLInputElement).value;
 		const index = selectedFriends.indexOf(friendUsername);
-    	if (index > -1)
-        	selectedFriends = [...selectedFriends.slice(0, index), ...selectedFriends.slice(index + 1)];
-    	else
-        	selectedFriends = [...selectedFriends, friendUsername];
+		if (index > -1)
+			selectedFriends = [...selectedFriends.slice(0, index), ...selectedFriends.slice(index + 1)];
+		else selectedFriends = [...selectedFriends, friendUsername];
 	}
 
 	async function createGroupChat() {
@@ -69,7 +77,7 @@
 				Authorization: `Bearer ${$token}`,
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({ groupName: "GROUP", memberUsernames: selectedFriends })
+			body: JSON.stringify({ groupName: 'GROUP', memberUsernames: selectedFriends })
 		});
 		if (res.ok) {
 			let data = await res.json();
@@ -77,28 +85,26 @@
 			$chatId = data.id;
 			toggleGroupChatMode();
 			$openChatWindow = true;
-		} else
-			console.error("Error creating group chat");
+		} else console.error('Error creating group chat');
 	}
 
 	function findChat(user1: string, user2: string) {
 		let foundChat;
 		chats.subscribe(($chats) => {
-        $chats.forEach(chat => {
-            const users = chat.chatUsers.map(chatUser => chatUser.user.username);
-            if (users.includes(user1) && users.includes(user2) && chat.isGroupChat === false) {
-                foundChat = chat;
-            }
-        	});
+			$chats.forEach((chat) => {
+				const users = chat.chatUsers.map((chatUser) => chatUser.user.username);
+				if (users.includes(user1) && users.includes(user2) && chat.isGroupChat === false) {
+					foundChat = chat;
+				}
+			});
 		});
-    	return foundChat;
+		return foundChat;
 	}
 
 	function startChat(friend: Contact) {
 		let chat: any;
 
-		if ($user)
-			chat = findChat($user?.username, friend.username);
+		if ($user) chat = findChat($user?.username, friend.username);
 		$chatId = chat?.id;
 		console.log(chat);
 		friendInfo.set({ id: friend.id, username: friend.username });
@@ -120,15 +126,16 @@
 		{#each $contacts as friend (friend.id)}
 			<div class="friend">
 				{#if groupChatMode}
-					<input	type="checkbox"
-							checked={selectedFriends.includes(friend.username)}
-							value={friend.username}
-							on:click={selectFriend}
+					<input
+						type="checkbox"
+						checked={selectedFriends.includes(friend.username)}
+						value={friend.username}
+						on:click={selectFriend}
 					/>
 				{/if}
 				<p
 					on:dblclick={() => {
-						addInstance('Profile', { username: friend.username }, {username: friend.id});
+						addInstance('Profile', { username: friend.username }, { username: friend.id });
 						$selected = null;
 					}}
 				>
@@ -144,7 +151,6 @@
 		{/each}
 	</div>
 </div>
-
 
 <style lang="scss">
 	#box {
