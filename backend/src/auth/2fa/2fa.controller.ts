@@ -28,13 +28,11 @@ export class TwoFactorController {
       otpauthUrl,
     )}`;
 
-    // 4. Send the QR code or setup URL to the user
-    console.log(qrCodeUrl);
-
-    // 5. Update the user's account record in the database
-    user.twoFactorEnabled = true;
-    await this.prisma.user.update({ where: { login: user.login }, data: user });
-    return user;
+    await this.prisma.user.update({
+      where: { login: user.login },
+      data: { twoFactorEnabled: true },
+    });
+    return qrCodeUrl;
   }
 
   @Post('test')

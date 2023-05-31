@@ -28,8 +28,6 @@ export class NotificationService {
           },
         });
 
-
-
         notif = await this.prisma.notification.create({
           data: {
             user: {
