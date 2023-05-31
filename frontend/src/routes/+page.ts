@@ -9,7 +9,7 @@ export async function load() {
 			token.set(sessionStorage.getItem('token'));
 		}
 		if (!get(token)) {
-			throw redirect(302, '/login');
+			throw redirect(302, '/login', { replace: true });
 		}
 	}
 }
