@@ -64,3 +64,15 @@ export function logout() {
 	get(socket)?.close();
 	goto('/login');
 }
+
+export async function enable2fa() {
+	const res = await fetch('http://localhost:3000/2fa/enable', {
+		method: 'POST',
+		headers: {
+			Authorization: `Bearer ${get(token)}`
+		}
+	});
+	const data = await res.json();
+	console.log(data);
+	return data;
+}

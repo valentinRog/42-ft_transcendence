@@ -81,7 +81,7 @@ export class PongGame {
       y: dimensions.height / 2 - dimensions.ballWidth / 2,
       dx: 1,
       dy: 0,
-      speed: 300,
+      speed: 450,
     },
     paddles: [new Paddle(), new Paddle()],
     time: Date.now(),

@@ -10,8 +10,8 @@
 		chatId
 	} from '$lib/stores/stores';
 	import type { Contact } from '$lib/stores/stores';
-	import { addInstance } from '$lib/scripts/appinstance';
-	import { getFriends } from '$lib/scripts/connect';
+	import { addInstance } from '$lib/utils/appinstance';
+	import { getFriends } from '$lib/utils/connect';
 
 	let groupChatMode = false;
 	let selectedFriends: string[] = [];

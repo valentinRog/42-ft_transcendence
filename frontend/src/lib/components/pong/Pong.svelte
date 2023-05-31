@@ -200,7 +200,6 @@
 				body: JSON.stringify({ token: $token })
 			});
 		}
-		console.log('destroyed pong');
 	});
 </script>
 

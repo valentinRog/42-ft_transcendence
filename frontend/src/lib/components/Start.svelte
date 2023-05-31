@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { logout } from '$lib/scripts/connect';
+	import { logout, enable2fa } from '$lib/utils/connect';
 	import Dropdown from '$lib/components/Dropdown.svelte';
 
 	let active = false;
@@ -59,6 +59,11 @@
 			{
 				name: 'logout',
 				event: logout,
+				children: []
+			},
+			{
+				name: '2fa',
+				event: enable2fa,
 				children: []
 			}
 		]
