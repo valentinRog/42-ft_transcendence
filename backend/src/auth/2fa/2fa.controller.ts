@@ -30,7 +30,7 @@ export class TwoFactorController {
 
     await this.prisma.user.update({
       where: { login: user.login },
-      data: { twoFactorEnabled: true },
+      data: { twoFactorEnabled: true, twoFactorAuthSecret: secret.base32 },
     });
     return { qrcode: qrCodeUrl };
   }
