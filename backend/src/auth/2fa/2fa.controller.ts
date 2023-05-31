@@ -32,7 +32,7 @@ export class TwoFactorController {
       where: { login: user.login },
       data: { twoFactorEnabled: true },
     });
-    return qrCodeUrl;
+    return { qrcode: qrCodeUrl };
   }
 
   @Post('test')
