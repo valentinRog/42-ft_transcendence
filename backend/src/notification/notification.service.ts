@@ -13,6 +13,7 @@ export class NotificationService {
   ) {}
 
   async notifyEvent(friend: string, username: string, message: string) {
+    let notif;
     if ((await this.userService.getUserStatus(friend)) != 'offline') {
       this.socketService.sendToUser(friend, username, message);
     } else {
@@ -20,7 +21,16 @@ export class NotificationService {
         throw new ForbiddenException(`${friend} is offline`);
       }
       try {
-        const notif = await this.prisma.notification.create({
+        notif = await this.prisma.notification.findFirst({
+          where: {
+            sender: username, // Replace with the actual sender value
+            message: message, // Replace with the actual message value
+          },
+        });
+
+
+
+        notif = await this.prisma.notification.create({
           data: {
             user: {
               connect: {
@@ -50,7 +60,10 @@ export class NotificationService {
           error instanceof Prisma.PrismaClientKnownRequestError &&
           error.code === 'P2002'
         ) {
-          throw new ForbiddenException('Duplicate notification');
+          this.prisma.notification.delete({
+            where: { id: notif.id },
+          });
+          return await this.notifyEvent(friend, username, message);
         }
         throw error;
       }

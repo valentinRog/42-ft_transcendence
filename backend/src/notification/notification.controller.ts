@@ -22,6 +22,7 @@ export class NotificationController {
       where: { username: dto.friend },
     });
     if (!prisma_friend) throw new ForbiddenException('User not found');
+    console.log('add-friend');
     return await this.notifService.notifyEvent(
       prisma_friend.username,
       username,

@@ -9,8 +9,8 @@
 
 	async function addFriend(event: Event) {
 		const form = (event.target as HTMLFormElement).friend.value;
-		const res = await fetch('http://localhost:3000/users/add-friend', {
-			method: 'PATCH',
+		const res = await fetch('http://localhost:3000/notification/add-friend', {
+			method: 'POST',
 			headers: {
 				Authorization: `Bearer ${$token}`,
 				'Content-Type': 'application/json'
