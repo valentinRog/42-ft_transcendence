@@ -41,7 +41,7 @@ export interface GameState {
 	lastInputId: number;
 	missed: boolean;
 	player1Score: number;
-  	player2Score: number;
+	player2Score: number;
 }
 
 export type Input = {
@@ -68,9 +68,10 @@ export function update(state: GameState, delta: number): GameState {
 			ball.y + dimensions.ballWidth >= s.paddles[0].y &&
 			ball.y <= s.paddles[0].y + dimensions.paddleHeight
 		) {
-			const dyMax = 1;
-			const distToCenter = ball.y + dimensions.ballWidth / 2 - s.paddles[0].y;
-			const dy = dyMax * (distToCenter / dimensions.paddleHeight - 0.5);
+			const dyMax = 0.65;
+			const distToCenter =
+				ball.y + dimensions.ballWidth / 2 - s.paddles[0].y - dimensions.paddleHeight / 2;
+			const dy = dyMax * (distToCenter / (dimensions.paddleHeight / 2));
 			ball.dx = Math.sqrt(1 - dy * dy);
 			ball.dy = dy;
 			ball.x = wallLeft + (wallLeft - ball.x);
@@ -80,6 +81,7 @@ export function update(state: GameState, delta: number): GameState {
 			ball.dx = 1;
 			ball.dy = 0;
 			s.missed = false;
+			s.player2Score++;
 		} else {
 			s.missed = true;
 		}
@@ -89,9 +91,10 @@ export function update(state: GameState, delta: number): GameState {
 			ball.y + dimensions.ballWidth >= s.paddles[1].y &&
 			ball.y <= s.paddles[1].y + dimensions.paddleHeight
 		) {
-			const dyMax = 1;
-			const distToCenter = ball.y + dimensions.ballWidth / 2 - s.paddles[1].y;
-			const dy = dyMax * (distToCenter / dimensions.paddleHeight - 0.5);
+			const dyMax = 0.9;
+			const distToCenter =
+				ball.y + dimensions.ballWidth / 2 - s.paddles[1].y - dimensions.paddleHeight / 2;
+			const dy = dyMax * (distToCenter / (dimensions.paddleHeight / 2));
 			ball.dx = -Math.sqrt(1 - dy * dy);
 			ball.dy = dy;
 			ball.x = wallRight - dimensions.ballWidth - (ball.x + dimensions.ballWidth - wallRight);
@@ -101,6 +104,7 @@ export function update(state: GameState, delta: number): GameState {
 			ball.dx = -1;
 			ball.dy = 0;
 			s.missed = false;
+			s.player1Score++;
 		} else {
 			s.missed = true;
 		}

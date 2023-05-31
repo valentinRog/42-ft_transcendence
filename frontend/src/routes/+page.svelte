@@ -2,13 +2,19 @@
 	import Window from '$lib/components/Window.svelte';
 	import Tab from '$lib/components/Tab.svelte';
 	import Start from '$lib/components/Start.svelte';
-	import { openChatWindow, time, appInstances, zstack, selected, user, token, chats } from '$lib/stores/stores';
+	import {
+		openChatWindow,
+		time,
+		appInstances,
+		zstack,
+		selected,
+		user,
+		socket
+	} from '$lib/stores/stores';
 	import type { App } from '$lib/types/types';
 	import { addInstance, removeInstance, putOnTop } from '$lib/scripts/appinstance';
 	import { onMount } from 'svelte';
 	import { connectSocket, getUser, getFriends, getAllUserChats } from '$lib/scripts/connect';
-	import { connect } from 'socket.io-client';
-	import { get } from 'svelte/store';
 
 	$: {
 		if ($openChatWindow) {
@@ -66,12 +72,21 @@
 
 	let soundOn: boolean = true;
 
-
 	onMount(async () => {
 		getUser();
 		getFriends();
 		connectSocket();
 		await getAllUserChats();
+
+		$socket!.on('add-friend', (data: { message: string }) => {
+			console.log('add-friend', data.message);
+			$socket!.emit('accept-friend', { response: true, friend: data.message });
+		});
+
+		$socket!.on('ask-game', (data: { message: string }) => {
+			console.log('accept-game', data.message);
+			$socket!.emit('accept-game', { response: true, friend: data.message });
+		});
 	});
 </script>
 
@@ -147,23 +162,14 @@
 	</div>
 	<div class="navbar-clock">
 		<p>
-			{#if soundOn}
-				<img
-					on:mousedown={() => {
-						soundOn = !soundOn;
-					}}
-					src="/sound-on.png"
-					alt="sound on"
-				/>
-			{:else}
-				<img
-					on:mousedown={() => {
-						soundOn = !soundOn;
-					}}
-					src="/sound-off.png"
-					alt="sound on"
-				/>
-			{/if}
+			<img
+				on:mousedown={() => {
+					soundOn = !soundOn;
+				}}
+				src={soundOn ? 'sound-on.png' : 'sound-off.png'}
+				alt={soundOn ? 'sound on' : 'sound off'}
+				draggable="false"
+			/>
 			{formatter.format($time)}
 		</p>
 	</div>

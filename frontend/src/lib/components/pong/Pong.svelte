@@ -40,7 +40,7 @@
 		lastInputId: 0,
 		missed: false,
 		player1Score: 0,
-    	player2Score: 0,
+		player2Score: 0
 	};
 
 	function draw(ctx: CanvasRenderingContext2D) {
@@ -70,18 +70,17 @@
 
 		ctx.font = '40px pong-score';
 		ctx.fillStyle = 'white';
-		const getPlayerScoreOffset = (score : number) => {
+		const getPlayerScoreOffset = (score: number) => {
 			if (score <= 9) return 12;
 			return 17 * (Math.floor(Math.log10(score)) + 1);
 		};
 		const offset1 = getPlayerScoreOffset(s.player1Score);
 		const offset2 = getPlayerScoreOffset(s.player2Score);
 		ctx.fillText(s.player1Score.toString(), dimensions.width / 4 - offset1, 60);
-		ctx.fillText(s.player2Score.toString(), 3 * dimensions.width / 4 - offset2, 60);
+		ctx.fillText(s.player2Score.toString(), (3 * dimensions.width) / 4 - offset2, 60);
 
 		requestAnimationFrame(() => draw(ctx));
 	}
-
 
 	async function joinMatchmakingQueue() {
 		console.log('joinMatchmakingQueue');
@@ -96,7 +95,6 @@
 	}
 
 	onMount(() => {
-
 		joinMatchmakingQueue();
 
 		$socket!.on('enter-room', (data: { room: string; index: number }) => {
@@ -106,15 +104,7 @@
 			$socket!.emit('enter-room', data);
 		});
 
-		//$socket!.on('add-friend', (data: { message: string }) => {
-		//	console.log('add-friend', data.message);
-		//	$socket!.emit('accept-friend', { response: true, friend: data.message });
-		//});
-
-		//$socket!.on('ask-game', (data: { message: string }) => {
-		//	console.log('accept-game', data.message);
-		//	$socket!.emit('accept-game', { response: true, friend: data.message });
-		//});
+		
 
 		$socket!.on('index', (i: number) => {
 			index = i;
@@ -200,8 +190,9 @@
 	});
 
 	onDestroy(() => {
-		if (room !== '') $socket!.emit('leave-room', { room: room, index: index });
-		else {
+		if (room !== '') {
+			$socket!.emit('leave-room', { room: room, index: index });
+		} else {
 			fetch('http://localhost:3000/matchmaking/unqueue', {
 				method: 'POST',
 				headers: {
@@ -211,6 +202,7 @@
 				body: JSON.stringify({ token: $token })
 			});
 		}
+		console.log('destroyed pong');
 	});
 </script>
 

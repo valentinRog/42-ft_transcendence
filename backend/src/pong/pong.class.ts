@@ -145,7 +145,7 @@ export class PongGame {
         ball.y + dimensions.ballWidth >= s.paddles[0].y &&
         ball.y <= s.paddles[0].y + dimensions.paddleHeight
       ) {
-        const dyMax = 0.65;
+        const dyMax = 0.9;
         const distToCenter =
           ball.y +
           dimensions.ballWidth / 2 -

@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { token } from '$lib/stores/stores';
-	import { page } from '$app/stores';
 	import '$lib/style/style.scss';
 </script>
 
@@ -8,6 +6,4 @@
 	<title>Yo</title>
 </svelte:head>
 
-{#if $token || $page.url.pathname === '/login'}
-	<slot />
-{/if}
+<slot />
