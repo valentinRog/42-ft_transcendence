@@ -12,13 +12,8 @@ export class TwoFactorController {
   @Post('enable')
   @UseGuards(JwtGuard)
   async enableTwoFactorAuth(@GetUser() user: User) {
-    // 1. Generate a 2FA secret key
     const secret = speakeasy.generateSecret();
 
-    // 2. Store the secret key in the user's database record
-    user.twoFactorAuthSecret = secret.base32;
-
-    // 3. Generate a QR code or a 2FA setup URL
     const otpauthUrl = speakeasy.otpauthURL({
       secret: secret.base32,
       label: 'transcendence',
