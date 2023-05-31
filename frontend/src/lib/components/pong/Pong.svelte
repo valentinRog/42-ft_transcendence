@@ -71,8 +71,8 @@
 		ctx.font = '40px pong-score';
 		ctx.fillStyle = 'white';
 		const getPlayerScoreOffset = (score : number) => {
-			if (score === 0) return 12;
-			return 12 * (Math.floor(Math.log10(score)) + 1);
+			if (score <= 9) return 12;
+			return 17 * (Math.floor(Math.log10(score)) + 1);
 		};
 		const offset1 = getPlayerScoreOffset(s.player1Score);
 		const offset2 = getPlayerScoreOffset(s.player2Score);
