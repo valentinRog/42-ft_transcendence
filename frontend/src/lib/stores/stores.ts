@@ -43,7 +43,7 @@ export const components = readable({
 
 // USER
 
-export const user = writable<{id: number; username: string; login: string } | null>(null);
+export const user = writable<{ id: number; username: string; login: string } | null>(null);
 
 // CONTACTS
 export const contacts = writable<Contact[]>([]);
@@ -76,7 +76,7 @@ type ChatUser = {
 	lastReadMessageId: number | null;
 	user: User;
 	userId: number;
-  };
+};
 
 interface Message {
 	chatId: number;
@@ -89,5 +89,5 @@ interface Message {
 
 interface User {
 	id: number;
-    username: string;
+	username: string;
 }

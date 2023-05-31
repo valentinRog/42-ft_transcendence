@@ -22,15 +22,15 @@ export function getUser() {
 }
 
 export async function getFriends() {
-    const res = await fetch('http://localhost:3000/users/me/friends', {
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${get(token)}`
-        }
-    });
-    const data = await res.json();
-    contacts.set(data);
-    return data;
+	const res = await fetch('http://localhost:3000/users/me/friends', {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${get(token)}`
+		}
+	});
+	const data = await res.json();
+	contacts.set(data);
+	return data;
 }
 
 export async function getAllUserChats() {
@@ -42,16 +42,15 @@ export async function getAllUserChats() {
 		}
 	});
 	if (response.ok) {
-		  const allUserChats = await response.json();
-		  chats.set(allUserChats);
-	} else
-		  console.error(`Error fetching all messages: ${response.statusText}`);
+		const allUserChats = await response.json();
+		chats.set(allUserChats);
+	} else console.error(`Error fetching all messages: ${response.statusText}`);
 }
 
 export function connectSocket() {
 	let url = window.location.origin;
 	url = url.substring(0, url.lastIndexOf(':'));
-	const s = ioClient("localhost" + ':3000', {
+	const s = ioClient('localhost' + ':3000', {
 		query: {
 			token: get(token)
 		}

@@ -9,7 +9,8 @@
 		zstack,
 		selected,
 		user,
-		socket
+		socket,
+		token
 	} from '$lib/stores/stores';
 	import type { App } from '$lib/types/types';
 	import { addInstance, removeInstance, putOnTop } from '$lib/scripts/appinstance';
@@ -88,6 +89,18 @@
 			$socket!.emit('accept-game', { response: true, friend: data.message });
 		});
 	});
+
+	async function enable2fa() {
+		const res = await fetch('http://localhost:3000/2fa/enable', {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${$token}`
+			}
+		});
+		const data = await res.json();
+		console.log(data);
+		return data;
+	}
 </script>
 
 <div
@@ -137,7 +150,9 @@
 
 <!-- NAVBAR -->
 
+
 <nav class="navbar" style:z-index={$zstack.length}>
+	<button on:click={enable2fa}>Enable 2fa</button>
 	<Start />
 	<div class="navbar-tabs">
 		{#each $appInstances as { componentType, visible, id, propsWin }, i (id)}

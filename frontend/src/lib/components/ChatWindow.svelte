@@ -11,40 +11,38 @@
 	let foundChat: any = null;
 
 	if (friend) {
-    	friendUsername = friend.username;
+		friendUsername = friend.username;
 	}
 
 	onMount(() => {
 		socket = io('http://localhost:3000', {
 			query: { token: $token }
 		});
-	
-		if(chatIdLocal)
-			foundChat = findChat(chatIdLocal);
+
+		if (chatIdLocal) foundChat = findChat(chatIdLocal);
 
 		console.log(foundChat);
 		socket.on('message', (message) => {
-    		if (message.from === friendUsername) {
-        		chats.update(currentChats => {
-            		let targetChat = currentChats.find(chat => chat.id === foundChat?.id);
-            		if (targetChat) {
-                		if (!targetChat.messages)
-                    		targetChat.messages = [];
-                		const newMessage = { userid: $user?.id, content: message.content };
-                		targetChat.messages.push(newMessage);
-            		}
-            		return currentChats;
-        		});
-    		}
+			if (message.from === friendUsername) {
+				chats.update((currentChats) => {
+					let targetChat = currentChats.find((chat) => chat.id === foundChat?.id);
+					if (targetChat) {
+						if (!targetChat.messages) targetChat.messages = [];
+						const newMessage = { userid: $user?.id, content: message.content };
+						targetChat.messages.push(newMessage);
+					}
+					return currentChats;
+				});
+			}
 		});
 	});
 
 	function findChat(chatId: number) {
 		let chat: any;
 		chats.subscribe(($chats) => {
-			chat = $chats.find(c => c.id === chatId);
+			chat = $chats.find((c) => c.id === chatId);
 		});
-    	return chat;
+		return chat;
 	}
 
 	function sendMessage() {
@@ -52,8 +50,8 @@
 		if (socket) {
 			socket.emit('sendMessage', { to: friendUsername, content: messageContent });
 			sendApiMessage(friendUsername, chatIdLocal, messageContent);
-			chats.update(currentChats => {
-				currentChats = currentChats.map(chat => {
+			chats.update((currentChats) => {
+				currentChats = currentChats.map((chat) => {
 					if (chat.id === foundChat?.id) {
 						const newMessage = { userid: $user?.id, content: messageContent };
 						chat.messages.push(newMessage);
@@ -70,13 +68,12 @@
 		const response = await fetch('http://localhost:3000/chat/add-message', {
 			method: 'POST',
 			headers: {
-				'Authorization': `Bearer ${$token}`,
+				Authorization: `Bearer ${$token}`,
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({ recipientUsername, chatId, content })
 		});
-		if (!response.ok)
-			console.error(`Error sending message: ${response.statusText}`);
+		if (!response.ok) console.error(`Error sending message: ${response.statusText}`);
 	}
 </script>
 
@@ -84,8 +81,8 @@
 	<div id="chat-window">
 		<h4>Chat with {friendUsername}</h4>
 		<ul>
-			{#if foundChat && $chats.find(c => c.id === foundChat.id)}
-				{#each $chats.find(c => c.id === foundChat.id)?.messages || [] as message, i (i)}
+			{#if foundChat && $chats.find((c) => c.id === foundChat.id)}
+				{#each $chats.find((c) => c.id === foundChat.id)?.messages || [] as message, i (i)}
 					<li>
 						{message.userId === $user?.id ? $user.username : friendUsername}: {message.content}
 					</li>
