@@ -36,7 +36,7 @@
 	}
 
 	async function askGame(friendUsername: string) {
-		const res = await fetch('http://38.242.214.243:3000/notification/ask-game', {
+		const res = await fetch('http://localhost:3000/notification/ask-game', {
 			method: 'POST',
 			headers: {
 				Authorization: `Bearer ${$token}`,
@@ -120,10 +120,10 @@
 		{#each $contacts as friend (friend.id)}
 			<div class="friend">
 				{#if groupChatMode}
-					<input	type="checkbox" 
-							checked={selectedFriends.includes(friend.username)} 
-							value={friend.username} 
-							on:click={selectFriend} 
+					<input	type="checkbox"
+							checked={selectedFriends.includes(friend.username)}
+							value={friend.username}
+							on:click={selectFriend}
 					/>
 				{/if}
 				<p

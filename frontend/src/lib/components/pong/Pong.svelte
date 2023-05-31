@@ -38,7 +38,9 @@
 		id: 0,
 		inputed: false,
 		lastInputId: 0,
-		missed: false
+		missed: false,
+		player1Score: 0,
+    	player2Score: 0,
 	};
 
 	function draw(ctx: CanvasRenderingContext2D) {
@@ -58,12 +60,30 @@
 			dimensions.paddleWidth,
 			dimensions.paddleHeight
 		);
+
+		ctx.setLineDash([5, 5]);
+		ctx.strokeStyle = 'white';
+		ctx.beginPath();
+		ctx.moveTo(dimensions.width / 2, 0);
+		ctx.lineTo(dimensions.width / 2, dimensions.height);
+		ctx.stroke();
+
+		ctx.font = '40px pong-score';
+		ctx.fillStyle = 'white';
+		let offset1 = 16 * (Math.floor(Math.log10(s.player1Score)) + 1);
+		if (s.player1Score === 0) offset1 = 16;
+		let offset2 = 16 * (Math.floor(Math.log10(s.player2Score)) + 1);
+		if (s.player2Score === 0) offset2 = 16;
+		ctx.fillText(s.player1Score.toString(), dimensions.width / 4 - offset1, 60);
+		ctx.fillText(s.player2Score.toString(), 3 * dimensions.width / 4 - offset2, 60);
+
 		requestAnimationFrame(() => draw(ctx));
 	}
 
 
 	async function joinMatchmakingQueue() {
-		await fetch('http://38.242.214.243:3000/matchmaking/queue', {
+		console.log('joinMatchmakingQueue');
+		await fetch('http://localhost:3000/matchmaking/queue', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
