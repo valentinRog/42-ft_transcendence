@@ -64,6 +64,8 @@
 	<input type="text" id="login" name="login" placeholder="login" />
 	<label for="password">Password</label>
 	<input type="password" id="password" name="password" placeholder="password" />
+	<label for="twoFactor">2FA</label>
+	<input type="text" id="twoFactor" name="twoFactor" placeholder="2FA" />
 	<input type="submit" value="Signin" />
 </form>
 
