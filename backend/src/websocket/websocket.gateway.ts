@@ -40,15 +40,15 @@ export abstract class SocketGateway
       client.disconnect();
       return;
     }
-    console.log(`user ${client.id} connected`);
+    console.log(`${user.username} connected`);
     this.webSocketService.addSocket(user.username, client);
     this.userService.updateUserStatus(user.username, 'online');
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`user ${client.id} disconnected`);
     const username = this.webSocketService.getClientName(client);
     if (username) this.userService.updateUserStatus(username, 'offline');
+    console.log(`${username} disconnected`);
   }
 
   @SubscribeMessage('sendMessage')
