@@ -45,6 +45,7 @@ export interface GameState {
 }
 
 export type Input = {
+	room: string;
 	clientId: string;
 	stateId: number;
 	clientTime: number;

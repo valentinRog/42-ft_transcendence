@@ -13,7 +13,8 @@
 	let up = false;
 	let down = false;
 	let room = '';
-	let pingTimer: number | null = null; // Store the timer ID
+	let pingTimer: number | null = null;
+	let gameTimer: number | null = null;
 
 	let state: GameState = {
 		ball: {
@@ -95,26 +96,43 @@
 		});
 	}
 
-	onMount(() => {
-		joinMatchmakingQueue();
+	function gameLoop() {
+		const input: Input = {
+			room,
+			clientId: $socket!.id,
+			stateId: state.id + delay,
+			clientTime: Date.now() + delay,
+			serverTime: Date.now() + delay + serverDelta,
+			up,
+			down
+		};
+		$socket!.emit('input', input);
+		inputs.push(input);
+		if (inputs.length > 100) {
+			inputs.shift();
+		}
+		gameTimer = setTimeout(gameLoop, 1000 / tickRate);
+	}
 
-		$socket!.on('enter-room', (data: { room: string; index: number }) => {
-			console.log('enter-room', data.room, data.index);
-			room = data.room;
-			index = data.index;
-			$socket!.emit('enter-room', data);
-		});
+	function pingLoop() {
+		$socket!.emit('ping', Date.now());
+		pingTimer = setTimeout(pingLoop, 1000);
+	}
+
+	function enterGame() {
+		gameLoop();
+		pingLoop();
 
 		$socket!.on('index', (i: number) => {
 			index = i;
 		});
 
 		$socket!.on('game-over', (winner: number) => {
-			if (winner === 0) {
-				alert('Player 1 wins!');
-			} else {
-				alert('Player 2 wins!');
-			}
+			//if (winner === 0) {
+			//	alert('Player 1 wins!');
+			//} else {
+			//	alert('Player 2 wins!');
+			//}
 		});
 
 		$socket!.on('ping', (data: [number, number]) => {
@@ -162,42 +180,32 @@
 				down = false;
 			}
 		});
+	}
 
-		function gameLoop() {
-			const input: Input = {
-				clientId: $socket!.id,
-				stateId: state.id + delay,
-				clientTime: Date.now() + delay,
-				serverTime: Date.now() + delay + serverDelta,
-				up,
-				down
-			};
-			$socket!.emit('input', input);
-			inputs.push(input);
-			if (inputs.length > 100) {
-				inputs.shift();
-			}
-			setTimeout(gameLoop, 1000 / tickRate);
-		}
-		gameLoop();
+	onMount(() => {
+		joinMatchmakingQueue();
 
-		function pingLoop() {
-			$socket!.emit('ping', Date.now());
-			pingTimer = setTimeout(pingLoop, 1000 / 3);
-		}
+		$socket!.on('enter-room', (data: { room: string; index: number }) => {
+			room = data.room;
+			index = data.index;
+			$socket!.emit('enter-room', data);
+			console.log('enter-room');
+			enterGame();
+		});
 
-		pingLoop();
 	});
 
-	function stopPingLoop() {
-		if (pingTimer !== null) {
+	function stopLoop() {
+		if (pingTimer !== null && gameTimer !== null) {
 			clearTimeout(pingTimer);
 			pingTimer = null;
+			clearTimeout(gameTimer);
+			gameTimer = null;
 		}
 	}
 
 	onDestroy(() => {
-		stopPingLoop();
+		stopLoop();
 		if (room !== '') {
 			$socket!.emit('leave-room', { room: room, index: index });
 		} else {

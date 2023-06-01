@@ -78,7 +78,6 @@ export class PongGateway extends SocketGateway {
   @SubscribeMessage('leave-room')
   handleLeaveRoom(client: Socket, data: { room: string; index: number }) {
     console.log('leave-room', data);
-
     client.leave(data.room);
     const game = this.games[data.room];
     if (game) {
@@ -91,6 +90,8 @@ export class PongGateway extends SocketGateway {
         if (p1 && p2) {
           this.userService.updateUserStatus(p1, 'online');
           this.userService.updateUserStatus(p2, 'online');
+        } else {
+          console.log('players not found');
         }
       }
     }

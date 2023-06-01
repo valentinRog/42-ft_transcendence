@@ -14,7 +14,6 @@ export class MatchmakingController {
       username: user.username,
       elo: user.stat.elo,
     };
-
     return await this.matchmakingService.handlePlayerJoinedQueue(player);
   }
 

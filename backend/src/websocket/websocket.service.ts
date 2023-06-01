@@ -25,7 +25,8 @@ export class WebSocketService {
   }
 
   getClientName(socket: Socket): string | undefined {
-    return this.reverseMap.get(socket?.id);
+    if (socket) return this.reverseMap.get(socket?.id);
+    else console.log('socket is undefined');
   }
 
   getAllSockets(): Map<string, Socket> {
@@ -42,6 +43,9 @@ export class WebSocketService {
 
     const socketPlayer1 = this.getSocket(player1);
     const socketPlayer2 = this.getSocket(player2);
+
+    console.log('socketPlayer1', socketPlayer1.id);
+    console.log('socketPlayer2', socketPlayer2.id);
 
     if (!socketPlayer1 || !socketPlayer2) {
       console.log('user socket not connected');
