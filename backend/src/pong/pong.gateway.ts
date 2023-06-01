@@ -7,9 +7,9 @@ import {
 import { Socket } from 'socket.io';
 import { SocketGateway } from '../websocket/websocket.gateway';
 import { PongGame } from './pong.class';
-import { Cipher } from 'crypto';
 
 type Input = {
+  room: string;
   clientId: string;
   stateId: number;
   idDelta: number;
@@ -30,6 +30,8 @@ export class PongGateway extends SocketGateway {
   @SubscribeMessage('ping')
   handlePing(@ConnectedSocket() client: Socket, @MessageBody() data: number) {
     client?.emit('ping', [data, Date.now()]);
+    console.log('ping', data);
+
     //if (client) {
     //  console.log('ping', data);
     //}
@@ -59,19 +61,31 @@ export class PongGateway extends SocketGateway {
 
   @SubscribeMessage('input')
   handleInput(client: Socket, input: Input) {
-    let gameRoom: string | null = null;
-    client.rooms.forEach((room: string) => {
-      if (room !== client.id && !gameRoom) {
-        // Exclude the default room, which has the same ID as the client
-        gameRoom = room;
-      }
-    });
+    //let gameRoom: string | null = null;
+    //client.rooms.forEach((room: string) => {
+    //  if (room !== client.id && !gameRoom) {
+    //    // Exclude the default room, which has the same ID as the client
+    //    gameRoom = room;
+    //  }
+    //});
 
-    if (gameRoom) {
-      const game = this.games[gameRoom];
+    if (input.room) {
+      const game = this.games[input.room];
       if (game) {
         game.handleInput(input);
       }
+    }
+  }
+
+  async gameEnd(game: PongGame) {
+    game.stopGame();
+    const p1 = this.webSocketService.getClientName(game.getPlayer1());
+    const p2 = this.webSocketService.getClientName(game.getPlayer2());
+    if (p1 && p2) {
+      await this.userService.updateUserStatus(p1, 'online');
+      await this.userService.updateUserStatus(p2, 'online');
+    } else {
+      console.log('players not found');
     }
   }
 
@@ -82,17 +96,9 @@ export class PongGateway extends SocketGateway {
     const game = this.games[data.room];
     if (game) {
       if (data.index === 0 || data.index === 1) {
-        game.stopGame();
+        this.gameEnd(game);
         delete this.games[data.room];
         this.server.to(data.room).emit('game-over', data.index ? 0 : 1);
-        const p1 = this.webSocketService.getClientName(game.getPlayer1());
-        const p2 = this.webSocketService.getClientName(game.getPlayer2());
-        if (p1 && p2) {
-          this.userService.updateUserStatus(p1, 'online');
-          this.userService.updateUserStatus(p2, 'online');
-        } else {
-          console.log('players not found');
-        }
       }
     }
   }

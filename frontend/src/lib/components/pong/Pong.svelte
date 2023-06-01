@@ -85,7 +85,6 @@
 	}
 
 	async function joinMatchmakingQueue() {
-		console.log('joinMatchmakingQueue');
 		await fetch('http://localhost:3000/matchmaking/queue', {
 			method: 'POST',
 			headers: {

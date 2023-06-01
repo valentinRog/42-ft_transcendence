@@ -124,10 +124,8 @@ export class PongGame {
   handleInput(input: Input) {
     if (this.player1 !== null && input.clientId === this.player1.id) {
       this.inputs1.push(input);
-      //console.log('input player1', input);
     } else if (this.player2 !== null && input.clientId === this.player2.id) {
       this.inputs2.push(input);
-      //console.log('input player2', input);
     }
   }
 
