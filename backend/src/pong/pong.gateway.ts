@@ -2,10 +2,12 @@ import {
   WebSocketGateway,
   SubscribeMessage,
   MessageBody,
+  ConnectedSocket,
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { SocketGateway } from '../websocket/websocket.gateway';
 import { PongGame } from './pong.class';
+import { Cipher } from 'crypto';
 
 type Input = {
   clientId: string;
@@ -26,8 +28,11 @@ export class PongGateway extends SocketGateway {
   private games: { [room: string]: PongGame } = {};
 
   @SubscribeMessage('ping')
-  handlePing(@MessageBody() data: number) {
-    return [data, Date.now()];
+  handlePing(@ConnectedSocket() client: Socket, @MessageBody() data: number) {
+    client?.emit('ping', [data, Date.now()]);
+    //if (client) {
+    //  console.log('ping', data);
+    //}
   }
 
   @SubscribeMessage('enter-room')

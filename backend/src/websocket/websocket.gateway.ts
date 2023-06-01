@@ -55,28 +55,47 @@ export abstract class SocketGateway
   }
 
   @SubscribeMessage('joinRoom')
-	handleJoinRoom(client: Socket, payload: {chatId: number}) {
-		client.join(`chat-${payload.chatId}`);
-	}
+  handleJoinRoom(client: Socket, payload: { chatId: number }) {
+    client.join(`chat-${payload.chatId}`);
+  }
 
   @SubscribeMessage('sendMessage')
-	async handleMessage(client: Socket, payload: {chatId: number, content: string, friendUsername: string}) {
+  async handleMessage(
+    client: Socket,
+    payload: { chatId: number; content: string; friendUsername: string },
+  ) {
     let chat = await this.chatService.findChatById(payload.chatId);
     const username = this.webSocketService.getClientName(client);
     const user = await this.userService.getUser(username);
     if (!chat) {
-      chat = await this.chatService.createChat(`${username}-${payload.friendUsername}`, [username, payload.friendUsername], false);
+      chat = await this.chatService.createChat(
+        `${username}-${payload.friendUsername}`,
+        [username, payload.friendUsername],
+        false,
+      );
     }
-		if (chat.isGroupChat) {
-      const newMessage = this.chatService.addMessageToDatabase(chat.id, payload.content, user.id);
-			//this.server.to(`chat-${payload.chatId}`).emit('message', newMessage);
-		} else {
-      const otherChatUser = chat.chatUsers.find(chatUser => (chatUser as any).user.username !== username);
-      const socket = this.webSocketService.getSocket((otherChatUser as any).user.username);
-      const newMessage = this.chatService.addMessageToDatabase(chat.id, payload.content, user.id);
-			//socket.emit('message', newMessage);
-		}
-	}
+    if (chat.isGroupChat) {
+      const newMessage = this.chatService.addMessageToDatabase(
+        chat.id,
+        payload.content,
+        user.id,
+      );
+      //this.server.to(`chat-${payload.chatId}`).emit('message', newMessage);
+    } else {
+      const otherChatUser = chat.chatUsers.find(
+        (chatUser) => (chatUser as any).user.username !== username,
+      );
+      const socket = this.webSocketService.getSocket(
+        (otherChatUser as any).user.username,
+      );
+      const newMessage = this.chatService.addMessageToDatabase(
+        chat.id,
+        payload.content,
+        user.id,
+      );
+      //socket.emit('message', newMessage);
+    }
+  }
 
   @SubscribeMessage('accept-friend')
   async handleAcceptFriend(

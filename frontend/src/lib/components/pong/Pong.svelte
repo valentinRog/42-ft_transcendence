@@ -13,6 +13,7 @@
 	let up = false;
 	let down = false;
 	let room = '';
+	let pingTimer: number | null = null; // Store the timer ID
 
 	let state: GameState = {
 		ball: {
@@ -182,12 +183,21 @@
 
 		function pingLoop() {
 			$socket!.emit('ping', Date.now());
-			setTimeout(pingLoop, 1000 / 3);
+			pingTimer = setTimeout(pingLoop, 1000 / 3);
 		}
+
 		pingLoop();
 	});
 
+	function stopPingLoop() {
+		if (pingTimer !== null) {
+			clearTimeout(pingTimer);
+			pingTimer = null;
+		}
+	}
+
 	onDestroy(() => {
+		stopPingLoop();
 		if (room !== '') {
 			$socket!.emit('leave-room', { room: room, index: index });
 		} else {
@@ -200,6 +210,7 @@
 				body: JSON.stringify({ token: $token })
 			});
 		}
+
 	});
 </script>
 
