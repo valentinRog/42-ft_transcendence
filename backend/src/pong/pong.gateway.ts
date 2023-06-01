@@ -77,8 +77,8 @@ export class PongGateway extends SocketGateway {
     const p1 = this.webSocketService.getClientName(game.getPlayer1());
     const p2 = this.webSocketService.getClientName(game.getPlayer2());
     if (p1 && p2) {
-      console.log(await this.userService.updateUserStatus(p1, 'online'));
-      console.log(await this.userService.updateUserStatus(p2, 'online'));
+      await this.userService.updateUserStatus(p1, 'online');
+      await this.userService.updateUserStatus(p2, 'online');
     } else {
       console.log('players not found');
     }
@@ -90,8 +90,6 @@ export class PongGateway extends SocketGateway {
     client.leave(data.room);
     const game = this.games.get(data.room);
     if (game) {
-      console.log(game.getPlayer1());
-      console.log(game.getPlayer2());
       if (data.index === 0 || data.index === 1) {
         await this.gameEnd(game);
         this.games.delete(data.room);
