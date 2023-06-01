@@ -38,6 +38,7 @@ export class PongGateway extends SocketGateway {
     if (!this.games.has(data.room)) {
       const game = new PongGame(this.server, data.room);
       this.games.set(data.room, game);
+      console.log(this.games.size);
     }
     if (data.index === 0) {
       this.games.get(data.room).setPlayer1(client);
@@ -63,7 +64,6 @@ export class PongGateway extends SocketGateway {
   }
 
   async gameEnd(game: PongGame) {
-    //game.stopGame();
     const p1 = this.webSocketService.getClientName(game.getPlayer1());
     const p2 = this.webSocketService.getClientName(game.getPlayer2());
     if (p1 && p2) {

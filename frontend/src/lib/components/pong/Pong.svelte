@@ -131,35 +131,6 @@
 		pingTimer = null;
 		gameTimer = null;
 
-		//state = {
-		//	ball: {
-		//		x: 0,
-		//		y: 0,
-		//		dx: 0,
-		//		dy: 0,
-		//		speed: 0
-		//	},
-		//	paddles: [
-		//		{
-		//			y: 0,
-		//			up: false,
-		//			down: false
-		//		},
-		//		{
-		//			y: 0,
-		//			up: false,
-		//			down: false
-		//		}
-		//	],
-		//	time: 0,
-		//	id: 0,
-		//	inputed: false,
-		//	lastInputId: 0,
-		//	missed: false,
-		//	player1Score: 0,
-		//	player2Score: 0
-		//};
-
 		$socket!.on('enter-room', (data: { room: string; index: number }) => {
 			room = data.room;
 			index = data.index;

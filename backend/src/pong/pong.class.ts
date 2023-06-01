@@ -67,7 +67,6 @@ export class PongGame {
     this.room = room;
     this.startGame();
   }
-  private gameLoopTimeout: NodeJS.Timeout | null = null;
   private server: Server;
   private tickRate = 30;
   private room: string;
@@ -96,13 +95,6 @@ export class PongGame {
   private startGame() {
     console.log(`Game in room ${this.room} started`);
     this.gameLoop();
-  }
-
-  stopGame() {
-    if (this.gameLoopTimeout) {
-      clearTimeout(this.gameLoopTimeout);
-      this.gameLoopTimeout = null;
-    }
   }
 
   setPlayer1(player1: Socket) {
@@ -230,7 +222,6 @@ export class PongGame {
         }
       }
     });
-
     return s;
   }
 
@@ -248,11 +239,7 @@ export class PongGame {
       this.state.paddles[1].up = input.up;
       this.state.paddles[1].down = input.down;
     }
-
     this.server.to(this.room).emit('state', this.state);
-    this.gameLoopTimeout = setTimeout(
-      this.gameLoop.bind(this),
-      1000 / this.tickRate,
-    );
+    setTimeout(this.gameLoop.bind(this), 1000 / this.tickRate);
   }
 }
