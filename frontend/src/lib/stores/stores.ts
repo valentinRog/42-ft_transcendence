@@ -89,5 +89,5 @@ interface Message {
 
 interface User {
 	id: number;
-	username: string;
+	username: string | null;
 }

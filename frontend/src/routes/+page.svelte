@@ -10,7 +10,8 @@
 		selected,
 		user,
 		socket,
-		token
+		token,
+		chats
 	} from '$lib/stores/stores';
 	import type { App } from '$lib/types/types';
 	import { addInstance, removeInstance, putOnTop } from '$lib/utils/appinstance';
@@ -45,8 +46,8 @@
 			DesktopProps: { name: 'Conversation', icon: '/big-mail.png' }
 		},
 		ChatWindow: {
-			TabProps: { name: 'MSN(a enlevé)', icon: '/mail3.png' },
-			DesktopProps: { name: 'MSN(a enlevé)', icon: '/big-mail.png' }
+			TabProps: { name: 'MSN(enlever)', icon: '/mail3.png' },
+			DesktopProps: { name: 'MSN(enlever)', icon: '/big-mail.png' }
 		},
 		Contact: {
 			TabProps: { name: 'Contact', icon: '/phone.png' },
@@ -87,6 +88,17 @@
 		$socket!.on('ask-game', (data: { message: string }) => {
 			console.log('accept-game', data.message);
 			$socket!.emit('accept-game', { response: true, friend: data.message });
+		});
+
+		chats.subscribe(($chats) => {
+			$chats.forEach(chat => {
+				if (chat.isGroupChat)
+					$socket!.emit('joinRoom', {chatId: chat.id});
+			});
+		});
+
+		$socket!.on('message', (message) => {
+			console.log('New message:', message);
 		});
 	});
 </script>

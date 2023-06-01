@@ -71,13 +71,13 @@
 	}
 
 	async function createGroupChat() {
-		const res = await fetch('http://localhost:3000/chat/create-group-chat', {
-			method: 'PATCH',
+		const res = await fetch('http://localhost:3000/chat/create-chat', {
+			method: 'POST',
 			headers: {
 				Authorization: `Bearer ${$token}`,
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({ groupName: 'GROUP', memberUsernames: selectedFriends })
+			body: JSON.stringify({ groupName: 'GROUP', memberUsernames: selectedFriends, isGroupChat: true })
 		});
 		if (res.ok) {
 			let data = await res.json();
@@ -104,9 +104,9 @@
 	function startChat(friend: Contact) {
 		let chat: any;
 
-		if ($user) chat = findChat($user?.username, friend.username);
+		if ($user) 
+			chat = findChat($user?.username, friend.username);
 		$chatId = chat?.id;
-		console.log(chat);
 		friendInfo.set({ id: friend.id, username: friend.username });
 		$openChatWindow = true;
 	}

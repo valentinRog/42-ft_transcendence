@@ -9,23 +9,6 @@ export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
   @UseGuards(JwtGuard)
-  @Post('add-message')
-  async sendMessage(
-    @GetUser() user,
-    @Body('recipientUsername') recipientUsername: string,
-    @Body('chatId') chatId: number | null,
-    @Body('content') content: string
-  ) {
-    if (!recipientUsername)
-      throw new BadRequestException('Recipient username is required');
-    if (!content)
-      throw new BadRequestException('Message content is required');
-    let newMessage = await this.chatService.sendMessage(user.username, recipientUsername, chatId, content);
-    return newMessage;
-  }
-
-
-  @UseGuards(JwtGuard)
   @Get('allUserChats')
   async getAllUserChats(@GetUser() user) {
     const chats = await this.chatService.getAllUserChats(user.username);
@@ -33,23 +16,13 @@ export class ChatController {
   }
 
   @UseGuards(JwtGuard)
-  @Get('allUserMessages')
-  async getAllMessages(@GetUser() user) {
-    const messages = await this.chatService.getAllUserMessages(user.username);
-    return messages;
-  }
-  
-  @UseGuards(JwtGuard)
-  @Post('create-group-chat')
-  async createGroupChat(
-    @GetUser() user,
+  @Post('create-chat')
+  async createChat(
     @Body('groupName') groupName: string,
-    @Body('memberUsernames') memberUsernames: string[]
+    @Body('memberUsernames') memberUsernames: string[],
+    @Body('isGroupChat') isGroupChat: boolean
   ) {
-    if (!groupName || !memberUsernames || memberUsernames.length < 2) {
-      throw new BadRequestException('Group name and at least two member usernames are required');
-    }
-    const newGroupChat = await this.chatService.createChatGroup(groupName, memberUsernames);
+    const newGroupChat = await this.chatService.createChat(groupName, memberUsernames, isGroupChat);
     return newGroupChat;
   }
 

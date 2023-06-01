@@ -1,88 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
+import { Chat, ChatUser, Message, User } from '../chat/model/chat.model';
 
 @Injectable()
 export class ChatService {
-  constructor(private prisma: PrismaClient) {}
-
-  async sendMessage(senderUsername: string, friendUsername: string, chatId: number | null, content: string) {
-    let chat;
-
-    if (chatId) {
-        chat = await this.prisma.chat.findUnique({
-            where: { id: chatId },
-        });
-    } else {
-        chat = await this.prisma.chat.findFirst({
-            where: {
-                AND: [
-                    { chatUsers: { some: { user: { username: senderUsername } } } },
-                    { chatUsers: { some: { user: { username: friendUsername } } } }
-                ]
-            }
-        });
-    }
-
-    if (!chat) {
-        chat = await this.prisma.chat.create({
-            data: {
-                isGroupChat: false,
-                name: `${senderUsername}-${friendUsername}`,
-                chatUsers: {
-                    create: [
-                        { user: { connect: { username: senderUsername } } },
-                        { user: { connect: { username: friendUsername } } }
-                    ]
-                }
-            }
-        });
-    }
-
-    const newMessage = await this.prisma.message.create({
-        data: {
-            content,
-            user: { connect: { username: senderUsername } },
-            chat: { connect: { id: chat.id } },
-        },
-    });
-
-    return newMessage;
-  }
-
-
-  async getAllUserMessages(username: string) {
-    const chats = await this.prisma.chat.findMany({
-      where: {
-        chatUsers: {
-          some: {
-            user: {
-              username: username
-            }
-          }
-        }
-      },
-      include: {
-        messages: {
-          include: {
-            user: true
-          },
-          orderBy: {
-            createdAt: 'asc'
-          }
-        }
-      }
-    });
-    const allMessages = chats.flatMap(chat => 
-      chat.messages.map(message => ({
-        chatId: chat.id,
-        from: message.user.username,
-        content: message.content,
-        createdAt: message.createdAt
-      }))
-    );
-    allMessages.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-    return allMessages;
-  }
+  constructor(private prisma: PrismaService) {}
 
   async getAllUserChats(username: string) {
     const chats = await this.prisma.chat.findMany({
@@ -107,18 +30,68 @@ export class ChatService {
     return chats;
   }
 
-  async createChatGroup(groupName: string, memberUsernames: string[]) {
+  async createChat(groupName: string, memberUsernames: string[], isGroupChat: boolean) : Promise<Chat | null> {
     const newGroupChat = await this.prisma.chat.create({
-      data: {
-        isGroupChat: true,
-        name: groupName,
-        chatUsers: {
-          create: memberUsernames.map(username => ({
-            user: { connect: { username } }
-          }))
+        data: {
+            isGroupChat: isGroupChat,
+            name: groupName,
+            updatedAt: new Date(),
+            createdAt: new Date(),
+            chatUsers: {
+                create: memberUsernames.map(username => ({
+                    user: { connect: { username } },
+                    createdAt: new Date(),
+                    lastReadMessageId: null,
+                }))
+            }
+        },
+        include: {
+          chatUsers: {
+            include: {
+              user: true
+            }
+          },
+          messages: true,
         }
-      }
     });
     return newGroupChat;
+  }
+
+
+  async findChatById(id: number | null) : Promise<Chat | null> {
+    if (id === undefined || id === null) 
+      return null;
+    const chat = await this.prisma.chat.findUnique({
+        where: {
+            id: id,
+        },
+        include: {
+            chatUsers: {
+              include: {
+                user: true,
+              },
+            },
+            messages: true,
+        },
+    });
+    return chat;
+  }
+
+  async addMessageToDatabase(chatId: number, content: string, userId: number): Promise<Message> {
+    const newMessage = await this.prisma.message.create({
+      data: {
+        content: content,
+        chat: {
+          connect: { id: chatId }
+        },
+        user: {
+          connect: { id: userId }
+        },
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    });
+
+    return newMessage;
   }
 }
