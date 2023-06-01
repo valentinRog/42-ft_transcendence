@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { NotFoundException } from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class WebSocketService {
@@ -40,7 +41,8 @@ export class WebSocketService {
   }
 
   createRoom(player1: string, player2: string) {
-    const room = `${player1}-${player2}`;
+    //const room = `${player1}-${player2}`;
+    const room = uuidv4();
     console.log('createRoom', room);
 
     const socketPlayer1 = this.getSocket(player1);

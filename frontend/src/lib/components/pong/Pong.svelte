@@ -5,45 +5,45 @@
 	import { update, dimensions } from './pong';
 
 	let ping = 0;
-	let serverDelta = 0;
-	const tickRate = 30;
-	const delay = 20;
-	let index = 0;
-	let inputs = new Array<Input>();
-	let up = false;
-	let down = false;
-	let room = '';
-	let pingTimer: number | null = null;
-	let gameTimer: number | null = null;
+		let serverDelta = 0;
+		const tickRate = 30;
+		const delay = 20;
+		let index = 0;
+		let inputs = new Array<Input>();
+		let up = false;
+		let down = false;
+		let room = '';
+		let pingTimer: number | null = null;
+		let gameTimer: number | null = null;
 
-	let state: GameState = {
-		ball: {
-			x: 0,
-			y: 0,
-			dx: 0,
-			dy: 0,
-			speed: 0
-		},
-		paddles: [
-			{
+		let state: GameState = {
+			ball: {
+				x: 0,
 				y: 0,
-				up: false,
-				down: false
+				dx: 0,
+				dy: 0,
+				speed: 0
 			},
-			{
-				y: 0,
-				up: false,
-				down: false
-			}
-		],
-		time: 0,
-		id: 0,
-		inputed: false,
-		lastInputId: 0,
-		missed: false,
-		player1Score: 0,
-		player2Score: 0
-	};
+			paddles: [
+				{
+					y: 0,
+					up: false,
+					down: false
+				},
+				{
+					y: 0,
+					up: false,
+					down: false
+				}
+			],
+			time: 0,
+			id: 0,
+			inputed: false,
+			lastInputId: 0,
+			missed: false,
+			player1Score: 0,
+			player2Score: 0
+		};
 
 	function draw(ctx: CanvasRenderingContext2D) {
 		const s = update(state, Date.now() - state.time);
@@ -126,6 +126,40 @@
 	onMount(() => {
 		joinMatchmakingQueue();
 
+		index = 0;
+		room = '';
+		pingTimer = null;
+		gameTimer = null;
+
+		//state = {
+		//	ball: {
+		//		x: 0,
+		//		y: 0,
+		//		dx: 0,
+		//		dy: 0,
+		//		speed: 0
+		//	},
+		//	paddles: [
+		//		{
+		//			y: 0,
+		//			up: false,
+		//			down: false
+		//		},
+		//		{
+		//			y: 0,
+		//			up: false,
+		//			down: false
+		//		}
+		//	],
+		//	time: 0,
+		//	id: 0,
+		//	inputed: false,
+		//	lastInputId: 0,
+		//	missed: false,
+		//	player1Score: 0,
+		//	player2Score: 0
+		//};
+
 		$socket!.on('enter-room', (data: { room: string; index: number }) => {
 			room = data.room;
 			index = data.index;
@@ -196,7 +230,6 @@
 	});
 
 	function stopLoop() {
-		console.log('stopLoop');
 		if (pingTimer !== null && gameTimer !== null) {
 			clearTimeout(pingTimer);
 			pingTimer = null;
@@ -219,12 +252,10 @@
 				body: JSON.stringify({ token: $token })
 			});
 		}
-
 		$socket!.off('enter-room');
 		$socket!.off('ping');
 		$socket!.off('state');
 		$socket!.off('input');
-
 	});
 
 </script>

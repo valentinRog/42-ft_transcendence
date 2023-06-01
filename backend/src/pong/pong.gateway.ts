@@ -7,7 +7,6 @@ import {
 import { Socket } from 'socket.io';
 import { SocketGateway } from '../websocket/websocket.gateway';
 import { PongGame } from './pong.class';
-import { timeStamp } from 'console';
 
 type Input = {
   room: string;
@@ -31,7 +30,6 @@ export class PongGateway extends SocketGateway {
   @SubscribeMessage('ping')
   handlePing(@ConnectedSocket() client: Socket, @MessageBody() data: number) {
     client?.emit('ping', [data, Date.now()]);
-    console.log('ping', data);
   }
 
   @SubscribeMessage('enter-room')
@@ -56,14 +54,6 @@ export class PongGateway extends SocketGateway {
 
   @SubscribeMessage('input')
   handleInput(client: Socket, input: Input) {
-    //let gameRoom: string | null = null;
-    //client.rooms.forEach((room: string) => {
-    //  if (room !== client.id && !gameRoom) {
-    //    // Exclude the default room, which has the same ID as the client
-    //    gameRoom = room;
-    //  }
-    //});
-
     if (input.room) {
       const game = this.games.get(input.room);
       if (game) {
