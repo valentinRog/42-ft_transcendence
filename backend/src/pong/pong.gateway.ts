@@ -30,11 +30,6 @@ export class PongGateway extends SocketGateway {
   @SubscribeMessage('ping')
   handlePing(@ConnectedSocket() client: Socket, @MessageBody() data: number) {
     client?.emit('ping', [data, Date.now()]);
-    console.log('ping', data);
-
-    //if (client) {
-    //  console.log('ping', data);
-    //}
   }
 
   @SubscribeMessage('enter-room')
