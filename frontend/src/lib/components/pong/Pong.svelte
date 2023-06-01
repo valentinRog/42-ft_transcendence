@@ -121,12 +121,25 @@
 	function enterGame() {
 		gameLoop();
 		pingLoop();
+	}
+
+	onMount(() => {
+		joinMatchmakingQueue();
+
+		$socket!.on('enter-room', (data: { room: string; index: number }) => {
+			room = data.room;
+			index = data.index;
+			$socket!.emit('enter-room', data);
+			console.log('enter-room');
+			enterGame();
+		});
 
 		$socket!.on('index', (i: number) => {
 			index = i;
 		});
 
 		$socket!.on('game-over', (winner: number) => {
+			stopLoop();
 			//if (winner === 0) {
 			//	alert('Player 1 wins!');
 			//} else {
@@ -138,6 +151,11 @@
 			ping = Date.now() - data[0];
 			serverDelta = data[1] - Date.now() + ping / 2;
 		});
+
+		const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+		const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+		canvas.width = dimensions.width;
+		canvas.height = dimensions.height;
 
 		$socket!.on('state', (s: GameState) => {
 			if (state.id === 0) {
@@ -160,11 +178,6 @@
 			state = s;
 		});
 
-		const canvas = document.querySelector('canvas') as HTMLCanvasElement;
-		const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-		canvas.width = dimensions.width;
-		canvas.height = dimensions.height;
-
 		window.addEventListener('keydown', (e: KeyboardEvent) => {
 			if (e.key === 'ArrowUp') {
 				up = true;
@@ -178,18 +191,6 @@
 			} else if (e.key === 'ArrowDown') {
 				down = false;
 			}
-		});
-	}
-
-	onMount(() => {
-		joinMatchmakingQueue();
-
-		$socket!.on('enter-room', (data: { room: string; index: number }) => {
-			room = data.room;
-			index = data.index;
-			$socket!.emit('enter-room', data);
-			console.log('enter-room');
-			enterGame();
 		});
 
 	});
@@ -219,7 +220,13 @@
 			});
 		}
 
+		$socket!.off('enter-room');
+		$socket!.off('ping');
+		$socket!.off('state');
+		$socket!.off('input');
+
 	});
+
 </script>
 
 <div>

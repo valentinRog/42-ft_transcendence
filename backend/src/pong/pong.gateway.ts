@@ -7,6 +7,7 @@ import {
 import { Socket } from 'socket.io';
 import { SocketGateway } from '../websocket/websocket.gateway';
 import { PongGame } from './pong.class';
+import { timeStamp } from 'console';
 
 type Input = {
   room: string;
@@ -36,16 +37,16 @@ export class PongGateway extends SocketGateway {
   @SubscribeMessage('enter-room')
   handleRoom(client: Socket, data: { room: string; index: number }) {
     client.join(data.room);
-    if (data.index === 0 && !this.games.get(data.room)) {
+    if (!this.games.has(data.room)) {
       const game = new PongGame(this.server, data.room);
       this.games.set(data.room, game);
     }
-    if (data.index === 0 && this.games.get(data.room)) {
+    if (data.index === 0) {
       this.games.get(data.room).setPlayer1(client);
       const p1 = this.webSocketService.getClientName(client);
       this.userService.updateUserStatus(p1, 'in-game');
       client.emit('index', 0);
-    } else if (data.index === 1 && this.games.get(data.room)) {
+    } else if (data.index === 1) {
       this.games.get(data.room).setPlayer2(client);
       const p2 = this.webSocketService.getClientName(client);
       this.userService.updateUserStatus(p2, 'in-game');
@@ -72,7 +73,7 @@ export class PongGateway extends SocketGateway {
   }
 
   async gameEnd(game: PongGame) {
-    game.stopGame();
+    //game.stopGame();
     const p1 = this.webSocketService.getClientName(game.getPlayer1());
     const p2 = this.webSocketService.getClientName(game.getPlayer2());
     if (p1 && p2) {
@@ -89,6 +90,8 @@ export class PongGateway extends SocketGateway {
     client.leave(data.room);
     const game = this.games.get(data.room);
     if (game) {
+      console.log(game.getPlayer1());
+      console.log(game.getPlayer2());
       if (data.index === 0 || data.index === 1) {
         await this.gameEnd(game);
         this.games.delete(data.room);
