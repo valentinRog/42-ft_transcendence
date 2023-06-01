@@ -26,7 +26,9 @@ export class WebSocketService {
 
   getClientName(socket: Socket): string | undefined {
     if (socket) return this.reverseMap.get(socket?.id);
-    else console.log('socket is undefined');
+    else {
+      console.log('socket is undefined');
+    }
   }
 
   getAllSockets(): Map<string, Socket> {

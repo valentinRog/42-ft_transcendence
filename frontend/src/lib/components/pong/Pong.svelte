@@ -195,6 +195,7 @@
 	});
 
 	function stopLoop() {
+		console.log('stopLoop');
 		if (pingTimer !== null && gameTimer !== null) {
 			clearTimeout(pingTimer);
 			pingTimer = null;
