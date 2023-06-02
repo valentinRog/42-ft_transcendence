@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { onMount, tick } from 'svelte';
+	import { onMount } from 'svelte';
 	import { chatId, friendInfo, user, chats, socket } from '$lib/stores/stores';
+	import  { io } from 'socket.io-client';
 	import type { Socket } from 'socket.io-client';
 
 	let chatIdLocal: number | null = $chatId;
@@ -16,11 +17,15 @@
 	}
 
 	onMount(() => {
-		console.log($chats);
-		console.log(chatIdLocal);
 		socket.subscribe(($socket) => {
 			socketInstance = $socket;
 		});
+
+		if (socketInstance) {
+  			socketInstance.on('updateChat', (chatId: number) => {
+    			chatIdLocal = chatId;
+  			});
+		}
 
 		let foundChat: any | null = findChat(chatIdLocal!);
 		if (foundChat && foundChat.isGroupChat === true)

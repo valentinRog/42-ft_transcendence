@@ -98,6 +98,10 @@
 			});
 		});
 
+		$socket!.on('addchat', (chat) => {
+    		chats.update(chatsValue => [...chatsValue, chat]);
+		});
+
 		$socket!.on('message', ({chatId, message}) => {
   			let targetChatIndex = $chats.findIndex(chat => chat.id === chatId);
   			if (targetChatIndex !== -1) {
@@ -107,11 +111,6 @@
   			} else {
     			console.error(`Received message for unknown chat with id: ${chatId}`);
   			}		
-		});
-
-		$socket!.on('addchat', (chat) => {
-			console.log("chatAJoute");
-    		chats.update(chatsValue => [...chatsValue, chat]);
 		});
 
 	});
