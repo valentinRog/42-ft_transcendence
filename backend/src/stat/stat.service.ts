@@ -16,7 +16,6 @@ export class StatService {
       where: { username: dto.opponentName },
       include: { stat: true },
     });
-
     const elo = new Elo({ kFactor: 20 });
     const { Ra, Rb } = elo.calculateRating(
       playerA.stat.elo,
@@ -25,7 +24,6 @@ export class StatService {
     );
     playerA.stat.elo = Math.round(Ra);
     playerB.stat.elo = Math.round(Rb);
-
     if (dto.result === 1) {
       playerA.stat.wins += 1;
       playerB.stat.losses += 1;
@@ -33,14 +31,12 @@ export class StatService {
       playerA.stat.losses += 1;
       playerB.stat.wins += 1;
     }
-
     await this.prisma.stat.update({
       where: { id: playerA.stat.id },
       data: {
         ...playerA.stat,
       },
     });
-
     await this.prisma.stat.update({
       where: { id: playerB.stat.id },
       data: {
@@ -50,7 +46,6 @@ export class StatService {
 
     const winnerId = dto.result === 1 ? userId : playerB.id;
     const loserId = dto.result === 1 ? playerB.id : userId;
-
     const match = await this.prisma.match.create({
       data: {
         winnerId: winnerId,
@@ -65,7 +60,6 @@ export class StatService {
       where: { id: loserId },
       data: { matchesAsLoser: { connect: { id: match.id } } },
     });
-
     return match;
   }
 
@@ -78,18 +72,28 @@ export class StatService {
           matchesAsLoser: true,
         },
       });
-
       // Merge the matches from both arrays into a single array
       const allMatches = [...user.matchesAsWinner, ...user.matchesAsLoser];
-
       // Sort the matches by date in descending order
       const sortedMatches = allMatches.sort(
         (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
       );
-
       return sortedMatches;
     } catch (error) {
       console.error('Error retrieving matches:', error);
+      throw error;
+    }
+  }
+
+  async getStats(playerId: number) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: playerId },
+        include: { stat: true },
+      });
+      return user.stat;
+    } catch (error) {
+      console.error('Error retrieving stats:', error);
       throw error;
     }
   }

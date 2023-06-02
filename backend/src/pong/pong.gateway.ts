@@ -73,6 +73,25 @@ export class PongGateway extends SocketGateway {
     }
   }
 
+  async updateStat(
+    game: PongGame,
+    client: Socket,
+    data: { room: string; index: number },
+    result: number,
+  ) {
+    const winner = await this.userService.getUser(
+      this.webSocketService.getClientName(client),
+    );
+    const opponent = data.index === 0 ? game.getPlayer2() : game.getPlayer1();
+    const loser = await this.userService.getUser(
+      this.webSocketService.getClientName(opponent),
+    );
+    await this.statService.updateStat(winner.id, {
+      result: result,
+      opponentName: loser.username,
+    });
+  }
+
   @SubscribeMessage('leave-room')
   async handleLeaveRoom(client: Socket, data: { room: string; index: number }) {
     console.log('leave-room', data);
@@ -84,19 +103,7 @@ export class PongGateway extends SocketGateway {
         this.games.delete(data.room);
         const result = data.index === 0 ? 1 : 0;
         this.server.to(data.room).emit('game-over', result);
-        // update stats
-        const winner = await this.userService.getUser(
-          this.webSocketService.getClientName(client),
-        );
-        const opponent =
-          data.index === 0 ? game.getPlayer2() : game.getPlayer1();
-        const loser = await this.userService.getUser(
-          this.webSocketService.getClientName(opponent),
-        );
-        await this.statService.updateStat(winner.id, {
-          result: result,
-          opponentName: loser.username,
-        });
+        this.updateStat(game, client, data, result);
       }
     }
   }

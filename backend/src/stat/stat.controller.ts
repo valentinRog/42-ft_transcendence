@@ -19,4 +19,9 @@ export class StatController {
   getHistory(@GetUser('id') userId: number) {
     return this.statService.getHistory(userId);
   }
+
+  @Get('get-stats')
+  getStats(@GetUser('id') userId: number) {
+    return this.statService.getStats(userId);
+  }
 }
