@@ -38,7 +38,6 @@ export class PongGateway extends SocketGateway {
     if (!this.games.has(data.room)) {
       const game = new PongGame(this.server, data.room);
       this.games.set(data.room, game);
-      console.log(this.games.size);
     }
     if (data.index === 0) {
       this.games.get(data.room).setPlayer1(client);
@@ -91,13 +90,14 @@ export class PongGateway extends SocketGateway {
         );
         const opponent =
           data.index === 0 ? game.getPlayer2() : game.getPlayer1();
-        this.statService.updateStat(winner.id, {
+        const loser = await this.userService.getUser(
+          this.webSocketService.getClientName(opponent),
+        );
+        await this.statService.updateStat(winner.id, {
           result: result,
-          opponentName: this.webSocketService.getClientName(opponent),
+          opponentName: loser.username,
         });
       }
-    } else {
-      console.log('game not found');
     }
   }
 }
