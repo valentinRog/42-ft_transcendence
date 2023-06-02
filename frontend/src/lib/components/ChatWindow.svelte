@@ -1,29 +1,39 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { token, chatId, friendInfo, user, chats } from '$lib/stores/stores';
-	import io, { Socket } from 'socket.io-client';
+	import { chatId, friendInfo, user, chats, socket } from '$lib/stores/stores';
+	import  { io } from 'socket.io-client';
+	import type { Socket } from 'socket.io-client';
 
 	let chatIdLocal: number | null = $chatId;
 	let friend = $friendInfo;
 	let friendUsername: string | null = '';
-	let socket: Socket | null = null;
+	let socketInstance: Socket | null = null;
 	let messageContent = '';
-	let foundChat: any = null;
 	let title = '';
+	let chatWindow: HTMLDivElement;
 
 	if (friend) {
 		friendUsername = friend.username;
 	}
 
 	onMount(() => {
-		socket = io('http://localhost:3000', {
-			query: { token: $token }
+		socket.subscribe(($socket) => {
+			socketInstance = $socket;
 		});
-		foundChat = findChat(chatIdLocal!);
-		if (foundChat)
-			title = foundChat.chatname;
+
+		if (socketInstance) {
+  			socketInstance.on('updateChat', (chatId: number) => {
+    			chatIdLocal = chatId;
+  			});
+		}
+
+		let foundChat: any | null = findChat(chatIdLocal!);
+		if (foundChat && foundChat.isGroupChat === true)
+			title = foundChat.name;
 		else
 			title = friendUsername!;
+
+		chatWindow.scrollTop = chatWindow.scrollHeight;
 	});
 
 	function findChat(chatId: number) {
@@ -34,32 +44,36 @@
 		return chat;
 	}
 
-	function sendMessage() {
+	async function sendMessage() {
 		if (messageContent.trim() === '') return;
-		if (socket) {
-			socket.emit('sendMessage', {chatId: chatIdLocal, content: messageContent, friendUsername: friendUsername} );
+		if (socketInstance) {
+			socketInstance.emit('sendMessage', {chatId: chatIdLocal, content: messageContent, friendUsername: friendUsername} );
 		}
+		messageContent = '';	
 	}
+
 
 </script>
 
 <div id="box">
-	<div id="chat-window">
+	<div id="chat-window" bind:this={chatWindow}>
 		<h4>Chat with {title}</h4>
 		<ul>
-			{#if foundChat && $chats.find((c) => c.id === foundChat.id)}
-				{#each $chats.find((c) => c.id === foundChat.id)?.messages || [] as message, i (i)}
+			{#if $chats.find((c) => c.id === chatIdLocal)}
+				{#each $chats.find((c) => c.id === chatIdLocal)?.messages || [] as message, i (i)}
 					<li>
-						{"quelqu'un"}: {message.content}
+						{"Someone"}: {message.content}
 					</li>
 				{/each}
 			{/if}
 		</ul>
 	</div>
 	<div id="sendMessage-window">
-		<input type="text" bind:value={messageContent} />
-		<button on:click={sendMessage}>Send</button>
-	</div>
+		<form on:submit|preventDefault={sendMessage}>
+			<input type="text" bind:value={messageContent} />
+			<button type="submit">Send</button>
+		</form>
+	</div>	
 </div>
 
 <style lang="scss">

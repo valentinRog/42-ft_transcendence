@@ -17,6 +17,7 @@
 	import { addInstance, removeInstance, putOnTop } from '$lib/utils/appinstance';
 	import { onMount } from 'svelte';
 	import { connectSocket, getUser, getFriends, getAllUserChats } from '$lib/utils/connect';
+	import { add_flush_callback } from 'svelte/internal';
 
 	$: {
 		if ($openChatWindow) {
@@ -97,9 +98,21 @@
 			});
 		});
 
-		$socket!.on('message', (message) => {
-			console.log('New message:', message);
+		$socket!.on('addchat', (chat) => {
+    		chats.update(chatsValue => [...chatsValue, chat]);
 		});
+
+		$socket!.on('message', ({chatId, message}) => {
+  			let targetChatIndex = $chats.findIndex(chat => chat.id === chatId);
+  			if (targetChatIndex !== -1) {
+    			let chatscopy =  [...$chats];
+				chatscopy[targetChatIndex].messages.push(message);
+				$chats = chatscopy;
+  			} else {
+    			console.error(`Received message for unknown chat with id: ${chatId}`);
+  			}		
+		});
+
 	});
 </script>
 

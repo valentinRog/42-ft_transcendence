@@ -69,35 +69,49 @@ export abstract class SocketGateway
     let chat = await this.chatService.findChatById(payload.chatId);
     const username = this.webSocketService.getClientName(client);
     const user = await this.userService.getUser(username);
+
+    let otherChatUser = chat ? chat.chatUsers.find(
+      (chatUser) => (chatUser as any).user.username !== username,
+    ) : null;
+    let socket = this.webSocketService.getSocket(
+      otherChatUser ? (otherChatUser as any).user.username : payload.friendUsername,
+    );
+
+    const sendMessage = async () => {
+      const newMessage = await this.chatService.addMessageToDatabase(
+        chat.id,
+        payload.content,
+        user.id,
+      );
+      if (chat.isGroupChat) {
+        this.server.to(`chat-${payload.chatId}`).emit('message', {chatId: chat.id, message: newMessage});
+      } else {
+        client.emit('message', {chatId: chat.id, message: newMessage});
+        if (socket)
+          socket.emit('message', {chatId: chat.id, message: newMessage});
+      }
+    };
+
     if (!chat) {
-      chat = await this.chatService.createChat(
+      const newchat = await this.chatService.createChat(
         `${username}-${payload.friendUsername}`,
         [username, payload.friendUsername],
         false,
       );
-    }
-    if (chat.isGroupChat) {
-      const newMessage = this.chatService.addMessageToDatabase(
-        chat.id,
+      const newMessage = await this.chatService.addMessageToDatabase(
+        newchat.id,
         payload.content,
         user.id,
       );
-      //this.server.to(`chat-${payload.chatId}`).emit('message', newMessage);
-    } else {
-      const otherChatUser = chat.chatUsers.find(
-        (chatUser) => (chatUser as any).user.username !== username,
-      );
-      const socket = this.webSocketService.getSocket(
-        (otherChatUser as any).user.username,
-      );
-      const newMessage = this.chatService.addMessageToDatabase(
-        chat.id,
-        payload.content,
-        user.id,
-      );
-      //socket.emit('message', newMessage);
-    }
+      newchat.messages.push(newMessage);
+      client.emit('addchat', newchat);
+      client.emit('updateChat', newchat.id);
+      if (socket)
+        socket.emit('addchat', newchat);
+    } else
+      await sendMessage();
   }
+
 
   @SubscribeMessage('accept-friend')
   async handleAcceptFriend(
