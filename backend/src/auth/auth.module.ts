@@ -7,11 +7,10 @@ import { JwtStrategy } from './jwt/jwt.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { HttpModule } from '@nestjs/axios';
-import { WebSocketService } from '../websocket/websocket.service';
 
 @Module({
-  imports: [JwtModule.register({}), HttpModule], //UserModule],
+  imports: [JwtModule.register({}), HttpModule],
   controllers: [AuthController, TwoFactorController],
-  providers: [AuthService, FortyTwoStrategy, JwtStrategy, UserService, WebSocketService],
+  providers: [AuthService, FortyTwoStrategy, JwtStrategy, UserService],
 })
 export class AuthModule {}

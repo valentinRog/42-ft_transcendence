@@ -83,7 +83,18 @@ export class PongGateway extends SocketGateway {
       if (data.index === 0 || data.index === 1) {
         await this.gameEnd(game);
         this.games.delete(data.room);
-        this.server.to(data.room).emit('game-over', data.index ? 0 : 1);
+        const result = data.index === 0 ? 1 : 0;
+        this.server.to(data.room).emit('game-over', result);
+        // update stats
+        const winner = await this.userService.getUser(
+          this.webSocketService.getClientName(client),
+        );
+        const opponent =
+          data.index === 0 ? game.getPlayer2() : game.getPlayer1();
+        this.statService.updateStat(winner.id, {
+          result: result,
+          opponentName: this.webSocketService.getClientName(opponent),
+        });
       }
     } else {
       console.log('game not found');

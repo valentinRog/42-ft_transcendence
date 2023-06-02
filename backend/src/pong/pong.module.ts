@@ -3,14 +3,22 @@ import { PongGateway } from './pong.gateway';
 import { JwtModule } from '@nestjs/jwt';
 import { HttpModule } from '@nestjs/axios';
 import { AuthService } from '../auth/auth.service';
-import { UserModule } from '../user/user.module';
 import { UserService } from '../user/user.service';
-import { ChatModule } from '../chat/chat.module';
 import { ChatService } from '../chat/chat.service';
 import { WebSocketModule } from '../websocket/websocket.module';
+import { StatModule } from 'src/stat/stat.module';
+import { StatService } from 'src/stat/stat.service';
+import { PrismaClient } from '@prisma/client';
 
 @Module({
-  imports: [JwtModule.register({}), HttpModule, UserModule, WebSocketModule, ChatModule],
-  providers: [PongGateway, AuthService, UserService,  ChatService],
+  imports: [JwtModule.register({}), HttpModule, WebSocketModule, StatModule],
+  providers: [
+    PongGateway,
+    AuthService,
+    UserService,
+    ChatService,
+    PrismaClient,
+    StatService,
+  ],
 })
 export class PongModule {}

@@ -12,6 +12,7 @@ import { WebSocketService } from './websocket.service';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
 import { ChatService } from 'src/chat/chat.service';
+import { StatService } from 'src/stat/stat.service';
 import { Chat, ChatUser, Message, User } from '../chat/model/chat.model';
 
 @WebSocketGateway({
@@ -30,6 +31,7 @@ export abstract class SocketGateway
     protected readonly authService: AuthService,
     protected readonly userService: UserService,
     protected readonly chatService: ChatService,
+    protected readonly statService: StatService,
   ) {}
 
   async handleConnection(client: Socket) {
