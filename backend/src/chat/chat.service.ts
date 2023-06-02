@@ -91,7 +91,6 @@ export class ChatService {
         updatedAt: new Date()
       }
     });
-
     return newMessage;
   }
 }

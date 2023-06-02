@@ -90,6 +90,7 @@
 
 	function findChat(user1: string, user2: string) {
 		let foundChat;
+		console.log(user1, user2)
 		chats.subscribe(($chats) => {
 			$chats.forEach((chat) => {
 				const users = chat.chatUsers.map((chatUser) => chatUser.user.username);
@@ -106,6 +107,7 @@
 
 		if ($user) 
 			chat = findChat($user?.username, friend.username);
+		console.log(chat);
 		$chatId = chat?.id;
 		friendInfo.set({ id: friend.id, username: friend.username });
 		$openChatWindow = true;
