@@ -12,13 +12,14 @@
 	import type { Contact } from '$lib/stores/stores';
 	import { addInstance } from '$lib/utils/appinstance';
 	import { getFriends } from '$lib/utils/connect';
+	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
 	let groupChatMode = false;
 	let selectedFriends: string[] = [];
 
 	async function addFriend(event: Event) {
 		const form = (event.target as HTMLFormElement).friend.value;
-		const res = await fetch('http://localhost:3000/notification/add-friend', {
+		const res = await fetch(`${PUBLIC_BACKEND_URL}/notification/add-friend`, {
 			method: 'POST',
 			headers: {
 				Authorization: `Bearer ${$token}`,
@@ -31,7 +32,7 @@
 	}
 
 	async function removeFriend(friendUsername: string) {
-		const res = await fetch('http://localhost:3000/users/remove-friend', {
+		const res = await fetch(`${PUBLIC_BACKEND_URL}/users/remove-friend`, {
 			method: 'PATCH',
 			headers: {
 				Authorization: `Bearer ${$token}`,
@@ -45,7 +46,7 @@
 	}
 
 	async function askGame(friendUsername: string) {
-		const res = await fetch('http://localhost:3000/notification/ask-game', {
+		const res = await fetch(`${PUBLIC_BACKEND_URL}/notification/ask-game`, {
 			method: 'POST',
 			headers: {
 				Authorization: `Bearer ${$token}`,
@@ -71,13 +72,17 @@
 	}
 
 	async function createGroupChat() {
-		const res = await fetch('http://localhost:3000/chat/create-chat', {
+		const res = await fetch(`${PUBLIC_BACKEND_URL}/chat/create-chat`, {
 			method: 'POST',
 			headers: {
 				Authorization: `Bearer ${$token}`,
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({ groupName: 'GROUP', memberUsernames: selectedFriends, isGroupChat: true })
+			body: JSON.stringify({
+				groupName: 'GROUP',
+				memberUsernames: selectedFriends,
+				isGroupChat: true
+			})
 		});
 		if (res.ok) {
 			let data = await res.json();
@@ -90,7 +95,7 @@
 
 	function findChat(user1: string, user2: string) {
 		let foundChat;
-		console.log(user1, user2)
+		console.log(user1, user2);
 		chats.subscribe(($chats) => {
 			$chats.forEach((chat) => {
 				const users = chat.chatUsers.map((chatUser) => chatUser.user.username);
@@ -105,8 +110,7 @@
 	function startChat(friend: Contact) {
 		let chat: any;
 
-		if ($user) 
-			chat = findChat($user?.username, friend.username);
+		if ($user) chat = findChat($user?.username, friend.username);
 		console.log(chat);
 		$chatId = chat?.id;
 		friendInfo.set({ id: friend.id, username: friend.username });

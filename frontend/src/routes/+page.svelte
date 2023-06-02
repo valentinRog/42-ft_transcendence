@@ -92,27 +92,25 @@
 		});
 
 		chats.subscribe(($chats) => {
-			$chats.forEach(chat => {
-				if (chat.isGroupChat)
-					$socket!.emit('joinRoom', {chatId: chat.id});
+			$chats.forEach((chat) => {
+				if (chat.isGroupChat) $socket!.emit('joinRoom', { chatId: chat.id });
 			});
 		});
 
 		$socket!.on('addchat', (chat) => {
-    		chats.update(chatsValue => [...chatsValue, chat]);
+			chats.update((chatsValue) => [...chatsValue, chat]);
 		});
 
-		$socket!.on('message', ({chatId, message}) => {
-  			let targetChatIndex = $chats.findIndex(chat => chat.id === chatId);
-  			if (targetChatIndex !== -1) {
-    			let chatscopy =  [...$chats];
+		$socket!.on('message', ({ chatId, message }) => {
+			let targetChatIndex = $chats.findIndex((chat) => chat.id === chatId);
+			if (targetChatIndex !== -1) {
+				let chatscopy = [...$chats];
 				chatscopy[targetChatIndex].messages.push(message);
 				$chats = chatscopy;
-  			} else {
-    			console.error(`Received message for unknown chat with id: ${chatId}`);
-  			}		
+			} else {
+				console.error(`Received message for unknown chat with id: ${chatId}`);
+			}
 		});
-
 	});
 </script>
 

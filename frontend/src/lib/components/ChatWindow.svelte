@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { chatId, friendInfo, user, chats, socket } from '$lib/stores/stores';
-	import  { io } from 'socket.io-client';
+	import { io } from 'socket.io-client';
 	import type { Socket } from 'socket.io-client';
 
 	let chatIdLocal: number | null = $chatId;
@@ -22,16 +22,14 @@
 		});
 
 		if (socketInstance) {
-  			socketInstance.on('updateChat', (chatId: number) => {
-    			chatIdLocal = chatId;
-  			});
+			socketInstance.on('updateChat', (chatId: number) => {
+				chatIdLocal = chatId;
+			});
 		}
 
 		let foundChat: any | null = findChat(chatIdLocal!);
-		if (foundChat && foundChat.isGroupChat === true)
-			title = foundChat.name;
-		else
-			title = friendUsername!;
+		if (foundChat && foundChat.isGroupChat === true) title = foundChat.name;
+		else title = friendUsername!;
 
 		chatWindow.scrollTop = chatWindow.scrollHeight;
 	});
@@ -47,12 +45,14 @@
 	async function sendMessage() {
 		if (messageContent.trim() === '') return;
 		if (socketInstance) {
-			socketInstance.emit('sendMessage', {chatId: chatIdLocal, content: messageContent, friendUsername: friendUsername} );
+			socketInstance.emit('sendMessage', {
+				chatId: chatIdLocal,
+				content: messageContent,
+				friendUsername: friendUsername
+			});
 		}
-		messageContent = '';	
+		messageContent = '';
 	}
-
-
 </script>
 
 <div id="box">
@@ -62,7 +62,7 @@
 			{#if $chats.find((c) => c.id === chatIdLocal)}
 				{#each $chats.find((c) => c.id === chatIdLocal)?.messages || [] as message, i (i)}
 					<li>
-						{"Someone"}: {message.content}
+						{'Someone'}: {message.content}
 					</li>
 				{/each}
 			{/if}
@@ -73,7 +73,7 @@
 			<input type="text" bind:value={messageContent} />
 			<button type="submit">Send</button>
 		</form>
-	</div>	
+	</div>
 </div>
 
 <style lang="scss">

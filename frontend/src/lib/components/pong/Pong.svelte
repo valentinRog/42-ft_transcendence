@@ -3,47 +3,48 @@
 	import { socket, token } from '$lib/stores/stores';
 	import type { GameState, Input } from './pong';
 	import { update, dimensions } from './pong';
+	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
 	let ping = 0;
-		let serverDelta = 0;
-		const tickRate = 30;
-		const delay = 20;
-		let index = 0;
-		let inputs = new Array<Input>();
-		let up = false;
-		let down = false;
-		let room = '';
-		let pingTimer: number | null = null;
-		let gameTimer: number | null = null;
+	let serverDelta = 0;
+	const tickRate = 30;
+	const delay = 20;
+	let index = 0;
+	let inputs = new Array<Input>();
+	let up = false;
+	let down = false;
+	let room = '';
+	let pingTimer: number | null = null;
+	let gameTimer: number | null = null;
 
-		let state: GameState = {
-			ball: {
-				x: 0,
+	let state: GameState = {
+		ball: {
+			x: 0,
+			y: 0,
+			dx: 0,
+			dy: 0,
+			speed: 0
+		},
+		paddles: [
+			{
 				y: 0,
-				dx: 0,
-				dy: 0,
-				speed: 0
+				up: false,
+				down: false
 			},
-			paddles: [
-				{
-					y: 0,
-					up: false,
-					down: false
-				},
-				{
-					y: 0,
-					up: false,
-					down: false
-				}
-			],
-			time: 0,
-			id: 0,
-			inputed: false,
-			lastInputId: 0,
-			missed: false,
-			player1Score: 0,
-			player2Score: 0
-		};
+			{
+				y: 0,
+				up: false,
+				down: false
+			}
+		],
+		time: 0,
+		id: 0,
+		inputed: false,
+		lastInputId: 0,
+		missed: false,
+		player1Score: 0,
+		player2Score: 0
+	};
 
 	function draw(ctx: CanvasRenderingContext2D) {
 		const s = update(state, Date.now() - state.time);
@@ -85,7 +86,7 @@
 	}
 
 	async function joinMatchmakingQueue() {
-		await fetch('http://localhost:3000/matchmaking/queue', {
+		await fetch(`${PUBLIC_BACKEND_URL}/matchmaking/queue`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -197,7 +198,6 @@
 				down = false;
 			}
 		});
-
 	});
 
 	function stopLoop() {
@@ -214,7 +214,7 @@
 		if (room !== '') {
 			$socket!.emit('leave-room', { room: room, index: index });
 		} else {
-			fetch('http://localhost:3000/matchmaking/unqueue', {
+			fetch(`${PUBLIC_BACKEND_URL}/matchmaking/unqueue`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -228,7 +228,6 @@
 		$socket!.off('state');
 		$socket!.off('input');
 	});
-
 </script>
 
 <div>

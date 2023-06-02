@@ -1,6 +1,6 @@
 <script lang="ts">
+	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import { token, user } from '$lib/stores/stores';
-	import { construct_svelte_component } from 'svelte/internal';
 
 	interface Friend {
 		id: string;
@@ -16,7 +16,7 @@
 		let res;
 		let url;
 		if (username === null) {
-			res = await fetch('http://localhost:3000/users/me', {
+			res = await fetch(`${PUBLIC_BACKEND_URL}/users/me`, {
 				method: 'GET',
 				headers: {
 					Authorization: `Bearer ${$token}`
@@ -24,7 +24,7 @@
 			});
 			username = $user?.username;
 		} else
-			res = await fetch(`http://localhost:3000/users/info/${username}`, {
+			res = await fetch(`${PUBLIC_BACKEND_URL}/users/info/${username}`, {
 				method: 'GET',
 				headers: {
 					Authorization: `Bearer ${$token}`
@@ -36,7 +36,7 @@
 	}
 
 	async function getFriends() {
-		const res = await fetch('http://localhost:3000/users/me/friends', {
+		const res = await fetch(`${PUBLIC_BACKEND_URL}/users/me/friends`, {
 			method: 'GET',
 			headers: {
 				Authorization: `Bearer ${$token}`

@@ -4,6 +4,7 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
+	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
 	onMount(() => {
 		if ($page.url.searchParams.get('token')) {
@@ -52,7 +53,7 @@
 		{#if signup}
 			<form
 				on:submit|preventDefault={handleSubmit}
-				action="http://localhost:3000/auth/signup"
+				action="{PUBLIC_BACKEND_URL}/auth/signup"
 				method="post"
 				enctype="application/x-www-form-urlencoded"
 			>
@@ -67,7 +68,7 @@
 		{:else}
 			<form
 				on:submit|preventDefault={handleSubmit}
-				action="http://localhost:3000/auth/signin"
+				action="{PUBLIC_BACKEND_URL}/auth/signin"
 				method="post"
 				enctype="application/x-www-form-urlencoded"
 			>
@@ -89,7 +90,7 @@
 				errorMessage = null;
 			}}>{signup ? 'I have an account' : 'Create an account'}</button
 		>
-		<a href="http://localhost:3000/auth/42login">login with 42</a>
+		<a href="{PUBLIC_BACKEND_URL}/auth/42login">login with 42</a>
 	</div>
 </div>
 

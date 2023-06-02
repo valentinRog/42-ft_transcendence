@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm install
+RUN npm i
 RUN npx prisma generate
 
-CMD npx prisma migrate deploy && npm run start
+CMD npx prisma migrate deploy && npm run build && npm run start:prod

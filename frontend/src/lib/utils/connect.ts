@@ -2,9 +2,10 @@ import { token, socket, user, contacts, chats } from '$lib/stores/stores';
 import ioClient from 'socket.io-client';
 import { goto } from '$app/navigation';
 import { get } from 'svelte/store';
+import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
 export function getUser() {
-	fetch('http://localhost:3000/users/me', {
+	fetch(`${PUBLIC_BACKEND_URL}/users/me`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${get(token)}`
@@ -22,7 +23,7 @@ export function getUser() {
 }
 
 export async function getFriends() {
-	const res = await fetch('http://localhost:3000/users/me/friends', {
+	const res = await fetch(`${PUBLIC_BACKEND_URL}/users/me/friends`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${get(token)}`
@@ -34,7 +35,7 @@ export async function getFriends() {
 }
 
 export async function getAllUserChats() {
-	const response = await fetch('http://localhost:3000/chat/allUserChats', {
+	const response = await fetch(`${PUBLIC_BACKEND_URL}/chat/allUserChats`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${get(token)}`,
@@ -66,7 +67,7 @@ export function logout() {
 }
 
 export async function enable2fa() {
-	const res = await fetch('http://localhost:3000/2fa/enable', {
+	const res = await fetch(`${PUBLIC_BACKEND_URL}/2fa/enable`, {
 		method: 'POST',
 		headers: {
 			Authorization: `Bearer ${get(token)}`
