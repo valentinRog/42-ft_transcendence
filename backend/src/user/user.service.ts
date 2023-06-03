@@ -48,8 +48,12 @@ export class UserService {
       const user = await this.prisma.user.findUnique({
         where: { username: username },
       });
+      console.log(user.username);
+      console.log(user.friends);
       return user.friends.includes(friendId);
     } catch (error) {
+      console.log('error');
+      console.log(error);
       return false;
     }
   }

@@ -24,7 +24,7 @@ export class NotificationService {
       notif = await this.prisma.notification.findFirst({
         where: {
           sender: username,
-          message: message,
+          type: message,
         },
       });
 
@@ -36,7 +36,7 @@ export class NotificationService {
             },
           },
           sender: username,
-          message: message,
+          type: message,
         },
       });
       const prisma_friend = await this.prisma.user.findUnique({
@@ -46,9 +46,6 @@ export class NotificationService {
       await this.prisma.user.update({
         where: { username: friend },
         data: {
-          notif_count: {
-            increment: 1,
-          },
           notifications: { connect: { id: notif.id } },
         },
       });
@@ -65,5 +62,24 @@ export class NotificationService {
       }
       throw error;
     }
+  }
+
+  async removeNotification(username: string, friend: string, message: string) {
+    const prisma_friend = await this.prisma.user.findUnique({
+      where: { username: friend },
+    });
+    if (!prisma_friend) throw new ForbiddenException('User not found');
+    await this.prisma.user.update({
+      where: { username: friend },
+      data: {
+        notifications: { disconnect: { id: prisma_friend.id } },
+      },
+    });
+    await this.prisma.notification.deleteMany({
+      where: {
+        sender: username,
+        type: message,
+      },
+    });
   }
 }

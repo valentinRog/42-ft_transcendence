@@ -1,11 +1,12 @@
-import { Controller, Post, UseGuards, Body, Get } from '@nestjs/common';
+import { Controller, Post, UseGuards, Body, Get, Patch } from '@nestjs/common';
 import { JwtGuard } from 'src/auth/guard';
 import { GetUser } from 'src/auth/decorator';
 import { ForbiddenException } from '@nestjs/common';
 import { FriendDto } from 'src/user/dto';
 import { PrismaClient } from '@prisma/client';
 import { NotificationService } from './notification.service';
-import { NotificationDto } from './dto';
+import { NotificationDto, ResponseDto } from './dto';
+import { UserService } from 'src/user/user.service';
 
 @UseGuards(JwtGuard)
 @Controller('notification')
@@ -13,6 +14,7 @@ export class NotificationController {
   constructor(
     private prisma: PrismaClient,
     private notifService: NotificationService,
+    private userService: UserService,
   ) {}
 
   @Post('add-friend')
@@ -29,6 +31,25 @@ export class NotificationController {
       username,
       'friend',
     );
+  }
+
+  @Post('friend-response')
+  async responseFriend(
+    @GetUser('username') username,
+    @Body() dto: ResponseDto,
+  ) {
+    console.log('friend-response');
+    this.notifService.removeNotification(username, dto.friend, 'friend');
+
+    if (dto.response) {
+      if (username == dto.friend)
+        throw new ForbiddenException('You cannot add yourself as a friend');
+      const prisma_friend = await this.prisma.user.findUnique({
+        where: { username: dto.friend },
+      });
+      if (!prisma_friend) throw new ForbiddenException('User not found');
+      return await this.userService.addFriend(username, prisma_friend.id);
+    }
   }
 
   @Post('ask-game')
@@ -54,6 +75,6 @@ export class NotificationController {
     });
     if (!prisma_user) throw new ForbiddenException('User not found');
     const notif = prisma_user.notifications;
-    return notif.filter((notif) => notif.message == dto.notification);
+    return notif.filter((notif) => notif.type == dto.notification);
   }
 }

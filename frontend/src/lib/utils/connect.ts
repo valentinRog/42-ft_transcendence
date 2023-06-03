@@ -31,6 +31,7 @@ export async function getFriends() {
 	});
 	const data = await res.json();
 	contacts.set(data);
+	console.log(data);
 	return data;
 }
 
@@ -46,6 +47,19 @@ export async function getAllUserChats() {
 		const allUserChats = await response.json();
 		chats.set(allUserChats);
 	} else console.error(`Error fetching all messages: ${response.statusText}`);
+}
+
+export async function getFriendNotifications() {
+	const res = await fetch(`${PUBLIC_BACKEND_URL}/notification`, {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${get(token)}`
+		},
+		body: JSON.stringify({ notification: 'friend' })
+	});
+	const data = await res.json();
+	//contacts.set(data);
+	return data;
 }
 
 export function connectSocket() {

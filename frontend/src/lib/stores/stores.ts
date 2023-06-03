@@ -54,6 +54,9 @@ export interface Contact {
 	status: string;
 }
 
+// NOTIFICATIONS
+//export const notifications = writable<Notif[]>([]);
+
 // CHAT
 export const friendInfo = writable<User | null>(null);
 export const chats = writable<Chat[]>([]);
