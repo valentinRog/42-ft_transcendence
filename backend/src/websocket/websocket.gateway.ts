@@ -17,7 +17,7 @@ import { Chat, ChatUser, Message, User } from '../chat/model/chat.model';
 
 @WebSocketGateway({
   cors: {
-    origin: 'http://localhost:5173',
+    origin: process.env.FRONTEND_URL,
   },
 })
 export abstract class SocketGateway
