@@ -4,6 +4,15 @@
 	export let event: any;
 	export let level = 0;
 	let isOpen = false;
+
+	export let desktopHeight: number;
+
+	function yo(e: HTMLElement) {
+		let y = e.getBoundingClientRect().bottom;
+		if (y > desktopHeight) {
+			e.style.top = `${desktopHeight - y}px`;
+		}
+	}
 </script>
 
 <div class="dropdown" on:mouseleave={() => (isOpen = false)}>
@@ -18,9 +27,9 @@
 	{/if}
 
 	{#if isOpen}
-		<div class="dropdown-content">
+		<div class="dropdown-content" use:yo>
 			{#each children as child}
-				<svelte:self {...child} level={level + 1} />
+				<svelte:self {...child} level={level + 1} {desktopHeight}/>
 			{/each}
 		</div>
 	{/if}
@@ -59,7 +68,7 @@
 
 	.dropdown-content {
 		position: absolute;
-		bottom: 0;
+		top: 0;
 		left: 100%;
 		width: 100%;
 		@include tab-contour;

@@ -32,11 +32,13 @@
 			body
 		});
 		const json = await res.json();
-		if (res.status !== 200) {
+		console.log(json);
+		if (res.status !== 200 && res.status !== 201) {
 			errorMessage = json.message;
 		} else if (json.access_token) {
 			$token = json.access_token;
 			if (browser) sessionStorage.setItem('token', json.access_token);
+			console.log('yuo');
 			goto('/');
 		}
 	}

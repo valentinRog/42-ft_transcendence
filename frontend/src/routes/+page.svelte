@@ -162,7 +162,7 @@
 <!-- NAVBAR -->
 
 <nav class="navbar" style:z-index={$zstack.length}>
-	<Start />
+	<Start desktopHeight={height}/>
 	<div class="navbar-tabs">
 		{#each $appInstances as { componentType, visible, id, propsWin }, i (id)}
 			<Tab

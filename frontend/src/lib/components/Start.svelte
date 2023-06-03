@@ -2,6 +2,8 @@
 	import { logout, enable2fa } from '$lib/utils/connect';
 	import Dropdown from '$lib/components/Dropdown.svelte';
 
+	export let desktopHeight: number;
+
 	let active = false;
 
 	const tree = {
@@ -84,12 +86,12 @@
 	</a>
 </button>
 <div class="menu" class:hidden={!active}>
-	<Dropdown {...tree} />
-	<Dropdown {...tree} />
-	<Dropdown {...tree} />
-	<Dropdown {...tree} />
-	<Dropdown {...tree} />
-	<Dropdown {...tree} />
+	<Dropdown {...tree} {desktopHeight}/>
+	<Dropdown {...tree} {desktopHeight}/>
+	<Dropdown {...tree} {desktopHeight}/>
+	<Dropdown {...tree} {desktopHeight}/>
+	<Dropdown {...tree} {desktopHeight}/>
+	<Dropdown {...tree} {desktopHeight}/>
 </div>
 
 <style lang="scss">
