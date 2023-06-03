@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { chatId, friendInfo, user, chats, socket } from '$lib/stores/stores';
-	import { io } from 'socket.io-client';
 	import type { Socket } from 'socket.io-client';
 
 	let chatIdLocal: number | null = $chatId;
@@ -23,7 +22,9 @@
 
 		if (socketInstance) {
 			socketInstance.on('updateChat', (chatId: number) => {
-				chatIdLocal = chatId;
+				console.log("chatId = " + chatId);
+				if (chatIdLocal === null || chatIdLocal === undefined)
+					chatIdLocal = chatId;
 			});
 		}
 
@@ -53,6 +54,19 @@
 		}
 		messageContent = '';
 	}
+
+	function findUser(userId : number, chatId : number | null) {
+		let chat : any;
+
+		chats.subscribe(($chats) => {
+		chat = $chats.find((c) => c.id === chatId);
+		});
+		if (chat) {
+			let chatUser = chat.chatUsers.find((cu : any) => cu.userId === userId);
+			return chatUser ? chatUser.user.username : 'Unknown';
+		}
+		return 'Unknown';
+  	}
 </script>
 
 <div id="box">
@@ -62,7 +76,7 @@
 			{#if $chats.find((c) => c.id === chatIdLocal)}
 				{#each $chats.find((c) => c.id === chatIdLocal)?.messages || [] as message, i (i)}
 					<li>
-						{'Someone'}: {message.content}
+						{findUser(message.userId, chatIdLocal)}: {message.content}
 					</li>
 				{/each}
 			{/if}

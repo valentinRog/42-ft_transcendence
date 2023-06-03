@@ -106,8 +106,10 @@ export abstract class SocketGateway
       newchat.messages.push(newMessage);
       client.emit('addchat', newchat);
       client.emit('updateChat', newchat.id);
-      if (socket)
+      if (socket) {
         socket.emit('addchat', newchat);
+        socket.emit('updateChat', newchat.id);
+      }
     } else
       await sendMessage();
   }

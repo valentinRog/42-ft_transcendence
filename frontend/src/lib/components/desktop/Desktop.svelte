@@ -106,9 +106,8 @@
 				let chatscopy = [...$chats];
 				chatscopy[targetChatIndex].messages.push(message);
 				$chats = chatscopy;
-			} else {
+			} else
 				console.error(`Received message for unknown chat with id: ${chatId}`);
-			}
 		});
 	});
 </script>

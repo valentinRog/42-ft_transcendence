@@ -7,7 +7,7 @@
 		contacts,
 		chats,
 		user,
-		chatId
+		chatId,
 	} from '$lib/stores/stores';
 	import type { Contact } from '$lib/stores/stores';
 	import { addInstance } from '$lib/utils/appinstance';
@@ -72,6 +72,8 @@
 	}
 
 	async function createGroupChat() {
+		selectedFriends = [$user!.username, ...selectedFriends];
+		const groupName = selectedFriends.join(', ');
 		const res = await fetch(`${PUBLIC_BACKEND_URL}/chat/create-chat`, {
 			method: 'POST',
 			headers: {
@@ -79,7 +81,7 @@
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
-				groupName: 'GROUP',
+				groupName: groupName,
 				memberUsernames: selectedFriends,
 				isGroupChat: true
 			})
