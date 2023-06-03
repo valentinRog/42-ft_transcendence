@@ -1,13 +1,15 @@
 <script lang="ts">
+	import type { Tree } from './dropdown';
+
 	export let name = '';
-	export let children: any[] = [];
-	export let event: any;
+	export let children: Tree[] = [];
+	export let event: () => void = () => {};
 	export let level = 0;
 	let isOpen = false;
 
 	export let desktopHeight: number;
 
-	function yo(e: HTMLElement) {
+	function boundBot(e: HTMLElement) {
 		let y = e.getBoundingClientRect().bottom;
 		if (y > desktopHeight) {
 			e.style.top = `${desktopHeight - y}px`;
@@ -27,9 +29,9 @@
 	{/if}
 
 	{#if isOpen}
-		<div class="dropdown-content" use:yo>
+		<div class="dropdown-content" use:boundBot>
 			{#each children as child}
-				<svelte:self {...child} level={level + 1} {desktopHeight}/>
+				<svelte:self {...child} level={level + 1} {desktopHeight} />
 			{/each}
 		</div>
 	{/if}

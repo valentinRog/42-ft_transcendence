@@ -1,10 +1,10 @@
 import { writable } from 'svelte/store';
 import type { Socket } from 'socket.io-client';
-import Pong from '$lib/components/pong/Pong.svelte';
-import ChatWindow from '$lib/components/ChatWindow.svelte';
-import Contact from '$lib/components/Contact.svelte';
-import Profile from '$lib/components/Profile.svelte';
-import Conversation from '$lib/components/Conversation.svelte';
+import Pong from '$lib/components/desktop/app/pong/Pong.svelte';
+import ChatWindow from '$lib/components/desktop/app/ChatWindow.svelte';
+import Contact from '$lib/components/desktop/app/Contact.svelte';
+import Profile from '$lib/components/desktop/app/Profile.svelte';
+import Conversation from '$lib/components/desktop/app/Conversation.svelte';
 
 // TIME
 export const token = writable<string | null>(null);

@@ -1,22 +1,20 @@
 <script lang="ts">
 	import { logout, enable2fa } from '$lib/utils/connect';
-	import Dropdown from '$lib/components/Dropdown.svelte';
+	import Dropdown from '$lib/components/dropdown/Dropdown.svelte';
+	import type { Tree } from '../dropdown/dropdown';
 
 	export let desktopHeight: number;
 
 	let active = false;
 
-	const tree = {
+	const tree: Tree = {
 		name: 'des trucs',
-		event: () => {},
 		children: [
 			{
 				name: "d'autres trucs",
-				event: () => {},
 				children: [
 					{
 						name: 'encore des trucs',
-						event: () => {},
 						children: [
 							{
 								name: 'toujours plus de trucs',
@@ -24,28 +22,23 @@
 								children: [
 									{
 										name: "omg c'est tellement recursif",
-										event: () => {},
-										children: []
+										event: () => {}
 									},
 									{
 										name: "omg c'est tellement recursif",
-										event: () => {},
-										children: []
+										event: () => {}
 									},
 									{
 										name: "omg c'est tellement recursif",
-										event: () => {},
-										children: []
+										event: () => {}
 									},
 									{
 										name: "omg c'est tellement recursif",
-										event: () => {},
-										children: []
+										event: () => {}
 									},
 									{
 										name: "omg c'est tellement recursif",
-										event: () => {},
-										children: []
+										event: () => {}
 									}
 								]
 							}
@@ -53,20 +46,17 @@
 					},
 					{
 						name: 'plus de trucs ici',
-						event: () => {},
-						children: []
+						event: () => {}
 					}
 				]
 			},
 			{
 				name: 'logout',
-				event: logout,
-				children: []
+				event: logout
 			},
 			{
 				name: '2fa',
-				event: enable2fa,
-				children: []
+				event: enable2fa
 			}
 		]
 	};
@@ -86,12 +76,12 @@
 	</a>
 </button>
 <div class="menu" class:hidden={!active}>
-	<Dropdown {...tree} {desktopHeight}/>
-	<Dropdown {...tree} {desktopHeight}/>
-	<Dropdown {...tree} {desktopHeight}/>
-	<Dropdown {...tree} {desktopHeight}/>
-	<Dropdown {...tree} {desktopHeight}/>
-	<Dropdown {...tree} {desktopHeight}/>
+	<Dropdown {...tree} {desktopHeight} />
+	<Dropdown {...tree} {desktopHeight} />
+	<Dropdown {...tree} {desktopHeight} />
+	<Dropdown {...tree} {desktopHeight} />
+	<Dropdown {...tree} {desktopHeight} />
+	<Dropdown {...tree} {desktopHeight} />
 </div>
 
 <style lang="scss">
