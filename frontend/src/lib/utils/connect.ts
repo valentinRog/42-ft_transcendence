@@ -49,9 +49,7 @@ export async function getAllUserChats() {
 }
 
 export function connectSocket() {
-	let url = window.location.origin;
-	url = url.substring(0, url.lastIndexOf(':'));
-	const s = ioClient('localhost' + ':3000', {
+	const s = ioClient(PUBLIC_BACKEND_URL, {
 		query: {
 			token: get(token)
 		}
