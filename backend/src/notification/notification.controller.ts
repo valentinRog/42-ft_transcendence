@@ -5,6 +5,7 @@ import { ForbiddenException } from '@nestjs/common';
 import { FriendDto } from 'src/user/dto';
 import { PrismaClient } from '@prisma/client';
 import { NotificationService } from './notification.service';
+import { NotificationDto } from './dto';
 
 @UseGuards(JwtGuard)
 @Controller('notification')
@@ -26,35 +27,33 @@ export class NotificationController {
     return await this.notifService.notifyEvent(
       prisma_friend.username,
       username,
-      'add-friend',
+      'friend',
     );
   }
 
   @Post('ask-game')
   async match(@GetUser('username') username, @Body() dto: FriendDto) {
-    console.log('ask-game');
-
     if (username == dto.friend)
       throw new ForbiddenException('You cannot match yourself');
     const prisma_friend = await this.prisma.user.findUnique({
       where: { username: dto.friend },
     });
     if (!prisma_friend) throw new ForbiddenException('User not found');
-
     return await this.notifService.notifyEvent(
       prisma_friend.username,
       username,
-      'ask-game',
+      'game',
     );
   }
 
-  @Get('notifications')
-  async getNotifications(@GetUser('username') username) {
+  @Get('notification')
+  async getNotifFriend(@GetUser('id') id, @Body() dto: NotificationDto) {
     const prisma_user = await this.prisma.user.findUnique({
-      where: { username: username },
+      where: { id: id },
       include: { notifications: true },
     });
     if (!prisma_user) throw new ForbiddenException('User not found');
-    return prisma_user.notifications;
+    const notif = prisma_user.notifications;
+    return notif.filter((notif) => notif.message == dto.notification);
   }
 }

@@ -34,11 +34,11 @@ model User {
 model Notification {
   id        Int       @id @default(autoincrement())
   createdAt DateTime  @default(now())
-  message   String
+  type	    String
   user      User      @relation(fields: [userId], references: [id])
   sender    String    @default("system")
   userId   	Int
-  @@unique([userId, sender, message])
+  @@unique([userId, sender, type])
 }
 
 model Match {

@@ -16,55 +16,54 @@ export class NotificationService {
     let notif;
     if ((await this.userService.getUserStatus(friend)) != 'offline') {
       this.socketService.sendToUser(friend, username, message);
-    } else {
-      if (message === 'match') {
-        throw new ForbiddenException(`${friend} is offline`);
-      }
-      try {
-        notif = await this.prisma.notification.findFirst({
-          where: {
-            sender: username, // Replace with the actual sender value
-            message: message, // Replace with the actual message value
-          },
-        });
+    }
+    if (message === 'game') {
+      throw new ForbiddenException(`${friend} is offline`);
+    }
+    try {
+      notif = await this.prisma.notification.findFirst({
+        where: {
+          sender: username,
+          message: message,
+        },
+      });
 
-        notif = await this.prisma.notification.create({
-          data: {
-            user: {
-              connect: {
-                username: friend,
-              },
+      notif = await this.prisma.notification.create({
+        data: {
+          user: {
+            connect: {
+              username: friend,
             },
-            sender: username,
-            message: message,
           },
-        });
-        const prisma_friend = await this.prisma.user.findUnique({
-          where: { username: friend },
-        });
-        if (!prisma_friend) throw new ForbiddenException('User not found');
-        await this.prisma.user.update({
-          where: { username: friend },
-          data: {
-            notif_count: {
-              increment: 1,
-            },
-            notifications: { connect: { id: notif.id } },
+          sender: username,
+          message: message,
+        },
+      });
+      const prisma_friend = await this.prisma.user.findUnique({
+        where: { username: friend },
+      });
+      if (!prisma_friend) throw new ForbiddenException('User not found');
+      await this.prisma.user.update({
+        where: { username: friend },
+        data: {
+          notif_count: {
+            increment: 1,
           },
+          notifications: { connect: { id: notif.id } },
+        },
+      });
+      return notif;
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        this.prisma.notification.delete({
+          where: { id: notif.id },
         });
-        return notif;
-      } catch (error) {
-        if (
-          error instanceof Prisma.PrismaClientKnownRequestError &&
-          error.code === 'P2002'
-        ) {
-          this.prisma.notification.delete({
-            where: { id: notif.id },
-          });
-          return await this.notifyEvent(friend, username, message);
-        }
-        throw error;
+        return await this.notifyEvent(friend, username, message);
       }
+      throw error;
     }
   }
 }
