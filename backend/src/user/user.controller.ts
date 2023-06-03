@@ -20,7 +20,6 @@ import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PrismaClient } from '@prisma/client';
 
-
 @UseGuards(JwtGuard)
 @Controller('users')
 export class UserController {
@@ -78,5 +77,16 @@ export class UserController {
     if (!prisma_friend) throw new ForbiddenException('User not found');
 
     return await this.userService.removeFriend(username, prisma_friend.id);
+  }
+
+  @Post('add-friend')
+  async addFriend(@GetUser('username') username, @Body() dto: FriendDto) {
+    if (username == dto.friend)
+      throw new ForbiddenException('You cannot add yourself as a friend');
+    const prisma_friend = await this.prisma.user.findUnique({
+      where: { username: dto.friend },
+    });
+    if (!prisma_friend) throw new ForbiddenException('User not found');
+    return await this.userService.addFriend(username, prisma_friend.id);
   }
 }

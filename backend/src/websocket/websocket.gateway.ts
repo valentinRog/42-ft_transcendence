@@ -66,15 +66,19 @@ export abstract class SocketGateway
     client: Socket,
     payload: { chatId: number; content: string; friendUsername: string },
   ) {
-    let chat = await this.chatService.findChatById(payload.chatId);
+    const chat = await this.chatService.findChatById(payload.chatId);
     const username = this.webSocketService.getClientName(client);
     const user = await this.userService.getUser(username);
 
-    let otherChatUser = chat ? chat.chatUsers.find(
-      (chatUser) => (chatUser as any).user.username !== username,
-    ) : null;
-    let socket = this.webSocketService.getSocket(
-      otherChatUser ? (otherChatUser as any).user.username : payload.friendUsername,
+    const otherChatUser = chat
+      ? chat.chatUsers.find(
+          (chatUser) => (chatUser as any).user.username !== username,
+        )
+      : null;
+    const socket = this.webSocketService.getSocket(
+      otherChatUser
+        ? (otherChatUser as any).user.username
+        : payload.friendUsername,
     );
 
     const sendMessage = async () => {
@@ -84,11 +88,13 @@ export abstract class SocketGateway
         user.id,
       );
       if (chat.isGroupChat) {
-        this.server.to(`chat-${payload.chatId}`).emit('message', {chatId: chat.id, message: newMessage});
+        this.server
+          .to(`chat-${payload.chatId}`)
+          .emit('message', { chatId: chat.id, message: newMessage });
       } else {
-        client.emit('message', {chatId: chat.id, message: newMessage});
+        client.emit('message', { chatId: chat.id, message: newMessage });
         if (socket)
-          socket.emit('message', {chatId: chat.id, message: newMessage});
+          socket.emit('message', { chatId: chat.id, message: newMessage });
       }
     };
 
@@ -106,18 +112,16 @@ export abstract class SocketGateway
       newchat.messages.push(newMessage);
       client.emit('addchat', newchat);
       client.emit('updateChat', newchat.id);
-      if (socket)
-        socket.emit('addchat', newchat);
-    } else
-      await sendMessage();
+      if (socket) socket.emit('addchat', newchat);
+    } else await sendMessage();
   }
-
 
   @SubscribeMessage('accept-friend')
   async handleAcceptFriend(
     @MessageBody() data: { response: boolean; friend: string },
     @ConnectedSocket() client: Socket,
   ) {
+    console.log('accept-friend');
     const username = this.webSocketService.getClientName(client);
     const user = await this.userService.getUser(data.friend);
     if (!user) return { error: 'User not found' };

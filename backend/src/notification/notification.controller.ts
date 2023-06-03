@@ -17,13 +17,13 @@ export class NotificationController {
 
   @Post('add-friend')
   async addFriend(@GetUser('username') username, @Body() dto: FriendDto) {
+    console.log(username);
     if (username == dto.friend)
       throw new ForbiddenException('You cannot add yourself as a friend');
     const prisma_friend = await this.prisma.user.findUnique({
       where: { username: dto.friend },
     });
     if (!prisma_friend) throw new ForbiddenException('User not found');
-    console.log('add-friend');
     return await this.notifService.notifyEvent(
       prisma_friend.username,
       username,

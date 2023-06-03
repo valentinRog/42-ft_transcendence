@@ -80,12 +80,12 @@
 		connectSocket();
 		await getAllUserChats();
 
-		$socket!.on('add-friend', (data: { message: string }) => {
+		$socket!.on('friend', (data: { message: string }) => {
 			console.log('add-friend', data.message);
 			$socket!.emit('accept-friend', { response: true, friend: data.message });
 		});
 
-		$socket!.on('ask-game', (data: { message: string }) => {
+		$socket!.on('game', (data: { message: string }) => {
 			console.log('accept-game', data.message);
 			$socket!.emit('accept-game', { response: true, friend: data.message });
 		});
