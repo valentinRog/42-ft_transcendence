@@ -144,7 +144,7 @@ export class PongGame {
           s.paddles[0].y -
           dimensions.paddleHeight / 2;
         const dy = dyMax * (distToCenter / (dimensions.paddleHeight / 2));
-        ball.dx = Math.sqrt(1 - dy * dy);
+        ball.dx = 1;
         ball.dy = dy;
         ball.x = wallLeft + (wallLeft - ball.x);
       } else if (ball.x + dimensions.ballWidth < 0) {
@@ -170,7 +170,7 @@ export class PongGame {
           s.paddles[1].y -
           dimensions.paddleHeight / 2;
         const dy = dyMax * (distToCenter / (dimensions.paddleHeight / 2));
-        ball.dx = -Math.sqrt(1 - dy * dy);
+        ball.dx = -1;
         ball.dy = dy;
         ball.x =
           wallRight -

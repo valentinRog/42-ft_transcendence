@@ -13,7 +13,7 @@
 		readonly paddleSpeed: number;
 	}
 
-	export const dimensions: Dimensions = {
+	const dimensions: Dimensions = {
 		width: 750,
 		height: 450,
 		ballWidth: 15,
@@ -37,7 +37,7 @@
 		down: boolean;
 	};
 
-	export interface GameState {
+	interface GameState {
 		ball: Ball;
 		paddles: [Paddle, Paddle];
 		time: number;
@@ -49,7 +49,7 @@
 		player2Score: number;
 	}
 
-	export type Input = {
+	type Input = {
 		room: string;
 		clientId: string;
 		stateId: number;
@@ -59,7 +59,7 @@
 		down: boolean;
 	};
 
-	export function update(state: GameState, delta: number): GameState {
+	function update(state: GameState, delta: number): GameState {
 		const s = structuredClone(state) as GameState;
 		const ball = s.ball;
 
@@ -78,7 +78,7 @@
 				const distToCenter =
 					ball.y + dimensions.ballWidth / 2 - s.paddles[0].y - dimensions.paddleHeight / 2;
 				const dy = dyMax * (distToCenter / (dimensions.paddleHeight / 2));
-				ball.dx = Math.sqrt(1 - dy * dy);
+				ball.dx = 1;
 				ball.dy = dy;
 				ball.x = wallLeft + (wallLeft - ball.x);
 			} else if (ball.x + dimensions.ballWidth < 0) {
@@ -101,7 +101,7 @@
 				const distToCenter =
 					ball.y + dimensions.ballWidth / 2 - s.paddles[1].y - dimensions.paddleHeight / 2;
 				const dy = dyMax * (distToCenter / (dimensions.paddleHeight / 2));
-				ball.dx = -Math.sqrt(1 - dy * dy);
+				ball.dx = -1;
 				ball.dy = dy;
 				ball.x = wallRight - dimensions.ballWidth - (ball.x + dimensions.ballWidth - wallRight);
 			} else if (ball.x > dimensions.width) {
@@ -141,7 +141,6 @@
 				}
 			}
 		});
-
 		return s;
 	}
 
