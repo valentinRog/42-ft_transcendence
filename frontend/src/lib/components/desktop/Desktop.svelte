@@ -3,6 +3,7 @@
 	import Tab from '$lib/components/desktop/Tab.svelte';
 	import Start from '$lib/components/desktop/Start.svelte';
 	import {
+		openFriendRequest,
 		openChatWindow,
 		time,
 		appInstances,
@@ -18,12 +19,18 @@
 	import { onMount } from 'svelte';
 	import { connectSocket, getUser, getFriends, getAllUserChats } from '$lib/utils/connect';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	import FriendRequest from './app/FriendRequest.svelte';
 
 	$: {
 		if ($openChatWindow) {
 			addInstance('ChatWindow');
 			$selected = null;
 			openChatWindow.set(false);
+		}
+		if ($openFriendRequest) {
+			addInstance('FriendRequest');
+			$selected = null;
+			openFriendRequest.set(false);
 		}
 	}
 
@@ -57,6 +64,10 @@
 		Profile: {
 			TabProps: { name: 'Profile', icon: '/computer.png' },
 			DesktopProps: { name: 'Profile', icon: '/computer.png' }
+		},
+		FriendRequest : {
+			TabProps: { name: 'FriendRequest', icon: '/computer.png' },
+			DesktopProps: { name: 'FriendRequest', icon: '/computer.png' }
 		}
 	};
 
@@ -74,7 +85,6 @@
 	});
 
 	let soundOn: boolean = true;
-
 
 	onMount(async () => {
 		getUser();

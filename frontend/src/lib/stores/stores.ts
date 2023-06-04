@@ -5,11 +5,13 @@ import ChatWindow from '$lib/components/desktop/app/ChatWindow.svelte';
 import Contact from '$lib/components/desktop/app/Contact.svelte';
 import Profile from '$lib/components/desktop/app/Profile.svelte';
 import Conversation from '$lib/components/desktop/app/Conversation.svelte';
+import FriendRequest from '$lib/components/desktop/app/FriendRequest.svelte';
 
 // TIME
 export const token = writable<string | null>(null);
 export const socket = writable<Socket | null>(null);
 export const openChatWindow = writable(false);
+export const openFriendRequest = writable(false);
 
 import { readable } from 'svelte/store';
 import type { AppInstance } from '$lib/types/types';
@@ -36,6 +38,7 @@ export const selected = writable<number | null>(0);
 export const components = readable({
 	Pong: Pong,
 	ChatWindow: ChatWindow,
+	FriendRequest: FriendRequest,
 	Contact: Contact,
 	Profile: Profile,
 	Conversation: Conversation

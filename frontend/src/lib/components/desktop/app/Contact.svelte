@@ -7,7 +7,8 @@
 		contacts,
 		chats,
 		user,
-		chatId
+		chatId,
+		openFriendRequest
 	} from '$lib/stores/stores';
 	import type { Contact } from '$lib/stores/stores';
 	import { addInstance } from '$lib/utils/appinstance';
@@ -29,6 +30,10 @@
 		});
 		getFriends();
 		return await res.json();
+	}
+
+	async function openRequest() {
+		$openFriendRequest = true;
 	}
 
 	async function removeFriend(friendUsername: string) {
@@ -125,6 +130,7 @@
 		<input type="submit" value="+" />
 	</form>
 	<button on:click={toggleGroupChatMode}>{groupChatMode ? 'Cancel' : 'Create Group Chat'}</button>
+	<button on:click={() => openRequest()}>Friend requests</button>
 	{#if groupChatMode && selectedFriends.length > 0}
 		<button on:click={createGroupChat}>Confirm</button>
 	{/if}
