@@ -15,15 +15,15 @@ export class ChatController {
     return chats;
   }
 
-  @UseGuards(JwtGuard)
-  @Post('create-chat')
-  async createChat(
-    @Body('groupName') groupName: string,
-    @Body('memberUsernames') memberUsernames: string[],
-    @Body('isGroupChat') isGroupChat: boolean
-  ) {
-    const newGroupChat = await this.chatService.createChat(groupName, memberUsernames, isGroupChat);
-    return newGroupChat;
-  }
+  // @UseGuards(JwtGuard)
+  // @Post('create-chat')
+  // async createChat(
+  //   @Body('groupName') groupName: string,
+  //   @Body('memberUsernames') memberUsernames: string[],
+  //   @Body('isGroupChat') isGroupChat: boolean
+  // ) {
+  //   const newGroupChat = await this.chatService.createChat(groupName, memberUsernames, isGroupChat);
+  //   return newGroupChat;
+  // }
 
 }

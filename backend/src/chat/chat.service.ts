@@ -96,10 +96,11 @@ export class ChatService {
 
   async leaveGroup(userId: number, chatId: number): Promise<any> {
     return this.prisma.chatUser.deleteMany({
-      where: {
-        userId: userId,
-        chatId: chatId
-      }
+        where: {
+            userId: userId,
+            chatId: chatId
+        }
     });
   }
+
 }
