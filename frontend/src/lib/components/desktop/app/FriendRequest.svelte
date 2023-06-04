@@ -18,7 +18,6 @@
 			body: JSON.stringify({ friend: friendUsername, response: response })
 		});
 		const ret = await res.json();
-		console.log(ret);
 		getFriendRequest();
 	}
 
