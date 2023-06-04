@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { chatId, friendInfo, user, chats, socket } from '$lib/stores/stores';
+	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { chatId, friendInfo, user, chats, socket, token } from '$lib/stores/stores';
 	import type { Socket } from 'socket.io-client';
 
 	let chatIdLocal: number | null = $chatId;
@@ -67,11 +68,19 @@
 		}
 		return 'Unknown';
   	}
+
+	async function leaveGroup() {
+		if (socketInstance)
+			socketInstance.emit('leaveGroup', { chatId: chatIdLocal });
+	}
 </script>
 
 <div id="box">
 	<div id="chat-window" bind:this={chatWindow}>
 		<h4>Chat with {title}</h4>
+		{#if $chats.find((c) => c.id === chatIdLocal)?.isGroupChat}
+    		<button on:click={leaveGroup}>Leave Group</button>
+		{/if}
 		<ul>
 			{#if $chats.find((c) => c.id === chatIdLocal)}
 				{#each $chats.find((c) => c.id === chatIdLocal)?.messages || [] as message, i (i)}

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, Get } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { JwtGuard } from '../auth/guard';
 import { UseGuards } from '@nestjs/common';

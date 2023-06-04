@@ -1,12 +1,16 @@
 <script lang="ts">
-	import { chats, user, chatId, openChatWindow } from '$lib/stores/stores';
-	import { onMount } from 'svelte';
-
-	onMount(() => {
-		console.log($chats);
-	});
+	import { chats, user, chatId, openChatWindow, friendInfo } from '$lib/stores/stores';
 
 	function startChat(chatNumber: number) {
+		let chat: any;
+		chats.subscribe(($chats) => { chat = $chats.find((c) => c.id === chatNumber); });
+		if (chat) {
+			let otherChatUser = chat.chatUsers.find((cu: any) => cu.userId !== $user?.id);
+			if (otherChatUser)
+				$friendInfo = otherChatUser.user;
+			else
+				$friendInfo = null;
+		}
 		$chatId = chatNumber;
 		$openChatWindow = true;
     }

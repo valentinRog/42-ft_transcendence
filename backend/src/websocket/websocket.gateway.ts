@@ -104,7 +104,7 @@ export abstract class SocketGateway
         user.id,
       );
       newchat.messages.push(newMessage);
-      client.emit('addchat', newchat);
+      client.emit('addChat', newchat);
       client.emit('updateChat', newchat.id);
       if (socket) {
         socket.emit('addchat', newchat);
@@ -114,6 +114,18 @@ export abstract class SocketGateway
       await sendMessage();
   }
 
+  @SubscribeMessage('leaveGroup')
+  async handleLeaveGroup(client: Socket, chatId: number ) {
+    
+    const user = this.webSocketService.getClientName(client);
+    const userId = (await this.userService.getUser(user)).id;
+    const isSuccessful = await this.chatService.leaveGroup(chatId, userId);
+
+    if(isSuccessful) {
+      this.server.to(`chat-${chatId}`).emit('leaveChat', chatId);
+      client.leave(`chat-${chatId}`);
+    }
+  }
 
   @SubscribeMessage('accept-friend')
   async handleAcceptFriend(
