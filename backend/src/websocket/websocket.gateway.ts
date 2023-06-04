@@ -61,6 +61,32 @@ export abstract class SocketGateway
     client.join(`chat-${payload.chatId}`);
   }
 
+  @SubscribeMessage('createGroupChat')
+  async handleCreateChat(
+    client: Socket,
+    payload: {
+      groupName: string;
+      memberUsernames: string[];
+      isGroupChat: boolean;
+    },
+  ) {
+    const user = this.webSocketService.getClientName(client);
+    const newGroupChat = await this.chatService.createChat(
+      payload.groupName,
+      payload.memberUsernames,
+      payload.isGroupChat,
+    );
+
+    for (const member of newGroupChat.chatUsers) {
+      const memberSocket = this.webSocketService.getSocket(
+        (member as any).user.username,
+      );
+      if (memberSocket) memberSocket.join(`chat-${newGroupChat.id}`);
+    }
+    this.server.to(`chat-${newGroupChat.id}`).emit('addChat', newGroupChat);
+    client.emit('createChat', newGroupChat.id);
+  }
+
   @SubscribeMessage('sendMessage')
   async handleMessage(
     client: Socket,
@@ -110,10 +136,26 @@ export abstract class SocketGateway
         user.id,
       );
       newchat.messages.push(newMessage);
-      client.emit('addchat', newchat);
-      client.emit('updateChat', newchat.id);
-      if (socket) socket.emit('addchat', newchat);
+      if (socket) {
+        socket.emit('addchat', newchat);
+        socket.emit('updateChat', newchat.id);
+      }
     } else await sendMessage();
+  }
+
+  @SubscribeMessage('leaveGroup')
+  async handleLeaveGroup(
+    @MessageBody() data: { chatId: number },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const user = this.webSocketService.getClientName(client);
+    const userId = (await this.userService.getUser(user)).id;
+    const isSuccessful = await this.chatService.leaveGroup(data.chatId, userId);
+
+    if (isSuccessful) {
+      this.server.to(`chat-${data.chatId}`).emit('leaveChat', data.chatId);
+      client.leave(`chat-${data.chatId}`);
+    }
   }
 
   @SubscribeMessage('accept-friend')

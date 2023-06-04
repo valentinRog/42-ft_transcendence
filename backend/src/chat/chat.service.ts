@@ -93,4 +93,15 @@ export class ChatService {
     });
     return newMessage;
   }
+
+  async leaveGroup(chatId: number, userId: number): Promise<any> {
+    const result = await this.prisma.chatUser.deleteMany({
+      where: {
+        userId: userId,
+        chatId: chatId
+      }
+    });
+    return result;
+  }
+
 }

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, Get } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { JwtGuard } from '../auth/guard';
 import { UseGuards } from '@nestjs/common';
@@ -15,15 +15,15 @@ export class ChatController {
     return chats;
   }
 
-  @UseGuards(JwtGuard)
-  @Post('create-chat')
-  async createChat(
-    @Body('groupName') groupName: string,
-    @Body('memberUsernames') memberUsernames: string[],
-    @Body('isGroupChat') isGroupChat: boolean
-  ) {
-    const newGroupChat = await this.chatService.createChat(groupName, memberUsernames, isGroupChat);
-    return newGroupChat;
-  }
+  // @UseGuards(JwtGuard)
+  // @Post('create-chat')
+  // async createChat(
+  //   @Body('groupName') groupName: string,
+  //   @Body('memberUsernames') memberUsernames: string[],
+  //   @Body('isGroupChat') isGroupChat: boolean
+  // ) {
+  //   const newGroupChat = await this.chatService.createChat(groupName, memberUsernames, isGroupChat);
+  //   return newGroupChat;
+  // }
 
 }

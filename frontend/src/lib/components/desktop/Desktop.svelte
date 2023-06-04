@@ -107,9 +107,16 @@
 			});
 		});
 
-		$socket!.on('addchat', (chat) => {
+		$socket!.on('addChat', (chat) => {
 			chats.update((chatsValue) => [...chatsValue, chat]);
 		});
+
+		$socket!.on('leaveChat', (chatId) => {
+			console.log("je suis là");
+    		chats.update(chatsValue => chatsValue.filter(chat => chat.id !== chatId));
+			console.log($chats);
+		});
+
 
 		$socket!.on('message', ({ chatId, message }) => {
 			let targetChatIndex = $chats.findIndex((chat) => chat.id === chatId);
@@ -117,9 +124,8 @@
 				let chatscopy = [...$chats];
 				chatscopy[targetChatIndex].messages.push(message);
 				$chats = chatscopy;
-			} else {
+			} else
 				console.error(`Received message for unknown chat with id: ${chatId}`);
-			}
 		});
 	});
 </script>
