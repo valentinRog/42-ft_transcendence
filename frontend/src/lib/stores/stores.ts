@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 import type { Socket } from 'socket.io-client';
-import Pong from '$lib/components/desktop/app/pong/Pong.svelte';
+import Pong from '$lib/components/desktop/app/Pong.svelte';
 import ChatWindow from '$lib/components/desktop/app/ChatWindow.svelte';
 import Contact from '$lib/components/desktop/app/Contact.svelte';
 import Profile from '$lib/components/desktop/app/Profile.svelte';
