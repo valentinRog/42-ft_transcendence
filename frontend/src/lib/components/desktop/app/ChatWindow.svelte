@@ -23,7 +23,6 @@
 
 		if (socketInstance) {
 			socketInstance.on('updateChat', (chatId: number) => {
-				console.log("chatId = " + chatId);
 				if (chatIdLocal === null || chatIdLocal === undefined)
 					chatIdLocal = chatId;
 			});

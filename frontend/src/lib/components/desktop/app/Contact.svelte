@@ -8,14 +8,25 @@
 		chats,
 		user,
 		chatId,
+		socket,
 	} from '$lib/stores/stores';
 	import type { Contact } from '$lib/stores/stores';
 	import { addInstance } from '$lib/utils/appinstance';
 	import { getFriends } from '$lib/utils/connect';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	import type { Socket } from 'socket.io-client';
+	import { onMount } from 'svelte';
 
 	let groupChatMode = false;
 	let selectedFriends: string[] = [];
+	let socketInstance: Socket | null = null;
+
+
+	onMount(() => {
+		socket.subscribe(($socket) => {
+			socketInstance = $socket;
+		});
+	});
 
 	async function addFriend(event: Event) {
 		const form = (event.target as HTMLFormElement).friend.value;
@@ -74,30 +85,23 @@
 	async function createGroupChat() {
 		selectedFriends = [$user!.username, ...selectedFriends];
 		const groupName = selectedFriends.join(', ');
-		const res = await fetch(`${PUBLIC_BACKEND_URL}/chat/create-chat`, {
-			method: 'POST',
-			headers: {
-				Authorization: `Bearer ${$token}`,
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
+		let chatid: Number;
+		if (socketInstance) {
+			socketInstance.emit('createGroupChat', {
 				groupName: groupName,
 				memberUsernames: selectedFriends,
-				isGroupChat: true
-			})
-		});
-		if (res.ok) {
-			let data = await res.json();
-
-			$chatId = data.id;
-			toggleGroupChatMode();
-			$openChatWindow = true;
-		} else console.error('Error creating group chat');
+				isGroupChat: true,
+			});
+			socketInstance.on('createChat', (chatNumber: number) => {
+				$chatId = chatNumber;
+				$openChatWindow = true;
+			});
+		}
+		toggleGroupChatMode();
 	}
 
 	function findChat(user1: string, user2: string) {
 		let foundChat;
-		console.log(user1, user2);
 		chats.subscribe(($chats) => {
 			$chats.forEach((chat) => {
 				const users = chat.chatUsers.map((chatUser) => chatUser.user.username);
@@ -113,7 +117,6 @@
 		let chat: any;
 
 		if ($user) chat = findChat($user?.username, friend.username);
-		console.log(chat);
 		$chatId = chat?.id;
 		friendInfo.set({ id: friend.id, username: friend.username });
 		$openChatWindow = true;
