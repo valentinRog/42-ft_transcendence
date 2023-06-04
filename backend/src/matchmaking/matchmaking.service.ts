@@ -69,8 +69,7 @@ export class MatchmakingService {
       const players = [this.queue.dequeue_last(), this.queue.dequeue_last()];
       return await this.handleMatchFound(players);
     }
-    console.log('queue', player);
-    return { response: 'Player added to queue' };
+     return { response: 'Player added to queue' };
   }
 
   handlePlayerLeftQueue(player: PlayerDto) {

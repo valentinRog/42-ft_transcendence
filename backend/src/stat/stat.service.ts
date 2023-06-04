@@ -80,8 +80,7 @@ export class StatService {
       );
       return sortedMatches;
     } catch (error) {
-      console.error('Error retrieving matches:', error);
-      throw error;
+      throw new Error('Error retrieving matches');
     }
   }
 

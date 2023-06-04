@@ -13,7 +13,6 @@ export class NotificationService {
   ) {}
 
   async notifyEvent(friend: string, username: string, message: string) {
-    let notif;
     if ((await this.userService.getUserStatus(friend)) != 'offline') {
       this.socketService.sendToUser(friend, username, message);
     }
@@ -21,46 +20,43 @@ export class NotificationService {
       throw new ForbiddenException(`${friend} is offline`);
     }
     try {
-      notif = await this.prisma.notification.findFirst({
+      const firstNotif = await this.prisma.notification.findFirst({
         where: {
           sender: username,
           type: message,
         },
       });
+      if (firstNotif) {
+        await this.prisma.notification.delete({
+          where: { id: firstNotif.id },
+        });
+      }
 
-      notif = await this.prisma.notification.create({
+      const prisma_friend = await this.prisma.user.findUnique({
+        where: { username: friend },
+      });
+      const notif = await this.prisma.notification.create({
         data: {
           user: {
             connect: {
-              username: friend,
+              id: prisma_friend.id,
             },
           },
           sender: username,
           type: message,
         },
       });
-      const prisma_friend = await this.prisma.user.findUnique({
-        where: { username: friend },
-      });
-      if (!prisma_friend) throw new ForbiddenException('User not found');
+
       await this.prisma.user.update({
-        where: { username: friend },
+        where: { username: prisma_friend.username },
         data: {
           notifications: { connect: { id: notif.id } },
         },
       });
       return notif;
     } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2002'
-      ) {
-        this.prisma.notification.delete({
-          where: { id: notif.id },
-        });
-        return await this.notifyEvent(friend, username, message);
-      }
-      throw error;
+      console.log(error);
+      throw new ForbiddenException('User not found');
     }
   }
 
@@ -69,12 +65,12 @@ export class NotificationService {
       where: { username: friend },
     });
     if (!prisma_friend) throw new ForbiddenException('User not found');
-    await this.prisma.user.update({
-      where: { username: friend },
-      data: {
-        notifications: { disconnect: { id: prisma_friend.id } },
-      },
-    });
+    //await this.prisma.user.update({
+    //  where: { username: friend },
+    //  data: {
+    //    notifications: { disconnect: { id: prisma_friend.id } },
+    //  },
+    //});
     await this.prisma.notification.deleteMany({
       where: {
         sender: username,

@@ -35,7 +35,7 @@ export class UserService {
       delete user.hash;
       return user;
     } catch (error) {
-      throw error;
+      throw new NotFoundException(`User with id '${userId}' not found.`);
     }
   }
 
@@ -44,18 +44,10 @@ export class UserService {
   }
 
   async findFriend(username: string, friendId: number): Promise<boolean> {
-    try {
-      const user = await this.prisma.user.findUnique({
-        where: { username: username },
-      });
-      console.log(user.username);
-      console.log(user.friends);
-      return user.friends.includes(friendId);
-    } catch (error) {
-      console.log('error');
-      console.log(error);
-      return false;
-    }
+    const user = await this.prisma.user.findUnique({
+      where: { username: username },
+    });
+    return user.friends.includes(friendId);
   }
 
   async addFriend(userName: string, friendId: number) {
@@ -74,7 +66,7 @@ export class UserService {
       delete user.hash;
       return user;
     } catch (error) {
-      throw error;
+      throw new ForbiddenException('Fail to update in database');
     }
   }
 
@@ -86,7 +78,9 @@ export class UserService {
       });
       return user.status;
     } catch (error) {
-      throw error;
+      throw new NotFoundException(
+        `User with username '${username}' not found.`,
+      );
     }
   }
 

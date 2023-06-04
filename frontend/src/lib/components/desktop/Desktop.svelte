@@ -17,6 +17,7 @@
 	import { addInstance, removeInstance, putOnTop } from '$lib/utils/appinstance';
 	import { onMount } from 'svelte';
 	import { connectSocket, getUser, getFriends, getAllUserChats } from '$lib/utils/connect';
+	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
 	$: {
 		if ($openChatWindow) {
@@ -74,6 +75,7 @@
 
 	let soundOn: boolean = true;
 
+
 	onMount(async () => {
 		getUser();
 		getFriends();
@@ -82,7 +84,20 @@
 
 		$socket!.on('friend', (data: { message: string }) => {
 			console.log('add-friend', data.message);
-			$socket!.emit('accept-friend', { response: true, friend: data.message });
+			//$socket!.emit('accept-friend', { response: true, friend: data.message });
+
+			(async () => {
+			const res = await fetch(`${PUBLIC_BACKEND_URL}/notification/friend-response`, {
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${$token}`,
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ friend: data.message, response: true })
+			});
+			const response = await res.json();
+			console.log(response);
+			})();
 		});
 
 		$socket!.on('game', (data: { message: string }) => {

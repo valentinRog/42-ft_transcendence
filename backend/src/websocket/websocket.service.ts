@@ -41,7 +41,6 @@ export class WebSocketService {
   }
 
   createRoom(player1: string, player2: string) {
-    //const room = `${player1}-${player2}`;
     const room = uuidv4();
     console.log('createRoom', room);
 
