@@ -14,6 +14,12 @@
 	import { addInstance } from '$lib/utils/appinstance';
 	import { getFriends } from '$lib/utils/connect';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { onMount } from 'svelte';
+
+
+	onMount(() => {
+		getFriends();
+	});
 
 	let groupChatMode = false;
 	let selectedFriends: string[] = [];

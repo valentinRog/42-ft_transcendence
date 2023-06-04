@@ -62,19 +62,6 @@ export async function getAllUserChats() {
 	} else console.error(`Error fetching all messages: ${response.statusText}`);
 }
 
-export async function getFriendNotifications() {
-	const res = await fetch(`${PUBLIC_BACKEND_URL}/notification`, {
-		method: 'GET',
-		headers: {
-			Authorization: `Bearer ${get(token)}`
-		},
-		body: JSON.stringify({ notification: 'friend' })
-	});
-	const data = await res.json();
-	//contacts.set(data);
-	return data;
-}
-
 export function connectSocket() {
 	const s = ioClient(PUBLIC_BACKEND_URL, {
 		query: {

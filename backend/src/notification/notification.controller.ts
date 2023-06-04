@@ -38,7 +38,6 @@ export class NotificationController {
     @GetUser('username') username,
     @Body() dto: ResponseDto,
   ) {
-    console.log('friend-response');
     this.notifService.removeNotification(dto.friend, 'friend');
 
     if (dto.response) {
