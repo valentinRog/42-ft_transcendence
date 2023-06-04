@@ -1,5 +1,7 @@
 import adapter from '@sveltejs/adapter-static';
 import preprocess from 'svelte-preprocess';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -7,7 +9,7 @@ const config = {
 	// for more information about preprocessors
 	preprocess: preprocess({
 		scss: {
-			prependData: `@import './src/lib/style/header.scss';`
+			prependData: `@import '${dirname(fileURLToPath(import.meta.url))}/src/lib/style/header.scss';`
 		}
 	}),
 
