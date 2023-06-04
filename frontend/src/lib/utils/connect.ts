@@ -1,4 +1,4 @@
-import { token, socket, user, contacts, chats } from '$lib/stores/stores';
+import { token, socket, user, contacts, chats, friendRequest } from '$lib/stores/stores';
 import ioClient from 'socket.io-client';
 import { goto } from '$app/navigation';
 import { get } from 'svelte/store';
@@ -34,6 +34,19 @@ export async function getFriends() {
 	console.log(data);
 	return data;
 }
+
+export async function getFriendRequest() {
+	const res = await fetch(`${PUBLIC_BACKEND_URL}/notification/get?type=friend`, {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${get(token)}`
+		}
+	});
+	const data = await res.json();
+	friendRequest.set(data);
+	return data;
+}
+
 
 export async function getAllUserChats() {
 	const response = await fetch(`${PUBLIC_BACKEND_URL}/chat/allUserChats`, {

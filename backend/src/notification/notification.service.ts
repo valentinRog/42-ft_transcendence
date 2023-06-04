@@ -59,20 +59,10 @@ export class NotificationService {
     }
   }
 
-  async removeNotification(username: string, friend: string, message: string) {
-    const prisma_friend = await this.prisma.user.findUnique({
-      where: { username: friend },
-    });
-    if (!prisma_friend) throw new ForbiddenException('User not found');
-    //await this.prisma.user.update({
-    //  where: { username: friend },
-    //  data: {
-    //    notifications: { disconnect: { id: prisma_friend.id } },
-    //  },
-    //});
+  async removeNotification(friend: string, message: string) {
     await this.prisma.notification.deleteMany({
       where: {
-        sender: username,
+        sender: friend,
         type: message,
       },
     });

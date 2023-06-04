@@ -1,11 +1,11 @@
-import { Controller, Post, UseGuards, Body, Get } from '@nestjs/common';
+import { Controller, Post, UseGuards, Body, Get, Query } from '@nestjs/common';
 import { JwtGuard } from 'src/auth/guard';
 import { GetUser } from 'src/auth/decorator';
 import { ForbiddenException } from '@nestjs/common';
 import { FriendDto } from 'src/user/dto';
 import { PrismaClient } from '@prisma/client';
 import { NotificationService } from './notification.service';
-import { NotificationDto, ResponseDto } from './dto';
+import { ResponseDto } from './dto';
 import { UserService } from 'src/user/user.service';
 
 @UseGuards(JwtGuard)
@@ -39,7 +39,7 @@ export class NotificationController {
     @Body() dto: ResponseDto,
   ) {
     console.log('friend-response');
-    this.notifService.removeNotification(username, dto.friend, 'friend');
+    this.notifService.removeNotification(dto.friend, 'friend');
 
     if (dto.response) {
       if (username == dto.friend)
@@ -67,14 +67,14 @@ export class NotificationController {
     );
   }
 
-  @Get('notification')
-  async getNotifFriend(@GetUser('id') id, @Body() dto: NotificationDto) {
+  @Get('get')
+  async getNotifFriend(@GetUser('id') id, @Query('type') type: string) {
     const prisma_user = await this.prisma.user.findUnique({
       where: { id: id },
       include: { notifications: true },
     });
     if (!prisma_user) throw new ForbiddenException('User not found');
     const notif = prisma_user.notifications;
-    return notif.filter((notif) => notif.type == dto.notification);
+    return notif.filter((notif) => notif.type == type);
   }
 }

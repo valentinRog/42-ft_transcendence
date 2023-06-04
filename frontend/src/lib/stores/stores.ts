@@ -58,12 +58,20 @@ export interface Contact {
 }
 
 // NOTIFICATIONS
-//export const notifications = writable<Notif[]>([]);
+export const friendRequest = writable<FriendRequest[]>([]);
 
 // CHAT
 export const friendInfo = writable<User | null>(null);
 export const chats = writable<Chat[]>([]);
 export const chatId = writable<number | null>(null);
+
+export type FriendRequest = {
+	id: number;
+	createdAt: string;
+	sender: string;
+	user: User;
+	userId: number;
+};
 
 export type Chat = {
 	chatUsers: ChatUser[];

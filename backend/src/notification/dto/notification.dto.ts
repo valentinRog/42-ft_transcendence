@@ -1,11 +1,4 @@
-import { IsNotEmpty, IsString, IsIn, IsBoolean } from 'class-validator';
-
-export class NotificationDto {
-  @IsString()
-  @IsNotEmpty()
-  @IsIn(['chat', 'game', 'friend'])
-  notification: string;
-}
+import { IsNotEmpty, IsString, IsBoolean } from 'class-validator';
 
 export class ResponseDto {
   @IsString()

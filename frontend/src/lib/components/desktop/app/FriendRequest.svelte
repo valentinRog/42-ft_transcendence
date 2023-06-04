@@ -1,43 +1,36 @@
 <script lang="ts">
-	import { token, friendInfo, selected, contacts, user } from '$lib/stores/stores';
-	import { addInstance } from '$lib/utils/appinstance';
+	import { token, friendRequest } from '$lib/stores/stores';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { getFriendRequest } from '$lib/utils/connect';
+	import { onMount } from 'svelte';
 
-	async function acceptFriendRequest(friendUsername: string) {
-	  const res = await fetch(`${PUBLIC_BACKEND_URL}/notification/accept-friend-request`, {
-		method: 'POST',
-		headers: {
-		  Authorization: `Bearer ${$token}`,
-		  'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({ friend: friendUsername })
-	  });
-	  const data = await res.json();
-	  return data;
-	}
+	onMount(() => {
+		getFriendRequest();
+	});
 
-	async function refuseFriendRequest(friendUsername: string) {
-	  const res = await fetch(`${PUBLIC_BACKEND_URL}/notification/refuse-friend-request`, {
-		method: 'POST',
-		headers: {
-		  Authorization: `Bearer ${$token}`,
-		  'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({ friend: friendUsername })
-	  });
-	  const data = await res.json();
-	  return data;
+	async function answerFriendRequest(friendUsername: string, response: boolean) {
+		const res = await fetch(`${PUBLIC_BACKEND_URL}/notification/friend-response`, {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${$token}`,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ friend: friendUsername, response: response })
+		});
+		const ret = await res.json();
+		console.log(ret);
+		getFriendRequest();
 	}
 
   </script>
 
   <div id="box">
 	<div id="friend-list">
-	  {#each $contacts as request (request.id)}
+	  {#each $friendRequest as request (request.id)}
 		  <div class="friend">
-			<p>{request.username}</p>
-			<button on:click={() => acceptFriendRequest(request.username)}>Accept</button>
-			<button on:click={() => refuseFriendRequest(request.username)}>Refuse</button>
+			<p>{request.sender}</p>
+			<button on:click={() => answerFriendRequest(request.sender, true)}>Accept</button>
+			<button on:click={() => answerFriendRequest(request.sender, false)}>Refuse</button>
 		  </div>
 	  {/each}
 	</div>
