@@ -43,9 +43,9 @@
 	}
 
 	const apps: Record<App, AppProps> = {
-		Pong: {
-			TabProps: { name: 'Pong', icon: '/pong.png' },
-			DesktopProps: { name: 'Pong', icon: '/big-pong.png' }
+		Profile: {
+			TabProps: { name: 'Profile', icon: '/computer.png' },
+			DesktopProps: { name: 'Profile', icon: '/computer.png' }
 		},
 		Conversation: {
 			TabProps: { name: 'Conversation', icon: '/mail3.png' },
@@ -59,9 +59,9 @@
 			TabProps: { name: 'Contact', icon: '/phone.png' },
 			DesktopProps: { name: 'Contact', icon: '/phone.png' }
 		},
-		Profile: {
-			TabProps: { name: 'Profile', icon: '/computer.png' },
-			DesktopProps: { name: 'Profile', icon: '/computer.png' }
+		Pong: {
+			TabProps: { name: 'Pong', icon: '/pong.png' },
+			DesktopProps: { name: 'Pong', icon: '/big-pong.png' }
 		},
 		FriendRequest : {
 			TabProps: { name: 'FriendRequest', icon: '/computer.png' },
@@ -140,8 +140,10 @@
 						$selected = null;
 					}}
 				>
-					<img src={v.DesktopProps.icon} alt={v.DesktopProps.name} draggable="false" />
-					<span>{v.DesktopProps.name}</span>
+					  <img src={v.DesktopProps.icon} alt={v.DesktopProps.name} draggable="false" />
+					<div class="icon-text">
+					  <span>{v.DesktopProps.name}</span>
+					</div>
 				</div>
 			{/if}
 		{/each}
@@ -212,24 +214,33 @@
 </nav>
 
 <style lang="scss">
-	.icons {
-		display: flex;
-		align-items: left;
+		.icons {
+			// put the icons to the left of the screen
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 7rem;
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+		}
 
 		.icon {
 			margin: 1rem;
 			display: flex;
 			flex-direction: column;
 			align-items: center;
-			gap: 0.3rem;
-			img {
-				width: 4rem;
-			}
-			span {
-				color: white;
-			}
 		}
-	}
+
+		img {
+			width: 2.6rem;
+		}
+
+		.icon-text {
+			color: white;
+			margin-top: 0.19rem; /* Add margin to the top of the text */
+			font-size: 0.9rem; /* Adjust the font size as desired */
+		}
 
 	div.desktop {
 		height: calc(100vh - $navbar-height);

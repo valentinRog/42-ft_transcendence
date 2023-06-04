@@ -54,7 +54,6 @@ export class NotificationService {
       });
       return notif;
     } catch (error) {
-      console.log(error);
       throw new ForbiddenException('User not found');
     }
   }

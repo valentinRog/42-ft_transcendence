@@ -19,7 +19,6 @@ export class NotificationController {
 
   @Post('add-friend')
   async addFriend(@GetUser('username') username, @Body() dto: FriendDto) {
-    console.log(username);
     if (username == dto.friend)
       throw new ForbiddenException('You cannot add yourself as a friend');
     const prisma_friend = await this.prisma.user.findUnique({

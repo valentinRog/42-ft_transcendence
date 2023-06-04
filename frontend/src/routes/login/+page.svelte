@@ -38,7 +38,6 @@
 		} else if (json.access_token) {
 			$token = json.access_token;
 			if (browser) sessionStorage.setItem('token', json.access_token);
-			console.log('yuo');
 			goto('/');
 		}
 	}
