@@ -13,7 +13,6 @@ export function getUser() {
 	})
 		.then((res) => res.json())
 		.then((data) => {
-			console.log(data);
 			user.set({
 				id: data.id,
 				username: data.username,
@@ -31,7 +30,6 @@ export async function getFriends() {
 	});
 	const data = await res.json();
 	contacts.set(data);
-	console.log(data);
 	return data;
 }
 
