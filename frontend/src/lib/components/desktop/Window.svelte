@@ -46,7 +46,9 @@
 	bind:offsetHeight={height}
 	on:mousedown
 >
-	<div
+	<div class="border-inside">
+
+		<div class="window"
 		on:mousedown={() => {
 			moving = true;
 		}}
@@ -58,15 +60,24 @@
 			<p>My {name}</p>
 		{:else if name === 'Chat' && props.name && props.typeChat}
 			<p>{props.typeChat}: {props.name}</p>
-		{:else}
+			{:else}
 			<p>{name}</p>
-		{/if}
+			{/if}
 		<div class="buttons">
-			<button on:click={() => dispatch('minimize')}>_</button>
-			<button on:click={() => dispatch('close')}>X</button>
+			<button on:click={() => dispatch('minimize')}>
+				<div class="border-inside">
+					_
+				</div>
+			</button>
+			<button on:click={() => dispatch('close')}>
+				<div class="border-inside">
+					X
+				</div>
+			</button>
 		</div>
 	</div>
 	<slot />
+</div>
 </section>
 
 <svelte:window on:mouseup={() => (moving = false)} on:mousemove={onMouseMove} />
@@ -80,7 +91,8 @@
 		user-select: none;
 		@include tab-contour;
 		background-color: $grey;
-		& > div {
+
+		.window {
 			display: flex;
 			height: 1.5rem;
 			margin: 0.2rem 0.2rem;
@@ -112,8 +124,10 @@
 		button {
 			@include tab-contour;
 			@include tab-contour-active;
-			padding: 0 0.25rem;
 			background-color: $grey;
+			.border-inside {
+				padding: 0.08rem 0.25rem;
+			}
 		}
 	}
 </style>

@@ -62,7 +62,7 @@
 	};
 </script>
 
-<button
+<div
 	class="navbar-start"
 	on:click={(event) => {
 		event.stopPropagation();
@@ -70,11 +70,11 @@
 	}}
 	class:active
 >
-	<a class="start">
+	<div class="border-inside">
 		<img src="/start.png" alt="start" draggable="false" />
-		Start
-	</a>
-</button>
+		<p class="start"> Start </p>
+	</div>
+</div>
 <div class="menu" class:hidden={!active}>
 	<Dropdown {...tree} {desktopHeight} />
 	<Dropdown {...tree} {desktopHeight} />
@@ -85,12 +85,15 @@
 </div>
 
 <style lang="scss">
-	button.navbar-start {
-		margin: 0 0.25rem;
+	.navbar-start {
 		@include tab;
+		margin: 0 0.25rem;
+		flex-basis: 7rem;
+		padding: 0;
+		width: 7rem;
 		.start {
-			width: 7rem;
 			font-weight: 800;
+			font-size: larger;
 		}
 	}
 	div.menu {

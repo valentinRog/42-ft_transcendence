@@ -56,26 +56,15 @@
 
 @mixin tab-contour {
 	@include tab-border(black, white); //border around the navbar element in outside mode
-	&::before {
-		//. & marche pas pour le contact ?
-		// line that's light grey nex to the white border when in outside mode
-		@include tab-top-line($light-grey);
-	}
-	&::after {
-		// line that's dark grey next to the black border when in outside mode
-		@include tab-bottom-line($dark-grey);
+	.border-inside {
+		@include tab-border($dark-grey, $light-grey); //border around the navbar element in outside mode
 	}
 }
 
 @mixin tab-contour-hollow {
 	@include tab-border(white, black); //border around the navbar element in outside mode
-	&::before {
-		// line that's light grey nex to the white border when in outside mode
-		@include tab-top-line($dark-grey);
-	}
-	&::after {
-		// line that's dark grey next to the black border when in outside mode
-		@include tab-bottom-line($light-grey);
+	.border-inside {
+		@include tab-border($light-grey, $dark-grey); //border around the navbar element in outside mode
 	}
 }
 
@@ -83,35 +72,45 @@
 	&:active,
 	&.active {
 		@include tab-border(white, black);
-	}
-	&:active::before,
-	&.active::before {
-		@include tab-top-line($dark-grey);
-	}
-	&:active::after,
-	&.active::after {
-		@include tab-bottom-line($light-grey);
+		.border-inside {
+			@include tab-border($light-grey, $dark-grey); //border around the navbar element in outside mode
+		}
 	}
 }
 
 @mixin tab {
 	background-color: $grey;
-	display: inline-block;
 	height: $tab-height;
-	padding: 0.2rem 0.8rem;
 	margin-right: 0.25rem;
-	align-items: center;
+	display: flex;
+	flex-basis: 15rem;
+	flex-shrink: 1;
+	flex-wrap: nowrap;
+	overflow: hidden;
+	
+	@include tab-contour();
+	@include tab-contour-active();
+	.border-inside {
+		padding: 0.2rem 0.8rem;
+		flex: 1;
+		margin-left: 0;
+		display: flex;
+		align-items: center;
+		white-space: nowrap;
+		overflow: hidden;
+		a {
+			color: inherit;
+			text-decoration: none;
+			font-size: 1.2rem;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+		img {
+			@include tab-logo;
+		}
+	}
 
-	@include tab-contour;
-	@include tab-contour-active;
-	a {
-		color: inherit;
-		text-decoration: none;
-		font-size: 1.2rem;
-	}
-	img {
-		@include tab-logo;
-	}
 }
 
 // ------------------------------------------------
@@ -135,7 +134,6 @@
 		display: flex;
 		flex-wrap: nowrap;
 		align-items: center;
-		// overflow-x: auto;
 
 		@include nav-border;
 		&::after {
@@ -145,10 +143,9 @@
 			flex-basis: calc(100% - 13.25rem); // 7 +  5.5 + 0.25 * 4 (1)
 			flex-shrink: 1;
 			margin-left: 0.3rem;
-			display: flex;
-			justify-content: flex-start;
 			flex-wrap: nowrap;
 			overflow: hidden;
+			display: flex;
 		}
 		.navbar-clock {
 			margin: 0 0.25rem;
