@@ -1,20 +1,28 @@
 <script lang="ts">
-	import { chats, user, chatId, openChatWindow, friendInfo } from '$lib/stores/stores';
+	import { user } from '$lib/stores/stores';
+	import {
+		chats,
+		openChatWindow,
+		chatId,
+		friendInfo
+	} from '$lib/components/desktop/app/Chat.svelte';
 
 	function startChat(chatNumber: number) {
 		$chatId = chatNumber;
 		$openChatWindow = true;
-    }
+	}
 
-	function getLastMessageSender(chat : any) {
+	function getLastMessageSender(chat: any) {
 		if (chat.messages.length > 0) {
-			return chat.chatUsers.find((chatUser : any) => 
-				chatUser.userId === chat.messages[chat.messages.length - 1].userId)?.user?.username;
+			return chat.chatUsers.find(
+				(chatUser: any) => chatUser.userId === chat.messages[chat.messages.length - 1].userId
+			)?.user?.username;
 		} else {
-			return "No messages yet";
+			return 'No messages yet';
 		}
 	}
 </script>
+
 <div id="box">
 	<div id="chat-window">
 		{#each $chats.sort((chatA, chatB) => {
@@ -23,8 +31,12 @@
 			return dateB.getTime() - dateA.getTime(); // This will sort in descending order
 		}) as chat (chat.id)}
 			<div class="chat" on:click={() => startChat(chat.id)}>
-				<h4>{chat.isGroupChat ? "Group: " + chat.name : 
-					"Chat: " + chat.chatUsers.find(chatUser => chatUser.userId !== $user?.id)?.user?.username}</h4>
+				<h4>
+					{chat.isGroupChat
+						? 'Group: ' + chat.name
+						: 'Chat: ' +
+						  chat.chatUsers.find((chatUser) => chatUser.userId !== $user?.id)?.user?.username}
+				</h4>
 				{#if chat.messages.length > 0}
 					<p>{getLastMessageSender(chat)}: {chat.messages[chat.messages.length - 1].content}</p>
 				{:else}
@@ -34,7 +46,6 @@
 		{/each}
 	</div>
 </div>
-
 
 <style lang="scss">
 	@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
@@ -76,5 +87,4 @@
 	p {
 		color: #000;
 	}
-
 </style>

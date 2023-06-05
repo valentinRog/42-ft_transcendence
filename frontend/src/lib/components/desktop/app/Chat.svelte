@@ -1,6 +1,48 @@
+<script lang="ts" context="module">
+	import { writable } from 'svelte/store';
+
+	export type Chat = {
+		chatUsers: ChatUser[];
+		messages: Message[];
+		createdAt: string;
+		id: number;
+		isGroupChat: boolean;
+		name: string;
+		updatedAt: string;
+	};
+
+	type ChatUser = {
+		chatId: number;
+		createdAt: string;
+		id: number;
+		lastReadMessageId: number | null;
+		user: User;
+		userId: number;
+	};
+
+	interface Message {
+		chatId: number;
+		content: string;
+		createdAt: string;
+		id: number;
+		updatedAt: string;
+		userId: number;
+	}
+
+	interface User {
+		id: number;
+		username: string | null;
+	}
+
+	export const friendInfo = writable<User | null>(null);
+	export const chats = writable<Chat[]>([]);
+	export const chatId = writable<number | null>(null);
+	export const openChatWindow = writable(false);
+</script>
+
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { chatId, friendInfo, user, chats, socket, token } from '$lib/stores/stores';
+	import { user, socket } from '$lib/stores/stores';
 	import type { Socket } from 'socket.io-client';
 
 	let chatIdLocal: number | null = $chatId;
@@ -22,20 +64,16 @@
 
 		if (socketInstance) {
 			socketInstance.on('updateChat', (chatId: number) => {
-				if (chatIdLocal === null || chatIdLocal === undefined)
-					chatIdLocal = chatId;
+				if (chatIdLocal === null || chatIdLocal === undefined) chatIdLocal = chatId;
 			});
 		}
 
 		let foundChat: any | null = findChat(chatIdLocal!);
 
-		if (!foundChat)
-			title = "Chat: " + $user!.username + "-" +friendUsername!;
+		if (!foundChat) title = 'Chat: ' + $user!.username + '-' + friendUsername!;
 		else {
-			if (foundChat.isGroupChat)
-				title = "Group: " + foundChat.name;
-			else
-				title = "Chat: " + foundChat.name;
+			if (foundChat.isGroupChat) title = 'Group: ' + foundChat.name;
+			else title = 'Chat: ' + foundChat.name;
 		}
 		chatWindow.scrollTop = chatWindow.scrollHeight;
 	});
@@ -60,22 +98,21 @@
 		messageContent = '';
 	}
 
-	function findUser(userId : number, chatId : number | null) {
-		let chat : any;
+	function findUser(userId: number, chatId: number | null) {
+		let chat: any;
 
 		chats.subscribe(($chats) => {
-		chat = $chats.find((c) => c.id === chatId);
+			chat = $chats.find((c) => c.id === chatId);
 		});
 		if (chat) {
-			let chatUser = chat.chatUsers.find((cu : any) => cu.userId === userId);
+			let chatUser = chat.chatUsers.find((cu: any) => cu.userId === userId);
 			return chatUser ? chatUser.user.username : 'Unknown';
 		}
 		return 'Unknown';
-  	}
+	}
 
 	async function leaveGroup() {
-		if (socketInstance)
-			socketInstance.emit('leaveGroup', { chatId: chatIdLocal });
+		if (socketInstance) socketInstance.emit('leaveGroup', { chatId: chatIdLocal });
 	}
 </script>
 
@@ -83,7 +120,7 @@
 	<div id="chat-window" bind:this={chatWindow}>
 		<h4>{title}</h4>
 		{#if $chats.find((c) => c.id === chatIdLocal)?.isGroupChat}
-    		<button on:click={leaveGroup}>Leave Group</button>
+			<button on:click={leaveGroup}>Leave Group</button>
 		{/if}
 		<ul>
 			{#if $chats.find((c) => c.id === chatIdLocal)}
