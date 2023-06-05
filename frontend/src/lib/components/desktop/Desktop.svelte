@@ -107,9 +107,15 @@
 			});
 		});
 
-		$socket!.on('addchat', (chat) => {
+		$socket!.on('addChat', (chat) => {
 			chats.update((chatsValue) => [...chatsValue, chat]);
+			console.log($chats);
 		});
+
+		$socket!.on('leaveChat', (chatId) => {
+    		chats.update(chatsValue => chatsValue.filter(chat => chat.id !== chatId));
+		});
+
 
 		$socket!.on('message', ({ chatId, message }) => {
 			let targetChatIndex = $chats.findIndex((chat) => chat.id === chatId);

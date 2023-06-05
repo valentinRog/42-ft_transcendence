@@ -16,6 +16,7 @@
 	import { getFriends } from '$lib/utils/connect';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import { onMount } from 'svelte';
+	import type { Socket } from 'socket.io-client';
 
 
 	onMount(() => {

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import { chatId, friendInfo, user, chats, socket, token } from '$lib/stores/stores';
 	import type { Socket } from 'socket.io-client';
 
@@ -29,9 +28,15 @@
 		}
 
 		let foundChat: any | null = findChat(chatIdLocal!);
-		if (foundChat && foundChat.isGroupChat === true) title = foundChat.name;
-		else title = friendUsername!;
 
+		if (!foundChat)
+			title = "Chat: " + $user!.username + "-" +friendUsername!;
+		else {
+			if (foundChat.isGroupChat)
+				title = "Group: " + foundChat.name;
+			else
+				title = "Chat: " + foundChat.name;
+		}
 		chatWindow.scrollTop = chatWindow.scrollHeight;
 	});
 
@@ -76,7 +81,7 @@
 
 <div id="box">
 	<div id="chat-window" bind:this={chatWindow}>
-		<h4>Chat with {title}</h4>
+		<h4>{title}</h4>
 		{#if $chats.find((c) => c.id === chatIdLocal)?.isGroupChat}
     		<button on:click={leaveGroup}>Leave Group</button>
 		{/if}

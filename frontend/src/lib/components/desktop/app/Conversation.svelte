@@ -2,15 +2,6 @@
 	import { chats, user, chatId, openChatWindow, friendInfo } from '$lib/stores/stores';
 
 	function startChat(chatNumber: number) {
-		let chat: any;
-		chats.subscribe(($chats) => { chat = $chats.find((c) => c.id === chatNumber); });
-		if (chat) {
-			let otherChatUser = chat.chatUsers.find((cu: any) => cu.userId !== $user?.id);
-			if (otherChatUser)
-				$friendInfo = otherChatUser.user;
-			else
-				$friendInfo = null;
-		}
 		$chatId = chatNumber;
 		$openChatWindow = true;
     }
@@ -24,10 +15,13 @@
 		}
 	}
 </script>
-
 <div id="box">
 	<div id="chat-window">
-		{#each $chats as chat (chat.id)}
+		{#each $chats.sort((chatA, chatB) => {
+			const dateA = new Date(chatA.messages.length > 0 ? chatA.messages[chatA.messages.length - 1].createdAt : chatA.createdAt);
+			const dateB = new Date(chatB.messages.length > 0 ? chatB.messages[chatB.messages.length - 1].createdAt : chatB.createdAt);
+			return dateB.getTime() - dateA.getTime(); // This will sort in descending order
+		}) as chat (chat.id)}
 			<div class="chat" on:click={() => startChat(chat.id)}>
 				<h4>{chat.isGroupChat ? "Group: " + chat.name : 
 					"Chat: " + chat.chatUsers.find(chatUser => chatUser.userId !== $user?.id)?.user?.username}</h4>
@@ -36,11 +30,11 @@
 				{:else}
 					<p>No messages yet</p>
 				{/if}
-
 			</div>
 		{/each}
 	</div>
 </div>
+
 
 <style lang="scss">
 	@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
