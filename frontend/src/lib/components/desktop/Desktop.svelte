@@ -18,6 +18,7 @@
 	import { addInstance, removeInstance, putOnTop } from '$lib/utils/appinstance';
 	import { onMount } from 'svelte';
 	import { connectSocket, getUser, getFriends, getAllUserChats, getFriendRequest } from '$lib/utils/connect';
+	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
 	$: {
 		if ($openChatWindow) {
@@ -128,6 +129,7 @@
 			}
 		});
 	});
+
 </script>
 
 <div

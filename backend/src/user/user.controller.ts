@@ -12,6 +12,8 @@ import {
   ForbiddenException,
   Get,
   Param,
+  Res,
+  StreamableFile
 } from '@nestjs/common';
 import { GetUser } from '../auth/decorator';
 import { JwtGuard } from '../auth/guard';
@@ -19,21 +21,36 @@ import { EditUserDto, FriendDto } from './dto';
 import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PrismaClient } from '@prisma/client';
+import { createReadStream } from 'fs';
+import { join } from 'path';
 
 @UseGuards(JwtGuard)
 @Controller('users')
 export class UserController {
-  constructor(private userService: UserService, private prisma: PrismaClient) {}
+  constructor(private userService: UserService, private prisma: PrismaClient) { }
 
   @Get('me')
   getMe(@GetUser() user) {
     return user;
   }
 
+  @Get('avatar/me')
+  getMyPhoto(@GetUser() user) {
+    const file = createReadStream(join(process.cwd(), '/upload', `${user.login}.png`));
+    return new StreamableFile(file);
+  }
+
   @Get('info/:id')
   getInfo(@Param('id') id: string) {
     const parseId = parseInt(id.toString());
     return this.prisma.user.findUnique({ where: { id: parseId } });
+  }
+
+  @Get('avatar/:login')
+  async getUserPhoto(@Param('login') login: string) {
+    const user = await this.userService.getUser(login);
+    const file = createReadStream(join(process.cwd(), '/upload', `${user.login}.png`));
+    return new StreamableFile(file);
   }
 
   @UseGuards(JwtGuard)

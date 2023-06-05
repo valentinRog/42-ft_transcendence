@@ -41,6 +41,7 @@
 			goto('/');
 		}
 	}
+
 </script>
 
 <div id="login">

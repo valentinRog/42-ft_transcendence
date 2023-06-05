@@ -9,10 +9,12 @@
 	}
 
 	export let username: string | null | undefined = null;
+	let login: string | null | undefined = null;
 	let currentUser: any = {};
 	let friends: Friend[] = [];
+	let imgUrl: string | '';
 
-	async function getUserById() {
+	(async function getUserById() {
 		let res;
 		let url;
 		if (username === null) {
@@ -32,10 +34,11 @@
 			});
 		const data = await res.json();
 		currentUser = data;
+		login = currentUser.login;
 		return data;
-	}
+	}) ();
 
-	async function getFriends() {
+	(async function getFriends() {
 		const res = await fetch(`${PUBLIC_BACKEND_URL}/users/me/friends`, {
 			method: 'GET',
 			headers: {
@@ -43,10 +46,19 @@
 			}
 		});
 		friends = await res.json();
-	}
+	}) ();
 
-	getFriends();
-	getUserById();
+	$: if (login)
+	(async function getPhoto() {
+		const res = await fetch(`${PUBLIC_BACKEND_URL}/users/avatar/${login}`, {
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${$token}`
+			}
+		});
+		const blob = await res.blob();
+		imgUrl = URL.createObjectURL(blob);
+	})();
 </script>
 
 <div id="box">
@@ -57,7 +69,7 @@
 				<li class="box">Login: {currentUser.login || ''}</li>
 			</div>
 			<li class="pic">
-				<img class="profile-pic" src="/computer.png" alt="profile picture" />
+				<img class="profile-pic" src={imgUrl} alt="profile picture" />
 			</li>
 		</div>
 		{#if username === $user?.username}
