@@ -41,7 +41,7 @@ export class ChatService {
                 create: memberUsernames.map(username => ({
                     user: { connect: { username } },
                     createdAt: new Date(),
-                    lastReadMessageId: null,
+                    lastReadMessageId: 0,
                 }))
             }
         },

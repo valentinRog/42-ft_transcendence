@@ -2,7 +2,7 @@
 	import { get, writable, readable } from 'svelte/store';
 
 	import Pong from '$lib/components/desktop/app/Pong.svelte';
-	import ChatWindow from '$lib/components/desktop/app/Chat.svelte';
+	import Chat from '$lib/components/desktop/app/Chat.svelte';
 	import Contact from '$lib/components/desktop/app/Contact.svelte';
 	import Profile from '$lib/components/desktop/app/Profile.svelte';
 	import Conversation from '$lib/components/desktop/app/Conversation.svelte';
@@ -10,7 +10,7 @@
 
 	export type App =
 		| 'Pong'
-		| 'ChatWindow'
+		| 'Chat'
 		| 'Contact'
 		| 'Profile'
 		| 'Conversation'
@@ -27,7 +27,7 @@
 
 	export const components = readable({
 		Pong: Pong,
-		ChatWindow: ChatWindow,
+		Chat: Chat,
 		FriendRequest: FriendRequest,
 		Contact: Contact,
 		Profile: Profile,
@@ -75,7 +75,7 @@
 	import Tab from '$lib/components/desktop/Tab.svelte';
 	import Start from '$lib/components/desktop/Start.svelte';
 	import { user, socket } from '$lib/stores/stores';
-	import { chats, openChatWindow } from '$lib/components/desktop/app/Chat.svelte';
+	import { chats, openChatWindow, chatId, friendInfo } from '$lib/components/desktop/app/Chat.svelte';
 	import { openFriendRequest } from '$lib/components/desktop/app/Contact.svelte';
 	import { onMount } from 'svelte';
 	import {
@@ -101,7 +101,23 @@
 
 	$: {
 		if ($openChatWindow) {
-			addInstance('ChatWindow');
+			let typeChat;
+			let name;
+			if ($chatId === null || $chatId === undefined)
+				name = $friendInfo?.username;
+			else {
+				let targetChat = $chats.find((chat) => chat.id === $chatId);
+
+				if (targetChat?.isGroupChat) {
+					name = targetChat.name;
+					typeChat = "Group";
+				}
+				else {
+					name = targetChat?.chatUsers.find((u) => u.user.username !== $user?.username)?.user.username;
+					typeChat = "Chat";
+				}
+			}
+			addInstance('Chat', {typeChat: typeChat, name: name});
 			$selected = null;
 			openChatWindow.set(false);
 		}
@@ -131,9 +147,9 @@
 			TabProps: { name: 'Conversation', icon: '/mail3.png' },
 			DesktopProps: { name: 'Conversation', icon: '/big-mail.png' }
 		},
-		ChatWindow: {
-			TabProps: { name: 'MSN(enlever)', icon: '/mail3.png' },
-			DesktopProps: { name: 'MSN(enlever)', icon: '/big-mail.png' }
+		Chat: {
+			TabProps: { name: 'Chat', icon: '/mail3.png' },
+			DesktopProps: { name: 'Chat', icon: '/big-mail.png' }
 		},
 		Contact: {
 			TabProps: { name: 'Contact', icon: '/phone.png' },
@@ -218,7 +234,7 @@
 >
 	<div class="icons">
 		{#each Object.entries(apps) as [k, v]}
-			{#if k !== 'FriendRequest' && k !== 'ChatWindow'}
+			{#if k !== 'FriendRequest' && k !== 'Chat'}
 				<div
 					class="icon"
 					on:dblclick={() => {

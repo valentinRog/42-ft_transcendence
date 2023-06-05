@@ -67,15 +67,6 @@
 				if (chatIdLocal === null || chatIdLocal === undefined) chatIdLocal = chatId;
 			});
 		}
-
-		let foundChat: any | null = findChat(chatIdLocal!);
-
-		if (!foundChat) title = 'Chat: ' + $user!.username + '-' + friendUsername!;
-		else {
-			if (foundChat.isGroupChat) title = 'Group: ' + foundChat.name;
-			else title = 'Chat: ' + foundChat.name;
-		}
-
 		chatWindow.scrollTop = chatWindow.scrollHeight;
 	});
 
@@ -119,10 +110,10 @@
 
 <div id="box">
 	<div id="chat-window" bind:this={chatWindow}>
-		<h4>{title}</h4>
 		{#if $chats.find((c) => c.id === chatIdLocal)?.isGroupChat}
 			<button on:click={leaveGroup}>Leave Group</button>
 		{/if}
+		<h5>waiting message...</h5>
 		<ul>
 			{#if $chats.find((c) => c.id === chatIdLocal)}
 				{#each $chats.find((c) => c.id === chatIdLocal)?.messages || [] as message, i (i)}

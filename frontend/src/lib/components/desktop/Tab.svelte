@@ -12,6 +12,8 @@
 			<p>{name} of {props.username}</p>
 		{:else if name === 'Profile'}
 			<p>My {name}</p>
+		{:else if name === 'Chat' && props.name && props.typeChat}
+			<p>{props.typeChat} of {props.name}</p>
 		{:else}
 			<p>{name}</p>
 		{/if}
