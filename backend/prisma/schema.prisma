@@ -88,10 +88,10 @@ model ChatUser {
   chatId           Int
   createdAt        DateTime @default(now())
   lastReadMessageId Int?
+  unreadMessages   Int      @default(0)
 
   user             User     @relation(fields: [userId], references: [id])
   chat             Chat     @relation(fields: [chatId], references: [id])
-  //lastReadMessage  Message? @relation(fields: [lastReadMessageId], references: [id])
 
   @@unique([userId, chatId])
 }
