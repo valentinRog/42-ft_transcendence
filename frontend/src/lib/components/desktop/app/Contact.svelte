@@ -1,23 +1,39 @@
+<script lang="ts" context="module">
+	import { writable } from 'svelte/store';
+
+	export interface Contact {
+		id: number;
+		username: string;
+		status: string;
+	}
+
+	export type FriendRequest = {
+		id: number;
+		createdAt: string;
+		sender: string;
+		user: User;
+		userId: number;
+	};
+
+	export const contacts = writable<Contact[]>([]);
+	export const friendRequest = writable<FriendRequest[]>([]);
+	export const openFriendRequest = writable(false);
+</script>
+
 <script lang="ts">
+	import { token, user, socket } from '$lib/stores/stores';
 	import {
-		token,
-		openChatWindow,
 		friendInfo,
-		selected,
-		contacts,
 		chats,
-		user,
 		chatId,
-		openFriendRequest,
-		socket
-	} from '$lib/stores/stores';
-	import type { Contact } from '$lib/stores/stores';
-	import { addInstance } from '$lib/utils/appinstance';
+		openChatWindow
+	} from '$lib/components/desktop/app/Chat.svelte';
+	import { selected } from '$lib/components/desktop/Desktop.svelte';
+	import { addInstance } from '$lib/components/desktop/Desktop.svelte';
 	import { getFriends } from '$lib/utils/connect';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import { onMount } from 'svelte';
 	import type { Socket } from 'socket.io-client';
-
 
 	onMount(() => {
 		getFriends();
@@ -26,7 +42,6 @@
 	let groupChatMode = false;
 	let selectedFriends: string[] = [];
 	let socketInstance: Socket | null = null;
-
 
 	onMount(() => {
 		socket.subscribe(($socket) => {
@@ -100,7 +115,7 @@
 			socketInstance.emit('createGroupChat', {
 				groupName: groupName,
 				memberUsernames: selectedFriends,
-				isGroupChat: true,
+				isGroupChat: true
 			});
 			socketInstance.on('createChat', (chatNumber: number) => {
 				$chatId = chatNumber;

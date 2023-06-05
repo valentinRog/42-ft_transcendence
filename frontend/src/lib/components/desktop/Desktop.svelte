@@ -1,24 +1,103 @@
+<script lang="ts" context="module">
+	import { get, writable, readable } from 'svelte/store';
+
+	import Pong from '$lib/components/desktop/app/Pong.svelte';
+	import ChatWindow from '$lib/components/desktop/app/Chat.svelte';
+	import Contact from '$lib/components/desktop/app/Contact.svelte';
+	import Profile from '$lib/components/desktop/app/Profile.svelte';
+	import Conversation from '$lib/components/desktop/app/Conversation.svelte';
+	import FriendRequest from '$lib/components/desktop/app/FriendRequest.svelte';
+
+	export type App =
+		| 'Pong'
+		| 'ChatWindow'
+		| 'Contact'
+		| 'Profile'
+		| 'Conversation'
+		| 'FriendRequest';
+
+	export interface AppInstance {
+		readonly componentType: App;
+		readonly component: any;
+		visible: boolean;
+		readonly id: number;
+		readonly propsWin: Record<string, any>;
+		readonly props: Record<string, any>;
+	}
+
+	export const components = readable({
+		Pong: Pong,
+		ChatWindow: ChatWindow,
+		FriendRequest: FriendRequest,
+		Contact: Contact,
+		Profile: Profile,
+		Conversation: Conversation
+	});
+
+	export const appInstances = writable<AppInstance[]>([]);
+	export const zstack = writable<number[]>([]);
+	export const gid = writable(0);
+	export const selected = writable<number | null>(0);
+
+	export function addInstance(
+		componentType: string,
+		propsWin: Record<string, any> = {},
+		props: Record<string, any> = {}
+	) {
+		zstack.set([...get(zstack), get(zstack).length]);
+		appInstances.set([
+			...get(appInstances),
+			{
+				componentType: componentType as App,
+				component: get(components)[componentType as App],
+				visible: true,
+				id: get(gid),
+				propsWin,
+				props
+			}
+		]);
+		gid.set(get(gid) + 1);
+	}
+
+	export const time = readable(new Date(), function start(set) {
+		const interval = setInterval(() => {
+			set(new Date());
+		}, 1000);
+
+		return function stop() {
+			clearInterval(interval);
+		};
+	});
+</script>
+
 <script lang="ts">
 	import Window from '$lib/components/desktop/Window.svelte';
 	import Tab from '$lib/components/desktop/Tab.svelte';
 	import Start from '$lib/components/desktop/Start.svelte';
-	import {
-		openFriendRequest,
-		openChatWindow,
-		time,
-		appInstances,
-		zstack,
-		selected,
-		user,
-		socket,
-		token,
-		chats
-	} from '$lib/stores/stores';
-	import type { App } from '$lib/types/types';
-	import { addInstance, removeInstance, putOnTop } from '$lib/utils/appinstance';
+	import { user, socket } from '$lib/stores/stores';
+	import { chats, openChatWindow } from '$lib/components/desktop/app/Chat.svelte';
+	import { openFriendRequest } from '$lib/components/desktop/app/Contact.svelte';
 	import { onMount } from 'svelte';
-	import { connectSocket, getUser, getFriends, getAllUserChats, getFriendRequest } from '$lib/utils/connect';
-	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	import {
+		connectSocket,
+		getUser,
+		getFriends,
+		getAllUserChats,
+		getFriendRequest
+	} from '$lib/utils/connect';
+
+	function removeInstance(id: number) {
+		appInstances.set(get(appInstances).filter((_, i) => i !== id));
+		zstack.set(
+			get(zstack)
+				.filter((z) => z !== id)
+				.map((z) => (z > id ? z - 1 : z))
+		);
+	}
+
+	function putOnTop(id: number) {
+		zstack.set([...get(zstack).filter((z) => z !== id), id]);
+	}
 
 	$: {
 		if ($openChatWindow) {
@@ -64,7 +143,7 @@
 			TabProps: { name: 'Pong', icon: '/pong.png' },
 			DesktopProps: { name: 'Pong', icon: '/big-pong.png' }
 		},
-		FriendRequest : {
+		FriendRequest: {
 			TabProps: { name: 'FriendRequest', icon: '/computer.png' },
 			DesktopProps: { name: 'FriendRequest', icon: '/computer.png' }
 		}
@@ -114,9 +193,8 @@
 		});
 
 		$socket!.on('leaveChat', (chatId) => {
-    		chats.update(chatsValue => chatsValue.filter(chat => chat.id !== chatId));
+			chats.update((chatsValue) => chatsValue.filter((chat) => chat.id !== chatId));
 		});
-
 
 		$socket!.on('message', ({ chatId, message }) => {
 			let targetChatIndex = $chats.findIndex((chat) => chat.id === chatId);
@@ -148,9 +226,9 @@
 						$selected = null;
 					}}
 				>
-					  <img src={v.DesktopProps.icon} alt={v.DesktopProps.name} draggable="false" />
+					<img src={v.DesktopProps.icon} alt={v.DesktopProps.name} draggable="false" />
 					<div class="icon-text">
-					  <span>{v.DesktopProps.name}</span>
+						<span>{v.DesktopProps.name}</span>
 					</div>
 				</div>
 			{/if}
@@ -222,33 +300,33 @@
 </nav>
 
 <style lang="scss">
-		.icons {
-			// put the icons to the left of the screen
-			position: absolute;
-			left: 0;
-			top: 0;
-			width: 7rem;
-			height: 100%;
-			display: flex;
-			flex-direction: column;
-		}
+	.icons {
+		// put the icons to the left of the screen
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 7rem;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+	}
 
-		.icon {
-			margin: 1rem;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-		}
+	.icon {
+		margin: 1rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
 
-		img {
-			width: 2.6rem;
-		}
+	img {
+		width: 2.6rem;
+	}
 
-		.icon-text {
-			color: white;
-			margin-top: 0.19rem; /* Add margin to the top of the text */
-			font-size: 0.9rem; /* Adjust the font size as desired */
-		}
+	.icon-text {
+		color: white;
+		margin-top: 0.19rem; /* Add margin to the top of the text */
+		font-size: 0.9rem; /* Adjust the font size as desired */
+	}
 
 	div.desktop {
 		height: calc(100vh - $navbar-height);

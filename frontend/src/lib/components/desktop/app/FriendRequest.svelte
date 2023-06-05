@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { token, friendRequest } from '$lib/stores/stores';
+	import { token } from '$lib/stores/stores';
+	import { friendRequest } from '$lib/components/desktop/app/Contact.svelte';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import { getFriendRequest } from '$lib/utils/connect';
 	import { onMount } from 'svelte';
@@ -20,29 +21,28 @@
 		const ret = await res.json();
 		getFriendRequest();
 	}
+</script>
 
-  </script>
-
-  <div id="box">
+<div id="box">
 	<div id="friend-list">
-	  {#each $friendRequest as request (request.id)}
-		  <div class="friend">
-			<p>{request.sender}</p>
-			<button on:click={() => answerFriendRequest(request.sender, true)}>Accept</button>
-			<button on:click={() => answerFriendRequest(request.sender, false)}>Refuse</button>
-		  </div>
-	  {/each}
+		{#each $friendRequest as request (request.id)}
+			<div class="friend">
+				<p>{request.sender}</p>
+				<button on:click={() => answerFriendRequest(request.sender, true)}>Accept</button>
+				<button on:click={() => answerFriendRequest(request.sender, false)}>Refuse</button>
+			</div>
+		{/each}
 	</div>
-  </div>
+</div>
 
-  <style lang="scss">
+<style lang="scss">
 	#box {
-	  width: 15.5rem;
-	  height: 20rem;
+		width: 15.5rem;
+		height: 20rem;
 	}
 
 	button {
-	  margin: 0.25rem 0 0rem 0.5rem;
-	  padding: 0.15rem 0.25rem;
+		margin: 0.25rem 0 0rem 0.5rem;
+		padding: 0.15rem 0.25rem;
 	}
-  </style>
+</style>
