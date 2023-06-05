@@ -75,6 +75,7 @@
 			if (foundChat.isGroupChat) title = 'Group: ' + foundChat.name;
 			else title = 'Chat: ' + foundChat.name;
 		}
+
 		chatWindow.scrollTop = chatWindow.scrollHeight;
 	});
 
