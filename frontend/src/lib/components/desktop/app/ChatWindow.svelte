@@ -37,6 +37,7 @@
 			else
 				title = "Chat: " + foundChat.name;
 		}
+
 		chatWindow.scrollTop = chatWindow.scrollHeight;
 	});
 

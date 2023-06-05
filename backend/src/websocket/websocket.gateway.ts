@@ -137,9 +137,11 @@ export abstract class SocketGateway
       );
       newchat.messages.push(newMessage);
       if (socket) {
-        socket.emit('addchat', newchat);
+        socket.emit('addChat', newchat);
         socket.emit('updateChat', newchat.id);
       }
+      client.emit('addChat', newchat);
+      client.emit('updateChat', newchat.id);
     } else await sendMessage();
   }
 
