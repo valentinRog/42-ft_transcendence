@@ -86,12 +86,12 @@
 <script lang="ts">
 	import { writable, readable } from 'svelte/store';
 	import { setContext } from 'svelte';
-	import Pong from '$lib/components/desktop/app/Pong.svelte';
-	import Chat from '$lib/components/desktop/app/Chat.svelte';
-	import Contact from '$lib/components/desktop/app/Contact.svelte';
-	import Profile from '$lib/components/desktop/app/Profile.svelte';
-	import Conversation from '$lib/components/desktop/app/Conversation.svelte';
-	import FriendRequest from '$lib/components/desktop/app/FriendRequest.svelte';
+	import Pong from '$lib/components/app/Pong.svelte';
+	import Chat from '$lib/components/app/Chat.svelte';
+	import Contact from '$lib/components/app/Contact.svelte';
+	import Profile from '$lib/components/app/Profile.svelte';
+	import Conversation from '$lib/components/app/Conversation.svelte';
+	import FriendRequest from '$lib/components/app/FriendRequest.svelte';
 
 	setContext('contacts', writable<Context.Contact[]>([]));
 	setContext('friendRequest', writable<Context.Contact[]>([]));

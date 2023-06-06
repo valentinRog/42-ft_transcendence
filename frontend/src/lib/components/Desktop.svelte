@@ -58,13 +58,14 @@
 </script>
 
 <script lang="ts">
-	import Window from '$lib/components/desktop/Window.svelte';
-	import Tab from '$lib/components/desktop/Tab.svelte';
-	import Start from '$lib/components/desktop/Start.svelte';
+	import Window from '$lib/components/Window.svelte';
+	import Tab from '$lib/components/Tab.svelte';
+	import Start from '$lib/components/Start.svelte';
 	import { user, socket } from '$lib/stores/stores';
 	import { onMount } from 'svelte';
 	import { connectSocket } from '$lib/utils/connect';
-	import { Context } from '$lib/components/desktop/Context.svelte';
+	import { Context } from '$lib/components/Context.svelte';
+	import Clock from './Clock.svelte';
 
 	const chats = Context.chats();
 	const chatId = Context.chatId();
@@ -163,16 +164,6 @@
 
 	let width: number;
 	let height: number;
-
-	// CLOCK
-
-	const formatter = new Intl.DateTimeFormat('en', {
-		hour12: false,
-		hour: 'numeric',
-		minute: '2-digit'
-	});
-
-	let soundOn: boolean = true;
 
 	const contacts = Context.contacts();
 	getFriends().then((data) => contacts.set(data));
@@ -293,19 +284,7 @@
 			/>
 		{/each}
 	</div>
-	<div class="navbar-clock">
-		<p>
-			<img
-				on:mousedown={() => {
-					soundOn = !soundOn;
-				}}
-				src={soundOn ? 'sound-on.png' : 'sound-off.png'}
-				alt={soundOn ? 'sound on' : 'sound off'}
-				draggable="false"
-			/>
-			{formatter.format($time)}
-		</p>
-	</div>
+	<Clock />
 </nav>
 
 <style lang="scss">

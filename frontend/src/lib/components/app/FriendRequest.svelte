@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { token } from '$lib/stores/stores';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
-	import { getFriendRequest } from '$lib/components/desktop/Desktop.svelte';
+	import { getFriendRequest } from '$lib/components/Desktop.svelte';
 	import { onMount } from 'svelte';
-	import { Context } from '$lib/components/desktop/Context.svelte';
+	import { Context } from '$lib/components/Context.svelte';
 
 	onMount(() => {
 		getFriendRequest();

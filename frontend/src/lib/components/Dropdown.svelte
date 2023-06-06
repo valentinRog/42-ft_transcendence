@@ -1,6 +1,10 @@
-<script lang="ts">
-	import type { Tree } from './dropdown';
+<script lang="ts" context="module">
+	export type Tree = {
+		name: string;
+	} & ({ event: () => void } | { children: Tree[] });
+</script>
 
+<script lang="ts">
 	export let name = '';
 	export let children: Tree[] = [];
 	export let event: () => void = () => {};

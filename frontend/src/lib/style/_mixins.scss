@@ -149,23 +149,5 @@
 			overflow: hidden;
 			display: flex;
 		}
-		.navbar-clock {
-			margin: 0 0.25rem;
-			margin-left: auto;
-			display: flex;
-			align-items: center;
-			vertical-align: auto;
-			@include tab-contour-hollow;
-			p {
-				img {
-					margin-left: 0.5rem;
-					@include tab-logo;
-				}
-				font-size: large;
-				margin-left: auto;
-				padding: 0.25rem;
-				width: 5.5rem;
-			}
-		}
 	}
 }

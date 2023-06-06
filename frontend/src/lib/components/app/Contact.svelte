@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { token, user, socket } from '$lib/stores/stores';
-	import { getFriends } from '$lib/components/desktop/Desktop.svelte';
+	import { getFriends } from '$lib/components/Desktop.svelte';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import { onMount } from 'svelte';
 	import type { Socket } from 'socket.io-client';
-	import { Context } from '$lib/components/desktop/Context.svelte';
+	import { Context } from '$lib/components/Context.svelte';
 
 	const chats = Context.chats();
 	const chatId = Context.chatId();

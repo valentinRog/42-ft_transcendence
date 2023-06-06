@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { user } from '$lib/stores/stores';
-	import { Context } from '$lib/components/desktop/Context.svelte';
+	import { Context } from '$lib/components/Context.svelte';
 
 	const chats = Context.chats();
 	const chatId = Context.chatId();

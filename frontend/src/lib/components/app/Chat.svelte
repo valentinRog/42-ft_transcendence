@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { user, socket } from '$lib/stores/stores';
 	import type { Socket } from 'socket.io-client';
-	import { Context } from '$lib/components/desktop/Context.svelte';
+	import { Context } from '$lib/components/Context.svelte';
 
 	const chats = Context.chats();
 	const chatId = Context.chatId();

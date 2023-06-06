@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { logout, enable2fa } from '$lib/utils/connect';
-	import Dropdown from '$lib/components/dropdown/Dropdown.svelte';
-	import type { Tree } from '../dropdown/dropdown';
+	import Dropdown from '$lib/components/Dropdown.svelte';
+	import type { Tree } from '$lib/components/Dropdown.svelte';
 
 	export let desktopHeight: number;
 
