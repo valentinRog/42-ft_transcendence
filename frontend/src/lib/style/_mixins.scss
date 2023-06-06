@@ -73,7 +73,10 @@
 	&.active {
 		@include tab-border(white, black);
 		.border-inside {
-			@include tab-border($light-grey, $dark-grey); //border around the navbar element in outside mode
+			@include tab-border(
+				$light-grey,
+				$dark-grey
+			); //border around the navbar element in outside mode
 		}
 	}
 }
@@ -87,7 +90,7 @@
 	flex-shrink: 1;
 	flex-wrap: nowrap;
 	overflow: hidden;
-	
+
 	@include tab-contour();
 	@include tab-contour-active();
 	.border-inside {
@@ -110,7 +113,6 @@
 			@include tab-logo;
 		}
 	}
-
 }
 
 // ------------------------------------------------

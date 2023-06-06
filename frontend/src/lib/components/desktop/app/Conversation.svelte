@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { user } from '$lib/stores/stores';
-	import {
-		chats,
-		openChatWindow,
-		chatId,
-		friendInfo
-	} from '$lib/components/desktop/app/Chat.svelte';
+	import { Context } from '$lib/components/desktop/Context.svelte';
+
+	const chats = Context.chats();
+	const chatId = Context.chatId();
+	const openChatWindow = Context.openChatWindow();
 
 	function startChat(chatNumber: number) {
 		$chatId = chatNumber;

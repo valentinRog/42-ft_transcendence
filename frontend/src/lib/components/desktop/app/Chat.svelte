@@ -1,49 +1,12 @@
-<script lang="ts" context="module">
-	import { writable } from 'svelte/store';
-
-	export type Chat = {
-		chatUsers: ChatUser[];
-		messages: Message[];
-		createdAt: string;
-		id: number;
-		isGroupChat: boolean;
-		name: string;
-		updatedAt: string;
-	};
-
-	type ChatUser = {
-		chatId: number;
-		createdAt: string;
-		id: number;
-		lastReadMessageId: number | null;
-		user: User;
-		userId: number;
-	};
-
-	interface Message {
-		chatId: number;
-		content: string;
-		createdAt: string;
-		id: number;
-		updatedAt: string;
-		userId: number;
-	}
-
-	interface User {
-		id: number;
-		username: string | null;
-	}
-
-	export const friendInfo = writable<User | null>(null);
-	export const chats = writable<Chat[]>([]);
-	export const chatId = writable<number | null>(null);
-	export const openChatWindow = writable(false);
-</script>
-
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { user, socket } from '$lib/stores/stores';
 	import type { Socket } from 'socket.io-client';
+	import { Context } from '$lib/components/desktop/Context.svelte';
+
+	const chats = Context.chats();
+	const chatId = Context.chatId();
+	const friendInfo = Context.friendInfo();
 
 	let chatIdLocal: number | null = $chatId;
 	let friend = $friendInfo;

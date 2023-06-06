@@ -47,37 +47,33 @@
 	on:mousedown
 >
 	<div class="border-inside">
-
-		<div class="window"
-		on:mousedown={() => {
-			moving = true;
-		}}
-	>
-		<img src={icon} draggable="false" />
-		{#if name === 'Profile' && props.username}
-			<p>{name} of {props.username}</p>
-		{:else if name === 'Profile'}
-			<p>My {name}</p>
-		{:else if name === 'Chat' && props.name && props.typeChat}
-			<p>{props.typeChat}: {props.name}</p>
+		<div
+			class="window"
+			on:mousedown={() => {
+				moving = true;
+			}}
+		>
+			<img src={icon} draggable="false" />
+			{#if name === 'Profile' && props.username}
+				<p>{name} of {props.username}</p>
+			{:else if name === 'Profile'}
+				<p>My {name}</p>
+			{:else if name === 'Chat' && props.name && props.typeChat}
+				<p>{props.typeChat}: {props.name}</p>
 			{:else}
-			<p>{name}</p>
+				<p>{name}</p>
 			{/if}
-		<div class="buttons">
-			<button on:click={() => dispatch('minimize')}>
-				<div class="border-inside">
-					_
-				</div>
-			</button>
-			<button on:click={() => dispatch('close')}>
-				<div class="border-inside">
-					X
-				</div>
-			</button>
+			<div class="buttons">
+				<button on:click={() => dispatch('minimize')}>
+					<div class="border-inside">_</div>
+				</button>
+				<button on:click={() => dispatch('close')}>
+					<div class="border-inside">X</div>
+				</button>
+			</div>
 		</div>
+		<slot />
 	</div>
-	<slot />
-</div>
 </section>
 
 <svelte:window on:mouseup={() => (moving = false)} on:mousemove={onMouseMove} />

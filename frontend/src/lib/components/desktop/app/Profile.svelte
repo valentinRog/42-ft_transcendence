@@ -36,7 +36,7 @@
 		currentUser = data;
 		login = currentUser.login;
 		return data;
-	}) ();
+	})();
 
 	(async function getFriends() {
 		const res = await fetch(`${PUBLIC_BACKEND_URL}/users/me/friends`, {
@@ -46,19 +46,19 @@
 			}
 		});
 		friends = await res.json();
-	}) ();
+	})();
 
 	$: if (login)
-	(async function getPhoto() {
-		const res = await fetch(`${PUBLIC_BACKEND_URL}/users/avatar/${login}`, {
-			method: 'GET',
-			headers: {
-				Authorization: `Bearer ${$token}`
-			}
-		});
-		const blob = await res.blob();
-		imgUrl = URL.createObjectURL(blob);
-	})();
+		(async function getPhoto() {
+			const res = await fetch(`${PUBLIC_BACKEND_URL}/users/avatar/${login}`, {
+				method: 'GET',
+				headers: {
+					Authorization: `Bearer ${$token}`
+				}
+			});
+			const blob = await res.blob();
+			imgUrl = URL.createObjectURL(blob);
+		})();
 </script>
 
 <div id="box">

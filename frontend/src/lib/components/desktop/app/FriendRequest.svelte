@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { token } from '$lib/stores/stores';
-	import { friendRequest } from '$lib/components/desktop/app/Contact.svelte';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
-	import { getFriendRequest } from '$lib/utils/connect';
+	import { getFriendRequest } from '$lib/components/desktop/Desktop.svelte';
 	import { onMount } from 'svelte';
+	import { Context } from '$lib/components/desktop/Context.svelte';
 
 	onMount(() => {
 		getFriendRequest();
@@ -21,6 +21,8 @@
 		const ret = await res.json();
 		getFriendRequest();
 	}
+
+	const friendRequest = Context.friendRequest();
 </script>
 
 <div id="box">

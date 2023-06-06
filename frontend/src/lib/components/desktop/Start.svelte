@@ -72,7 +72,7 @@
 >
 	<div class="border-inside">
 		<img src="/start.png" alt="start" draggable="false" />
-		<p class="start"> Start </p>
+		<p class="start">Start</p>
 	</div>
 </div>
 <div class="menu" class:hidden={!active}>

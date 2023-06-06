@@ -1,39 +1,18 @@
-<script lang="ts" context="module">
-	import { writable } from 'svelte/store';
-
-	export interface Contact {
-		id: number;
-		username: string;
-		status: string;
-	}
-
-	export type FriendRequest = {
-		id: number;
-		createdAt: string;
-		sender: string;
-		user: User;
-		userId: number;
-	};
-
-	export const contacts = writable<Contact[]>([]);
-	export const friendRequest = writable<FriendRequest[]>([]);
-	export const openFriendRequest = writable(false);
-</script>
-
 <script lang="ts">
 	import { token, user, socket } from '$lib/stores/stores';
-	import {
-		friendInfo,
-		chats,
-		chatId,
-		openChatWindow
-	} from '$lib/components/desktop/app/Chat.svelte';
-	import { selected } from '$lib/components/desktop/Desktop.svelte';
-	import { addInstance } from '$lib/components/desktop/Desktop.svelte';
-	import { getFriends } from '$lib/utils/connect';
+	import { getFriends } from '$lib/components/desktop/Desktop.svelte';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import { onMount } from 'svelte';
 	import type { Socket } from 'socket.io-client';
+	import { Context } from '$lib/components/desktop/Context.svelte';
+
+	const chats = Context.chats();
+	const chatId = Context.chatId();
+	const openChatWindow = Context.openChatWindow();
+	const contacts = Context.contacts();
+	const friendRequest = Context.friendRequest();
+	const openFriendRequest = Context.openFriendRequest();
+	const friendInfo = Context.friendInfo();
 
 	onMount(() => {
 		getFriends();
@@ -138,7 +117,7 @@
 		return foundChat;
 	}
 
-	function startChat(friend: Contact) {
+	function startChat(friend: Context.Contact) {
 		let chat: any;
 
 		if ($user) chat = findChat($user?.username, friend.username);
@@ -146,6 +125,9 @@
 		friendInfo.set({ id: friend.id, username: friend.username });
 		$openChatWindow = true;
 	}
+
+	const addInstance = Context.addInstance();
+	const selected = Context.selected();
 </script>
 
 <div id="box">
@@ -172,7 +154,7 @@
 				{/if}
 				<p
 					on:dblclick={() => {
-						addInstance('Profile', { username: friend.username }, { username: friend.id });
+						$addInstance('Profile', { username: friend.username }, { username: friend.id });
 						$selected = null;
 					}}
 				>

@@ -358,7 +358,6 @@
 		} else if (e.key === 'ArrowDown') {
 			down = true;
 		}
-		console.log(e.key);
 	}
 
 	function handleKeyUp(e: KeyboardEvent) {
