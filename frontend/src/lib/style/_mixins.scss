@@ -151,3 +151,16 @@
 		}
 	}
 }
+
+@mixin dropdown-button {
+	@include no-border;
+	background-color: $grey;
+	cursor: url($click), auto;
+	padding: 0.15rem 0.25rem;
+	font-size: medium;
+
+	&:hover {
+		background-color: $blue;
+		color: white;
+	}
+}

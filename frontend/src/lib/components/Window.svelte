@@ -72,6 +72,7 @@
 				</button>
 			</div>
 		</div>
+
 		<slot />
 	</div>
 </section>
@@ -87,24 +88,23 @@
 		user-select: none;
 		@include tab-contour;
 		background-color: $grey;
+	}
 
-		.window {
-			display: flex;
-			height: 1.5rem;
-			margin: 0.2rem 0.2rem;
-			background-color: $dark-grey;
-			align-items: center;
+	div.window {
+		display: flex;
+		height: 1.5rem;
+		margin: 0.2rem 0.2rem;
+		background-color: $dark-grey;
+		align-items: center;
 
-			&:hover {
-				cursor: url($grab), auto;
-			}
-
-			.buttons {
-				margin-left: auto;
-				margin-right: 0.2rem;
-			}
+		&:hover {
+			cursor: url($grab), auto;
 		}
 
+		.buttons {
+			margin-left: auto;
+			margin-right: 0.2rem;
+		}
 		img {
 			margin-left: 0.5rem;
 			height: 1rem;

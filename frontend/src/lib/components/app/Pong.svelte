@@ -1,8 +1,64 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
-	import { token } from '$lib/stores';
-	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import { Context } from '$lib/components/Context.svelte';
+	import DropMenu from '$lib/components/DropMenu.svelte';
+
+	const tree = {
+		name: 'des trucs',
+		children: [
+			{
+				name: "d'autres trucs",
+				children: [
+					{
+						name: 'toujours plus de trucs',
+						event: () => {},
+						children: [
+							{
+								name: "omg c'est tellement recursif",
+								event: () => {}
+							},
+							{
+								name: "omg c'est tellement recursif",
+								event: () => {}
+							},
+							{
+								name: "omg c'est tellement recursif",
+								event: () => {}
+							},
+							{
+								name: "omg c'est tellement recursif",
+								event: () => {}
+							},
+							{
+								name: "omg c'est tellement recursif",
+								event: () => {}
+							}
+						]
+					},
+					{
+						name: 'plus de trucs ici',
+						event: () => {}
+					}
+				]
+			},
+			{
+				name: 'logout',
+				event: () => {}
+			},
+			{
+				name: '2fa',
+				event: () => {}
+			}
+		]
+	};
+
+	const dropdowns = [
+		{ name: 'drop 1', trees: [tree, tree, tree] },
+		{ name: 'drop 2', trees: [tree, tree, tree] },
+		{ name: 'drop 3', trees: [tree, tree, tree] },
+		{ name: 'drop 4', trees: [tree, tree, tree] },
+		{ name: 'drop 5', trees: [tree, tree, tree] }
+	];
 
 	const fetchWithToken = Context.fetchWithToken();
 	const socket = Context.socket();
@@ -257,6 +313,8 @@
 	}
 
 	function handleCanvas(e: HTMLCanvasElement) {
+		e.width = dimensions.width;
+		e.height = dimensions.height;
 		const ctx = e.getContext('2d') as CanvasRenderingContext2D;
 		draw(ctx);
 	}
@@ -296,11 +354,6 @@
 			ping = Date.now() - data[0];
 			serverDelta = data[1] - Date.now() + ping / 2;
 		});
-
-		const canvas = document.querySelector('canvas') as HTMLCanvasElement;
-		const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-		canvas.width = dimensions.width;
-		canvas.height = dimensions.height;
 
 		$socket!.on('state', (s: GameState) => {
 			s.time -= serverDelta;
@@ -361,6 +414,7 @@
 
 <svelte:window on:keydown={handleKeyDown} on:keyup={handleKeyUp} />
 
+<DropMenu {dropdowns} />
 <canvas use:handleCanvas />
 
 <style lang="scss">

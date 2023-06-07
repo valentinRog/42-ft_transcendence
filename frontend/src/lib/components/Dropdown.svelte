@@ -50,18 +50,9 @@
 
 	.dropdown-button {
 		width: 100%;
-		padding: 0.4rem 0.6rem;
-		@include no-border;
-		background-color: $grey;
-		cursor: url($click), auto;
-		padding: 0.15rem 0.25rem;
-		font-size: medium;
+		@include dropdown-button;
 	}
 
-	.dropdown-button:hover {
-		background-color: $blue;
-		color: white;
-	}
 	.dropdown-div {
 		background-color: $grey;
 		padding: 0.15rem 0.25rem;
