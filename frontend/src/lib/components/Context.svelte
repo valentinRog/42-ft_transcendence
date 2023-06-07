@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-	import type { Writable } from 'svelte/store';
+	import type { Readable, Writable } from 'svelte/store';
 	import { getContext } from 'svelte';
 
 	export namespace Context {
@@ -66,7 +66,7 @@
 			readonly componentType: App;
 			readonly component: any;
 			visible: boolean;
-			readonly id: number;
+			readonly id: string;
 			readonly propsWin: Record<string, any>;
 			readonly props: Record<string, any>;
 		}
@@ -76,7 +76,6 @@
 		export const appInstances = (): Writable<AppInstance[]> => getContext('appInstances');
 		export const selected = (): Writable<number | null> => getContext('selected');
 		export const zstack = (): Writable<number[]> => getContext('zstack');
-		export const gid = (): Writable<number> => getContext('gid');
 
 		export const addInstance = (): ((
 			componentType: string,
@@ -88,6 +87,8 @@
 		export const fetchFriends = (): (() => Promise<any>) => getContext('fetchFriends');
 		export const fetchFriendRequest = (): (() => Promise<any>) => getContext('fetchFriendRequest');
 		export const fetchChats = (): (() => Promise<any>) => getContext('fetchChats');
+
+		export const socket = (): Readable<Socket> => getContext('socket');
 	}
 </script>
 
@@ -102,6 +103,10 @@
 	import FriendRequest from '$lib/components/app/FriendRequest.svelte';
 	import { token, user } from '$lib/stores';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	import type { Socket } from 'socket.io-client';
+	import ioClient from 'socket.io-client';
+	import { onDestroy } from 'svelte';
+	import { v4 as uuidv4 } from 'uuid';
 
 	function fetchWithToken(route: string, options: RequestInit = {}) {
 		return fetch(`${PUBLIC_BACKEND_URL}/${route}`, {
@@ -142,7 +147,6 @@
 
 	const appInstances = writable<Context.AppInstance[]>([]);
 	const zstack = writable<number[]>([]);
-	const gid = writable(0);
 	const selected = writable<number | null>(null);
 
 	function addInstance(
@@ -157,7 +161,7 @@
 				componentType: componentType as Context.App,
 				component: $components[componentType as Context.App],
 				visible: true,
-				id: $gid++,
+				id: uuidv4(),
 				propsWin,
 				props
 			}
@@ -167,7 +171,6 @@
 	setContext('components', components);
 	setContext('appInstances', appInstances);
 	setContext('zstack', zstack);
-	setContext('gid', gid);
 	setContext('selected', selected);
 	setContext('addInstance', addInstance);
 
@@ -207,6 +210,49 @@
 	setContext('fetchFriends', fetchFriends);
 	setContext('fetchFriendRequest', fetchFriendRequest);
 	setContext('fetchChats', fetchChats);
+
+	const socket = readable<Socket>(
+		ioClient(PUBLIC_BACKEND_URL, {
+			query: {
+				token: $token
+			}
+		})
+	);
+
+	$socket.on('friend', (data: { message: string }) => {
+		console.log('add-friend', data.message);
+	});
+
+	$socket.on('game', (data: { message: string }) => {
+		console.log('accept-game', data.message);
+		$socket.emit('accept-game', { response: true, friend: data.message });
+	});
+
+	$socket.on('addChat', (chat) => {
+		chats.update((chatsValue) => [...chatsValue, chat]);
+		console.log($chats);
+	});
+
+	$socket.on('leaveChat', (chatId) => {
+		$chats = $chats.filter((chat) => chat.id !== chatId);
+	});
+
+	$socket.on('message', ({ chatId, message }) => {
+		let targetChatIndex = $chats.findIndex((chat) => chat.id === chatId);
+		if (targetChatIndex !== -1) {
+			let chatscopy = [...$chats];
+			chatscopy[targetChatIndex].messages.push(message);
+			$chats = chatscopy;
+		} else {
+			console.error(`Received message for unknown chat with id: ${chatId}`);
+		}
+	});
+
+	setContext('socket', socket);
+
+	onDestroy(() => {
+		$socket.disconnect();
+	});
 </script>
 
 <slot />

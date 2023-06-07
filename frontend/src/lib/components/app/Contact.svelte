@@ -1,8 +1,10 @@
 <script lang="ts">
-	import { user, socket } from '$lib/stores';
+	import { user } from '$lib/stores';
 	import { onMount } from 'svelte';
 	import type { Socket } from 'socket.io-client';
 	import { Context } from '$lib/components/Context.svelte';
+
+	const socket = Context.socket();
 
 	const fetchWithToken = Context.fetchWithToken();
 	const fetchFriends = Context.fetchFriends();

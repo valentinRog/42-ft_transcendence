@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
-	import { socket, token } from '$lib/stores';
+	import { token } from '$lib/stores';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import { Context } from '$lib/components/Context.svelte';
 
 	const fetchWithToken = Context.fetchWithToken();
+	const socket = Context.socket();
 
 	interface Dimensions {
 		readonly width: number;
@@ -262,11 +263,7 @@
 
 	onMount(() => {
 		fetchWithToken('matchmaking/queue', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ token: $token })
+			method: 'POST'
 		});
 
 		index = 0;
@@ -335,13 +332,8 @@
 		if (room !== '') {
 			$socket!.emit('leave-room', { room: room, index: index });
 		} else {
-			fetch(`${PUBLIC_BACKEND_URL}/matchmaking/unqueue`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${$token}`
-				},
-				body: JSON.stringify({ token: $token })
+			fetchWithToken('matchmaking/unqueue', {
+				method: 'POST'
 			});
 		}
 		$socket!.off('enter-room');

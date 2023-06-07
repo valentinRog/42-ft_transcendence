@@ -2,9 +2,8 @@
 	import Window from '$lib/components/Window.svelte';
 	import Tab from '$lib/components/Tab.svelte';
 	import Start from '$lib/components/Start.svelte';
-	import { user, socket } from '$lib/stores';
+	import { user } from '$lib/stores';
 	import { onMount } from 'svelte';
-	import { connectSocket } from '$lib/utils/connect';
 	import { Context } from '$lib/components/Context.svelte';
 	import Clock from './Clock.svelte';
 
@@ -20,6 +19,8 @@
 	const selected = Context.selected();
 
 	const addInstance = Context.addInstance();
+
+	const socket = Context.socket();
 
 	function removeInstance(id: number) {
 		$appInstances = $appInstances.filter((_, i) => i !== id);
@@ -108,46 +109,10 @@
 		await fetchMe();
 		await fetchFriends();
 		await fetchChats();
-	})()
+	})();
 
-	connectSocket();
-
-	onMount(() => {
-		$socket!.on('friend', (data: { message: string }) => {
-			console.log('add-friend', data.message);
-			//$socket!.emit('accept-friend', { response: true, friend: data.message });
-		});
-
-		$socket!.on('game', (data: { message: string }) => {
-			console.log('accept-game', data.message);
-			$socket!.emit('accept-game', { response: true, friend: data.message });
-		});
-
-		chats.subscribe(($chats) => {
-			$chats.forEach((chat) => {
-				if (chat.isGroupChat) $socket!.emit('joinRoom', { chatId: chat.id });
-			});
-		});
-
-		$socket!.on('addChat', (chat) => {
-			chats.update((chatsValue) => [...chatsValue, chat]);
-			console.log($chats);
-		});
-
-		$socket!.on('leaveChat', (chatId) => {
-			chats.update((chatsValue) => chatsValue.filter((chat) => chat.id !== chatId));
-		});
-
-		$socket!.on('message', ({ chatId, message }) => {
-			let targetChatIndex = $chats.findIndex((chat) => chat.id === chatId);
-			if (targetChatIndex !== -1) {
-				let chatscopy = [...$chats];
-				chatscopy[targetChatIndex].messages.push(message);
-				$chats = chatscopy;
-			} else {
-				console.error(`Received message for unknown chat with id: ${chatId}`);
-			}
-		});
+	$chats.forEach((chat) => {
+		if (chat.isGroupChat) $socket.emit('joinRoom', { chatId: chat.id });
 	});
 </script>
 

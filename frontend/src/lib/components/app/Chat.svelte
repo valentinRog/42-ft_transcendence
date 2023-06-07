@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { socket } from '$lib/stores';
 	import type { Socket } from 'socket.io-client';
 	import { Context } from '$lib/components/Context.svelte';
+
+	const socket = Context.socket();
 
 	const chats = Context.chats();
 	const chatId = Context.chatId();
@@ -13,7 +14,6 @@
 	let friendUsername: string | null = '';
 	let socketInstance: Socket | null = null;
 	let messageContent = '';
-	let title = '';
 	let chatWindow: HTMLDivElement;
 
 	if (friend) {
