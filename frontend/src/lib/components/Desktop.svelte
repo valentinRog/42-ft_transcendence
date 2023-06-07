@@ -100,9 +100,15 @@
 	let width: number;
 	let height: number;
 
-	Context.fetchMe()();
-	Context.fetchFriends()();
-	Context.fetchChats()();
+	const fetchMe = Context.fetchMe();
+	const fetchFriends = Context.fetchFriends();
+	const fetchChats = Context.fetchChats();
+
+	(async () => {
+		await fetchMe();
+		await fetchFriends();
+		await fetchChats();
+	})()
 
 	connectSocket();
 

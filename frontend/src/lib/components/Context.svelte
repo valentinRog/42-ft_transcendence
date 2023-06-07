@@ -84,10 +84,10 @@
 			props?: Record<string, any>
 		) => void) => getContext('addInstance');
 
-		export const fetchMe = (): (() => void) => getContext('fetchMe');
-		export const fetchFriends = (): (() => void) => getContext('fetchFriends');
-		export const fetchFriendRequest = (): (() => void) => getContext('fetchFriendRequest');
-		export const fetchChats = (): (() => void) => getContext('fetchChats');
+		export const fetchMe = (): (() => Promise<any>) => getContext('fetchMe');
+		export const fetchFriends = (): (() => Promise<any>) => getContext('fetchFriends');
+		export const fetchFriendRequest = (): (() => Promise<any>) => getContext('fetchFriendRequest');
+		export const fetchChats = (): (() => Promise<any>) => getContext('fetchChats');
 	}
 </script>
 
@@ -171,39 +171,40 @@
 	setContext('selected', selected);
 	setContext('addInstance', addInstance);
 
-	function fetchMe() {
-		fetchWithToken('users/me')
-			.then((res) => res.json())
-			.then(
-				(data) =>
-					($user = {
-						id: data.id,
-						username: data.username,
-						login: data.login
-					})
-			);
+	async function fetchMe() {
+		const res = await fetchWithToken('users/me');
+		const data = await res.json();
+		$user = {
+			id: data.id,
+			username: data.username,
+			login: data.login
+		};
+		return data;
 	}
 
-	function fetchFriends() {
-		fetchWithToken('users/me/friends')
-			.then((res) => res.json())
-			.then((data) => ($contacts = data));
+	async function fetchFriends() {
+		const res = await fetchWithToken('users/me/friends');
+		const data = await res.json();
+		$contacts = data;
+		return data;
 	}
 
-	function fetchFriendRequest() {
-		fetchWithToken('notification/get?type=friend')
-			.then((res) => res.json())
-			.then((data) => ($friendRequest = data));
+	async function fetchFriendRequest() {
+		const res = await fetchWithToken('notification/get?type=friend');
+		const data = await res.json();
+		$friendRequest = data;
+		return data;
 	}
 
-	function fetchChats() {
-		fetchWithToken('chat/allUserChats')
-			.then((res) => res.json())
-			.then((data) => ($chats = data));
+	async function fetchChats() {
+		const res = await fetchWithToken('chat/allUserChats');
+		const data = await res.json();
+		$chats = data;
+		return data;
 	}
 
-	setContext('fetchFriends', fetchFriends);
 	setContext('fetchMe', fetchMe);
+	setContext('fetchFriends', fetchFriends);
 	setContext('fetchFriendRequest', fetchFriendRequest);
 	setContext('fetchChats', fetchChats);
 </script>
