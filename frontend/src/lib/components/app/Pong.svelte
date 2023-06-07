@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
-	import DropMenu from '$lib/components/DropMenu.svelte';
+	import DropDown from '$lib/components/drop/DropDown.svelte';
+	import RightDrop from '$lib/components/drop/RightDrop.svelte';
+	import DropButton from '../drop/DropButton.svelte';
 
 	const tree = {
 		name: 'des trucs',
@@ -414,10 +416,24 @@
 
 <svelte:window on:keydown={handleKeyDown} on:keyup={handleKeyUp} />
 
-<DropMenu {dropdowns} />
+<div class="menu">
+	<DropDown name="settings">
+		<RightDrop name="settings">
+			<RightDrop name="settings">
+				<DropButton>Yo</DropButton>
+				<DropButton>Yo</DropButton>
+				<DropButton>Yo</DropButton>
+			</RightDrop>
+		</RightDrop>
+	</DropDown>
+</div>
 <canvas use:handleCanvas />
 
 <style lang="scss">
+	div.menu {
+		width: fit-content;
+	}
+
 	canvas {
 		margin: 0.2rem;
 		background-color: black;

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { logout } from '$lib/utils/connect';
-	import Dropdown from '$lib/components/Dropdown.svelte';
-	import type { Tree } from '$lib/components/Dropdown.svelte';
 	import { Context } from '$lib/components/Context.svelte';
+	import RightDrop from '$lib/components/drop/RightDrop.svelte';
+	import DropButton from '$lib/components/drop/DropButton.svelte';
 
 	export let desktopHeight: number;
 
@@ -15,60 +15,6 @@
 			method: 'POST'
 		});
 	}
-
-	const tree: Tree = {
-		name: 'des trucs',
-		children: [
-			{
-				name: "d'autres trucs",
-				children: [
-					{
-						name: 'encore des trucs',
-						children: [
-							{
-								name: 'toujours plus de trucs',
-								event: () => {},
-								children: [
-									{
-										name: "omg c'est tellement recursif",
-										event: () => {}
-									},
-									{
-										name: "omg c'est tellement recursif",
-										event: () => {}
-									},
-									{
-										name: "omg c'est tellement recursif",
-										event: () => {}
-									},
-									{
-										name: "omg c'est tellement recursif",
-										event: () => {}
-									},
-									{
-										name: "omg c'est tellement recursif",
-										event: () => {}
-									}
-								]
-							}
-						]
-					},
-					{
-						name: 'plus de trucs ici',
-						event: () => {}
-					}
-				]
-			},
-			{
-				name: 'logout',
-				event: logout
-			},
-			{
-				name: '2fa',
-				event: enable2fa
-			}
-		]
-	};
 </script>
 
 <div
@@ -85,15 +31,29 @@
 	</div>
 </div>
 <div class="menu" class:hidden={!active}>
-	<Dropdown {...tree} {desktopHeight} />
-	<Dropdown {...tree} {desktopHeight} />
-	<Dropdown {...tree} {desktopHeight} />
-	<Dropdown {...tree} {desktopHeight} />
-	<Dropdown {...tree} {desktopHeight} />
-	<Dropdown {...tree} {desktopHeight} />
+	<RightDrop name="trucs" {desktopHeight} />
+	<RightDrop name="trucs" {desktopHeight} />
+	<RightDrop name="trucs" {desktopHeight}>
+		<RightDrop name="trucs" {desktopHeight}>
+			<DropButton on:click={logout}>logout</DropButton>
+			<DropButton on:click={enable2fa}>enable 2fa</DropButton>
+		</RightDrop>
+		<RightDrop name="trucs" {desktopHeight}>
+			<DropButton on:click={logout}>logout</DropButton>
+			<DropButton on:click={enable2fa}>enable 2fa</DropButton>
+		</RightDrop>
+		<RightDrop name="trucs" {desktopHeight}>
+			<DropButton on:click={logout}>logout</DropButton>
+			<DropButton on:click={enable2fa}>enable 2fa</DropButton>
+		</RightDrop>
+	</RightDrop>
 </div>
 
 <style lang="scss">
+	.hidden {
+		display: none;
+	}
+
 	.navbar-start {
 		@include tab;
 		margin: 0 0.25rem;
@@ -105,11 +65,10 @@
 			font-size: larger;
 		}
 	}
+
 	div.menu {
+		min-width: 12rem;
 		@include tab-contour;
-		&.hidden {
-			display: none;
-		}
 		position: absolute;
 		bottom: $navbar-height;
 		left: 0;
