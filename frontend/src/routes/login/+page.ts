@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import { token, user } from '$lib/stores/stores';
+import { token, user } from '$lib/stores';
 
 export function load() {
 	if (browser) {

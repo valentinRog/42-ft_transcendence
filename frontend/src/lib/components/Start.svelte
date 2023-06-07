@@ -1,11 +1,20 @@
 <script lang="ts">
-	import { logout, enable2fa } from '$lib/utils/connect';
+	import { logout } from '$lib/utils/connect';
 	import Dropdown from '$lib/components/Dropdown.svelte';
 	import type { Tree } from '$lib/components/Dropdown.svelte';
+	import { Context } from '$lib/components/Context.svelte';
 
 	export let desktopHeight: number;
 
 	let active = false;
+
+	const fetchWithToken = Context.fetchWithToken();
+
+	function enable2fa() {
+		fetchWithToken('2fa/enable', {
+			method: 'POST'
+		});
+	}
 
 	const tree: Tree = {
 		name: 'des trucs',

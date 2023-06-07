@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { user, socket } from '$lib/stores/stores';
+	import { socket } from '$lib/stores';
 	import type { Socket } from 'socket.io-client';
 	import { Context } from '$lib/components/Context.svelte';
 

@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { token, user, socket } from '$lib/stores/stores';
-	import { getFriends } from '$lib/components/Desktop.svelte';
-	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { user, socket } from '$lib/stores';
 	import { onMount } from 'svelte';
 	import type { Socket } from 'socket.io-client';
 	import { Context } from '$lib/components/Context.svelte';
+
+	const fetchWithToken = Context.fetchWithToken();
+	const fetchFriends = Context.fetchFriends();
 
 	const chats = Context.chats();
 	const chatId = Context.chatId();
@@ -13,10 +14,6 @@
 	const friendRequest = Context.friendRequest();
 	const openFriendRequest = Context.openFriendRequest();
 	const friendInfo = Context.friendInfo();
-
-	onMount(() => {
-		getFriends();
-	});
 
 	let groupChatMode = false;
 	let selectedFriends: string[] = [];
@@ -30,16 +27,15 @@
 
 	async function addFriend(event: Event) {
 		const form = (event.target as HTMLFormElement).friend.value;
-		const res = await fetch(`${PUBLIC_BACKEND_URL}/notification/add-friend`, {
+		const res = await fetchWithToken('users/add-friend', {
 			method: 'POST',
 			headers: {
-				Authorization: `Bearer ${$token}`,
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({ friend: form })
 		});
-		getFriends();
-		return await res.json();
+		await res.json();
+		fetchFriends();
 	}
 
 	async function openRequest() {
@@ -47,30 +43,25 @@
 	}
 
 	async function removeFriend(friendUsername: string) {
-		const res = await fetch(`${PUBLIC_BACKEND_URL}/users/remove-friend`, {
+		const res = await fetchWithToken('users/remove-friend', {
 			method: 'PATCH',
 			headers: {
-				Authorization: `Bearer ${$token}`,
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({ friend: friendUsername })
 		});
-		const data = await res.json();
-		getFriends();
-		return data;
+		await res.json();
+		fetchFriends();
 	}
 
-	async function askGame(friendUsername: string) {
-		const res = await fetch(`${PUBLIC_BACKEND_URL}/notification/ask-game`, {
+	function askGame(friendUsername: string) {
+		fetchWithToken('notification/ask-game', {
 			method: 'POST',
 			headers: {
-				Authorization: `Bearer ${$token}`,
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({ friend: friendUsername })
 		});
-		const data = await res.json();
-		return data;
 	}
 
 	function toggleGroupChatMode() {
@@ -154,7 +145,7 @@
 				{/if}
 				<p
 					on:dblclick={() => {
-						$addInstance('Profile', { username: friend.username }, { username: friend.id });
+						addInstance('Profile', { username: friend.username }, { username: friend.id });
 						$selected = null;
 					}}
 				>

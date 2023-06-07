@@ -1,28 +1,22 @@
 <script lang="ts">
-	import { token } from '$lib/stores/stores';
-	import { PUBLIC_BACKEND_URL } from '$env/static/public';
-	import { getFriendRequest } from '$lib/components/Desktop.svelte';
-	import { onMount } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
 
-	onMount(() => {
-		getFriendRequest();
-	});
+	const fetchWithToken = Context.fetchWithToken();
+	const fetchFriendRequest = Context.fetchFriendRequest();
 
 	async function answerFriendRequest(friendUsername: string, response: boolean) {
-		const res = await fetch(`${PUBLIC_BACKEND_URL}/notification/friend-response`, {
+		const res = await fetchWithToken('notification/friend-response', {
 			method: 'POST',
 			headers: {
-				Authorization: `Bearer ${$token}`,
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({ friend: friendUsername, response: response })
 		});
-		const ret = await res.json();
-		getFriendRequest();
+		await res.json();
+		fetchFriendRequest();
 	}
-
 	const friendRequest = Context.friendRequest();
+	fetchFriendRequest();
 </script>
 
 <div id="box">

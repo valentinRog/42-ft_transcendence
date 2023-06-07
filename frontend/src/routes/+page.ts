@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import { token } from '$lib/stores/stores';
+import { token } from '$lib/stores';
 import { get } from 'svelte/store';
 import { goto } from '$app/navigation';
 

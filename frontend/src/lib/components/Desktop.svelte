@@ -1,67 +1,8 @@
-<script lang="ts" context="module">
-	import { token } from '$lib/stores/stores';
-	import { get } from 'svelte/store';
-	import { PUBLIC_BACKEND_URL } from '$env/static/public';
-
-	export function getUser() {
-		fetch(`${PUBLIC_BACKEND_URL}/users/me`, {
-			method: 'GET',
-			headers: {
-				Authorization: `Bearer ${get(token)}`
-			}
-		})
-			.then((res) => res.json())
-			.then((data) => {
-				user.set({
-					id: data.id,
-					username: data.username,
-					login: data.login
-				});
-			});
-	}
-
-	export async function getFriends() {
-		const res = await fetch(`${PUBLIC_BACKEND_URL}/users/me/friends`, {
-			method: 'GET',
-			headers: {
-				Authorization: `Bearer ${get(token)}`
-			}
-		});
-		return await res.json();
-	}
-
-	export async function getFriendRequest() {
-		const res = await fetch(`${PUBLIC_BACKEND_URL}/notification/get?type=friend`, {
-			method: 'GET',
-			headers: {
-				Authorization: `Bearer ${get(token)}`
-			}
-		});
-		const data = await res.json();
-		Context.friendRequest().set(data);
-		return data;
-	}
-
-	export async function getAllUserChats(chats: any) {
-		const response = await fetch(`${PUBLIC_BACKEND_URL}/chat/allUserChats`, {
-			method: 'GET',
-			headers: {
-				Authorization: `Bearer ${get(token)}`,
-				'Content-Type': 'application/json'
-			}
-		});
-		if (response.ok) {
-			const allUserChats = await response.json();
-			chats.set(allUserChats);
-		} else console.error(`Error fetching all messages: ${response.statusText}`);
-	}
-</script>
-
 <script lang="ts">
 	import Window from '$lib/components/Window.svelte';
 	import Tab from '$lib/components/Tab.svelte';
 	import Start from '$lib/components/Start.svelte';
-	import { user, socket } from '$lib/stores/stores';
+	import { user, socket } from '$lib/stores';
 	import { onMount } from 'svelte';
 	import { connectSocket } from '$lib/utils/connect';
 	import { Context } from '$lib/components/Context.svelte';
@@ -80,19 +21,13 @@
 
 	const addInstance = Context.addInstance();
 
-	const time = Context.time();
-
 	function removeInstance(id: number) {
-		appInstances.set(get(appInstances).filter((_, i) => i !== id));
-		zstack.set(
-			get(zstack)
-				.filter((z) => z !== id)
-				.map((z) => (z > id ? z - 1 : z))
-		);
+		$appInstances = $appInstances.filter((_, i) => i !== id);
+		$zstack = $zstack.filter((z) => z !== id).map((z) => (z > id ? z - 1 : z));
 	}
 
 	function putOnTop(id: number) {
-		zstack.set([...get(zstack).filter((z) => z !== id), id]);
+		$zstack = [...$zstack.filter((z) => z !== id), id];
 	}
 
 	$: {
@@ -112,12 +47,12 @@
 					typeChat = 'Chat';
 				}
 			}
-			$addInstance('Chat', { typeChat: typeChat, name: name });
+			addInstance('Chat', { typeChat: typeChat, name: name });
 			$selected = null;
 			openChatWindow.set(false);
 		}
 		if ($openFriendRequest) {
-			$addInstance('FriendRequest');
+			addInstance('FriendRequest');
 			$selected = null;
 			openFriendRequest.set(false);
 		}
@@ -165,10 +100,10 @@
 	let width: number;
 	let height: number;
 
-	const contacts = Context.contacts();
-	getFriends().then((data) => contacts.set(data));
-	getUser();
-	getAllUserChats(chats);
+	Context.fetchMe()();
+	Context.fetchFriends()();
+	Context.fetchChats()();
+
 	connectSocket();
 
 	onMount(() => {
@@ -222,7 +157,7 @@
 				<div
 					class="icon"
 					on:dblclick={() => {
-						$addInstance(k);
+						addInstance(k);
 						$selected = null;
 					}}
 				>

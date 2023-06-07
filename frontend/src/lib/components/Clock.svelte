@@ -1,7 +1,9 @@
 <script lang="ts">
-	import { Context } from '$lib/components/Context.svelte';
+	import { onDestroy } from 'svelte';
 
-	const time = Context.time();
+	let time = new Date();
+
+	const interval = setInterval(() => (time = new Date()), 1000);
 
 	const formatter = new Intl.DateTimeFormat('en', {
 		hour12: false,
@@ -10,6 +12,8 @@
 	});
 
 	let soundOn: boolean = true;
+
+	onDestroy(() => clearInterval(interval));
 </script>
 
 <div class="navbar-clock">
@@ -20,7 +24,7 @@
 			alt={soundOn ? 'sound on' : 'sound off'}
 			draggable="false"
 		/>
-		{formatter.format($time)}
+		{formatter.format(time)}
 	</p>
 </div>
 

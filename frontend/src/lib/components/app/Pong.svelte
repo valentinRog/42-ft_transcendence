@@ -1,7 +1,10 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
-	import { socket, token } from '$lib/stores/stores';
+	import { socket, token } from '$lib/stores';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { Context } from '$lib/components/Context.svelte';
+
+	const fetchWithToken = Context.fetchWithToken();
 
 	interface Dimensions {
 		readonly width: number;
@@ -224,17 +227,6 @@
 		requestAnimationFrame(() => draw(ctx));
 	}
 
-	async function joinMatchmakingQueue() {
-		await fetch(`${PUBLIC_BACKEND_URL}/matchmaking/queue`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${$token}`
-			},
-			body: JSON.stringify({ token: $token })
-		});
-	}
-
 	function gameLoop() {
 		const input: Input = {
 			room,
@@ -269,7 +261,13 @@
 	}
 
 	onMount(() => {
-		joinMatchmakingQueue();
+		fetchWithToken('matchmaking/queue', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ token: $token })
+		});
 
 		index = 0;
 		room = '';

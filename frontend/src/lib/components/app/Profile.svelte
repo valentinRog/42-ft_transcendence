@@ -1,64 +1,32 @@
 <script lang="ts">
-	import { PUBLIC_BACKEND_URL } from '$env/static/public';
-	import { token, user } from '$lib/stores/stores';
+	import { user } from '$lib/stores';
+	import { Context } from '$lib/components/Context.svelte';
 
-	interface Friend {
-		id: string;
-		username: string;
-		status: string;
-	}
+	const fetchWithToken = Context.fetchWithToken();
 
 	export let username: string | null | undefined = null;
 	let login: string | null | undefined = null;
 	let currentUser: any = {};
-	let friends: Friend[] = [];
 	let imgUrl: string | '';
 
-	(async function getUserById() {
-		let res;
-		let url;
-		if (username === null) {
-			res = await fetch(`${PUBLIC_BACKEND_URL}/users/me`, {
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${$token}`
-				}
+	if (username === null) {
+		username = $user!.username;
+		login = $user!.login;
+	} else {
+		fetchWithToken(`users/info/${username}`)
+			.then((res) => res.json())
+			.then((data) => {
+				currentUser = data;
+				login = currentUser.login;
 			});
-			username = $user?.username;
-		} else
-			res = await fetch(`${PUBLIC_BACKEND_URL}/users/info/${username}`, {
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${$token}`
-				}
-			});
-		const data = await res.json();
-		currentUser = data;
-		login = currentUser.login;
-		return data;
-	})();
+	}
 
-	(async function getFriends() {
-		const res = await fetch(`${PUBLIC_BACKEND_URL}/users/me/friends`, {
-			method: 'GET',
-			headers: {
-				Authorization: `Bearer ${$token}`
-			}
-		});
-		friends = await res.json();
-	})();
+	const friends = Context.contacts();
 
 	$: if (login)
-		(async function getPhoto() {
-			const res = await fetch(`${PUBLIC_BACKEND_URL}/users/avatar/${login}`, {
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${$token}`
-				}
-			});
-			const blob = await res.blob();
-			imgUrl = URL.createObjectURL(blob);
-		})();
+		fetchWithToken(`users/avatar/${login}`)
+			.then((res) => res.blob())
+			.then((blob) => (imgUrl = URL.createObjectURL(blob)));
 </script>
 
 <div id="box">
@@ -76,7 +44,7 @@
 			<li class="box friends">
 				<p>My friends</p>
 				<ul id="friend-list">
-					{#each friends as friend (friend.id)}
+					{#each $friends as friend (friend.id)}
 						<li class="friend">
 							<div>
 								<p>{friend.username} :</p>

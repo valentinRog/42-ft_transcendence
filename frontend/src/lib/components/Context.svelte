@@ -1,8 +1,11 @@
 <script lang="ts" context="module">
-	import type { Readable, Writable } from 'svelte/store';
+	import type { Writable } from 'svelte/store';
 	import { getContext } from 'svelte';
 
 	export namespace Context {
+		export const fetchWithToken = (): ((url: string, options?: RequestInit) => Promise<Response>) =>
+			getContext('fetchWithToken');
+
 		export interface Contact {
 			id: number;
 			username: string;
@@ -75,11 +78,16 @@
 		export const zstack = (): Writable<number[]> => getContext('zstack');
 		export const gid = (): Writable<number> => getContext('gid');
 
-		export const addInstance = (): Readable<
-			(componentType: string, propsWin?: Record<string, any>, props?: Record<string, any>) => void
-		> => getContext('addInstance');
+		export const addInstance = (): ((
+			componentType: string,
+			propsWin?: Record<string, any>,
+			props?: Record<string, any>
+		) => void) => getContext('addInstance');
 
-		export const time = (): Writable<Date> => getContext('time');
+		export const fetchMe = (): (() => void) => getContext('fetchMe');
+		export const fetchFriends = (): (() => void) => getContext('fetchFriends');
+		export const fetchFriendRequest = (): (() => void) => getContext('fetchFriendRequest');
+		export const fetchChats = (): (() => void) => getContext('fetchChats');
 	}
 </script>
 
@@ -92,14 +100,36 @@
 	import Profile from '$lib/components/app/Profile.svelte';
 	import Conversation from '$lib/components/app/Conversation.svelte';
 	import FriendRequest from '$lib/components/app/FriendRequest.svelte';
+	import { token, user } from '$lib/stores';
+	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
-	setContext('contacts', writable<Context.Contact[]>([]));
-	setContext('friendRequest', writable<Context.Contact[]>([]));
-	setContext('openFriendRequest', writable(false));
-	setContext('friendInfo', writable<Context.User | null>(null));
-	setContext('chats', writable<Context.Chat[]>([]));
-	setContext('chatId', writable<number | null>(null));
-	setContext('openChatWindow', writable(false));
+	function fetchWithToken(route: string, options: RequestInit = {}) {
+		return fetch(`${PUBLIC_BACKEND_URL}/${route}`, {
+			...options,
+			headers: {
+				...options.headers,
+				Authorization: `Bearer ${$token}`
+			}
+		});
+	}
+
+	setContext('fetchWithToken', fetchWithToken);
+
+	const contacts = writable<Context.Contact[]>([]);
+	const friendRequest = writable<Context.Contact[]>([]);
+	const openFriendRequest = writable(false);
+	const friendInfo = writable<Context.User | null>(null);
+	const chats = writable<Context.Chat[]>([]);
+	const chatId = writable<number | null>(null);
+	const openChatWindow = writable(false);
+
+	setContext('contacts', contacts);
+	setContext('friendRequest', friendRequest);
+	setContext('openFriendRequest', openFriendRequest);
+	setContext('friendInfo', friendInfo);
+	setContext('chats', chats);
+	setContext('chatId', chatId);
+	setContext('openChatWindow', openChatWindow);
 
 	const components = readable({
 		Pong: Pong,
@@ -115,26 +145,24 @@
 	const gid = writable(0);
 	const selected = writable<number | null>(null);
 
-	const addInstance = readable(
-		(
-			componentType: string,
-			propsWin: Record<string, any> = {},
-			props: Record<string, any> = {}
-		) => {
-			$zstack = [...$zstack, $zstack.length];
-			$appInstances = [
-				...$appInstances,
-				{
-					componentType: componentType as Context.App,
-					component: $components[componentType as Context.App],
-					visible: true,
-					id: $gid++,
-					propsWin,
-					props
-				}
-			];
-		}
-	);
+	function addInstance(
+		componentType: string,
+		propsWin: Record<string, any> = {},
+		props: Record<string, any> = {}
+	) {
+		$zstack = [...$zstack, $zstack.length];
+		$appInstances = [
+			...$appInstances,
+			{
+				componentType: componentType as Context.App,
+				component: $components[componentType as Context.App],
+				visible: true,
+				id: $gid++,
+				propsWin,
+				props
+			}
+		];
+	}
 
 	setContext('components', components);
 	setContext('appInstances', appInstances);
@@ -143,18 +171,41 @@
 	setContext('selected', selected);
 	setContext('addInstance', addInstance);
 
-	setContext(
-		'time',
-		readable(new Date(), function start(set) {
-			const interval = setInterval(() => {
-				set(new Date());
-			}, 1000);
+	function fetchMe() {
+		fetchWithToken('users/me')
+			.then((res) => res.json())
+			.then(
+				(data) =>
+					($user = {
+						id: data.id,
+						username: data.username,
+						login: data.login
+					})
+			);
+	}
 
-			return function stop() {
-				clearInterval(interval);
-			};
-		})
-	);
+	function fetchFriends() {
+		fetchWithToken('users/me/friends')
+			.then((res) => res.json())
+			.then((data) => ($contacts = data));
+	}
+
+	function fetchFriendRequest() {
+		fetchWithToken('notification/get?type=friend')
+			.then((res) => res.json())
+			.then((data) => ($friendRequest = data));
+	}
+
+	function fetchChats() {
+		fetchWithToken('chat/allUserChats')
+			.then((res) => res.json())
+			.then((data) => ($chats = data));
+	}
+
+	setContext('fetchFriends', fetchFriends);
+	setContext('fetchMe', fetchMe);
+	setContext('fetchFriendRequest', fetchFriendRequest);
+	setContext('fetchChats', fetchChats);
 </script>
 
 <slot />
