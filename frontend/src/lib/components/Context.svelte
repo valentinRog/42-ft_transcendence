@@ -19,6 +19,7 @@
 			user: User;
 			userId: number;
 		};
+
 		export type Chat = {
 			chatUsers: ChatUser[];
 			messages: Message[];
@@ -66,22 +67,23 @@
 			readonly componentType: App;
 			readonly component: any;
 			visible: boolean;
-			readonly id: string;
 			readonly propsWin: Record<string, any>;
 			readonly props: Record<string, any>;
 		}
 
-		export const components = (): Writable<Record<App, any>> => getContext('components');
+		export const components = (): Readable<Record<App, any>> => getContext('components');
 
-		export const appInstances = (): Writable<AppInstance[]> => getContext('appInstances');
-		export const selected = (): Writable<number | null> => getContext('selected');
-		export const zstack = (): Writable<number[]> => getContext('zstack');
+		export const appInstances = (): Writable<Map<string, AppInstance>> => getContext('appInstances');
+		export const selected = (): Writable<string | null> => getContext('selected');
+		export const zstack = (): Writable<string[]> => getContext('zstack');
 
 		export const addInstance = (): ((
 			componentType: string,
 			propsWin?: Record<string, any>,
 			props?: Record<string, any>
 		) => void) => getContext('addInstance');
+
+		export const removeInstance = (): ((id: string) => void) => getContext('removeInstance');
 
 		export const fetchMe = (): (() => Promise<any>) => getContext('fetchMe');
 		export const fetchFriends = (): (() => Promise<any>) => getContext('fetchFriends');
@@ -145,27 +147,32 @@
 		Conversation: Conversation
 	});
 
-	const appInstances = writable<Context.AppInstance[]>([]);
-	const zstack = writable<number[]>([]);
-	const selected = writable<number | null>(null);
+	const appInstances = writable(new Map<string, Context.AppInstance>);
+	const zstack = writable<string[]>([]);
+	const selected = writable<string | null>(null);
 
 	function addInstance(
 		componentType: string,
 		propsWin: Record<string, any> = {},
 		props: Record<string, any> = {}
 	) {
-		$zstack = [...$zstack, $zstack.length];
-		$appInstances = [
-			...$appInstances,
-			{
-				componentType: componentType as Context.App,
-				component: $components[componentType as Context.App],
-				visible: true,
-				id: uuidv4(),
-				propsWin,
-				props
-			}
-		];
+		const id = uuidv4();
+		$zstack = [...$zstack, id];
+		$appInstances.set(id,
+		{
+			componentType: componentType as Context.App,
+			component: $components[componentType as Context.App],
+			visible: true,
+			propsWin,
+			props
+		});
+		$appInstances = $appInstances;
+	}
+
+	function removeInstance(id: string) {
+		$appInstances.delete(id);
+		$appInstances = $appInstances;
+		$zstack = $zstack.filter((z) => z !== id);
 	}
 
 	setContext('components', components);
@@ -173,6 +180,7 @@
 	setContext('zstack', zstack);
 	setContext('selected', selected);
 	setContext('addInstance', addInstance);
+	setContext('removeInstance', removeInstance);
 
 	async function fetchMe() {
 		const res = await fetchWithToken('users/me');
