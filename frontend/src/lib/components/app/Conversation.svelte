@@ -45,14 +45,6 @@
 		}
 	}
 
-	function truncateMessageContent(content: string, length: number) {
-		if (content.length > length) {
-			return content.substring(0, length) + ' ...';
-		} else {
-			return content;
-		}
-	}
-
 	function timeDifference(current: Date, previous: Date) { //PAS SUR DE GARDER
 		const msPerMinute = 60 * 1000;
 		const msPerHour = msPerMinute * 60;
@@ -96,7 +88,7 @@
 				<div class="chat-content">
 					{#if chat.messages.length > 0}
 						<div class="message-details">
-							<p>{getLastMessageSender(chat)}: {truncateMessageContent(chat.messages[chat.messages.length - 1].content, 17)}</p>
+							<p>{getLastMessageSender(chat)}: {chat.messages[chat.messages.length - 1].content}</p>
 							<span class="timestamp">{timeDifference(now, new Date(chat.messages[chat.messages.length - 1].createdAt))}</span>
 						</div>
 						<p class="unread-messages">{getUnreadMessagesCount(chat, chat.chatUsers.find(chatUser => chatUser.userId === $user?.id))}</p>
@@ -157,10 +149,13 @@
         justify-content: space-between;
     }
 
-	.message-details {
-		display: flex;
-		flex-direction: column;
-	}
+	.message-details p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
 
     .unread-messages {
         display: flex;
