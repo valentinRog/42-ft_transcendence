@@ -6,6 +6,17 @@
 	const chats = Context.chats();
 	const chatId = Context.chatId();
 	const openChatWindow = Context.openChatWindow();
+	let now = new Date();
+
+	onMount(() => {
+        const intervalId = setInterval(() => {
+            now = new Date();
+        }, 30000);
+
+        return () => {
+            clearInterval(intervalId);
+        };
+    });
 
 	function startChat(chatNumber: number) {
 		$chatId = chatNumber;
@@ -42,8 +53,9 @@
 		const msPerYear = msPerDay * 365;
 
 		const elapsed = current.getTime() - previous.getTime();
-
-		if (elapsed < msPerMinute)
+		if (elapsed <= 0)
+			return 'just now';
+		else if (elapsed < msPerMinute)
 			return Math.round(elapsed / 1000) + ' s ago';   
 		else if (elapsed < msPerHour)
 			return Math.round(elapsed / msPerMinute) + ' min ago';   
@@ -77,7 +89,7 @@
 					{#if chat.messages.length > 0}
 						<div class="message-details">
 							<p>{getLastMessageSender(chat)}: {chat.messages[chat.messages.length - 1].content}</p>
-							<span class="timestamp">{timeDifference(new Date(), new Date(chat.messages[chat.messages.length - 1].createdAt))}</span>
+							<span class="timestamp">{timeDifference(now, new Date(chat.messages[chat.messages.length - 1].createdAt))}</span>
 						</div>
 						<p class="unread-messages">{getUnreadMessagesCount(chat, chat.chatUsers.find(chatUser => chatUser.userId === $user?.id))}</p>
 					{:else}
