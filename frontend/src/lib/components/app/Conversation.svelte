@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { user } from '$lib/stores';
 	import { Context } from '$lib/components/Context.svelte';
 
@@ -20,6 +21,42 @@
 			return 'No messages yet';
 		}
 	}
+
+	function getUnreadMessagesCount(chat: any, chatUser: any) {
+		if (chat.messages.length > 0) {
+			const lastReadMessageId = chatUser.lastReadMessageId || 0;
+			const unreadMessages = chat.messages.filter((message : any) => message.id > lastReadMessageId);
+			const unreadCount = unreadMessages.length;
+
+			return unreadCount > 99 ? "99+" : unreadCount;
+		} else {
+			return 0;
+		}
+	}
+
+	function timeDifference(current: Date, previous: Date) { //PAS SUR DE GARDER
+		const msPerMinute = 60 * 1000;
+		const msPerHour = msPerMinute * 60;
+		const msPerDay = msPerHour * 24;
+		const msPerMonth = msPerDay * 30;
+		const msPerYear = msPerDay * 365;
+
+		const elapsed = current.getTime() - previous.getTime();
+
+		if (elapsed < msPerMinute)
+			return Math.round(elapsed / 1000) + ' s ago';   
+		else if (elapsed < msPerHour)
+			return Math.round(elapsed / msPerMinute) + ' min ago';   
+		else if (elapsed < msPerDay )
+			return Math.round(elapsed / msPerHour ) + ' h ago';   
+		else if (elapsed < msPerMonth)
+			return Math.round(elapsed / msPerDay) + ' d ago';   
+		else if (elapsed < msPerYear)
+			return Math.round(elapsed / msPerMonth) + ' m ago';   
+		else
+			return Math.round(elapsed / msPerYear ) + ' y ago';   
+	}
+
 </script>
 
 <div id="box">
@@ -27,7 +64,7 @@
 		{#each $chats.sort((chatA, chatB) => {
 			const dateA = new Date(chatA.messages.length > 0 ? chatA.messages[chatA.messages.length - 1].createdAt : chatA.createdAt);
 			const dateB = new Date(chatB.messages.length > 0 ? chatB.messages[chatB.messages.length - 1].createdAt : chatB.createdAt);
-			return dateB.getTime() - dateA.getTime(); // This will sort in descending order
+			return dateB.getTime() - dateA.getTime();
 		}) as chat (chat.id)}
 			<div class="chat" on:click={() => startChat(chat.id)}>
 				<h4>
@@ -36,15 +73,22 @@
 						: 'Chat: ' +
 						  chat.chatUsers.find((chatUser) => chatUser.userId !== $user?.id)?.user?.username}
 				</h4>
-				{#if chat.messages.length > 0}
-					<p>{getLastMessageSender(chat)}: {chat.messages[chat.messages.length - 1].content}</p>
-				{:else}
-					<p>No messages yet</p>
-				{/if}
+				<div class="chat-content">
+					{#if chat.messages.length > 0}
+						<div class="message-details">
+							<p>{getLastMessageSender(chat)}: {chat.messages[chat.messages.length - 1].content}</p>
+							<span class="timestamp">{timeDifference(new Date(), new Date(chat.messages[chat.messages.length - 1].createdAt))}</span>
+						</div>
+						<p class="unread-messages">{getUnreadMessagesCount(chat, chat.chatUsers.find(chatUser => chatUser.userId === $user?.id))}</p>
+					{:else}
+						<p>No messages yet</p>
+					{/if}
+				</div>
 			</div>
 		{/each}
 	</div>
 </div>
+
 
 <style lang="scss">
 	@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
@@ -81,9 +125,40 @@
 
 	h4 {
 		color: #000080;
+		margin-bottom: 0.5rem;
 	}
 
 	p {
 		color: #000;
 	}
+
+    .chat-content {
+        display: flex;
+        justify-content: space-between;
+    }
+
+	.message-details {
+		display: flex;
+		flex-direction: column;
+	}
+
+    .unread-messages {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 15px;
+        height: 15px;
+        color: white;
+        background-color: red;
+        border-radius: 50%;
+        font-size: 10px;
+        margin: 0;
+		align-self: center;
+    }
+
+	.timestamp {
+    	font-size: 0.8rem;
+		color: rgb(58, 58, 58);
+	}
+
 </style>

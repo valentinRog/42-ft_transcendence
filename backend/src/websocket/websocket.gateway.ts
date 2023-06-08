@@ -155,7 +155,7 @@ export abstract class SocketGateway
     const isSuccessful = await this.chatService.leaveGroup(data.chatId, userId);
 
     if (isSuccessful) {
-      this.server.to(`chat-${data.chatId}`).emit('leaveChat', data.chatId);
+      client.emit('leaveChat', data.chatId);
       client.leave(`chat-${data.chatId}`);
     }
   }
