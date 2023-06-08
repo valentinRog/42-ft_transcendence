@@ -89,6 +89,8 @@
 		export const fetchChats = (): (() => Promise<any>) => getContext('fetchChats');
 
 		export const socket = (): Readable<Socket> => getContext('socket');
+		
+		export const getUnreadMessagesCount = (): ((chat: any, chatUser: any) => number) => getContext('getUnreadMessagesCount');
 	}
 </script>
 
@@ -253,6 +255,20 @@
 	onDestroy(() => {
 		$socket.disconnect();
 	});
+
+	function getUnreadMessagesCount(chat: any, chatUser: any) {
+		if (chat.messages.length > 0) {
+			const lastReadMessageId = chatUser.lastReadMessageId || 0;
+			const unreadMessages = chat.messages.filter((message : any) => message.id > lastReadMessageId);
+			const unreadCount = unreadMessages.length;
+
+			return unreadCount > 99 ? "99+" : unreadCount;
+		} else {
+			return 0;
+		}
+	}
+
+	setContext('getUnreadMessagesCount', getUnreadMessagesCount);
 </script>
 
 <slot />

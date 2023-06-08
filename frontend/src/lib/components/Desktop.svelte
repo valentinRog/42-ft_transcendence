@@ -230,5 +230,9 @@
 		position: relative;
 	}
 
+	.icon-container {
+		position: relative;
+	}
+
 	@include navbar;
 </style>

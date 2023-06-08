@@ -6,6 +6,7 @@
 	const chats = Context.chats();
 	const chatId = Context.chatId();
 	const openChatWindow = Context.openChatWindow();
+	const getUnreadMessagesCount = Context.getUnreadMessagesCount();
 	let now = new Date();
 
 	onMount(() => {
@@ -30,18 +31,6 @@
 			)?.user?.username;
 		} else {
 			return 'No messages yet';
-		}
-	}
-
-	function getUnreadMessagesCount(chat: any, chatUser: any) {
-		if (chat.messages.length > 0) {
-			const lastReadMessageId = chatUser.lastReadMessageId || 0;
-			const unreadMessages = chat.messages.filter((message : any) => message.id > lastReadMessageId);
-			const unreadCount = unreadMessages.length;
-
-			return unreadCount > 99 ? "99+" : unreadCount;
-		} else {
-			return 0;
 		}
 	}
 
