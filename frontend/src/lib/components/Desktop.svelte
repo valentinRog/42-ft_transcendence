@@ -108,12 +108,15 @@
 	(async () => {
 		await fetchMe();
 		await fetchFriends();
-		await fetchChats();
+		
+		fetchChats().then(() => {
+			$chats.forEach((chat) => {
+				if (chat.isGroupChat)
+					$socket.emit('joinRoom', { chatId: chat.id });
+			});
+		});
 	})();
 
-	$chats.forEach((chat) => {
-		if (chat.isGroupChat) $socket.emit('joinRoom', { chatId: chat.id });
-	});
 </script>
 
 <div
