@@ -6,6 +6,18 @@
 	const chats = Context.chats();
 	const chatId = Context.chatId();
 	const openChatWindow = Context.openChatWindow();
+	const getUnreadMessagesCount = Context.getUnreadMessagesCount();
+	let now = new Date();
+
+	onMount(() => {
+        const intervalId = setInterval(() => {
+            now = new Date();
+        }, 30000);
+
+        return () => {
+            clearInterval(intervalId);
+        };
+    });
 
 	function startChat(chatNumber: number) {
 		$chatId = chatNumber;
@@ -22,18 +34,6 @@
 		}
 	}
 
-	function getUnreadMessagesCount(chat: any, chatUser: any) {
-		if (chat.messages.length > 0) {
-			const lastReadMessageId = chatUser.lastReadMessageId || 0;
-			const unreadMessages = chat.messages.filter((message : any) => message.id > lastReadMessageId);
-			const unreadCount = unreadMessages.length;
-
-			return unreadCount > 99 ? "99+" : unreadCount;
-		} else {
-			return 0;
-		}
-	}
-
 	function timeDifference(current: Date, previous: Date) { //PAS SUR DE GARDER
 		const msPerMinute = 60 * 1000;
 		const msPerHour = msPerMinute * 60;
@@ -42,8 +42,9 @@
 		const msPerYear = msPerDay * 365;
 
 		const elapsed = current.getTime() - previous.getTime();
-
-		if (elapsed < msPerMinute)
+		if (elapsed <= 0)
+			return 'just now';
+		else if (elapsed < msPerMinute)
 			return Math.round(elapsed / 1000) + ' s ago';   
 		else if (elapsed < msPerHour)
 			return Math.round(elapsed / msPerMinute) + ' min ago';   
@@ -77,7 +78,7 @@
 					{#if chat.messages.length > 0}
 						<div class="message-details">
 							<p>{getLastMessageSender(chat)}: {chat.messages[chat.messages.length - 1].content}</p>
-							<span class="timestamp">{timeDifference(new Date(), new Date(chat.messages[chat.messages.length - 1].createdAt))}</span>
+							<span class="timestamp">{timeDifference(now, new Date(chat.messages[chat.messages.length - 1].createdAt))}</span>
 						</div>
 						<p class="unread-messages">{getUnreadMessagesCount(chat, chat.chatUsers.find(chatUser => chatUser.userId === $user?.id))}</p>
 					{:else}
@@ -137,10 +138,13 @@
         justify-content: space-between;
     }
 
-	.message-details {
-		display: flex;
-		flex-direction: column;
-	}
+	.message-details p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
 
     .unread-messages {
         display: flex;
