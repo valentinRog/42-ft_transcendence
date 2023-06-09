@@ -57,36 +57,36 @@
 
 <div id="login">
 
-
-
 	<dialog
 		bind:this={dialog}
 		on:close={() => (showModal = false)}
 		on:click|self={() => dialog.close()}
 	>
-	<!--<section>
-		<div class="border-inside">
-	<div class="window">-->
+
+
+
+
+
+
+		<div class="top-bar">
 		<div class="buttons">
 			<button on:click={() => dialog.close()}>
-				<div class="border-inside">X</div>
+				<div class="border-inside">&nbspX&nbsp</div>
 			</button>
 		</div>
+	</div>
+		<p> {errorMessage} </p>
 		<div on:click|stopPropagation>
-			<p>Error</p>
 			<button autofocus on:click={() => dialog.close()}>OK</button>
 		</div>
-	<!--</div>-->
-	<!--</div>
-	</section>-->
 	</dialog>
 
 	<div id="formular">
 	<div class="top-bar">
 
 		<div class="buttons">
-			<button>?</button>
-			<button>X</button>
+			<button>&nbsp?&nbsp</button>
+			<button>&nbspX&nbsp</button>
 		</div>
 	</div>
 	<div class="content">
@@ -137,7 +137,12 @@
 <style lang="scss">
 
 	@include dialog-95;
-	@include window-95;
+	//@include window-95;
+
+	#box {
+		width: 15.5rem;
+		height: 20rem;
+	}
 
 	div#formular {
 
@@ -177,10 +182,9 @@
 
 		@include tab-contour;
 		background-color: $grey;
-		display: block;
 		width: fit-content;
 		margin: 0 auto;
-		margin-top: 5rem;
+		margin-top: 10rem;
 
 		div.top-bar {
 			background-color: $blue;
@@ -204,8 +208,8 @@
 
 		.button-container button {
 			font-size: inherit;
-			padding: 0.3rem 1rem; /* Adjust the padding as desired */
-			width: 10rem; /* Adjust the width as desired */
+			padding: 0.3rem 1rem;
+			width: 10rem;
 
 		}
 

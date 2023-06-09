@@ -180,27 +180,27 @@
 @mixin dialog-95 {
 	dialog {
 		max-width: 32em;
+    	height: 8em; /* Adjust the value as needed */
 		border: none;
 		padding: 0;
 		position: fixed;
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
-
 		background-color: $grey;
 	}
 	dialog::backdrop {
 		background: rgba(0, 0, 0, 0.3);
 	}
-	dialog > div {
-		padding: 1em;
-	}
+
 
 	dialog > div > button {
-		position: absolute;
-		top: 0;
-		right: 0;
-		transform: translate(-50%, -50%);
+		margin-top: 60px; /* Adjust the margin value to position the button lower */
+		// center
+		margin-left: auto;
+		margin-right: auto;
+		display: block;
+
 	}
 
 	dialog[open] {
