@@ -48,8 +48,10 @@
 		actionUrl = signup ? `${PUBLIC_BACKEND_URL}/auth/signup` : `${PUBLIC_BACKEND_URL}/auth/signin`;
 	}
 	let showModal = false;
-	let dialog : HTMLDialogElement | null = null;
+	let dialog; // HTMLDialogElement
+
 	$: if (dialog && showModal) dialog.showModal();
+
 </script>
 
 
@@ -58,7 +60,6 @@
 		bind:this={dialog}
 		on:close={() => (showModal = false)}
 		on:click|self={() => dialog.close()}
-		on:click|stopPropagation
 	>
 		<div class="top-bar">
 		<div class="buttons">
@@ -134,11 +135,6 @@
 
 	@include dialog-95;
 
-	#box {
-		width: 15.5rem;
-		height: 20rem;
-	}
-
 	div#formular {
 		form {
 			display: flex;
@@ -203,7 +199,6 @@
 			font-size: inherit;
 			padding: 0.3rem 1rem;
 			width: 10rem;
-
 		}
 
 		div.content {

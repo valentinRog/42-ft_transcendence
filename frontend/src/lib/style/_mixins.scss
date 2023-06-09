@@ -179,8 +179,7 @@
 
 @mixin dialog-95 {
 	dialog {
-
-		border: none;
+		@include tab-contour;
 		padding: 0;
 		position: fixed;
 		top: 50%;
@@ -218,11 +217,6 @@
 		justify-content: center;
 		text-align: center;
 	}
-
-	dialog[open] {
-		animation: none !important;
-	}
-
 }
 
 @mixin window-95 {
