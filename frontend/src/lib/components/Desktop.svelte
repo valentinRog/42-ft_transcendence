@@ -34,12 +34,12 @@
 	$: {
 		if ($openChatWindow) {
 			let name;
-			if ($chatId === null || $chatId === undefined) 
-				name = $friendInfo?.username;
+			if ($chatId === null || $chatId === undefined) name = $friendInfo?.username;
 			else {
 				let targetChat = $chats.find((chat) => chat.id === $chatId);
 
-				name = targetChat?.chatUsers.find((u) => u.user.username !== $user?.username)?.user.username;
+				name = targetChat?.chatUsers.find((u) => u.user.username !== $user?.username)?.user
+					.username;
 			}
 			addInstance('Chat', { name: name });
 			$selected = null;
@@ -101,15 +101,13 @@
 	(async () => {
 		await fetchMe();
 		await fetchFriends();
-		
+
 		fetchChats().then(() => {
 			$chats.forEach((chat) => {
-				if (chat.isGroupChat)
-					$socket.emit('joinRoom', { chatId: chat.id });
+				if (chat.isGroupChat) $socket.emit('joinRoom', { chatId: chat.id });
 			});
 		});
 	})();
-
 </script>
 
 <div

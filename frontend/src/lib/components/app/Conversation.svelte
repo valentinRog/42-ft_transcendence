@@ -10,14 +10,14 @@
 	let now = new Date();
 
 	onMount(() => {
-        const intervalId = setInterval(() => {
-            now = new Date();
-        }, 30000);
+		const intervalId = setInterval(() => {
+			now = new Date();
+		}, 30000);
 
-        return () => {
-            clearInterval(intervalId);
-        };
-    });
+		return () => {
+			clearInterval(intervalId);
+		};
+	});
 
 	function startChat(chatNumber: number) {
 		$chatId = chatNumber;
@@ -42,22 +42,14 @@
 		const msPerYear = msPerDay * 365;
 
 		const elapsed = current.getTime() - previous.getTime();
-		if (elapsed <= 0)
-			return 'just now';
-		else if (elapsed < msPerMinute)
-			return Math.round(elapsed / 1000) + ' s ago';   
-		else if (elapsed < msPerHour)
-			return Math.round(elapsed / msPerMinute) + ' min ago';   
-		else if (elapsed < msPerDay )
-			return Math.round(elapsed / msPerHour ) + ' h ago';   
-		else if (elapsed < msPerMonth)
-			return Math.round(elapsed / msPerDay) + ' d ago';   
-		else if (elapsed < msPerYear)
-			return Math.round(elapsed / msPerMonth) + ' m ago';   
-		else
-			return Math.round(elapsed / msPerYear ) + ' y ago';   
+		if (elapsed <= 0) return 'just now';
+		else if (elapsed < msPerMinute) return Math.round(elapsed / 1000) + ' s ago';
+		else if (elapsed < msPerHour) return Math.round(elapsed / msPerMinute) + ' min ago';
+		else if (elapsed < msPerDay) return Math.round(elapsed / msPerHour) + ' h ago';
+		else if (elapsed < msPerMonth) return Math.round(elapsed / msPerDay) + ' d ago';
+		else if (elapsed < msPerYear) return Math.round(elapsed / msPerMonth) + ' m ago';
+		else return Math.round(elapsed / msPerYear) + ' y ago';
 	}
-
 </script>
 
 <div id="box">
@@ -78,9 +70,19 @@
 					{#if chat.messages.length > 0}
 						<div class="message-details">
 							<p>{getLastMessageSender(chat)}: {chat.messages[chat.messages.length - 1].content}</p>
-							<span class="timestamp">{timeDifference(now, new Date(chat.messages[chat.messages.length - 1].createdAt))}</span>
+							<span class="timestamp"
+								>{timeDifference(
+									now,
+									new Date(chat.messages[chat.messages.length - 1].createdAt)
+								)}</span
+							>
 						</div>
-						<p class="unread-messages">{getUnreadMessagesCount(chat, chat.chatUsers.find(chatUser => chatUser.userId === $user?.id))}</p>
+						<p class="unread-messages">
+							{getUnreadMessagesCount(
+								chat,
+								chat.chatUsers.find((chatUser) => chatUser.userId === $user?.id)
+							)}
+						</p>
 					{:else}
 						<p>No messages yet</p>
 					{/if}
@@ -89,7 +91,6 @@
 		{/each}
 	</div>
 </div>
-
 
 <style lang="scss">
 	@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
@@ -139,7 +140,7 @@
 		color: #000;
 	}
 
-    .chat-content {
+	.chat-content {
 		position: relative;
 		display: flex;
 		justify-content: space-between;
@@ -152,8 +153,7 @@
 		max-width: 9.2rem;
 	}
 
-
-    .chat-content {
+	.chat-content {
 		position: relative;
 		display: flex;
 		justify-content: space-between;
@@ -175,10 +175,8 @@
 		align-self: center;
 	}
 
-
 	.timestamp {
-    	font-size: 0.8rem;
+		font-size: 0.8rem;
 		color: rgb(58, 58, 58);
 	}
-
 </style>

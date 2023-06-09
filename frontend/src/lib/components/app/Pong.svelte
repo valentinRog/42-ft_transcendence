@@ -5,63 +5,6 @@
 	import RightDrop from '$lib/components/drop/RightDrop.svelte';
 	import DropButton from '../drop/DropButton.svelte';
 
-	const tree = {
-		name: 'des trucs',
-		children: [
-			{
-				name: "d'autres trucs",
-				children: [
-					{
-						name: 'toujours plus de trucs',
-						event: () => {},
-						children: [
-							{
-								name: "omg c'est tellement recursif",
-								event: () => {}
-							},
-							{
-								name: "omg c'est tellement recursif",
-								event: () => {}
-							},
-							{
-								name: "omg c'est tellement recursif",
-								event: () => {}
-							},
-							{
-								name: "omg c'est tellement recursif",
-								event: () => {}
-							},
-							{
-								name: "omg c'est tellement recursif",
-								event: () => {}
-							}
-						]
-					},
-					{
-						name: 'plus de trucs ici',
-						event: () => {}
-					}
-				]
-			},
-			{
-				name: 'logout',
-				event: () => {}
-			},
-			{
-				name: '2fa',
-				event: () => {}
-			}
-		]
-	};
-
-	const dropdowns = [
-		{ name: 'drop 1', trees: [tree, tree, tree] },
-		{ name: 'drop 2', trees: [tree, tree, tree] },
-		{ name: 'drop 3', trees: [tree, tree, tree] },
-		{ name: 'drop 4', trees: [tree, tree, tree] },
-		{ name: 'drop 5', trees: [tree, tree, tree] }
-	];
-
 	const fetchWithToken = Context.fetchWithToken();
 	const socket = Context.socket();
 
@@ -289,14 +232,14 @@
 	function gameLoop() {
 		const input: Input = {
 			room,
-			clientId: $socket!.id,
+			clientId: $socket.id,
 			stateId: state.id + delay,
 			clientTime: Date.now() + delay,
 			serverTime: Date.now() + delay + serverDelta,
 			up,
 			down
 		};
-		$socket!.emit('input', input);
+		$socket.emit('input', input);
 		inputs.push(input);
 		if (inputs.length > 100) {
 			inputs.shift();
@@ -305,7 +248,7 @@
 	}
 
 	function pingLoop() {
-		$socket!.emit('ping', Date.now());
+		$socket.emit('ping', Date.now());
 		pingTimer = setTimeout(pingLoop, 1000);
 	}
 
@@ -331,19 +274,19 @@
 		pingTimer = null;
 		gameTimer = null;
 
-		$socket!.on('enter-room', (data: { room: string; index: number }) => {
+		$socket.on('enter-room', (data: { room: string; index: number }) => {
 			room = data.room;
 			index = data.index;
-			$socket!.emit('enter-room', data);
+			$socket.emit('enter-room', data);
 			console.log('enter-room');
 			enterGame();
 		});
 
-		$socket!.on('index', (i: number) => {
+		$socket.on('index', (i: number) => {
 			index = i;
 		});
 
-		$socket!.on('game-over', (winner: number) => {
+		$socket.on('game-over', (winner: number) => {
 			stopLoop();
 			//if (winner === 0) {
 			//	alert('Player 1 wins!');
@@ -352,12 +295,12 @@
 			//}
 		});
 
-		$socket!.on('ping', (data: [number, number]) => {
+		$socket.on('ping', (data: [number, number]) => {
 			ping = Date.now() - data[0];
 			serverDelta = data[1] - Date.now() + ping / 2;
 		});
 
-		$socket!.on('state', (s: GameState) => {
+		$socket.on('state', (s: GameState) => {
 			s.time -= serverDelta;
 			while (inputs.length && inputs[0].clientTime < s.time) {
 				inputs.shift();
@@ -385,16 +328,16 @@
 	onDestroy(() => {
 		stopLoop();
 		if (room !== '') {
-			$socket!.emit('leave-room', { room: room, index: index });
+			$socket.emit('leave-room', { room: room, index: index });
 		} else {
 			fetchWithToken('matchmaking/unqueue', {
 				method: 'POST'
 			});
 		}
-		$socket!.off('enter-room');
-		$socket!.off('ping');
-		$socket!.off('state');
-		$socket!.off('input');
+		$socket.off('enter-room');
+		$socket.off('ping');
+		$socket.off('state');
+		$socket.off('input');
 	});
 
 	function handleKeyDown(e: KeyboardEvent) {

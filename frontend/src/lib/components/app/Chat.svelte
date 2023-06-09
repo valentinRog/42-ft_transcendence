@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, afterUpdate } from 'svelte';
 	import type { Socket } from 'socket.io-client';
 	import { Context } from '$lib/components/Context.svelte';
 	import { user } from '$lib/stores';
@@ -16,6 +16,7 @@
 	let socketInstance: Socket | null = null;
 	let messageContent = '';
 	let chatWindow: HTMLDivElement;
+	let autoScroll = true;
 
 	if (friend) {
 		friendUsername = friend.username;
@@ -33,6 +34,18 @@
 		}
 		chatWindow.scrollTop = chatWindow.scrollHeight;
 	});
+
+	afterUpdate(() => {
+		if (autoScroll) chatWindow.scrollTop = chatWindow.scrollHeight;
+	});
+
+	function handleScroll() {
+		if (chatWindow.scrollTop + chatWindow.clientHeight + 1 >= chatWindow.scrollHeight) {
+			autoScroll = true;
+		} else {
+			autoScroll = false;
+		}
+	}
 
 	async function sendMessage() {
 		if (messageContent.trim() === '') return;
@@ -65,106 +78,108 @@
 </script>
 
 <div id="box">
-    <div id="chat-window" bind:this={chatWindow}>
-        <h5>Waiting message...</h5>
-        <ul>
-            {#if $chats.find((c) => c.id === chatIdLocal)}
-                {#each $chats.find((c) => c.id === chatIdLocal)?.messages || [] as message, i (i)}
-                    <li class={findUser(message.userId, chatIdLocal) === $user?.username ? 'self' : 'other'}>
-                        <div class="message-header">
-                            <strong>{findUser(message.userId, chatIdLocal)}</strong><span>:</span>
-                        </div>
-                        <div class="message-content">{message.content}</div>
-                    </li>
-                {/each}
-            {/if}
-        </ul>
-    </div>
-    <div id="sendMessage-window">
-        <form on:submit|preventDefault={sendMessage} class="send-message-form">
-            <input type="text" bind:value={messageContent} class="message-input" />
-            <button type="submit" class="btn send-btn">Send</button>
-        </form>
-    </div>
+	<div id="chat-window" bind:this={chatWindow} on:scroll={handleScroll}>
+		<h5>Waiting message...</h5>
+		<ul>
+			{#if $chats.find((c) => c.id === chatIdLocal)}
+				{#each $chats.find((c) => c.id === chatIdLocal)?.messages || [] as message, i (i)}
+					<li class={findUser(message.userId, chatIdLocal) === $user?.username ? 'self' : 'other'}>
+						<div class="message-header">
+							<strong>{findUser(message.userId, chatIdLocal)}</strong><span>:</span>
+						</div>
+						<div class="message-content">{message.content}</div>
+					</li>
+				{/each}
+			{/if}
+		</ul>
+	</div>
+	<div id="sendMessage-window">
+		<form on:submit|preventDefault={sendMessage} class="send-message-form">
+			<input type="text" bind:value={messageContent} class="message-input" />
+			<button type="submit" class="btn send-btn">Send</button>
+		</form>
+	</div>
 </div>
 
 <style lang="scss">
-    #box {
-        background: #C0C0C0;
-        color: #000;
-        font-family: 'MS Sans Serif', sans-serif;
-        box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, 0.5);
-        width: 15rem;
-        height: 17rem;
-    }
+	#box {
+		background: #c0c0c0;
+		color: #000;
+		font-family: 'MS Sans Serif', sans-serif;
+		box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, 0.5);
+		width: 15rem;
+		height: 17rem;
+	}
 
-    #chat-window {
-        height: 85%;
-        overflow-y: auto;
-        overflow-x: hidden;
-        padding: 0.5rem;
-        border-bottom: 1px solid #000;
-    }
+	#chat-window {
+		height: 85%;
+		overflow-y: auto;
+		overflow-x: hidden;
+		padding: 0.5rem;
+		border-bottom: 1px solid #000;
+	}
 
-    #sendMessage-window {
-        padding: 0.5rem;
-    }
+	#sendMessage-window {
+		padding: 0.5rem;
+	}
 
-    .btn {
-        background: #C0C0C0;
-        border: 1px solid #000;
-        color: #000;
-    }
+	.btn {
+		background: #c0c0c0;
+		border: 1px solid #000;
+		color: #000;
+	}
 
-    .send-btn {
-        margin-left: auto;
-        order: 2;
-    }
+	.send-btn {
+		margin-left: auto;
+		order: 2;
+	}
 
-    .leave-group {
-        float: right;
-    }
+	.leave-group {
+		float: right;
+	}
 
-    h5 {
-        margin: 0;
+	h5 {
+		margin: 0;
 		text-align: center;
-        color: rgba(51, 51, 51, 0.814);
-    }
+		color: rgba(51, 51, 51, 0.814);
+	}
 
-    input[type="text"].message-input {
-        width: 100%;
-        box-sizing: border-box;
-        margin-right: 0.5rem;
-        order: 1;
-    }
+	input[type='text'].message-input {
+		width: 100%;
+		box-sizing: border-box;
+		margin-right: 0.5rem;
+		order: 1;
+	}
 
-    ul {
-        list-style: none;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-    }
+	ul {
+		list-style: none;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+	}
 
-    li {
-        margin-bottom: 0.5rem;
-        word-break: break-word;
-        display: flex;
-        flex-direction: column;
-    }
+	li {
+		margin-bottom: 0.5rem;
+		word-break: break-word;
+		display: flex;
+		flex-direction: column;
+	}
 
-    li.self .message-header, li.self .message-content {
-        align-self: flex-end;
-        display: flex;
-        justify-content: flex-end;
-        width: 9.5rem;
-    }
+	li.self .message-header,
+	li.self .message-content {
+		align-self: flex-end;
+		display: flex;
+		justify-content: flex-end;
+		width: 9.5rem;
+	}
 
-    li.other .message-header, li.other .message-content {
-        align-self: flex-start;
-        display: flex;
-        justify-content: flex-start;
-        width: 9.5rem;
-    }
+	li.other .message-header,
+	li.other .message-content {
+		align-self: flex-start;
+		display: flex;
+		justify-content: flex-start;
+		width: 9.5rem;
+	}
 
 	.message-header {
 		font-size: 0.85em;
@@ -172,20 +187,19 @@
 		color: #242424d1;
 	}
 
-    .message-content {
-        margin-top: 0.2rem;
-        padding-left: 0.5rem;
+	.message-content {
+		margin-top: 0.2rem;
+		padding-left: 0.5rem;
 		padding-right: 0.5rem;
 		padding-top: 0.3rem;
 		padding-bottom: 0.3rem;
 		font-size: 0.9em;
 		border-radius: 0.8rem;
-        background-color: rgb(229, 229, 229);
-    }
+		background-color: rgb(229, 229, 229);
+	}
 
-    .send-message-form {
-        display: flex;
-        width: 100%;
-    }
+	.send-message-form {
+		display: flex;
+		width: 100%;
+	}
 </style>
-

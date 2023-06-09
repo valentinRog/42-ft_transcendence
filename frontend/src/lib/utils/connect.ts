@@ -1,4 +1,4 @@
-import { token} from '$lib/stores';
+import { token } from '$lib/stores';
 import { goto } from '$app/navigation';
 
 export function logout() {

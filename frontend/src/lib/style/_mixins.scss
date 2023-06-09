@@ -156,8 +156,9 @@
 	@include no-border;
 	background-color: $grey;
 	cursor: url($click), auto;
-	padding: 0.15rem 0.25rem;
+	padding: 0.15rem 0.5rem;
 	font-size: medium;
+	min-width: 8rem;
 
 	&:hover {
 		background-color: $blue;

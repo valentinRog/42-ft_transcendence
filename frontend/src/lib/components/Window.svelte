@@ -36,10 +36,8 @@
 
 		if (name === 'Chat') {
 			currentChat = $chats.find((chat) => chat.id === chatIdLocal);
-			if (currentChat?.isGroupChat)
-				typeChat = 'Group';
-			else
-				typeChat = 'Chat';
+			if (currentChat?.isGroupChat) typeChat = 'Group';
+			else typeChat = 'Chat';
 		}
 	}
 
@@ -80,14 +78,14 @@
 					socketInstance.emit('changeChatName', {
 						chatId: chatIdLocal,
 						newName: prevName
-					});		
+					});
 				}
-			} 
+			}
 			editable = false;
 		}
 	}
 
-	function handleBlur() { 
+	function handleBlur() {
 		currentChat.name = prevName;
 		editable = false;
 	}
@@ -102,11 +100,13 @@
 		dialog.close();
 		if (socketInstance) socketInstance.emit('leaveGroup', { chatId: chatIdLocal });
 	}
-
 </script>
 
 <head>
-	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet" />
+	<link
+		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+		rel="stylesheet"
+	/>
 </head>
 
 <section
@@ -132,7 +132,13 @@
 				<p>My {name}</p>
 			{:else if name === 'Chat' && currentChat && currentChat.isGroupChat}
 				{#if editable}
-				<input type="text" bind:value={currentChat.name} on:keydown={handleEdit} on:blur={handleBlur} autofocus />
+					<input
+						type="text"
+						bind:value={currentChat.name}
+						on:keydown={handleEdit}
+						on:blur={handleBlur}
+						autofocus
+					/>
 				{:else}
 					<p id="group-chat-name" on:dblclick={toggleEdit}>{typeChat}: {currentChat.name}</p>
 				{/if}
@@ -144,13 +150,18 @@
 			<div class="buttons">
 				{#if name === 'Chat' && currentChat && currentChat.isGroupChat}
 					<button on:click={() => leaveGroup()}>
-						<i class="fas fa-sign-out-alt"></i>
+						<i class="fas fa-sign-out-alt" />
 						<dialog bind:this={dialog} class="dialog" open={isDialogOpen}>
 							<p>Voulez-vous vraiment quitter le groupe {currentChat?.name} ?</p>
 							<button on:click={() => leaveGroupConfirm()}>Oui</button>
-							<button on:click|stopPropagation={() => { isDialogOpen = false; dialog.close(); }}>Non</button>
-						</dialog>	
-					</button>					
+							<button
+								on:click|stopPropagation={() => {
+									isDialogOpen = false;
+									dialog.close();
+								}}>Non</button
+							>
+						</dialog>
+					</button>
 				{/if}
 				<button on:click={() => dispatch('minimize')}>
 					<div class="border-inside">_</div>
@@ -164,7 +175,6 @@
 		<slot />
 	</div>
 </section>
-
 
 <svelte:window on:mouseup={() => (moving = false)} on:mousemove={onMouseMove} />
 
@@ -224,7 +234,7 @@
 	}
 
 	#group-chat-name::after {
-		content: " ✎";
+		content: ' ✎';
 		font-size: 0.8rem;
 		position: relative;
 		opacity: 0.7;
@@ -254,5 +264,4 @@
 		margin-bottom: 1.25rem;
 		font-size: 1rem;
 	}
-
 </style>
