@@ -62,12 +62,6 @@
 		on:close={() => (showModal = false)}
 		on:click|self={() => dialog.close()}
 	>
-
-
-
-
-
-
 		<div class="top-bar">
 		<div class="buttons">
 			<button on:click={() => dialog.close()}>
@@ -75,10 +69,14 @@
 			</button>
 		</div>
 	</div>
-		<p> {errorMessage} </p>
+	<div class="content">
+		<div class="row-icon"><img src="/msg_warning.png"></div>
+		<p>{errorMessage}</p>
+	</div>
 		<div on:click|stopPropagation>
 			<button autofocus on:click={() => dialog.close()}>OK</button>
 		</div>
+
 	</dialog>
 
 	<div id="formular">
@@ -137,7 +135,6 @@
 <style lang="scss">
 
 	@include dialog-95;
-	//@include window-95;
 
 	#box {
 		width: 15.5rem;

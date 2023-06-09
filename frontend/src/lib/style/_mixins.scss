@@ -179,8 +179,8 @@
 
 @mixin dialog-95 {
 	dialog {
-		max-width: 32em;
-    	height: 8em; /* Adjust the value as needed */
+		//max-width: 32em;
+    	//height: 8em; /* Adjust the value as needed */
 		border: none;
 		padding: 0;
 		position: fixed;
@@ -195,12 +195,20 @@
 
 
 	dialog > div > button {
-		margin-top: 60px; /* Adjust the margin value to position the button lower */
-		// center
+		margin-top: 60px;
 		margin-left: auto;
 		margin-right: auto;
 		display: block;
+		padding: 0.2rem 2rem;
 
+	}
+
+	.content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
 	}
 
 	dialog[open] {
