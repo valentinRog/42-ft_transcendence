@@ -34,14 +34,6 @@
 		chatWindow.scrollTop = chatWindow.scrollHeight;
 	});
 
-	function findChat(chatId: number) {
-		let chat: any;
-		chats.subscribe(($chats) => {
-			chat = $chats.find((c) => c.id === chatId);
-		});
-		return chat;
-	}
-
 	async function sendMessage() {
 		if (messageContent.trim() === '') return;
 		if (socketInstance) {

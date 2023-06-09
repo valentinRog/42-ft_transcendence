@@ -17,6 +17,7 @@
 	const openFriendRequest = Context.openFriendRequest();
 	const friendInfo = Context.friendInfo();
 
+	let friendInput: string = "";
 	let groupChatMode = false;
 	let selectedFriends: string[] = [];
 	let socketInstance: Socket | null = null;
@@ -38,6 +39,7 @@
 		});
 		await res.json();
 		fetchFriends();
+		friendInput = "";
 	}
 
 	async function openRequest() {
@@ -127,10 +129,10 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <form on:submit|preventDefault={addFriend} id="add-friend-form">
-        <label for="friend">Add Friend: </label>
-        <input type="text" id="friend" name="friend" />
-        <input type="submit" value="+" />
-    </form>
+		<label for="friend">Add Friend: </label>
+		<input type="text" id="friend" name="friend" bind:value={friendInput} />
+		<input type="submit" id="submit-friend" value="+" />
+	</form>
     <div id="centered-buttons">
         <button on:click={toggleGroupChatMode}>{groupChatMode ? 'Cancel' : 'Create Group Chat'}</button>
         {#if groupChatMode && selectedFriends.length > 0}
@@ -206,6 +208,10 @@
 		align-items: center;
 		padding: 0.625rem;
 		border: 1px solid #ccc;
+	}
+
+	#submit-friend {
+		padding: 0.2rem;
 	}
 
 	.status-dot {

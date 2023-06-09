@@ -108,7 +108,7 @@
 	}
 
 	#chat-window {
-		height: 40vh;
+		height: 22rem;
 		overflow-y: auto;
 		overflow-x: hidden;
 		border-right-color: #fff;
@@ -132,7 +132,7 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		max-width: 150px;
+		max-width: 9.5rem;
 	}
 
 	p {
@@ -149,7 +149,7 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		max-width: 75%;
+		max-width: 9.2rem;
 	}
 
 
