@@ -35,6 +35,9 @@
 		console.log(json);
 		if (res.status !== 200 && res.status !== 201) {
 			errorMessage = json.message;
+			showModal = true;
+
+
 		} else if (json.access_token) {
 			$token = json.access_token;
 			if (browser) sessionStorage.setItem('token', json.access_token);
@@ -43,10 +46,44 @@
 	}
 
 	let actionUrl = signup ? `${PUBLIC_BACKEND_URL}/auth/signup` : `${PUBLIC_BACKEND_URL}/auth/signin`;
+	let showModal = false;
+
+	let dialog : HTMLDialogElement | null = null;
+	$: if (dialog && showModal) dialog.showModal();
+
 </script>
 
+
+
 <div id="login">
+
+
+
+	<dialog
+		bind:this={dialog}
+		on:close={() => (showModal = false)}
+		on:click|self={() => dialog.close()}
+	>
+	<!--<section>
+		<div class="border-inside">
+	<div class="window">-->
+		<div class="buttons">
+			<button on:click={() => dialog.close()}>
+				<div class="border-inside">X</div>
+			</button>
+		</div>
+		<div on:click|stopPropagation>
+			<p>Error</p>
+			<button autofocus on:click={() => dialog.close()}>OK</button>
+		</div>
+	<!--</div>-->
+	<!--</div>
+	</section>-->
+	</dialog>
+
+	<div id="formular">
 	<div class="top-bar">
+
 		<div class="buttons">
 			<button>?</button>
 			<button>X</button>
@@ -83,7 +120,7 @@
 				</div>
 			{/if}
 			<div class="button-container">
-				<button
+				<button type="button"
 				on:click={() => {
 					signup = !signup;
 				}}>{signup ? 'I have an account' : 'Create an account'}</button>
@@ -91,14 +128,18 @@
 			</div>
 		</form>
 		<a href="{PUBLIC_BACKEND_URL}/auth/42login">login with 42</a>
-
-
 	</div>
 </div>
+</div>
+
+
 
 <style lang="scss">
 
-	div#login {
+	@include dialog-95;
+	@include window-95;
+
+	div#formular {
 
 		form {
 			display: flex;
@@ -129,6 +170,10 @@
 			@include form-95;
   			margin-left: 10px; /* Add a gap between label and input field */
 		}
+
+	}
+
+	div#login {
 
 		@include tab-contour;
 		background-color: $grey;
@@ -166,10 +211,6 @@
 
 		div.content {
 			padding: 1rem;
-
-			strong {
-				color: red;
-			}
 
 			a {
 				display: block;

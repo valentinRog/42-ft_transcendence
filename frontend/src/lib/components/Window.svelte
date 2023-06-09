@@ -78,14 +78,14 @@
 					socketInstance.emit('changeChatName', {
 						chatId: chatIsLocal,
 						newName: prevName
-					});		
+					});
 				}
-			} 
+			}
 			editable = false;
 		}
 	}
 
-	function handleBlur() { 
+	function handleBlur() {
 		currentChat.name = prevName;
 		editable = false;
 	}
@@ -142,52 +142,8 @@
 <svelte:window on:mouseup={() => (moving = false)} on:mousemove={onMouseMove} />
 
 <style lang="scss">
-	section {
-		position: absolute;
-		top: 5rem;
-		left: 5rem;
-		border: 0.2rem solid black;
-		user-select: none;
-		@include tab-contour;
-		background-color: $grey;
-	}
 
-	div.window {
-		display: flex;
-		height: 1.5rem;
-		margin: 0.2rem 0.2rem;
-		background-color: $dark-grey;
-		align-items: center;
-
-		&:hover {
-			cursor: url($grab), auto;
-		}
-
-		.buttons {
-			margin-left: auto;
-			margin-right: 0.2rem;
-		}
-		img {
-			margin-left: 0.5rem;
-			height: 1rem;
-			width: auto;
-		}
-
-		p {
-			padding: 0.25rem;
-			color: $light-grey;
-			font-weight: bolder;
-		}
-
-		button {
-			@include tab-contour;
-			@include tab-contour-active;
-			background-color: $grey;
-			.border-inside {
-				padding: 0.08rem 0.25rem;
-			}
-		}
-	}
+	@include window-95;
 
 	#group-chat-name::after {
 		content: " ✎";
