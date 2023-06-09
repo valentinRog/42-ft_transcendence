@@ -36,8 +36,6 @@
 		if (res.status !== 200 && res.status !== 201) {
 			errorMessage = json.message;
 			showModal = true;
-
-
 		} else if (json.access_token) {
 			$token = json.access_token;
 			if (browser) sessionStorage.setItem('token', json.access_token);
@@ -45,22 +43,22 @@
 		}
 	}
 
-	let actionUrl = signup ? `${PUBLIC_BACKEND_URL}/auth/signup` : `${PUBLIC_BACKEND_URL}/auth/signin`;
+	let actionUrl = `${PUBLIC_BACKEND_URL}/auth/signin`;
+	function updateActionUrl() {
+		actionUrl = signup ? `${PUBLIC_BACKEND_URL}/auth/signup` : `${PUBLIC_BACKEND_URL}/auth/signin`;
+	}
 	let showModal = false;
-
 	let dialog : HTMLDialogElement | null = null;
 	$: if (dialog && showModal) dialog.showModal();
-
 </script>
 
 
-
 <div id="login">
-
 	<dialog
 		bind:this={dialog}
 		on:close={() => (showModal = false)}
 		on:click|self={() => dialog.close()}
+		on:click|stopPropagation
 	>
 		<div class="top-bar">
 		<div class="buttons">
@@ -71,20 +69,17 @@
 	</div>
 	<div class="content">
 		<div class="icon-and-paragraph">
-
 		<div class="row-icon"><img src="/msg_warning.png"></div>
 		<p>{errorMessage}</p>
 		</div>
 	</div>
 		<div on:click|stopPropagation>
-			<button autofocus on:click={() => dialog.close()}>OK</button>
+			<button on:click={() => dialog.close()}>OK</button>
 		</div>
-
 	</dialog>
 
 	<div id="formular">
 	<div class="top-bar">
-
 		<div class="buttons">
 			<button>&nbsp?&nbsp</button>
 			<button>&nbspX&nbsp</button>
@@ -124,6 +119,7 @@
 				<button type="button"
 				on:click={() => {
 					signup = !signup;
+					updateActionUrl();
 				}}>{signup ? 'I have an account' : 'Create an account'}</button>
 				<button type="submit">{#if signup}Sign Up{:else}Sign In{/if}</button>
 			</div>
@@ -132,7 +128,6 @@
 	</div>
 </div>
 </div>
-
 
 
 <style lang="scss">
@@ -145,11 +140,10 @@
 	}
 
 	div#formular {
-
 		form {
 			display: flex;
-			flex-direction: column; /* Align form-rows vertically */
-			align-items: left; /* Vertically align form-row elements */
+			flex-direction: column;
+			align-items: left;
 			gap: 0.5rem;
 			padding: 1rem;
 			width: 25rem;
@@ -173,9 +167,8 @@
 
 		input {
 			@include form-95;
-  			margin-left: 10px; /* Add a gap between label and input field */
+  			margin-left: 10px;
 		}
-
 	}
 
 	div#login {
@@ -215,7 +208,6 @@
 
 		div.content {
 			padding: 1rem;
-
 			a {
 				display: block;
 				text-align: center;
