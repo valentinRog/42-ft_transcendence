@@ -34,7 +34,7 @@
 		}
 	}
 
-	function timeDifference(current: Date, previous: Date) { //PAS SUR DE GARDER
+	function timeDifference(current: Date, previous: Date) {
 		const msPerMinute = 60 * 1000;
 		const msPerHour = msPerMinute * 60;
 		const msPerDay = msPerHour * 24;
@@ -110,6 +110,7 @@
 	#chat-window {
 		height: 40vh;
 		overflow-y: auto;
+		overflow-x: hidden;
 		border-right-color: #fff;
 		border-bottom-color: #fff;
 		margin-bottom: 1rem;
@@ -127,6 +128,11 @@
 	h4 {
 		color: #000080;
 		margin-bottom: 0.5rem;
+
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 150px;
 	}
 
 	p {
@@ -134,31 +140,41 @@
 	}
 
     .chat-content {
-        display: flex;
-        justify-content: space-between;
-    }
+		position: relative;
+		display: flex;
+		justify-content: space-between;
+	}
 
 	.message-details p {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 150px;
-}
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 75%;
+	}
 
 
-    .unread-messages {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 15px;
-        height: 15px;
-        color: white;
-        background-color: red;
-        border-radius: 50%;
-        font-size: 10px;
-        margin: 0;
+    .chat-content {
+		position: relative;
+		display: flex;
+		justify-content: space-between;
+	}
+
+	.unread-messages {
+		position: absolute;
+		right: 0;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 1.5em;
+		height: 1.5em;
+		color: white;
+		background-color: rgb(213, 1, 1);
+		border-radius: 50%;
+		font-size: 0.6em;
+		margin: 0;
 		align-self: center;
-    }
+	}
+
 
 	.timestamp {
     	font-size: 0.8rem;

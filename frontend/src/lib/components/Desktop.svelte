@@ -33,22 +33,15 @@
 
 	$: {
 		if ($openChatWindow) {
-			let typeChat;
 			let name;
-			if ($chatId === null || $chatId === undefined) name = $friendInfo?.username;
+			if ($chatId === null || $chatId === undefined) 
+				name = $friendInfo?.username;
 			else {
 				let targetChat = $chats.find((chat) => chat.id === $chatId);
 
-				if (targetChat?.isGroupChat) {
-					name = targetChat.name;
-					typeChat = 'Group';
-				} else {
-					name = targetChat?.chatUsers.find((u) => u.user.username !== $user?.username)?.user
-						.username;
-					typeChat = 'Chat';
-				}
+				name = targetChat?.chatUsers.find((u) => u.user.username !== $user?.username)?.user.username;
 			}
-			addInstance('Chat', { typeChat: typeChat, name: name });
+			addInstance('Chat', { name: name });
 			$selected = null;
 			openChatWindow.set(false);
 		}

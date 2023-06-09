@@ -239,6 +239,17 @@
 		$chats = $chats.filter((chat) => chat.id !== chatId);
 	});
 
+	$socket.on('updateChatName', ({ chatId, newName }) => {
+		let targetChatIndex = $chats.findIndex((chat) => chat.id === chatId);
+		if (targetChatIndex !== -1) {
+			let chatscopy = [...$chats];
+			chatscopy[targetChatIndex].name = newName;
+			$chats = chatscopy;
+		} else {
+			console.error(`Received message for unknown chat with id: ${chatId}`);
+		}
+	});
+
 	$socket.on('message', ({ chatId, message }) => {
 		let targetChatIndex = $chats.findIndex((chat) => chat.id === chatId);
 		if (targetChatIndex !== -1) {
