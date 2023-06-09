@@ -193,14 +193,18 @@
 		background: rgba(0, 0, 0, 0.3);
 	}
 
+	.icon-and-paragraph {
+		display: flex;
+		align-items: center;
+	}
 
 	dialog > div > button {
-		margin-top: 60px;
+		margin-top: 8px;
+		margin-bottom: 4px;
 		margin-left: auto;
 		margin-right: auto;
 		display: block;
 		padding: 0.2rem 2rem;
-
 	}
 
 	.content {

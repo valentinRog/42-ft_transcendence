@@ -70,8 +70,11 @@
 		</div>
 	</div>
 	<div class="content">
+		<div class="icon-and-paragraph">
+
 		<div class="row-icon"><img src="/msg_warning.png"></div>
 		<p>{errorMessage}</p>
+		</div>
 	</div>
 		<div on:click|stopPropagation>
 			<button autofocus on:click={() => dialog.close()}>OK</button>
