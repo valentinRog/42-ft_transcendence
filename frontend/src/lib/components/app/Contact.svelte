@@ -125,6 +125,7 @@
 
 <div id="box">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <form on:submit|preventDefault={addFriend} id="add-friend-form">
         <label for="friend">Add Friend: </label>
         <input type="text" id="friend" name="friend" />
@@ -165,6 +166,13 @@
                     <i class="fas fa-comments" on:click={() => startChat(friend)}></i>
                     <i class="fas fa-user-times" on:click={() => removeFriend(friend.username)}></i>
                 </div>
+				<!-- <div class="buttons">
+					{#if friend.status === 'online' || friend.status === 'in-game' || friend.status === 'spectator'}
+						<i class="fa fa-gamepad" on:click={() => askGame(friend.username)}></i>
+					{/if}
+					<i class="fa fa-comments" on:click={() => startChat(friend)}></i>
+					<i class="fa fa-times-circle" on:click={() => removeFriend(friend.username)}></i>
+				</div>-->
             </div>
         {/each}
     </div>
@@ -227,9 +235,8 @@
 	.buttons i {
 		cursor: pointer;
 		margin-left: 0.625rem;
-		padding: 0.3rem;
-		border: 1px solid #414141;
-		border-radius: 4px;
+		padding: 0.3rem;;
+		border-radius: 2px;
 		background-color: #f8f8f8;
 		transition: background-color 0.3s ease;
 	}

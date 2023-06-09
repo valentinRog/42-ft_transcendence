@@ -136,6 +136,7 @@
     h5 {
         margin: 0;
 		text-align: center;
+        color: rgba(51, 51, 51, 0.814);
     }
 
     input[type="text"].message-input {
@@ -180,14 +181,14 @@
 	}
 
     .message-content {
+        margin-top: 0.2rem;
         padding-left: 0.5rem;
 		padding-right: 0.5rem;
 		padding-top: 0.3rem;
 		padding-bottom: 0.3rem;
 		font-size: 0.9em;
-		border: 0.12em solid #4f4f4f62;
 		border-radius: 0.8rem;
-        background-color: rgb(205, 205, 205);
+        background-color: rgb(229, 229, 229);
     }
 
     .send-message-form {
