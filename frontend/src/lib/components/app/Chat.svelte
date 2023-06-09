@@ -102,7 +102,6 @@
         color: #000;
         font-family: 'MS Sans Serif', sans-serif;
         box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, 0.5);
-        border: 1px outset white;
         width: 15rem;
         height: 17rem;
     }
@@ -186,8 +185,9 @@
 		padding-top: 0.3rem;
 		padding-bottom: 0.3rem;
 		font-size: 0.9em;
-		border: 0.12em solid #4f4f4fad;
+		border: 0.12em solid #4f4f4f62;
 		border-radius: 0.8rem;
+        background-color: rgb(205, 205, 205);
     }
 
     .send-message-form {

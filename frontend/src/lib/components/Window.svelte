@@ -24,7 +24,7 @@
 	let editable = false;
 
 	let currentChat: any;
-	let chatIsLocal: number | null = $chatId;
+	let chatIdLocal: number | null = $chatId;
 	let typeChat: string | null = null;
 	let socketInstance: Socket | null = null;
 
@@ -35,7 +35,7 @@
 		if (left < 0) left = 0;
 
 		if (name === 'Chat') {
-			currentChat = $chats.find((chat) => chat.id === chatIsLocal);
+			currentChat = $chats.find((chat) => chat.id === chatIdLocal);
 			if (currentChat?.isGroupChat)
 				typeChat = 'Group';
 			else
@@ -76,7 +76,7 @@
 				prevName = (e.target as HTMLInputElement).value;
 				if (socketInstance) {
 					socketInstance.emit('changeChatName', {
-						chatId: chatIsLocal,
+						chatId: chatIdLocal,
 						newName: prevName
 					});		
 				}
@@ -88,6 +88,10 @@
 	function handleBlur() { 
 		currentChat.name = prevName;
 		editable = false;
+	}
+
+	async function leaveGroup() {
+		if (socketInstance) socketInstance.emit('leaveGroup', { chatId: chatIdLocal });
 	}
 
 </script>
@@ -125,6 +129,11 @@
 				<p>{name}</p>
 			{/if}
 			<div class="buttons">
+				{#if name === 'Chat'}
+					<button on:click={() => leaveGroup()}>
+						<div class="border-inside">Q</div>
+					</button>
+				{/if}
 				<button on:click={() => dispatch('minimize')}>
 					<div class="border-inside">_</div>
 				</button>
