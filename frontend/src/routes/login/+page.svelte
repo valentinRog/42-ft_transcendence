@@ -48,7 +48,7 @@
 		actionUrl = signup ? `${PUBLIC_BACKEND_URL}/auth/signup` : `${PUBLIC_BACKEND_URL}/auth/signin`;
 	}
 	let showModal = false;
-	let dialog; // HTMLDialogElement
+	let dialog: HTMLDialogElement;
 
 	$: if (dialog && showModal) dialog.showModal();
 
@@ -139,7 +139,6 @@
 		form {
 			display: flex;
 			flex-direction: column;
-			align-items: left;
 			gap: 0.5rem;
 			padding: 1rem;
 			width: 25rem;
