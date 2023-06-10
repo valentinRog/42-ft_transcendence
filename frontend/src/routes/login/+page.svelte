@@ -134,6 +134,9 @@
 	@include dialog-95;
 
 	div#formular {
+
+		@include form-95;
+
 		form {
 			display: flex;
 			flex-direction: column;
@@ -158,10 +161,6 @@
 			align-items: center;
 		}
 
-		input {
-			@include form-95;
-  			margin-left: 10px;
-		}
 	}
 
 	div#login {

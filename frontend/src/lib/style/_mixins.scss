@@ -171,11 +171,27 @@
 // ------------------------------------------------
 
 @mixin form-95 {
-	width: 100%;
-    border: 2px inset #d5d5d5;
-    color: #424242;
-    background: #fff;
-    box-shadow: -1px -1px 0 0 #828282;
+
+	input {
+		width: 100%;
+		border: 2px inset #d5d5d5;
+		color: #424242;
+		background: #fff;
+		box-shadow: -1px -1px 0 0 #828282;
+		margin-left: 10px;
+	}
+
+	.bootstrap-select,
+	textarea:focus,
+	textarea.form-control:focus,
+	input.form-control:focus,
+	input[type=text]:focus,
+	input[type=password]:focus,
+	[type=text].form-control:focus,
+	[type=password].form-control:focus,
+	[contenteditable].form-control:focus {
+		outline: 0 !important;
+	}
 }
 
 @mixin dialog-95 {
