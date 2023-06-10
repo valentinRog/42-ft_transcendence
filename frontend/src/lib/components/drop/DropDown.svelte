@@ -23,12 +23,13 @@
 	div.container {
 		position: relative;
 
-        div.drop:hover {
-            cursor: pointer;
-            background-color: $blue;
-        }
+		div.drop:hover {
+			cursor: pointer;
+			background-color: $blue;
+		}
 
 		div.content {
+			@include tab-contour;
 			position: absolute;
 		}
 	}

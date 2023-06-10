@@ -8,6 +8,7 @@
 <style lang="scss">
 	button {
 		@include dropdown-button;
+		text-align: left;
 		width: 100%;
 	}
 </style>
