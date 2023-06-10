@@ -127,9 +127,9 @@
 		>
 			<img src={icon} draggable="false" />
 			{#if name === 'Profile' && props.username}
-				<p>{name} of {props.username}</p>
+				<p class="title">{name} of {props.username}</p>
 			{:else if name === 'Profile'}
-				<p>My {name}</p>
+				<p class="title">My {name}</p>
 			{:else if name === 'Chat' && currentChat && currentChat.isGroupChat}
 				{#if editable}
 					<input
@@ -145,7 +145,7 @@
 			{:else if name === 'Chat' && currentChat && !currentChat.isGroupChat}
 				<p id="chat-name">{typeChat}: {props.name}</p>
 			{:else}
-				<p>{name}</p>
+				<p class="title">{name}</p>
 			{/if}
 			<div class="buttons">
 				{#if name === 'Chat' && currentChat && currentChat.isGroupChat}
@@ -180,7 +180,52 @@
 
 <style lang="scss">
 
-	@include window-95;
+	section {
+		position: absolute;
+		top: 5rem;
+		left: 5rem;
+		border: 0.2rem solid black;
+		user-select: none;
+		@include tab-contour;
+		background-color: $grey;
+	}
+
+	div.window {
+		display: flex;
+		height: 1.5rem;
+		margin: 0.2rem 0.2rem;
+		background-color: $dark-grey;
+		align-items: center;
+
+		.title {
+			margin-right: 0.3rem;
+			margin-top: 0.2rem;
+		}
+
+		&:hover {
+			cursor: url($grab), auto;
+		}
+
+		.buttons {
+			margin-left: auto;
+			margin-right: 0.2rem;
+		}
+		img {
+			margin-left: 0.5rem;
+			margin-right: 0.5rem;
+			height: 1rem;
+			width: auto;
+		}
+
+		button {
+			@include tab-contour;
+			@include tab-contour-active;
+			background-color: $grey;
+			.border-inside {
+				padding: 0.08rem 0.25rem;
+			}
+		}
+	}
 
 	#group-chat-name {
 		white-space: nowrap;
