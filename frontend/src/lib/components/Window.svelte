@@ -179,7 +179,6 @@
 <svelte:window on:mouseup={() => (moving = false)} on:mousemove={onMouseMove} />
 
 <style lang="scss">
-
 	@include window-95;
 
 	#group-chat-name {

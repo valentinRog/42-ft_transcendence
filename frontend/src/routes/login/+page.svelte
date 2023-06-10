@@ -5,6 +5,7 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
 
 	onMount(() => {
 		if ($page.url.searchParams.get('token')) {
@@ -48,91 +49,66 @@
 		actionUrl = signup ? `${PUBLIC_BACKEND_URL}/auth/signup` : `${PUBLIC_BACKEND_URL}/auth/signin`;
 	}
 	let showModal = false;
-	let dialog: HTMLDialogElement;
-
-	$: if (dialog && showModal) dialog.showModal();
-
 </script>
 
-
 <div id="login">
-	<dialog
-		bind:this={dialog}
-		on:close={() => (showModal = false)}>
-		<div class="top-bar">
-		<div class="buttons">
-			<button on:click={() => dialog.close()}>
-				<div class="border-inside">&nbspX&nbsp</div>
-			</button>
-		</div>
-	</div>
-	<div class="content">
-		<div class="icon-and-paragraph">
-		<div class="row-icon"><img src="/msg_warning.png"></div>
-		<p>{errorMessage}</p>
-		</div>
-	</div>
-		<div on:click|stopPropagation>
-			<button on:click={() => dialog.close()}>OK</button>
-		</div>
-	</dialog>
-
+	<ErrorDialog {showModal} {errorMessage} on:close={() => (showModal = false)} />
 	<div id="formular">
-	<div class="top-bar">
-		<div class="buttons">
-			<button>&nbsp?&nbsp</button>
-			<button>&nbspX&nbsp</button>
+		<div class="top-bar">
+			<div class="buttons">
+				<button>&nbsp?&nbsp</button>
+				<button>&nbspX&nbsp</button>
+			</div>
+		</div>
+		<div class="content">
+			<form
+				on:submit|preventDefault={handleSubmit}
+				action={actionUrl}
+				method="post"
+				enctype="application/x-www-form-urlencoded"
+			>
+				<div class="form-group">
+					<div class="row-icon"><img src="/user.png" /></div>
+					<label for="login">Login:</label>
+					<input type="text" id="login" name="login" />
+				</div>
+				<div class="form-group">
+					<div class="row-icon"><img src="/keys-3.png" /></div>
+					<label for="password">Password:</label>
+					<input type="password" id="password" name="password" />
+				</div>
+				{#if !signup}
+					<div class="form-group">
+						<div class="row-icon"><img src="/padlock.png" /></div>
+						<label for="twoFactor">2FA:</label>
+						<input type="text" id="twoFactor" name="twoFactor" />
+					</div>
+				{:else}
+					<div class="form-group">
+						<div class="row-icon"><img src="/agent.png" /></div>
+						<label for="username">Username:</label>
+						<input type="text" id="username" name="username" />
+					</div>
+				{/if}
+				<div class="button-container">
+					<button
+						type="button"
+						on:click={() => {
+							signup = !signup;
+							updateActionUrl();
+						}}>{signup ? 'I have an account' : 'Create an account'}</button
+					>
+					<button type="submit"
+						>{#if signup}Sign Up{:else}Sign In{/if}</button
+					>
+				</div>
+			</form>
+			<a href="{PUBLIC_BACKEND_URL}/auth/42login">login with 42</a>
 		</div>
 	</div>
-	<div class="content">
-		<form
-			on:submit|preventDefault={handleSubmit}
-			action={actionUrl}
-			method="post"
-			enctype="application/x-www-form-urlencoded"
-			>
-			<div class="form-group">
-				<div class="row-icon"><img src="/user.png"></div>
-				<label for="login">Login:</label>
-				<input type="text" id="login" name="login"/>
-			</div>
-			<div class="form-group">
-				<div class="row-icon"><img src="/keys-3.png"></div>
-				<label for="password">Password:</label>
-				<input type="password" id="password" name="password"/>
-			</div>
-			{#if !signup}
-			<div class="form-group">
-				<div class="row-icon"><img src="/padlock.png"></div>
-				<label for="twoFactor">2FA:</label>
-				<input type="text" id="twoFactor" name="twoFactor"/>
-				</div>
-			{:else}
-			<div class="form-group">
-				<div class="row-icon"><img src="/agent.png"></div>
-				<label for="username">Username:</label>
-				<input type="text" id="username" name="username"/>
-				</div>
-			{/if}
-			<div class="button-container">
-				<button type="button"
-				on:click={() => {
-					signup = !signup;
-					updateActionUrl();
-				}}>{signup ? 'I have an account' : 'Create an account'}</button>
-				<button type="submit">{#if signup}Sign Up{:else}Sign In{/if}</button>
-			</div>
-		</form>
-		<a href="{PUBLIC_BACKEND_URL}/auth/42login">login with 42</a>
-	</div>
 </div>
-</div>
-
 
 <style lang="scss">
-
-	@include dialog-95;
-
 	div#formular {
 		form {
 			display: flex;
@@ -145,7 +121,7 @@
 			.row-icon img {
 				margin-right: 10px;
 				width: 25px;
- 			    height: 25px;
+				height: 25px;
 			}
 
 			label {
@@ -160,12 +136,11 @@
 
 		input {
 			@include form-95;
-  			margin-left: 10px;
+			margin-left: 10px;
 		}
 	}
 
 	div#login {
-
 		@include tab-contour;
 		background-color: $grey;
 		width: fit-content;
@@ -205,6 +180,5 @@
 				text-align: center;
 			}
 		}
-
 	}
 </style>

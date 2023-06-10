@@ -172,44 +172,10 @@
 
 @mixin form-95 {
 	width: 100%;
-    border: 2px inset #d5d5d5;
-    color: #424242;
-    background: #fff;
-    box-shadow: -1px -1px 0 0 #828282;
-}
-
-@mixin dialog-95 {
-	dialog {
-		@include tab-contour;
-		padding: 0;
-		position: fixed;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		background-color: $grey;
-	}
-	dialog::backdrop {
-		background: rgba(0, 0, 0, 0.3);
-	}
-
-	.icon-and-paragraph {
-		display: flex;
-		align-items: center;
-		gap : 0.7rem;
-	}
-
-	.row-icon img {
-		width: 40px;
-		height: 40px;
-	}
-
-	dialog > div > button {
-		margin-bottom: 14px;
-		margin-left: auto;
-		margin-right: auto;
-		display: block;
-		padding: 0.3rem 2rem;
-	}
+	border: 2px inset #d5d5d5;
+	color: #424242;
+	background: #fff;
+	box-shadow: -1px -1px 0 0 #828282;
 }
 
 @mixin window-95 {

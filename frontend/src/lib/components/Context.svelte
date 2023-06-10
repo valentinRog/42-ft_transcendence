@@ -19,6 +19,7 @@
 			user: User;
 			userId: number;
 		};
+
 		export type Chat = {
 			chatUsers: ChatUser[];
 			messages: Message[];
