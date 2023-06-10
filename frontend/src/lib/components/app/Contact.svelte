@@ -15,7 +15,7 @@
 	const contacts = Context.contacts();
 	const friendRequest = Context.friendRequest();
 	const openFriendRequest = Context.openFriendRequest();
-	const friendInfo = Context.friendInfo();
+	const friendInfoId = Context.friendInfoId();
 
 	let friendInput: string = '';
 	let groupChatMode = false;
@@ -117,10 +117,9 @@
 
 		if ($user) chat = findChat($user?.username, friend.username);
 		$chatId = chat?.id;
-		friendInfo.set({ id: friend.id, username: friend.username });
+		$friendInfoId = friend.id;
 		$openChatWindow = true;
 	}
-
 	const addInstance = Context.addInstance();
 	const selected = Context.selected();
 </script>

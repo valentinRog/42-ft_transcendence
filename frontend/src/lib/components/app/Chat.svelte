@@ -8,18 +8,23 @@
 
 	const chats = Context.chats();
 	const chatId = Context.chatId();
-	const friendInfo = Context.friendInfo();
+	const friendInfoId = Context.friendInfoId();
+	const contacts = Context.contacts();
 
 	let chatIdLocal: number | null = $chatId;
-	let friend = $friendInfo;
-	let friendUsername: string | null = '';
+	let currentChat: any = null;
+	let friendUsername: string | null | undefined = '';
+	let friendId: number | null = $friendInfoId;
 	let socketInstance: Socket | null = null;
 	let messageContent = '';
 	let chatWindow: HTMLDivElement;
 	let autoScroll = true;
 
-	if (friend) {
-		friendUsername = friend.username;
+	$: {
+		if (chatIdLocal !== null && chatIdLocal !== undefined)
+			currentChat = $chats.find((chat) => chat.id === chatIdLocal);
+		else
+			friendUsername = $contacts.find((contact) => contact.id === friendId)?.username;
 	}
 
 	onMount(() => {
@@ -60,13 +65,8 @@
 	}
 
 	function findUser(userId: number, chatId: number | null) {
-		let chat: any;
-
-		chats.subscribe(($chats) => {
-			chat = $chats.find((c) => c.id === chatId);
-		});
-		if (chat) {
-			let chatUser = chat.chatUsers.find((cu: any) => cu.userId === userId);
+		if (currentChat) {
+			let chatUser = currentChat.chatUsers.find((cu: any) => cu.userId === userId);
 			return chatUser ? chatUser.user.username : 'Unknown';
 		}
 		return 'Unknown';
@@ -81,8 +81,8 @@
 	<div id="chat-window" bind:this={chatWindow} on:scroll={handleScroll}>
 		<h5>Waiting message...</h5>
 		<ul>
-			{#if $chats.find((c) => c.id === chatIdLocal)}
-				{#each $chats.find((c) => c.id === chatIdLocal)?.messages || [] as message, i (i)}
+			{#if currentChat}
+				{#each currentChat?.messages || [] as message, i (i)}
 					<li class={findUser(message.userId, chatIdLocal) === $user?.username ? 'self' : 'other'}>
 						<div class="message-header">
 							<strong>{findUser(message.userId, chatIdLocal)}</strong><span>:</span>

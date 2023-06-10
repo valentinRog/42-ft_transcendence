@@ -5,6 +5,7 @@
 
 	const chats = Context.chats();
 	const chatId = Context.chatId();
+	const friendInfoId = Context.friendInfoId();
 	const openChatWindow = Context.openChatWindow();
 	const getUnreadMessagesCount = Context.getUnreadMessagesCount();
 	let now = new Date();
@@ -17,8 +18,9 @@
 		clearInterval(intervalId);
 	});
 
-	function startChat(chatNumber: number) {
+	function startChat(chatNumber: number, chat: any) {
 		$chatId = chatNumber;
+		$friendInfoId = chat.chatUsers.find((c: any) => c.userId !== $user?.id)?.user?.id;
 		$openChatWindow = true;
 	}
 
@@ -57,7 +59,7 @@
 			const dateB = new Date(chatB.messages.length > 0 ? chatB.messages[chatB.messages.length - 1].createdAt : chatB.createdAt);
 			return dateB.getTime() - dateA.getTime();
 		}) as chat (chat.id)}
-			<div class="chat" on:click={() => startChat(chat.id)}>
+			<div class="chat" on:click={() => startChat(chat.id, chat)}>
 				<h4>
 					{chat.isGroupChat
 						? 'Group: ' + chat.name

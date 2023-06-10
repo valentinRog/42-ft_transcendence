@@ -56,7 +56,7 @@
 		export const contacts = (): Writable<Contact[]> => getContext('contacts');
 		export const friendRequest = (): Writable<FriendRequest[]> => getContext('friendRequest');
 		export const openFriendRequest = (): Writable<boolean> => getContext('openFriendRequest');
-		export const friendInfo = (): Writable<User | null> => getContext('friendInfo');
+		export const friendInfoId = (): Writable<number | null> => getContext('friendInfoId');
 		export const chats = (): Writable<Chat[]> => getContext('chats');
 		export const chatId = (): Writable<number | null> => getContext('chatId');
 		export const openChatWindow = (): Writable<boolean> => getContext('openChatWindow');
@@ -128,7 +128,7 @@
 	const contacts = writable<Context.Contact[]>([]);
 	const friendRequest = writable<Context.Contact[]>([]);
 	const openFriendRequest = writable(false);
-	const friendInfo = writable<Context.User | null>(null);
+	const friendInfoId = writable<Context.User | null>(null);
 	const chats = writable<Context.Chat[]>([]);
 	const chatId = writable<number | null>(null);
 	const openChatWindow = writable(false);
@@ -136,7 +136,7 @@
 	setContext('contacts', contacts);
 	setContext('friendRequest', friendRequest);
 	setContext('openFriendRequest', openFriendRequest);
-	setContext('friendInfo', friendInfo);
+	setContext('friendInfoId', friendInfoId);
 	setContext('chats', chats);
 	setContext('chatId', chatId);
 	setContext('openChatWindow', openChatWindow);

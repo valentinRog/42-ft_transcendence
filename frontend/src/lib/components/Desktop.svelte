@@ -9,7 +9,7 @@
 	const chats = Context.chats();
 	const chatId = Context.chatId();
 	const openChatWindow = Context.openChatWindow();
-	const friendInfo = Context.friendInfo();
+	const friendInfoId = Context.friendInfoId();
 
 	const openFriendRequest = Context.openFriendRequest();
 
@@ -28,15 +28,7 @@
 
 	$: {
 		if ($openChatWindow) {
-			let name;
-			if ($chatId === null || $chatId === undefined) name = $friendInfo?.username;
-			else {
-				let targetChat = $chats.find((chat) => chat.id === $chatId);
-
-				name = targetChat?.chatUsers.find((u) => u.user.username !== $user?.username)?.user
-					.username;
-			}
-			addInstance('Chat', { name: name });
+			addInstance('Chat', { friendId: $friendInfoId });
 			$selected = null;
 			openChatWindow.set(false);
 		}

@@ -7,6 +7,7 @@
 	const dispatch = createEventDispatcher();
 	const chatId = Context.chatId();
 	const chats = Context.chats();
+	const contacts = Context.contacts();
 	const socket = Context.socket();
 
 	export let props: Record<string, any>;
@@ -26,6 +27,7 @@
 	let currentChat: any;
 	let chatIdLocal: number | null = $chatId;
 	let typeChat: string | null = null;
+	let friendUsername: string | null | undefined = '';
 
 	$: {
 		if (top + height > parentHeight) top = parentHeight - height;
@@ -36,8 +38,12 @@
 		if (name === 'Chat') {
 			currentChat = $chats.find((chat) => chat.id === chatIdLocal);
 			if (currentChat?.isGroupChat) typeChat = 'Group';
-			else typeChat = 'Chat';
+			else { 
+				typeChat = 'Chat';
+				if (props.friendId) friendUsername = $contacts.find((c) => c.id === props.friendId)?.username;
+			}
 		}
+
 	}
 
 	let moving = false;
@@ -135,8 +141,8 @@
 				{:else}
 					<p id="group-chat-name" on:dblclick={toggleEdit}>{typeChat}: {currentChat.name}</p>
 				{/if}
-			{:else if name === 'Chat' && currentChat && !currentChat.isGroupChat}
-				<p id="chat-name">{typeChat}: {props.name}</p>
+			{:else if name === 'Chat'}
+				<p id="chat-name">{typeChat}: {friendUsername}</p>
 			{:else}
 				<p>{name}</p>
 			{/if}
