@@ -15,7 +15,7 @@
 }
 
 @mixin tab-top-line($color: $light-grey) {
-	//probleme ici, elle se met beaucop trop haut
+	//probleme ici, elle se met beaucoup trop haut
 	content: '';
 	position: absolute;
 	top: 0rem;
@@ -156,11 +156,67 @@
 	@include no-border;
 	background-color: $grey;
 	cursor: url($click), auto;
-	padding: 0.15rem 0.25rem;
+	padding: 0.15rem 0.5rem;
 	font-size: medium;
+	min-width: 8rem;
 
 	&:hover {
 		background-color: $blue;
 		color: white;
+	}
+}
+
+// ------------------------------------------------
+// -------------------- FORM --------------------
+// ------------------------------------------------
+
+@mixin form-95 {
+	width: 100%;
+	border: 2px inset #d5d5d5;
+	color: #424242;
+	background: #fff;
+	box-shadow: -1px -1px 0 0 #828282;
+}
+
+@mixin window-95 {
+	section {
+		position: absolute;
+		top: 5rem;
+		left: 5rem;
+		border: 0.2rem solid black;
+		user-select: none;
+		@include tab-contour;
+		background-color: $grey;
+	}
+
+	div.window {
+		display: flex;
+		height: 1.5rem;
+		margin: 0.2rem 0.2rem;
+		background-color: $dark-grey;
+		align-items: center;
+
+		&:hover {
+			cursor: url($grab), auto;
+		}
+
+		.buttons {
+			margin-left: auto;
+			margin-right: 0.2rem;
+		}
+		img {
+			margin-left: 0.5rem;
+			height: 1rem;
+			width: auto;
+		}
+
+		button {
+			@include tab-contour;
+			@include tab-contour-active;
+			background-color: $grey;
+			.border-inside {
+				padding: 0.08rem 0.25rem;
+			}
+		}
 	}
 }

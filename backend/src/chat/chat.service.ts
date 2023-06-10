@@ -104,4 +104,16 @@ export class ChatService {
     return result;
   }
 
+  async changeChatName(chatId: number, newName: string): Promise<any> {
+    const result = await this.prisma.chat.update({
+      where: {
+        id: chatId
+      },
+      data: {
+        name: newName
+      }
+    });
+    return result;
+  }
+
 }

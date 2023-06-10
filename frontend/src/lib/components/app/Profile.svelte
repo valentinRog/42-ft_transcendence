@@ -12,6 +12,7 @@
 	if (username === null) {
 		username = $user!.username;
 		login = $user!.login;
+		currentUser = $user;
 	} else {
 		fetchWithToken(`users/info/${username}`)
 			.then((res) => res.json())

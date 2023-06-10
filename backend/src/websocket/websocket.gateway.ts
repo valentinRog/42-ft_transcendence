@@ -160,6 +160,23 @@ export abstract class SocketGateway
     }
   }
 
+  @SubscribeMessage('changeChatName')
+  async handleChangeChatName(
+    @MessageBody() data: { chatId: number; newName: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const isSuccessful = await this.chatService.changeChatName(
+      data.chatId,
+      data.newName,
+    );
+    if (isSuccessful && isSuccessful.isGroupChat) {
+      this.server
+        .to(`chat-${data.chatId}`)
+        .emit('updateChatName', { chatId: data.chatId, newName: data.newName });
+    }
+  }
+
+
   @SubscribeMessage('accept-friend')
   async handleAcceptFriend(
     @MessageBody() data: { response: boolean; friend: string },

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onDestroy } from 'svelte';
 	import { user } from '$lib/stores';
 	import { Context } from '$lib/components/Context.svelte';
 
@@ -9,15 +9,13 @@
 	const getUnreadMessagesCount = Context.getUnreadMessagesCount();
 	let now = new Date();
 
-	onMount(() => {
-        const intervalId = setInterval(() => {
-            now = new Date();
-        }, 30000);
+	const intervalId = setInterval(() => {
+		now = new Date();
+	}, 30000);
 
-        return () => {
-            clearInterval(intervalId);
-        };
-    });
+	onDestroy(() => {
+		clearInterval(intervalId);
+	});
 
 	function startChat(chatNumber: number) {
 		$chatId = chatNumber;
@@ -34,7 +32,7 @@
 		}
 	}
 
-	function timeDifference(current: Date, previous: Date) { //PAS SUR DE GARDER
+	function timeDifference(current: Date, previous: Date) {
 		const msPerMinute = 60 * 1000;
 		const msPerHour = msPerMinute * 60;
 		const msPerDay = msPerHour * 24;
@@ -42,22 +40,14 @@
 		const msPerYear = msPerDay * 365;
 
 		const elapsed = current.getTime() - previous.getTime();
-		if (elapsed <= 0)
-			return 'just now';
-		else if (elapsed < msPerMinute)
-			return Math.round(elapsed / 1000) + ' s ago';   
-		else if (elapsed < msPerHour)
-			return Math.round(elapsed / msPerMinute) + ' min ago';   
-		else if (elapsed < msPerDay )
-			return Math.round(elapsed / msPerHour ) + ' h ago';   
-		else if (elapsed < msPerMonth)
-			return Math.round(elapsed / msPerDay) + ' d ago';   
-		else if (elapsed < msPerYear)
-			return Math.round(elapsed / msPerMonth) + ' m ago';   
-		else
-			return Math.round(elapsed / msPerYear ) + ' y ago';   
+		if (elapsed <= 0) return 'just now';
+		else if (elapsed < msPerMinute) return Math.round(elapsed / 1000) + ' s ago';
+		else if (elapsed < msPerHour) return Math.round(elapsed / msPerMinute) + ' min ago';
+		else if (elapsed < msPerDay) return Math.round(elapsed / msPerHour) + ' h ago';
+		else if (elapsed < msPerMonth) return Math.round(elapsed / msPerDay) + ' d ago';
+		else if (elapsed < msPerYear) return Math.round(elapsed / msPerMonth) + ' m ago';
+		else return Math.round(elapsed / msPerYear) + ' y ago';
 	}
-
 </script>
 
 <div id="box">
@@ -78,9 +68,19 @@
 					{#if chat.messages.length > 0}
 						<div class="message-details">
 							<p>{getLastMessageSender(chat)}: {chat.messages[chat.messages.length - 1].content}</p>
-							<span class="timestamp">{timeDifference(now, new Date(chat.messages[chat.messages.length - 1].createdAt))}</span>
+							<span class="timestamp"
+								>{timeDifference(
+									now,
+									new Date(chat.messages[chat.messages.length - 1].createdAt)
+								)}</span
+							>
 						</div>
-						<p class="unread-messages">{getUnreadMessagesCount(chat, chat.chatUsers.find(chatUser => chatUser.userId === $user?.id))}</p>
+						<p class="unread-messages">
+							{getUnreadMessagesCount(
+								chat,
+								chat.chatUsers.find((chatUser) => chatUser.userId === $user?.id)
+							)}
+						</p>
 					{:else}
 						<p>No messages yet</p>
 					{/if}
@@ -89,7 +89,6 @@
 		{/each}
 	</div>
 </div>
-
 
 <style lang="scss">
 	@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
@@ -108,8 +107,9 @@
 	}
 
 	#chat-window {
-		height: 40vh;
+		height: 22rem;
 		overflow-y: auto;
+		overflow-x: hidden;
 		border-right-color: #fff;
 		border-bottom-color: #fff;
 		margin-bottom: 1rem;
@@ -127,42 +127,54 @@
 	h4 {
 		color: #000080;
 		margin-bottom: 0.5rem;
+
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 9.5rem;
 	}
 
 	p {
 		color: #000;
 	}
 
-    .chat-content {
-        display: flex;
-        justify-content: space-between;
-    }
-
-	.message-details p {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 150px;
-}
-
-
-    .unread-messages {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 15px;
-        height: 15px;
-        color: white;
-        background-color: red;
-        border-radius: 50%;
-        font-size: 10px;
-        margin: 0;
-		align-self: center;
-    }
-
-	.timestamp {
-    	font-size: 0.8rem;
-		color: rgb(58, 58, 58);
+	.chat-content {
+		position: relative;
+		display: flex;
+		justify-content: space-between;
 	}
 
+	.message-details p {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 9.2rem;
+	}
+
+	.chat-content {
+		position: relative;
+		display: flex;
+		justify-content: space-between;
+	}
+
+	.unread-messages {
+		position: absolute;
+		right: 0;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 1.5em;
+		height: 1.5em;
+		color: white;
+		background-color: rgb(213, 1, 1);
+		border-radius: 50%;
+		font-size: 0.6em;
+		margin: 0;
+		align-self: center;
+	}
+
+	.timestamp {
+		font-size: 0.8rem;
+		color: rgb(58, 58, 58);
+	}
 </style>

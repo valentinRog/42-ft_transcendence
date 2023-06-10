@@ -91,8 +91,9 @@
 		export const fetchChats = (): (() => Promise<any>) => getContext('fetchChats');
 
 		export const socket = (): Readable<Socket> => getContext('socket');
-		
-		export const getUnreadMessagesCount = (): ((chat: any, chatUser: any) => number) => getContext('getUnreadMessagesCount');
+
+		export const getUnreadMessagesCount = (): ((chat: any, chatUser: any) => number) =>
+			getContext('getUnreadMessagesCount');
 	}
 </script>
 
@@ -184,7 +185,7 @@
 	setContext('addInstance', addInstance);
 	setContext('removeInstance', removeInstance);
 
-	async function fetchMe() {
+	async function fetchMe() { 
 		const res = await fetchWithToken('users/me');
 		const data = await res.json();
 		$user = {
@@ -247,6 +248,17 @@
 		$chats = $chats.filter((chat) => chat.id !== chatId);
 	});
 
+	$socket.on('updateChatName', ({ chatId, newName }) => {
+		let targetChatIndex = $chats.findIndex((chat) => chat.id === chatId);
+		if (targetChatIndex !== -1) {
+			let chatscopy = [...$chats];
+			chatscopy[targetChatIndex].name = newName;
+			$chats = chatscopy;
+		} else {
+			console.error(`Received message for unknown chat with id: ${chatId}`);
+		}
+	});
+
 	$socket.on('message', ({ chatId, message }) => {
 		let targetChatIndex = $chats.findIndex((chat) => chat.id === chatId);
 		if (targetChatIndex !== -1) {
@@ -267,10 +279,10 @@
 	function getUnreadMessagesCount(chat: any, chatUser: any) {
 		if (chat.messages.length > 0) {
 			const lastReadMessageId = chatUser.lastReadMessageId || 0;
-			const unreadMessages = chat.messages.filter((message : any) => message.id > lastReadMessageId);
+			const unreadMessages = chat.messages.filter((message: any) => message.id > lastReadMessageId);
 			const unreadCount = unreadMessages.length;
 
-			return unreadCount > 99 ? "99+" : unreadCount;
+			return unreadCount > 99 ? '99+' : unreadCount;
 		} else {
 			return 0;
 		}

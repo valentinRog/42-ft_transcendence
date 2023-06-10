@@ -28,26 +28,17 @@
 
 	$: {
 		if ($openChatWindow) {
-			let typeChat;
 			let name;
 			if ($chatId === null || $chatId === undefined) name = $friendInfo?.username;
 			else {
 				let targetChat = $chats.find((chat) => chat.id === $chatId);
 
-				if (targetChat?.isGroupChat) {
-					name = targetChat.name;
-					typeChat = 'Group';
-				} else {
-					name = targetChat?.chatUsers.find((u) => u.user.username !== $user?.username)?.user
-						.username;
-					typeChat = 'Chat';
-				}
+				name = targetChat?.chatUsers.find((u) => u.user.username !== $user?.username)?.user
+					.username;
 			}
-			if ($appInstances ) { //!!!
-				addInstance('Chat', { typeChat: typeChat, name: name });
-				$selected = null;
-				openChatWindow.set(false);
-			}
+			addInstance('Chat', { name: name });
+			$selected = null;
+			openChatWindow.set(false);
 		}
 		if ($openFriendRequest) {
 			addInstance('FriendRequest');
@@ -105,15 +96,13 @@
 	(async () => {
 		await fetchMe();
 		await fetchFriends();
-		
+
 		fetchChats().then(() => {
 			$chats.forEach((chat) => {
-				if (chat.isGroupChat)
-					$socket.emit('joinRoom', { chatId: chat.id });
+				if (chat.isGroupChat) $socket.emit('joinRoom', { chatId: chat.id });
 			});
 		});
 	})();
-
 </script>
 
 <div

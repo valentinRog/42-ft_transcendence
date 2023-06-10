@@ -1,23 +1,18 @@
 <script lang="ts">
-	import { afterUpdate } from 'svelte';
+	import { onMount, afterUpdate } from 'svelte';
 
 	export let name: string;
 	export let desktopHeight: number | null = null;
 
 	let visible = false;
-	let contentElement: HTMLElement | null = null;
-
-	function boundBot() {
-		if (contentElement !== null && desktopHeight !== null) {
-			const y = contentElement.getBoundingClientRect().bottom;
-			if (y > desktopHeight) {
-				contentElement.style.top = `${desktopHeight - y}px`;
-			}
-		}
-	}
+	let content: HTMLElement | null = null;
 
 	afterUpdate(() => {
-		boundBot();
+		if (desktopHeight === null) return;
+		const y = content!.getBoundingClientRect().bottom;
+		if (y > desktopHeight) {
+			content!.style.top = `${desktopHeight - y}px`;
+		}
 	});
 </script>
 
@@ -26,8 +21,8 @@
 	on:mouseenter={() => (visible = true)}
 	on:mouseleave={() => (visible = false)}
 >
-	<div class="drop">{name}</div>
-	<div class="content" class:hide={!visible} bind:this={contentElement}>
+	<div class="drop" class:path={visible}>{name}</div>
+	<div class="content" class:hide={!visible} bind:this={content}>
 		<slot />
 	</div>
 </div>
@@ -42,6 +37,11 @@
 
 		div.drop {
 			@include dropdown-button;
+
+			&.path {
+				background-color: $blue;
+				color: white;
+			}
 		}
 
 		div.content {
