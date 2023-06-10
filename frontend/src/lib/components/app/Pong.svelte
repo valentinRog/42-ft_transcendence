@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
 	import DropDown from '$lib/components/drop/DropDown.svelte';
 	import RightDrop from '$lib/components/drop/RightDrop.svelte';
@@ -190,29 +190,36 @@
 		player2Score: 0
 	};
 
+	let scale = 1;
+
 	function draw(ctx: CanvasRenderingContext2D) {
 		const s = update(state, Date.now() - state.time);
-		ctx.clearRect(0, 0, dimensions.width, dimensions.height);
+		ctx.clearRect(0, 0, dimensions.width * scale, dimensions.height * scale);
 		ctx.fillStyle = 'white';
-		ctx.fillRect(s.ball.x, s.ball.y, dimensions.ballWidth, dimensions.ballWidth);
 		ctx.fillRect(
-			dimensions.paddleOffset,
-			s.paddles[0].y,
-			dimensions.paddleWidth,
-			dimensions.paddleHeight
+			s.ball.x * scale,
+			s.ball.y * scale,
+			dimensions.ballWidth * scale,
+			dimensions.ballWidth * scale
 		);
 		ctx.fillRect(
-			dimensions.width - dimensions.paddleWidth - dimensions.paddleOffset,
-			s.paddles[1].y,
-			dimensions.paddleWidth,
-			dimensions.paddleHeight
+			dimensions.paddleOffset * scale,
+			s.paddles[0].y * scale,
+			dimensions.paddleWidth * scale,
+			dimensions.paddleHeight * scale
+		);
+		ctx.fillRect(
+			dimensions.width * scale - dimensions.paddleWidth * scale - dimensions.paddleOffset * scale,
+			s.paddles[1].y * scale,
+			dimensions.paddleWidth * scale,
+			dimensions.paddleHeight * scale
 		);
 
 		ctx.setLineDash([5, 5]);
 		ctx.strokeStyle = 'white';
 		ctx.beginPath();
-		ctx.moveTo(dimensions.width / 2, 0);
-		ctx.lineTo(dimensions.width / 2, dimensions.height);
+		ctx.moveTo((dimensions.width / 2) * scale, 0);
+		ctx.lineTo((dimensions.width / 2) * scale, dimensions.height * scale);
 		ctx.stroke();
 
 		ctx.font = '40px pong-score';
@@ -223,45 +230,43 @@
 		};
 		const offset1 = getPlayerScoreOffset(s.player1Score);
 		const offset2 = getPlayerScoreOffset(s.player2Score);
-		ctx.fillText(s.player1Score.toString(), dimensions.width / 4 - offset1, 60);
-		ctx.fillText(s.player2Score.toString(), (3 * dimensions.width) / 4 - offset2, 60);
+		ctx.fillText(s.player1Score.toString(), (dimensions.width * scale) / 4 - offset1, 60);
+		ctx.fillText(s.player2Score.toString(), (3 * dimensions.width * scale) / 4 - offset2, 60);
 
 		requestAnimationFrame(() => draw(ctx));
 	}
 
-	function gameLoop() {
-		const input: Input = {
-			room,
-			clientId: $socket.id,
-			stateId: state.id + delay,
-			clientTime: Date.now() + delay,
-			serverTime: Date.now() + delay + serverDelta,
-			up,
-			down
-		};
-		$socket.emit('input', input);
-		inputs.push(input);
-		if (inputs.length > 100) {
-			inputs.shift();
-		}
-		gameTimer = setTimeout(gameLoop, 1000 / tickRate);
-	}
-
-	function pingLoop() {
-		$socket.emit('ping', Date.now());
-		pingTimer = setTimeout(pingLoop, 1000);
-	}
-
 	function enterGame() {
-		gameLoop();
-		pingLoop();
+		setInterval(() => {
+			const input: Input = {
+				room,
+				clientId: $socket.id,
+				stateId: state.id + delay,
+				clientTime: Date.now() + delay,
+				serverTime: Date.now() + delay + serverDelta,
+				up,
+				down
+			};
+			$socket.emit('input', input);
+			inputs.push(input);
+			if (inputs.length > 100) {
+				inputs.shift();
+			}
+		}, 1000 / tickRate);
+
+		setInterval(() => $socket.emit('ping', Date.now()), 1000);
 	}
 
-	function handleCanvas(e: HTMLCanvasElement) {
-		e.width = dimensions.width;
-		e.height = dimensions.height;
-		const ctx = e.getContext('2d') as CanvasRenderingContext2D;
+	let canvas: HTMLCanvasElement;
+
+	onMount(() => {
+		const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 		draw(ctx);
+	});
+
+	$: if (canvas !== undefined) {
+		canvas.width = dimensions.width * scale;
+		canvas.height = dimensions.height * scale;
 	}
 
 	fetchWithToken('matchmaking/queue', {
@@ -359,16 +364,17 @@
 
 <div class="menu">
 	<DropDown name="settings">
-		<RightDrop name="settings">
-			<RightDrop name="settings">
-				<DropButton>Yo</DropButton>
-				<DropButton>Yo</DropButton>
-				<DropButton>Yo</DropButton>
-			</RightDrop>
+		<RightDrop name="scale">
+			<DropButton on:click={() => (scale = 0.6)}>60</DropButton>
+			<DropButton on:click={() => (scale = 0.8)}>80</DropButton>
+			<DropButton on:click={() => (scale = 1)}>100</DropButton>
+			<DropButton on:click={() => (scale = 1.2)}>120</DropButton>
+			<DropButton on:click={() => (scale = 1.4)}>140</DropButton>
+			<DropButton on:click={() => (scale = 1.6)}>160</DropButton>
 		</RightDrop>
 	</DropDown>
 </div>
-<canvas use:handleCanvas />
+<canvas bind:this={canvas} />
 
 <style lang="scss">
 	div.menu {
