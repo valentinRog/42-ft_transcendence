@@ -101,13 +101,11 @@
 
 	function findChat(user1: string, user2: string) {
 		let foundChat;
-		chats.subscribe(($chats) => {
-			$chats.forEach((chat) => {
-				const users = chat.chatUsers.map((chatUser) => chatUser.user.username);
-				if (users.includes(user1) && users.includes(user2) && chat.isGroupChat === false) {
-					foundChat = chat;
-				}
-			});
+		$chats.forEach((chat) => {
+			const users = chat.chatUsers.map((chatUser) => chatUser.user.username);
+			if (users.includes(user1) && users.includes(user2) && chat.isGroupChat === false) {
+				foundChat = chat;
+			}
 		});
 		return foundChat;
 	}
