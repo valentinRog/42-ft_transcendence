@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onDestroy } from 'svelte';
 	import { user } from '$lib/stores';
 	import { Context } from '$lib/components/Context.svelte';
 
@@ -9,14 +9,12 @@
 	const getUnreadMessagesCount = Context.getUnreadMessagesCount();
 	let now = new Date();
 
-	onMount(() => {
-		const intervalId = setInterval(() => {
-			now = new Date();
-		}, 30000);
+	const intervalId = setInterval(() => {
+		now = new Date();
+	}, 30000);
 
-		return () => {
-			clearInterval(intervalId);
-		};
+	onDestroy(() => {
+		clearInterval(intervalId);
 	});
 
 	function startChat(chatNumber: number) {

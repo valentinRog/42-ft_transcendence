@@ -26,7 +26,6 @@
 	let currentChat: any;
 	let chatIdLocal: number | null = $chatId;
 	let typeChat: string | null = null;
-	let socketInstance: Socket | null = null;
 
 	$: {
 		if (top + height > parentHeight) top = parentHeight - height;
@@ -43,10 +42,6 @@
 
 	let moving = false;
 	onMount(() => {
-		socket.subscribe(($socket) => {
-			socketInstance = $socket;
-		});
-
 		top -= height / 2;
 		left -= width / 2;
 	});
@@ -74,12 +69,10 @@
 		if (e.key === 'Enter') {
 			if ((e.target as HTMLInputElement).value !== prevName) {
 				prevName = (e.target as HTMLInputElement).value;
-				if (socketInstance) {
-					socketInstance.emit('changeChatName', {
-						chatId: chatIdLocal,
-						newName: prevName
-					});
-				}
+				$socket.emit('changeChatName', {
+					chatId: chatIdLocal,
+					newName: prevName
+				});
 			}
 			editable = false;
 		}
@@ -98,7 +91,7 @@
 	async function leaveGroupConfirm() {
 		isDialogOpen = false;
 		dialog.close();
-		if (socketInstance) socketInstance.emit('leaveGroup', { chatId: chatIdLocal });
+		$socket.emit('leaveGroup', { chatId: chatIdLocal });
 	}
 </script>
 

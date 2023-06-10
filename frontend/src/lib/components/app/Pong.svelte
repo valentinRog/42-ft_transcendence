@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onDestroy, onMount } from 'svelte';
+	import { onDestroy } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
 	import DropDown from '$lib/components/drop/DropDown.svelte';
 	import RightDrop from '$lib/components/drop/RightDrop.svelte';
@@ -264,56 +264,54 @@
 		draw(ctx);
 	}
 
-	onMount(() => {
-		fetchWithToken('matchmaking/queue', {
-			method: 'POST'
-		});
+	fetchWithToken('matchmaking/queue', {
+		method: 'POST'
+	});
 
-		index = 0;
-		room = '';
-		pingTimer = null;
-		gameTimer = null;
+	index = 0;
+	room = '';
+	pingTimer = null;
+	gameTimer = null;
 
-		$socket.on('enter-room', (data: { room: string; index: number }) => {
-			room = data.room;
-			index = data.index;
-			$socket.emit('enter-room', data);
-			console.log('enter-room');
-			enterGame();
-		});
+	$socket.on('enter-room', (data: { room: string; index: number }) => {
+		room = data.room;
+		index = data.index;
+		$socket.emit('enter-room', data);
+		console.log('enter-room');
+		enterGame();
+	});
 
-		$socket.on('index', (i: number) => {
-			index = i;
-		});
+	$socket.on('index', (i: number) => {
+		index = i;
+	});
 
-		$socket.on('game-over', (winner: number) => {
-			stopLoop();
-			//if (winner === 0) {
-			//	alert('Player 1 wins!');
-			//} else {
-			//	alert('Player 2 wins!');
-			//}
-		});
+	$socket.on('game-over', (winner: number) => {
+		stopLoop();
+		//if (winner === 0) {
+		//	alert('Player 1 wins!');
+		//} else {
+		//	alert('Player 2 wins!');
+		//}
+	});
 
-		$socket.on('ping', (data: [number, number]) => {
-			ping = Date.now() - data[0];
-			serverDelta = data[1] - Date.now() + ping / 2;
-		});
+	$socket.on('ping', (data: [number, number]) => {
+		ping = Date.now() - data[0];
+		serverDelta = data[1] - Date.now() + ping / 2;
+	});
 
-		$socket.on('state', (s: GameState) => {
-			s.time -= serverDelta;
-			while (inputs.length && inputs[0].clientTime < s.time) {
-				inputs.shift();
-			}
-			for (let i = 1; i < inputs.length && inputs[i].clientTime <= Date.now(); i++) {
-				s = update(s, inputs[i].clientTime - inputs[i - 1].clientTime);
-				s.paddles[index].up = inputs[i].up;
-				s.paddles[index].down = inputs[i].down;
-				s.time = inputs[i].clientTime;
-				s.id = inputs[i].stateId;
-			}
-			state = s;
-		});
+	$socket.on('state', (s: GameState) => {
+		s.time -= serverDelta;
+		while (inputs.length && inputs[0].clientTime < s.time) {
+			inputs.shift();
+		}
+		for (let i = 1; i < inputs.length && inputs[i].clientTime <= Date.now(); i++) {
+			s = update(s, inputs[i].clientTime - inputs[i - 1].clientTime);
+			s.paddles[index].up = inputs[i].up;
+			s.paddles[index].down = inputs[i].down;
+			s.time = inputs[i].clientTime;
+			s.id = inputs[i].stateId;
+		}
+		state = s;
 	});
 
 	function stopLoop() {
