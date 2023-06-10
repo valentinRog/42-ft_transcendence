@@ -58,9 +58,7 @@
 <div id="login">
 	<dialog
 		bind:this={dialog}
-		on:close={() => (showModal = false)}
-		on:click|self={() => dialog.close()}
-	>
+		on:close={() => (showModal = false)}>
 		<div class="top-bar">
 		<div class="buttons">
 			<button on:click={() => dialog.close()}>
@@ -139,7 +137,7 @@
 		form {
 			display: flex;
 			flex-direction: column;
-			gap: 0.5rem;
+			gap: 0.8rem;
 			padding: 1rem;
 			width: 25rem;
 			margin-top: 1rem;
