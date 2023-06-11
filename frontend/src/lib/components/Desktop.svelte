@@ -3,9 +3,9 @@
 	import Tab from '$lib/components/Tab.svelte';
 	import Start from '$lib/components/Start.svelte';
 	import { user } from '$lib/stores';
-	import { onMount } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
 	import Clock from './Clock.svelte';
+	import NotificationBadge from './NotificationBadge.svelte';
 
 	const chats = Context.chats();
 	const chatId = Context.chatId();
@@ -19,6 +19,8 @@
 	const selected = Context.selected();
 
 	const addInstance = Context.addInstance();
+
+	const fetchNotification = Context.fetchNotification();
 
 	const socket = Context.socket();
 
@@ -98,6 +100,9 @@
 	const fetchFriends = Context.fetchFriends();
 	const fetchChats = Context.fetchChats();
 
+	let count = 2;
+	$: count = 3;
+
 	(async () => {
 		await fetchMe();
 		await fetchFriends();
@@ -126,7 +131,13 @@
 						$selected = null;
 					}}
 				>
-					<img src={v.DesktopProps.icon} alt={v.DesktopProps.name} draggable="false" />
+				<NotificationBadge count={count} />
+				<!--<span class="notification-badge">
+					{#if count > 0}
+					  {count}
+					{/if}
+				  </span>-->
+				<img src={v.DesktopProps.icon} alt={v.DesktopProps.name} draggable="false" />
 					<div class="icon-text">
 						<span>{v.DesktopProps.name}</span>
 					</div>
@@ -189,7 +200,6 @@
 
 <style lang="scss">
 	.icons {
-		// put the icons to the left of the screen
 		position: absolute;
 		left: 0;
 		top: 0;

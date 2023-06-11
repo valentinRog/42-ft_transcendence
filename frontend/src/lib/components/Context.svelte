@@ -12,7 +12,7 @@
 			status: string;
 		}
 
-		type FriendRequest = {
+		export type FriendRequest = {
 			id: number;
 			createdAt: string;
 			sender: string;
@@ -83,6 +83,8 @@
 			props?: Record<string, any>
 		) => void) => getContext('addInstance');
 
+		export const fetchNotification = (): ((type: string) => Promise<any>) => getContext('fetchNotification');
+
 		export const fetchMe = (): (() => Promise<any>) => getContext('fetchMe');
 		export const fetchFriends = (): (() => Promise<any>) => getContext('fetchFriends');
 		export const fetchFriendRequest = (): (() => Promise<any>) => getContext('fetchFriendRequest');
@@ -124,7 +126,7 @@
 	setContext('fetchWithToken', fetchWithToken);
 
 	const contacts = writable<Context.Contact[]>([]);
-	const friendRequest = writable<Context.Contact[]>([]);
+	const friendRequest = writable<Context.FriendRequest[]>([]);
 	const openFriendRequest = writable(false);
 	const friendInfo = writable<Context.User | null>(null);
 	const chats = writable<Context.Chat[]>([]);
@@ -193,6 +195,12 @@
 		const data = await res.json();
 		$contacts = data;
 		return data;
+	}
+
+	async function fetchNotification(type : string) {
+		const res = await fetchWithToken('notification/get?type=' + type);
+		const data = await res.json();
+		return data.size;
 	}
 
 	async function fetchFriendRequest() {

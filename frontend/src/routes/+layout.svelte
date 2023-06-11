@@ -20,11 +20,6 @@
 	}
 
 	@font-face {
-		font-family: 'bit5x3';
-		src: url('/fonts/bit5x3.ttf') format('truetype');
-	}
-
-	@font-face {
 		font-family: 'pong-score';
 		src: url('/fonts/pong-score.ttf') format('truetype');
 	}
