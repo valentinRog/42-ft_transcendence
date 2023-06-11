@@ -15,28 +15,26 @@
 	let currentChat: any = null;
 	let friendUsername: string | null | undefined = '';
 	let friendId: number | null = $friendInfoId;
-	let socketInstance: Socket | null = null;
 	let messageContent = '';
+	let isFriend = true;
 	let chatWindow: HTMLDivElement;
 	let autoScroll = true;
 
 	$: {
-		if (chatIdLocal !== null && chatIdLocal !== undefined)
+		friendUsername = $contacts.find((contact) => contact.id === friendId)?.username;
+		if (friendUsername === undefined) isFriend = false;
+		else isFriend = true;
+		if (chatIdLocal !== null && chatIdLocal !== undefined) {
 			currentChat = $chats.find((chat) => chat.id === chatIdLocal);
-		else
-			friendUsername = $contacts.find((contact) => contact.id === friendId)?.username;
+			if (currentChat.isGroupChat)
+				isFriend = true;
+		}
 	}
 
 	onMount(() => {
-		socket.subscribe(($socket) => {
-			socketInstance = $socket;
+		$socket.on('updateChat', (chatId: number) => {
+			if (chatIdLocal === null || chatIdLocal === undefined) chatIdLocal = chatId;
 		});
-
-		if (socketInstance) {
-			socketInstance.on('updateChat', (chatId: number) => {
-				if (chatIdLocal === null || chatIdLocal === undefined) chatIdLocal = chatId;
-			});
-		}
 		chatWindow.scrollTop = chatWindow.scrollHeight;
 	});
 
@@ -54,13 +52,11 @@
 
 	async function sendMessage() {
 		if (messageContent.trim() === '') return;
-		if (socketInstance) {
-			socketInstance.emit('sendMessage', {
-				chatId: chatIdLocal,
-				content: messageContent,
-				friendUsername: friendUsername
-			});
-		}
+		$socket.emit('sendMessage', {
+			chatId: chatIdLocal,
+			content: messageContent,
+			friendUsername: friendUsername
+		});
 		messageContent = '';
 	}
 
@@ -73,7 +69,7 @@
 	}
 
 	async function leaveGroup() {
-		if (socketInstance) socketInstance.emit('leaveGroup', { chatId: chatIdLocal });
+		$socket.emit('leaveGroup', { chatId: chatIdLocal });
 	}
 </script>
 
@@ -94,10 +90,14 @@
 		</ul>
 	</div>
 	<div id="sendMessage-window">
-		<form on:submit|preventDefault={sendMessage} class="send-message-form">
-			<input type="text" bind:value={messageContent} class="message-input" />
-			<button type="submit" class="btn send-btn">Send</button>
-		</form>
+		{#if isFriend}
+			<form on:submit|preventDefault={sendMessage} class="send-message-form">
+				<input type="text" bind:value={messageContent} class="message-input" />
+				<button type="submit" class="btn send-btn">Send</button>
+			</form>
+		{:else}
+			<p>You are no longer friends with this user.</p>
+		{/if}
 	</div>
 </div>
 
@@ -202,4 +202,11 @@
 		display: flex;
 		width: 100%;
 	}
+
+	p {
+		font-weight: bold;
+		text-align: center;
+		font-size: 0.9rem;
+	}
+
 </style>

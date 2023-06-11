@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { createEventDispatcher } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
+	import { user } from '$lib/stores';
 	import type { Socket } from 'socket.io-client';
 
 	const dispatch = createEventDispatcher();
@@ -40,7 +41,13 @@
 			if (currentChat?.isGroupChat) typeChat = 'Group';
 			else { 
 				typeChat = 'Chat';
-				if (props.friendId) friendUsername = $contacts.find((c) => c.id === props.friendId)?.username;
+				if (props.friendId) 
+					friendUsername = $contacts.find((c) => c.id === props.friendId)?.username;
+				if (currentChat && friendUsername === undefined) {
+					currentChat.chatUsers.forEach((c: any) => {
+						if (c.userId !== $user?.id) friendUsername = c.user.username;
+					});
+				}
 			}
 		}
 

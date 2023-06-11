@@ -150,7 +150,7 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		max-width: 9.2rem;
+		max-width: 8.6rem;
 	}
 
 	.chat-content {

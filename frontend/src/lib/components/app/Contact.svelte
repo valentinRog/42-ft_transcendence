@@ -20,13 +20,6 @@
 	let friendInput: string = '';
 	let groupChatMode = false;
 	let selectedFriends: string[] = [];
-	let socketInstance: Socket | null = null;
-
-	onMount(() => {
-		socket.subscribe(($socket) => {
-			socketInstance = $socket;
-		});
-	});
 
 	async function addFriend(event: Event) {
 		const form = (event.target as HTMLFormElement).friend.value;
@@ -85,22 +78,21 @@
 		selectedFriends = [$user!.username, ...selectedFriends];
 		const groupName = selectedFriends.join(', ');
 		let chatid: Number;
-		if (socketInstance) {
-			socketInstance.emit('createGroupChat', {
-				groupName: groupName,
-				memberUsernames: selectedFriends,
-				isGroupChat: true
-			});
-			socketInstance.on('createChat', (chatNumber: number) => {
-				$chatId = chatNumber;
-				$openChatWindow = true;
-			});
-		}
+		$socket.emit('createGroupChat', {
+			groupName: groupName,
+			memberUsernames: selectedFriends,
+			isGroupChat: true
+		});
+		$socket.on('createChat', (chatNumber: number) => {
+			$chatId = chatNumber;
+			$openChatWindow = true;
+		});
 		toggleGroupChatMode();
 	}
 
 	function findChat(user1: string, user2: string) {
 		let foundChat;
+
 		$chats.forEach((chat) => {
 			const users = chat.chatUsers.map((chatUser) => chatUser.user.username);
 			if (users.includes(user1) && users.includes(user2) && chat.isGroupChat === false) {
