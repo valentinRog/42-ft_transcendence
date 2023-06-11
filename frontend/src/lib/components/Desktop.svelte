@@ -101,7 +101,7 @@
 	const fetchChats = Context.fetchChats();
 
 	let count = 2;
-	$: count = 3;
+	$: count = 10;
 
 	(async () => {
 		await fetchMe();
@@ -131,13 +131,16 @@
 						$selected = null;
 					}}
 				>
-				<NotificationBadge count={count} />
-				<!--<span class="notification-badge">
-					{#if count > 0}
-					  {count}
-					{/if}
-				  </span>-->
 				<img src={v.DesktopProps.icon} alt={v.DesktopProps.name} draggable="false" />
+					{#if k === 'Conversation'}
+						<NotificationBadge count={count} />
+					{/if}
+					{#if k === 'Contact'}
+						<NotificationBadge count={count} />
+					{/if}
+					{#if k === 'Pong'}
+						<NotificationBadge count={count} />
+					{/if}
 					<div class="icon-text">
 						<span>{v.DesktopProps.name}</span>
 					</div>
