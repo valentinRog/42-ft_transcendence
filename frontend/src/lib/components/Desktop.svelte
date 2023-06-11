@@ -11,17 +11,12 @@
 	const chatId = Context.chatId();
 	const openChatWindow = Context.openChatWindow();
 	const friendInfo = Context.friendInfo();
-
 	const openFriendRequest = Context.openFriendRequest();
-
 	const appInstances = Context.appInstances();
 	const zstack = Context.zstack();
 	const selected = Context.selected();
-
 	const addInstance = Context.addInstance();
-
 	const fetchNotification = Context.fetchNotification();
-
 	const socket = Context.socket();
 
 	function removeInstance(id: number) {
@@ -103,6 +98,12 @@
 	let count = 2;
 	$: count = 10;
 
+	let notificationCounts = {
+		icon1: 0,
+		icon2: 0,
+		icon3: 0
+	};
+
 	(async () => {
 		await fetchMe();
 		await fetchFriends();
@@ -112,6 +113,11 @@
 				if (chat.isGroupChat) $socket.emit('joinRoom', { chatId: chat.id });
 			});
 		});
+
+		const iconTypes = ['icon1', 'icon2', 'icon3']; // Replace with your actual icon types
+		for (const type of iconTypes) {
+			//notificationCounts[type] = await fetchNotification(type);
+		}
 	})();
 </script>
 
@@ -132,15 +138,11 @@
 					}}
 				>
 				<img src={v.DesktopProps.icon} alt={v.DesktopProps.name} draggable="false" />
-					{#if k === 'Conversation'}
-						<NotificationBadge count={count} />
-					{/if}
-					{#if k === 'Contact'}
-						<NotificationBadge count={count} />
-					{/if}
-					{#if k === 'Pong'}
-						<NotificationBadge count={count} />
-					{/if}
+				{#if k === 'Conversation' || k === 'Contact' || k === 'Pong'}
+				<span class="notification-badge {k}">
+					<NotificationBadge count={1} />
+				</span>
+				{/if}
 					<div class="icon-text">
 						<span>{v.DesktopProps.name}</span>
 					</div>
@@ -203,9 +205,7 @@
 
 <style lang="scss">
 	.icons {
-		position: absolute;
-		left: 0;
-		top: 0;
+		position: relative;
 		width: 7rem;
 		height: 100%;
 		display: flex;
@@ -225,16 +225,12 @@
 
 	.icon-text {
 		color: white;
-		margin-top: 0.19rem; /* Add margin to the top of the text */
-		font-size: 0.9rem; /* Adjust the font size as desired */
+		margin-top: 0.19rem;
+		font-size: 0.9rem;
 	}
 
 	div.desktop {
 		height: calc(100vh - $navbar-height);
-		position: relative;
-	}
-
-	.icon-container {
 		position: relative;
 	}
 
