@@ -73,6 +73,10 @@
 		FriendRequest: {
 			TabProps: { name: 'FriendRequest', icon: '/computer.png' },
 			DesktopProps: { name: 'FriendRequest', icon: '/computer.png' }
+		},
+		Forum: {
+			TabProps: { name: 'Forum', icon: '/computer.png' },
+			DesktopProps: { name: 'Forum', icon: '/computer.png' }
 		}
 	};
 

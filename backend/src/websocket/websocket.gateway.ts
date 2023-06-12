@@ -68,6 +68,7 @@ export abstract class SocketGateway
       groupName: string;
       memberUsernames: string[];
       isGroupChat: boolean;
+      accessibility: string;
     },
   ) {
     const user = this.webSocketService.getClientName(client);
@@ -75,6 +76,7 @@ export abstract class SocketGateway
       payload.groupName,
       payload.memberUsernames,
       payload.isGroupChat,
+      payload.accessibility
     );
 
     for (const member of newGroupChat.chatUsers) {
@@ -129,6 +131,7 @@ export abstract class SocketGateway
         `${username}-${payload.friendUsername}`,
         [username, payload.friendUsername],
         false,
+        "private"
       );
       const newMessage = await this.chatService.addMessageToDatabase(
         newchat.id,

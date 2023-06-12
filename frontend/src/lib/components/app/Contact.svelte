@@ -81,7 +81,8 @@
 		$socket.emit('createGroupChat', {
 			groupName: groupName,
 			memberUsernames: selectedFriends,
-			isGroupChat: true
+			isGroupChat: true,
+			accessibility: "private"
 		});
 		$socket.on('createChat', (chatNumber: number) => {
 			$chatId = chatNumber;

@@ -30,18 +30,22 @@ export class ChatService {
     return chats;
   }
 
-  async createChat(groupName: string, memberUsernames: string[], isGroupChat: boolean) : Promise<Chat | null> {
+  async createChat(groupName: string, memberUsernames: string[], isGroupChat: boolean, accessibility: string, password?: string) : Promise<Chat | null> {
     const newGroupChat = await this.prisma.chat.create({
-        data: {
+          data: {
             isGroupChat: isGroupChat,
             name: groupName,
+            accessibility: accessibility,
+            password: password,
             updatedAt: new Date(),
             createdAt: new Date(),
             chatUsers: {
-                create: memberUsernames.map(username => ({
+                create: memberUsernames.map((username, index) => ({
                     user: { connect: { username } },
                     createdAt: new Date(),
                     lastReadMessageId: 0,
+                    isAdmin: index === 0, 
+                    isBanned: false, 
                 }))
             }
         },

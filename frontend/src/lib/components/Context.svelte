@@ -61,7 +61,7 @@
 		export const chatId = (): Writable<number | null> => getContext('chatId');
 		export const openChatWindow = (): Writable<boolean> => getContext('openChatWindow');
 
-		export type App = 'Pong' | 'Chat' | 'Contact' | 'Profile' | 'Conversation' | 'FriendRequest';
+		export type App = 'Pong' | 'Chat' | 'Contact' | 'Profile' | 'Conversation' | 'FriendRequest' | 'Forum';
 
 		export interface AppInstance {
 			readonly componentType: App;
@@ -105,6 +105,7 @@
 	import Chat from '$lib/components/app/Chat.svelte';
 	import Contact from '$lib/components/app/Contact.svelte';
 	import Profile from '$lib/components/app/Profile.svelte';
+	import Forum from '$lib/components/app/Forum.svelte';
 	import Conversation from '$lib/components/app/Conversation.svelte';
 	import FriendRequest from '$lib/components/app/FriendRequest.svelte';
 	import { token, user } from '$lib/stores';
@@ -148,7 +149,8 @@
 		FriendRequest: FriendRequest,
 		Contact: Contact,
 		Profile: Profile,
-		Conversation: Conversation
+		Conversation: Conversation,
+		Forum: Forum,
 	});
 
 	const appInstances = writable(new Map<string, Context.AppInstance>());
