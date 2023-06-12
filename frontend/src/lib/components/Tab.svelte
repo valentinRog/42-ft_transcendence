@@ -45,9 +45,9 @@
 			{:else if name === 'Profile'}
 				<p>My {name}</p>
 			{:else if name === 'Chat' && currentChat && currentChat.isGroupChat}
-				<p>{typeChat}: {currentChat.name}</p>
+				<p>{typeChat} {currentChat.name}</p>
 			{:else if name === 'Chat'}
-				<p>{typeChat} : {friendUsername}</p>
+				<p>{typeChat} {friendUsername}</p>
 			{:else}
 				<p>{name}</p>
 			{/if}

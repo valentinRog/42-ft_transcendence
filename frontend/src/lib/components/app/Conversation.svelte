@@ -2,6 +2,7 @@
 	import { onDestroy } from 'svelte';
 	import { user } from '$lib/stores';
 	import { Context } from '$lib/components/Context.svelte';
+	import { each } from 'svelte/internal';
 
 	const chats = Context.chats();
 	const chatId = Context.chatId();
@@ -60,12 +61,21 @@
 			return dateB.getTime() - dateA.getTime();
 		}) as chat (chat.id)}
 			<div class="chat" on:click={() => startChat(chat.id, chat)}>
-				<h4>
-					{chat.isGroupChat
-						? 'Group: ' + chat.name
-						: 'Chat: ' +
-						  chat.chatUsers.find((chatUser) => chatUser.userId !== $user?.id)?.user?.username}
-				</h4>
+				<div class="chat-header">
+					{#if chat.isGroupChat}
+						<h4>{chat.name}
+							<h5>
+								{#each chat.chatUsers as chatUser, i}
+									{#if chatUser.user.username != $user?.username}
+										{chatUser.user.username + (chat.chatUsers.length - i > 1 ? ', ' : '')}
+									{/if}
+								{/each}
+							</h5>
+						</h4>
+					{:else}
+						<h4>{chat.chatUsers.find((chatUser) => chatUser.userId !== $user?.id)?.user?.username}</h4>
+					{/if}
+				</div>
 				<div class="chat-content">
 					{#if chat.messages.length > 0}
 						<div class="message-details">
