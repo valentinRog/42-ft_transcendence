@@ -84,7 +84,7 @@
 				{#each currentChat?.messages || [] as message, i (i)}
 					<li class={findUser(message.userId, chatIdLocal) === $user?.username ? 'self' : 'other'}>
 						<div class="message-header">
-							{#if i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId}
+							{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
 								<strong>{findUser(message.userId, chatIdLocal)}</strong>
 							{/if}
 						</div>
