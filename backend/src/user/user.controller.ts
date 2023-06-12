@@ -95,7 +95,6 @@ export class UserController {
       where: { username: dto.friend },
     });
     if (!prisma_friend) throw new ForbiddenException('User not found');
-
     return await this.userService.removeFriend(username, prisma_friend.id);
   }
 

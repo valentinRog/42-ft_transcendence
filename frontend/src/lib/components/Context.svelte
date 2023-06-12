@@ -251,6 +251,7 @@
 	$socket.on('friend', (data: { message: string }) => {
 		console.log('add-friend', data.message);
 		fetchFriendRequest();
+		fetchFriends();
 	});
 
 	$socket.on('game', (data: { message: string }) => {

@@ -132,7 +132,7 @@
 				<img src={v.DesktopProps.icon} alt={v.DesktopProps.name} draggable="false" />
 				{#if k === 'Conversation'}
 				<span class="notification-badge">
-					<NotificationBadge count={1} />
+					<NotificationBadge count={0} />
 				</span>
 				{:else if k === 'Contact'}
 				<span class="notification-badge">

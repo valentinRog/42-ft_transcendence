@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EditUserDto } from './dto';
+import { WebSocketService } from '../websocket/websocket.service';
 import { createWriteStream } from 'fs';
 import { HttpService } from '@nestjs/axios';
 import UPLOAD_PATH from '../../config/upload-path';
@@ -16,6 +17,7 @@ export class UserService {
   constructor(
     private prisma: PrismaService,
     private httpService: HttpService,
+    private socketService: WebSocketService,
   ) {}
 
   async getUser(username: string) {
@@ -59,10 +61,13 @@ export class UserService {
         where: { username: userName },
         data: { friends: { push: friendId } },
       });
-      await this.prisma.user.update({
+      const friend = await this.prisma.user.update({
         where: { id: friendId },
         data: { friends: { push: user.id } },
       });
+      if ((await this.getUserStatus(friend.username)) != 'offline') {
+        this.socketService.sendToUser(friend.username, userName, 'friend');
+      }
       delete user.hash;
       return user;
     } catch (error) {
@@ -103,7 +108,7 @@ export class UserService {
         },
       });
       // Remove the user from the friend's friend list
-      await this.prisma.user.update({
+      const friend = await this.prisma.user.update({
         where: { id: friendId },
         data: {
           friends: {
@@ -116,6 +121,10 @@ export class UserService {
           },
         },
       });
+      // Notify the friend that the user has removed them
+      if ((await this.getUserStatus(friend.username)) != 'offline') {
+        this.socketService.sendToUser(friend.username, userName, 'friend');
+      }
       delete user.hash;
       return user;
     } catch (error) {
