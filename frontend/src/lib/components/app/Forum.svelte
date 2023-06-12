@@ -46,7 +46,7 @@
 				<option value="protected">Protected by password</option>
 			</select>
 		</label>
-		{#if accessibility === 'password'}
+		{#if accessibility === 'protected'}
 			<label>
 				Password :
 				<input type="password" bind:value={password} required>
@@ -59,7 +59,7 @@
 		<button type="submit">Créer un chat</button>
 	</form>
      <!-- Public chats -->
-     <h3>Public Chats</h3>
+     <h3>Public Topics</h3>
      <ul>
          <!-- {#each publicChats as chat (chat)}
              <li>{chat}</li>
@@ -67,7 +67,7 @@
      </ul>
  
      <!-- My chats public-->
-     <h3>My Chats</h3>
+     <h3>My Topics</h3>
      <ul>
         {#each $chats as chat (chat.id)}
             {#if chat.accessibility !== 'private'}

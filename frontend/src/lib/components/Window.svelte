@@ -153,7 +153,7 @@
 				<p>{name}</p>
 			{/if}
 			<div class="buttons">
-				{#if name === 'Chat' && currentChat && currentChat.isGroupChat}
+				{#if name === 'Chat' && currentChat && currentChat.isGroupChat && currentChat.accessibility === "private"}
 					<button on:click={() => leaveGroup()}>
 						<i class="fas fa-sign-out-alt" />
 						<dialog bind:this={dialog} class="dialog" open={isDialogOpen}>
