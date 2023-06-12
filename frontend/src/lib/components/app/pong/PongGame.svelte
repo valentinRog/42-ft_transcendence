@@ -1,9 +1,6 @@
 <script lang="ts">
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
-	import DropDown from '$lib/components/drop/DropDown.svelte';
-	import RightDrop from '$lib/components/drop/RightDrop.svelte';
-	import DropButton from '../drop/DropButton.svelte';
 
 	const fetchWithToken = Context.fetchWithToken();
 	const socket = Context.socket();
@@ -153,11 +150,11 @@
 	let serverDelta = 0;
 	const tickRate = 30;
 	const delay = 20;
-	let index = 0;
+	export let index: number;
 	let inputs = new Array<Input>();
 	let up = false;
 	let down = false;
-	let room = '';
+	export let room: string;
 	let pingTimer: number | null = null;
 	let gameTimer: number | null = null;
 
@@ -190,29 +187,36 @@
 		player2Score: 0
 	};
 
+	export let scale = 1;
+
 	function draw(ctx: CanvasRenderingContext2D) {
 		const s = update(state, Date.now() - state.time);
-		ctx.clearRect(0, 0, dimensions.width, dimensions.height);
+		ctx.clearRect(0, 0, dimensions.width * scale, dimensions.height * scale);
 		ctx.fillStyle = 'white';
-		ctx.fillRect(s.ball.x, s.ball.y, dimensions.ballWidth, dimensions.ballWidth);
 		ctx.fillRect(
-			dimensions.paddleOffset,
-			s.paddles[0].y,
-			dimensions.paddleWidth,
-			dimensions.paddleHeight
+			s.ball.x * scale,
+			s.ball.y * scale,
+			dimensions.ballWidth * scale,
+			dimensions.ballWidth * scale
 		);
 		ctx.fillRect(
-			dimensions.width - dimensions.paddleWidth - dimensions.paddleOffset,
-			s.paddles[1].y,
-			dimensions.paddleWidth,
-			dimensions.paddleHeight
+			dimensions.paddleOffset * scale,
+			s.paddles[0].y * scale,
+			dimensions.paddleWidth * scale,
+			dimensions.paddleHeight * scale
+		);
+		ctx.fillRect(
+			dimensions.width * scale - dimensions.paddleWidth * scale - dimensions.paddleOffset * scale,
+			s.paddles[1].y * scale,
+			dimensions.paddleWidth * scale,
+			dimensions.paddleHeight * scale
 		);
 
 		ctx.setLineDash([5, 5]);
 		ctx.strokeStyle = 'white';
 		ctx.beginPath();
-		ctx.moveTo(dimensions.width / 2, 0);
-		ctx.lineTo(dimensions.width / 2, dimensions.height);
+		ctx.moveTo((dimensions.width / 2) * scale, 0);
+		ctx.lineTo((dimensions.width / 2) * scale, dimensions.height * scale);
 		ctx.stroke();
 
 		ctx.font = '40px pong-score';
@@ -223,13 +227,13 @@
 		};
 		const offset1 = getPlayerScoreOffset(s.player1Score);
 		const offset2 = getPlayerScoreOffset(s.player2Score);
-		ctx.fillText(s.player1Score.toString(), dimensions.width / 4 - offset1, 60);
-		ctx.fillText(s.player2Score.toString(), (3 * dimensions.width) / 4 - offset2, 60);
+		ctx.fillText(s.player1Score.toString(), (dimensions.width * scale) / 4 - offset1, 60);
+		ctx.fillText(s.player2Score.toString(), (3 * dimensions.width * scale) / 4 - offset2, 60);
 
 		requestAnimationFrame(() => draw(ctx));
 	}
 
-	function gameLoop() {
+	setInterval(() => {
 		const input: Input = {
 			room,
 			clientId: $socket.id,
@@ -244,76 +248,52 @@
 		if (inputs.length > 100) {
 			inputs.shift();
 		}
-		gameTimer = setTimeout(gameLoop, 1000 / tickRate);
-	}
+	}, 1000 / tickRate);
 
-	function pingLoop() {
-		$socket.emit('ping', Date.now());
-		pingTimer = setTimeout(pingLoop, 1000);
-	}
+	setInterval(() => $socket.emit('ping', Date.now()), 1000);
 
-	function enterGame() {
-		gameLoop();
-		pingLoop();
-	}
-
-	function handleCanvas(e: HTMLCanvasElement) {
-		e.width = dimensions.width;
-		e.height = dimensions.height;
-		const ctx = e.getContext('2d') as CanvasRenderingContext2D;
-		draw(ctx);
-	}
+	let canvas: HTMLCanvasElement;
 
 	onMount(() => {
-		fetchWithToken('matchmaking/queue', {
-			method: 'POST'
-		});
+		const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+		draw(ctx);
+	});
 
-		index = 0;
-		room = '';
-		pingTimer = null;
-		gameTimer = null;
+	$: if (canvas !== undefined) {
+		canvas.width = dimensions.width * scale;
+		canvas.height = dimensions.height * scale;
+	}
 
-		$socket.on('enter-room', (data: { room: string; index: number }) => {
-			room = data.room;
-			index = data.index;
-			$socket.emit('enter-room', data);
-			console.log('enter-room');
-			enterGame();
-		});
+	pingTimer = null;
+	gameTimer = null;
 
-		$socket.on('index', (i: number) => {
-			index = i;
-		});
+	$socket.on('game-over', (winner: number) => {
+		stopLoop();
+		//if (winner === 0) {
+		//	alert('Player 1 wins!');
+		//} else {
+		//	alert('Player 2 wins!');
+		//}
+	});
 
-		$socket.on('game-over', (winner: number) => {
-			stopLoop();
-			//if (winner === 0) {
-			//	alert('Player 1 wins!');
-			//} else {
-			//	alert('Player 2 wins!');
-			//}
-		});
+	$socket.on('ping', (data: [number, number]) => {
+		ping = Date.now() - data[0];
+		serverDelta = data[1] - Date.now() + ping / 2;
+	});
 
-		$socket.on('ping', (data: [number, number]) => {
-			ping = Date.now() - data[0];
-			serverDelta = data[1] - Date.now() + ping / 2;
-		});
-
-		$socket.on('state', (s: GameState) => {
-			s.time -= serverDelta;
-			while (inputs.length && inputs[0].clientTime < s.time) {
-				inputs.shift();
-			}
-			for (let i = 1; i < inputs.length && inputs[i].clientTime <= Date.now(); i++) {
-				s = update(s, inputs[i].clientTime - inputs[i - 1].clientTime);
-				s.paddles[index].up = inputs[i].up;
-				s.paddles[index].down = inputs[i].down;
-				s.time = inputs[i].clientTime;
-				s.id = inputs[i].stateId;
-			}
-			state = s;
-		});
+	$socket.on('state', (s: GameState) => {
+		s.time -= serverDelta;
+		while (inputs.length && inputs[0].clientTime < s.time) {
+			inputs.shift();
+		}
+		for (let i = 1; i < inputs.length && inputs[i].clientTime <= Date.now(); i++) {
+			s = update(s, inputs[i].clientTime - inputs[i - 1].clientTime);
+			s.paddles[index].up = inputs[i].up;
+			s.paddles[index].down = inputs[i].down;
+			s.time = inputs[i].clientTime;
+			s.id = inputs[i].stateId;
+		}
+		state = s;
 	});
 
 	function stopLoop() {
@@ -334,7 +314,6 @@
 				method: 'POST'
 			});
 		}
-		$socket.off('enter-room');
 		$socket.off('ping');
 		$socket.off('state');
 		$socket.off('input');
@@ -359,26 +338,12 @@
 
 <svelte:window on:keydown={handleKeyDown} on:keyup={handleKeyUp} />
 
-<div class="menu">
-	<DropDown name="settings">
-		<RightDrop name="settings">
-			<RightDrop name="settings">
-				<DropButton>Yo</DropButton>
-				<DropButton>Yo</DropButton>
-				<DropButton>Yo</DropButton>
-			</RightDrop>
-		</RightDrop>
-	</DropDown>
+<div class="container">
+	<canvas bind:this={canvas} />
 </div>
-<canvas use:handleCanvas />
 
 <style lang="scss">
-	div.menu {
-		width: fit-content;
-	}
-
 	canvas {
-		margin: 0.2rem;
 		background-color: black;
 	}
 </style>

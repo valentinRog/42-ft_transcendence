@@ -1,8 +1,37 @@
 <script lang="ts">
+	import { Context } from '$lib/components/Context.svelte';
+	import { user } from '$lib/stores';
+
+	const chatId = Context.chatId();
+	const chats = Context.chats();
+	const contacts = Context.contacts();
+
 	export let name: string;
 	export let icon: string;
 	export let active: boolean;
 	export let props: Record<string, any>;
+
+	let currentChat: any;
+	let chatIdLocal: number | null = $chatId;
+	let typeChat: string | null = null;
+	let friendUsername: string | undefined = '';
+
+	$: {
+		if (name === 'Chat') {
+			currentChat = $chats.find((chat) => chat.id === chatIdLocal);
+			if (currentChat?.isGroupChat) typeChat = 'Group';
+			else {
+				typeChat = 'Chat';
+				if (props.friendId)
+					friendUsername = $contacts.find((c) => c.id === props.friendId)?.username;
+				if (currentChat && friendUsername === undefined) {
+					currentChat.chatUsers.forEach((c: any) => {
+						if (c.userId !== $user?.id) friendUsername = c.user.username;
+					});
+				}
+			}
+		}
+	}
 </script>
 
 <div class="tab" on:click class:active>
@@ -13,8 +42,10 @@
 				<p>{name} of {props.username}</p>
 			{:else if name === 'Profile'}
 				<p>My {name}</p>
-			{:else if name === 'Chat' && props.name && props.typeChat}
-				<p>{props.typeChat} of {props.name}</p>
+			{:else if name === 'Chat' && currentChat && currentChat.isGroupChat}
+				<p>{typeChat} {currentChat.name}</p>
+			{:else if name === 'Chat'}
+				<p>{typeChat} {friendUsername}</p>
 			{:else}
 				<p>{name}</p>
 			{/if}

@@ -10,34 +10,24 @@
 	const chats = Context.chats();
 	const chatId = Context.chatId();
 	const openChatWindow = Context.openChatWindow();
-	const friendInfo = Context.friendInfo();
+	const friendInfoId = Context.friendInfoId();
+
 	const openFriendRequest = Context.openFriendRequest();
 	const appInstances = Context.appInstances();
 	const zstack = Context.zstack();
 	const selected = Context.selected();
 	const addInstance = Context.addInstance();
+	const removeInstance = Context.removeInstance();
+
 	const socket = Context.socket();
 
-	function removeInstance(id: number) {
-		$appInstances = $appInstances.filter((_, i) => i !== id);
-		$zstack = $zstack.filter((z) => z !== id).map((z) => (z > id ? z - 1 : z));
-	}
-
-	function putOnTop(id: number) {
+	function putOnTop(id: string) {
 		$zstack = [...$zstack.filter((z) => z !== id), id];
 	}
 
 	$: {
 		if ($openChatWindow) {
-			let name;
-			if ($chatId === null || $chatId === undefined) name = $friendInfo?.username;
-			else {
-				let targetChat = $chats.find((chat) => chat.id === $chatId);
-
-				name = targetChat?.chatUsers.find((u) => u.user.username !== $user?.username)?.user
-					.username;
-			}
-			addInstance('Chat', { name: name });
+			addInstance('Chat', { friendId: $friendInfoId });
 			$selected = null;
 			openChatWindow.set(false);
 		}
@@ -82,6 +72,14 @@
 		FriendRequest: {
 			TabProps: { name: 'FriendRequest', icon: '/computer.png' },
 			DesktopProps: { name: 'FriendRequest', icon: '/computer.png' }
+		},
+		Forum: {
+			TabProps: { name: 'Forum', icon: '/computer.png' },
+			DesktopProps: { name: 'Forum', icon: '/computer.png' }
+		},
+		Paint: {
+			TabProps: { name: 'Paint', icon: '/paint.png' },
+			DesktopProps: { name: 'Paint', icon: '/paint.png' }
 		}
 	};
 
@@ -150,24 +148,23 @@
 			{/if}
 		{/each}
 	</div>
-	{JSON.stringify($user)}
-	{#each $appInstances as { componentType, component, visible, id, propsWin, props }, i (id)}
+	{#each [...$appInstances.entries()] as [id, { componentType, component, visible, propsWin, props }] (id)}
 		<Window
 			{...apps[componentType].TabProps}
 			props={propsWin}
 			parentWidth={width}
 			parentHeight={height}
-			z={$zstack.indexOf(i)}
+			z={$zstack.indexOf(id)}
 			{visible}
 			on:minimize={() => {
 				visible = !visible;
 				$selected = null;
 			}}
-			on:close={() => removeInstance(i)}
+			on:close={() => removeInstance(id)}
 			on:mousedown={(event) => {
 				event.stopPropagation();
-				putOnTop(i);
-				$selected = i;
+				putOnTop(id);
+				$selected = id;
 			}}
 		>
 			<svelte:component this={component} {...props} />
@@ -180,21 +177,21 @@
 <nav class="navbar" style:z-index={$zstack.length}>
 	<Start desktopHeight={height} />
 	<div class="navbar-tabs">
-		{#each $appInstances as { componentType, visible, id, propsWin }, i (id)}
+		{#each [...$appInstances.entries()] as [id, { componentType, visible, propsWin }]}
 			<Tab
 				{...apps[componentType].TabProps}
 				props={propsWin}
-				active={$selected === i}
+				active={$selected === id}
 				on:click={() => {
-					putOnTop(i);
-					if (visible && $selected === i) {
+					putOnTop(id);
+					if (visible && $selected === id) {
 						visible = !visible;
 						$selected = null;
 					} else if (visible) {
-						$selected = i;
+						$selected = id;
 					} else {
 						visible = !visible;
-						$selected = i;
+						$selected = id;
 					}
 				}}
 			/>

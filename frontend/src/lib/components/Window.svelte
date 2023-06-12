@@ -2,11 +2,12 @@
 	import { onMount } from 'svelte';
 	import { createEventDispatcher } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
-	import type { Socket } from 'socket.io-client';
+	import { user } from '$lib/stores';
 
 	const dispatch = createEventDispatcher();
 	const chatId = Context.chatId();
 	const chats = Context.chats();
+	const contacts = Context.contacts();
 	const socket = Context.socket();
 
 	export let props: Record<string, any>;
@@ -26,7 +27,7 @@
 	let currentChat: any;
 	let chatIdLocal: number | null = $chatId;
 	let typeChat: string | null = null;
-	let socketInstance: Socket | null = null;
+	let friendUsername: string | null | undefined = '';
 
 	$: {
 		if (top + height > parentHeight) top = parentHeight - height;
@@ -37,16 +38,21 @@
 		if (name === 'Chat') {
 			currentChat = $chats.find((chat) => chat.id === chatIdLocal);
 			if (currentChat?.isGroupChat) typeChat = 'Group';
-			else typeChat = 'Chat';
+			else {
+				typeChat = 'Chat';
+				if (props.friendId)
+					friendUsername = $contacts.find((c) => c.id === props.friendId)?.username;
+				if (currentChat && friendUsername === undefined) {
+					currentChat.chatUsers.forEach((c: any) => {
+						if (c.userId !== $user?.id) friendUsername = c.user.username;
+					});
+				}
+			}
 		}
 	}
 
 	let moving = false;
 	onMount(() => {
-		socket.subscribe(($socket) => {
-			socketInstance = $socket;
-		});
-
 		top -= height / 2;
 		left -= width / 2;
 	});
@@ -74,12 +80,10 @@
 		if (e.key === 'Enter') {
 			if ((e.target as HTMLInputElement).value !== prevName) {
 				prevName = (e.target as HTMLInputElement).value;
-				if (socketInstance) {
-					socketInstance.emit('changeChatName', {
-						chatId: chatIdLocal,
-						newName: prevName
-					});
-				}
+				$socket.emit('changeChatName', {
+					chatId: chatIdLocal,
+					newName: prevName
+				});
 			}
 			editable = false;
 		}
@@ -98,7 +102,7 @@
 	async function leaveGroupConfirm() {
 		isDialogOpen = false;
 		dialog.close();
-		if (socketInstance) socketInstance.emit('leaveGroup', { chatId: chatIdLocal });
+		$socket.emit('leaveGroup', { chatId: chatIdLocal });
 	}
 </script>
 
@@ -142,13 +146,13 @@
 				{:else}
 					<p id="group-chat-name" on:dblclick={toggleEdit}>{typeChat}: {currentChat.name}</p>
 				{/if}
-			{:else if name === 'Chat' && currentChat && !currentChat.isGroupChat}
-				<p id="chat-name">{typeChat}: {props.name}</p>
+			{:else if name === 'Chat'}
+				<p id="chat-name">{typeChat}: {friendUsername}</p>
 			{:else}
 				<p class="title">{name}</p>
 			{/if}
 			<div class="buttons">
-				{#if name === 'Chat' && currentChat && currentChat.isGroupChat}
+				{#if name === 'Chat' && currentChat && currentChat.isGroupChat && currentChat.accessibility === "private"}
 					<button on:click={() => leaveGroup()}>
 						<i class="fas fa-sign-out-alt" />
 						<dialog bind:this={dialog} class="dialog" open={isDialogOpen}>
@@ -179,6 +183,7 @@
 <svelte:window on:mouseup={() => (moving = false)} on:mousemove={onMouseMove} />
 
 <style lang="scss">
+<<<<<<< HEAD
 
 	section {
 		position: absolute;
@@ -226,12 +231,18 @@
 			}
 		}
 	}
+=======
+	@include window-95;
+>>>>>>> main
 
 	#group-chat-name {
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		max-width: 8.5rem;
+		&:hover {
+			cursor: url($click), auto;
+		}
 	}
 
 	#group-chat-name::after {
@@ -252,17 +263,15 @@
 		left: 50%;
 		transform: translate(-50%, -50%);
 		padding: 1.25rem;
-	}
-
-	.dialog button {
-		margin-top: 1.25rem;
-		margin-right: 0.625rem;
-		padding: 0.3rem;
-		float: right;
-	}
-
-	.dialog p {
-		margin-bottom: 1.25rem;
-		font-size: 1rem;
+		button {
+			margin-top: 1.25rem;
+			margin-right: 0.625rem;
+			padding: 0.3rem;
+			float: right;
+		}
+		p {
+			margin-bottom: 1.25rem;
+			font-size: 1rem;
+		}
 	}
 </style>

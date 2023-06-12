@@ -8,30 +8,32 @@
 
 	const chats = Context.chats();
 	const chatId = Context.chatId();
-	const friendInfo = Context.friendInfo();
+	const friendInfoId = Context.friendInfoId();
+	const contacts = Context.contacts();
 
 	let chatIdLocal: number | null = $chatId;
-	let friend = $friendInfo;
-	let friendUsername: string | null = '';
-	let socketInstance: Socket | null = null;
+	let currentChat: any = null;
+	let friendUsername: string | null | undefined = '';
+	let friendId: number | null = $friendInfoId;
 	let messageContent = '';
+	let isFriend = true;
 	let chatWindow: HTMLDivElement;
 	let autoScroll = true;
 
-	if (friend) {
-		friendUsername = friend.username;
+	$: {
+		friendUsername = $contacts.find((contact) => contact.id === friendId)?.username;
+		if (friendUsername === undefined) isFriend = false;
+		else isFriend = true;
+		if (chatIdLocal !== null && chatIdLocal !== undefined) {
+			currentChat = $chats.find((chat) => chat.id === chatIdLocal);
+			if (currentChat.isGroupChat) isFriend = true;
+		}
 	}
 
 	onMount(() => {
-		socket.subscribe(($socket) => {
-			socketInstance = $socket;
+		$socket.on('updateChat', (chatId: number) => {
+			if (chatIdLocal === null || chatIdLocal === undefined) chatIdLocal = chatId;
 		});
-
-		if (socketInstance) {
-			socketInstance.on('updateChat', (chatId: number) => {
-				if (chatIdLocal === null || chatIdLocal === undefined) chatIdLocal = chatId;
-			});
-		}
 		chatWindow.scrollTop = chatWindow.scrollHeight;
 	});
 
@@ -49,43 +51,42 @@
 
 	async function sendMessage() {
 		if (messageContent.trim() === '') return;
-		if (socketInstance) {
-			socketInstance.emit('sendMessage', {
-				chatId: chatIdLocal,
-				content: messageContent,
-				friendUsername: friendUsername
-			});
-		}
+		$socket.emit('sendMessage', {
+			chatId: chatIdLocal,
+			content: messageContent,
+			friendUsername: friendUsername
+		});
 		messageContent = '';
 	}
 
 	function findUser(userId: number, chatId: number | null) {
-		let chat: any;
-
-		chats.subscribe(($chats) => {
-			chat = $chats.find((c) => c.id === chatId);
-		});
-		if (chat) {
-			let chatUser = chat.chatUsers.find((cu: any) => cu.userId === userId);
+		if (currentChat) {
+			let chatUser = currentChat.chatUsers.find((cu: any) => cu.userId === userId);
 			return chatUser ? chatUser.user.username : 'Unknown';
 		}
 		return 'Unknown';
 	}
 
 	async function leaveGroup() {
-		if (socketInstance) socketInstance.emit('leaveGroup', { chatId: chatIdLocal });
+		$socket.emit('leaveGroup', { chatId: chatIdLocal });
 	}
 </script>
 
 <div id="box">
 	<div id="chat-window" bind:this={chatWindow} on:scroll={handleScroll}>
-		<h5>Waiting message...</h5>
+		{#if !currentChat}
+			<h5>Waiting for messages...</h5>
+		{:else}
+			<h5>▪ End of messages ▪</h5>
+		{/if}
 		<ul>
-			{#if $chats.find((c) => c.id === chatIdLocal)}
-				{#each $chats.find((c) => c.id === chatIdLocal)?.messages || [] as message, i (i)}
+			{#if currentChat}
+				{#each currentChat?.messages || [] as message, i (i)}
 					<li class={findUser(message.userId, chatIdLocal) === $user?.username ? 'self' : 'other'}>
 						<div class="message-header">
-							<strong>{findUser(message.userId, chatIdLocal)}</strong><span>:</span>
+							{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
+								<strong>{findUser(message.userId, chatIdLocal)}</strong>
+							{/if}
 						</div>
 						<div class="message-content">{message.content}</div>
 					</li>
@@ -94,10 +95,14 @@
 		</ul>
 	</div>
 	<div id="sendMessage-window">
-		<form on:submit|preventDefault={sendMessage} class="send-message-form">
-			<input type="text" bind:value={messageContent} class="message-input" />
-			<button type="submit" class="btn send-btn">Send</button>
-		</form>
+		{#if isFriend}
+			<form on:submit|preventDefault={sendMessage} class="send-message-form">
+				<input type="text" bind:value={messageContent} class="message-input" />
+				<button type="submit" class="btn send-btn">Send</button>
+			</form>
+		{:else}
+			<p>You are no longer friends with this user.</p>
+		{/if}
 	</div>
 </div>
 
@@ -124,9 +129,7 @@
 	}
 
 	.btn {
-		background: #c0c0c0;
-		border: 1px solid #000;
-		color: #000;
+		padding: 0.1rem 0.4rem;
 	}
 
 	.send-btn {
@@ -145,6 +148,8 @@
 	}
 
 	input[type='text'].message-input {
+		@include tab-border(white, black);
+		background-color: $light-grey;
 		width: 100%;
 		box-sizing: border-box;
 		margin-right: 0.5rem;
@@ -165,12 +170,20 @@
 		flex-direction: column;
 	}
 
+	li.self .message-header {
+		color: white;
+	}
+
 	li.self .message-header,
 	li.self .message-content {
 		align-self: flex-end;
 		display: flex;
 		justify-content: flex-end;
 		width: 9.5rem;
+	}
+
+	li.other .message-header {
+		color: $blue;
 	}
 
 	li.other .message-header,
@@ -194,12 +207,19 @@
 		padding-top: 0.3rem;
 		padding-bottom: 0.3rem;
 		font-size: 0.9em;
-		border-radius: 0.8rem;
+		@include tab-border(white, black);
+		// border-radius: 0.8rem;
 		background-color: rgb(229, 229, 229);
 	}
 
 	.send-message-form {
 		display: flex;
 		width: 100%;
+	}
+
+	p {
+		font-weight: bold;
+		text-align: center;
+		font-size: 0.9rem;
 	}
 </style>

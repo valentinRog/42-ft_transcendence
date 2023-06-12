@@ -27,6 +27,8 @@
 			id: number;
 			isGroupChat: boolean;
 			name: string;
+			accessibility: string;
+			password: string;
 			updatedAt: string;
 		};
 
@@ -57,26 +59,36 @@
 		export const friendRequest = (): Writable<NotifRequest[]> => getContext('friendRequest');
 		export const gameRequest = (): Writable<NotifRequest[]> => getContext('gameRequest');
 		export const openFriendRequest = (): Writable<boolean> => getContext('openFriendRequest');
-		export const friendInfo = (): Writable<User | null> => getContext('friendInfo');
+		export const friendInfoId = (): Writable<number | null> => getContext('friendInfoId');
 		export const chats = (): Writable<Chat[]> => getContext('chats');
 		export const chatId = (): Writable<number | null> => getContext('chatId');
 		export const openChatWindow = (): Writable<boolean> => getContext('openChatWindow');
 
-		export type App = 'Pong' | 'Chat' | 'Contact' | 'Profile' | 'Conversation' | 'FriendRequest';
+
+		export type App =
+			| 'Pong'
+			| 'Paint'
+			| 'Chat'
+			| 'Contact'
+			| 'Profile'
+			| 'Conversation'
+			| 'Forum'
+			| 'FriendRequest';
 
 		export interface AppInstance {
 			readonly componentType: App;
 			readonly component: any;
 			visible: boolean;
-			readonly id: string;
 			readonly propsWin: Record<string, any>;
 			readonly props: Record<string, any>;
 		}
 
-		export const components = (): Writable<Record<App, any>> => getContext('components');
-		export const appInstances = (): Writable<AppInstance[]> => getContext('appInstances');
-		export const selected = (): Writable<number | null> => getContext('selected');
-		export const zstack = (): Writable<number[]> => getContext('zstack');
+		export const components = (): Readable<Record<App, any>> => getContext('components');
+
+		export const appInstances = (): Writable<Map<string, AppInstance>> =>
+			getContext('appInstances');
+		export const selected = (): Writable<string | null> => getContext('selected');
+		export const zstack = (): Writable<string[]> => getContext('zstack');
 
 		export const addInstance = (): ((
 			componentType: string,
@@ -84,7 +96,7 @@
 			props?: Record<string, any>
 		) => void) => getContext('addInstance');
 
-		export const fetchNotification = (): ((type: string) => number) => getContext('fetchNotification');
+		export const removeInstance = (): ((id: string) => void) => getContext('removeInstance');
 
 		export const fetchMe = (): (() => Promise<any>) => getContext('fetchMe');
 		export const fetchFriends = (): (() => Promise<any>) => getContext('fetchFriends');
@@ -102,10 +114,12 @@
 <script lang="ts">
 	import { writable, readable } from 'svelte/store';
 	import { setContext } from 'svelte';
-	import Pong from '$lib/components/app/Pong.svelte';
+	import Pong from '$lib/components/app/pong/Pong.svelte';
+	import Paint from '$lib/components/app/Paint.svelte';
 	import Chat from '$lib/components/app/Chat.svelte';
 	import Contact from '$lib/components/app/Contact.svelte';
 	import Profile from '$lib/components/app/Profile.svelte';
+	import Forum from '$lib/components/app/Forum.svelte';
 	import Conversation from '$lib/components/app/Conversation.svelte';
 	import FriendRequest from '$lib/components/app/FriendRequest.svelte';
 	import { token, user } from '$lib/stores';
@@ -131,7 +145,7 @@
 	const friendRequest = writable<Context.NotifRequest[]>([]);
 	const gameRequest = writable<Context.NotifRequest[]>([]);
 	const openFriendRequest = writable(false);
-	const friendInfo = writable<Context.User | null>(null);
+	const friendInfoId = writable<Context.User | null>(null);
 	const chats = writable<Context.Chat[]>([]);
 	const chatId = writable<number | null>(null);
 	const openChatWindow = writable(false);
@@ -140,41 +154,47 @@
 	setContext('friendRequest', friendRequest);
 	setContext('gameRequest', gameRequest);
 	setContext('openFriendRequest', openFriendRequest);
-	setContext('friendInfo', friendInfo);
+	setContext('friendInfoId', friendInfoId);
 	setContext('chats', chats);
 	setContext('chatId', chatId);
 	setContext('openChatWindow', openChatWindow);
 
 	const components = readable({
 		Pong: Pong,
+		Paint: Paint,
 		Chat: Chat,
 		FriendRequest: FriendRequest,
 		Contact: Contact,
 		Profile: Profile,
-		Conversation: Conversation
+		Conversation: Conversation,
+		Forum: Forum,
 	});
 
-	const appInstances = writable<Context.AppInstance[]>([]);
-	const zstack = writable<number[]>([]);
-	const selected = writable<number | null>(null);
+	const appInstances = writable(new Map<string, Context.AppInstance>());
+	const zstack = writable<string[]>([]);
+	const selected = writable<string | null>(null);
 
 	function addInstance(
 		componentType: string,
 		propsWin: Record<string, any> = {},
 		props: Record<string, any> = {}
 	) {
-		$zstack = [...$zstack, $zstack.length];
-		$appInstances = [
-			...$appInstances,
-			{
-				componentType: componentType as Context.App,
-				component: $components[componentType as Context.App],
-				visible: true,
-				id: uuidv4(),
-				propsWin,
-				props
-			}
-		];
+		const id = uuidv4();
+		$zstack = [...$zstack, id];
+		$appInstances.set(id, {
+			componentType: componentType as Context.App,
+			component: $components[componentType as Context.App],
+			visible: true,
+			propsWin,
+			props
+		});
+		$appInstances = $appInstances;
+	}
+
+	function removeInstance(id: string) {
+		$appInstances.delete(id);
+		$appInstances = $appInstances;
+		$zstack = $zstack.filter((z) => z !== id);
 	}
 
 	setContext('components', components);
@@ -182,6 +202,7 @@
 	setContext('zstack', zstack);
 	setContext('selected', selected);
 	setContext('addInstance', addInstance);
+	setContext('removeInstance', removeInstance);
 
 	async function fetchMe() {
 		const res = await fetchWithToken('users/me');

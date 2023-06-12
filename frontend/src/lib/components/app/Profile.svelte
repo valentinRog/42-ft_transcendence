@@ -12,6 +12,7 @@
 	if (username === null) {
 		username = $user!.username;
 		login = $user!.login;
+		currentUser = $user;
 	} else {
 		fetchWithToken(`users/info/${username}`)
 			.then((res) => res.json())
@@ -50,13 +51,15 @@
 								<p>{friend.username} :</p>
 								<p class="status">{friend.status}</p>
 								{#if friend.status === 'online'}
-									<img class="img-status" src="/happy.png" alt="online" />
+									<img class="img-status" src="/online.png" alt="online" />
 								{:else if friend.username === 'vrogiste' && friend.status === 'in-game'}
-									<img class="img-status" src="/focused-val.png" alt="in-game" />
+									<img class="img-status" src="/in-game-val.png" alt="in-game" />
 								{:else if friend.status === 'in-game'}
-									<img class="img-status" src="/focused3.png" alt="in-game" />
+									<img class="img-status" src="/in-game.png" alt="in-game" />
+								{:else if friend.status === 'spectator'}
+									<img class="img-status" src="/spectator.png" alt="spectator" />
 								{:else}
-									<img class="img-status" src="/sad.png" alt="offline" />
+									<img class="img-status" src="/offline.png" alt="offline" />
 								{/if}
 							</div>
 						</li>
@@ -113,7 +116,7 @@
 			}
 		}
 		.img-status {
-			height: 0.75rem;
+			height: 0.8rem;
 			width: auto;
 		}
 	}

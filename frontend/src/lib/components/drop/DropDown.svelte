@@ -23,9 +23,14 @@
 	div.container {
 		position: relative;
 
-		div.drop:hover {
-			cursor: pointer;
-			background-color: $blue;
+		div.drop {
+			padding: 0.2rem 0.65rem;
+
+			&:hover {
+				cursor: pointer;
+				background-color: $blue;
+				color: white;
+			}
 		}
 
 		div.content {
