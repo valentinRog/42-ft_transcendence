@@ -112,30 +112,15 @@
 	}
 	const addInstance = Context.addInstance();
 	const selected = Context.selected();
+	let visible: number = 0;
 </script>
 
-<div id="box">
-	<link
-		rel="stylesheet"
-		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
-	/>
-	<link
-		rel="stylesheet"
-		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-	/>
-	<form on:submit|preventDefault={addFriend} id="add-friend-form">
-		<label for="friend">Add Friend: </label>
-		<input type="text" id="friend" name="friend" bind:value={friendInput} />
-		<input type="submit" id="submit-friend" value="+" />
+<div class="box">
+	<form on:submit|preventDefault={addFriend} class="add-friend-form">
+		<input type="text" name="friend" bind:value={friendInput} placeholder=" Search..." />
+		<input type="submit" value="Add friend" />
 	</form>
-	<div id="centered-buttons">
-		<button on:click={toggleGroupChatMode}>{groupChatMode ? 'Cancel' : 'Create Group Chat'}</button>
-		{#if groupChatMode && selectedFriends.length > 0}
-			<button on:click={createGroupChat}>Confirm</button>
-		{/if}
-		<button on:click={() => openRequest()}>Friend requests</button>
-	</div>
-	<div id="friend-list">
+	<div class="friend-list">
 		{#each $contacts as friend (friend.id)}
 			<div class="friend">
 				{#if groupChatMode}
@@ -146,108 +131,132 @@
 						on:click={selectFriend}
 					/>
 				{/if}
-				<span
-					class="status-dot {friend.status === 'online' ||
-					friend.status === 'in-game' ||
-					friend.status === 'spectator'
-						? 'online'
-						: 'offline'}"
-				/>
-				<p
-					on:dblclick={() => {
-						addInstance('Profile', { username: friend.username }, { username: friend.id });
-						$selected = null;
+				<div
+					class="name-options"
+					on:mouseleave={() => {
+						visible = 0;
 					}}
-					class="username"
 				>
-					{friend.username}
-				</p>
-				<div class="buttons">
-					{#if friend.status === 'online' || friend.status === 'in-game' || friend.status === 'spectator'}
-						<i class="fas fa-gamepad" on:click={() => askGame(friend.username)} />
-					{/if}
-					<i class="fas fa-comments" on:click={() => startChat(friend)} />
-					<i class="fas fa-user-times" on:click={() => removeFriend(friend.username)} />
+					<p
+						class="username"
+						on:click={() => {
+							visible = visible === friend.id ? 0 : friend.id;
+						}}
+					>
+						{friend.username}
+						▾
+					</p>
+					<div class="buttons">
+						{#if visible === friend.id}
+							<img
+								class="option-icons"
+								src="/profile2.png"
+								on:click={() => {
+									addInstance('Profile', { username: friend.username }, { username: friend.id });
+									$selected = null;
+								}}
+							/>
+							{#if friend.status === 'online' || friend.status === 'in-game' || friend.status === 'spectator'}
+								<img
+									class="option-icons"
+									src="/joystick.png"
+									on:click={() => askGame(friend.username)}
+								/>
+							{/if}
+							<img class="option-icons" src="/write.png" on:click={() => startChat(friend)} />
+							<img
+								class="option-icons"
+								src="/no-friend.png"
+								on:click={() => removeFriend(friend.username)}
+							/>
+						{/if}
+					</div>
 				</div>
-				<!-- <div class="buttons">
-					{#if friend.status === 'online' || friend.status === 'in-game' || friend.status === 'spectator'}
-						<i class="fa fa-gamepad" on:click={() => askGame(friend.username)}></i>
-					{/if}
-					<i class="fa fa-comments" on:click={() => startChat(friend)}></i>
-					<i class="fa fa-times-circle" on:click={() => removeFriend(friend.username)}></i>
-				</div>-->
+				{#if friend.status === 'online'}
+					<img class="status" src="/online.png" alt="online" />
+				{:else if friend.username === 'vrogiste' && friend.status === 'in-game'}
+					<img class="status" src="/in-game-val.png" alt="in-game" />
+				{:else if friend.status === 'in-game'}
+					<img class="status" src="/in-game.png" alt="in-game" />
+				{:else if friend.status === 'spectator'}
+					<img class="status" src="/spectator.png" alt="spectator" />
+				{:else}
+					<img class="status" src="/offline.png" alt="offline" />
+				{/if}
 			</div>
 		{/each}
+	</div>
+	<div class="centered-buttons">
+		<button on:click={toggleGroupChatMode}>{groupChatMode ? 'Cancel' : 'Create Group Chat'}</button>
+		{#if groupChatMode && selectedFriends.length > 0}
+			<button on:click={createGroupChat}>Confirm</button>
+		{/if}
+		<button on:click={() => openRequest()}>Friend requests</button>
 	</div>
 </div>
 
 <style lang="scss">
-	body {
-		font-family: Arial, sans-serif;
-	}
-
-	#box {
+	.box {
+		display: flex;
+		flex-direction: column;
 		width: 15rem;
 		height: 20rem;
-		flex-direction: column;
-		align-items: center;
-	}
+		.centered-buttons {
+			margin: 0.4rem 0;
+			display: flex;
+		}
+		.add-friend-form {
+			display: flex;
+			justify-content: center;
+			width: 100%;
 
-	#add-friend-form,
-	#centered-buttons {
-		display: flex;
-		justify-content: center;
-		width: 100%;
-		margin-top: 0.5rem;
-		margin-bottom: 1rem;
+			label {
+				width: 100%;
+				display: block;
+			}
+			input[type='text'] {
+				@include input-text;
+				width: 100%;
+			}
+			input[type='submit'] {
+				@include input-submit;
+			}
+		}
 	}
+	.friend-list {
+		flex-grow: 2;
+		@include tab-border($light-grey, $dark-grey);
+		margin: 0.25rem;
+		.friend {
+			display: flex;
+			justify-content: space-between;
+			white-space: nowrap;
+			padding: 0.25rem;
+			.status {
+				height: 0.8rem;
+				margin: 0.2rem 0.4rem auto auto;
+			}
+			.option-icons {
+				margin: 0.15rem;
+				height: 1.3rem;
+				cursor: url($click), auto;
+			}
+			.username {
+				margin: 0 0.25rem;
+				cursor: url($click), auto;
+			}
+		}
 
-	.friend {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 0.625rem;
-		border: 1px solid #ccc;
+		.buttons {
+			display: flex;
+			align-items: right;
+		}
+
 	}
-
-	#submit-friend {
-		padding: 0.2rem;
-	}
-
-	.status-dot {
-		width: 0.625rem;
-		height: 0.625rem;
-		border-radius: 50%;
-		margin-right: 0.625rem;
-	}
-
-	.online {
-		background: green;
-	}
-
-	.offline {
-		background: red;
-	}
-
-	.buttons {
-		display: flex;
-		align-items: right;
-	}
-
 	button {
 		padding: 0.3rem 0.625rem;
-	}
-
-	.buttons i {
-		cursor: pointer;
-		margin-left: 0.625rem;
-		padding: 0.3rem;
-		border-radius: 2px;
-		background-color: #f8f8f8;
-		transition: background-color 0.3s ease;
-	}
-
-	.buttons i:hover {
-		background-color: #c4c4c4;
+		margin: 0 0.25rem;
+		width: 100%;
+		white-space: nowrap;
 	}
 </style>
