@@ -12,13 +12,14 @@
 			status: string;
 		}
 
-		export type FriendRequest = {
+		export type NotifRequest = {
 			id: number;
 			createdAt: string;
 			sender: string;
 			user: User;
 			userId: number;
 		};
+
 		export type Chat = {
 			chatUsers: ChatUser[];
 			messages: Message[];
@@ -53,7 +54,8 @@
 		}
 
 		export const contacts = (): Writable<Contact[]> => getContext('contacts');
-		export const friendRequest = (): Writable<FriendRequest[]> => getContext('friendRequest');
+		export const friendRequest = (): Writable<NotifRequest[]> => getContext('friendRequest');
+		export const gameRequest = (): Writable<NotifRequest[]> => getContext('gameRequest');
 		export const openFriendRequest = (): Writable<boolean> => getContext('openFriendRequest');
 		export const friendInfo = (): Writable<User | null> => getContext('friendInfo');
 		export const chats = (): Writable<Chat[]> => getContext('chats');
@@ -72,7 +74,6 @@
 		}
 
 		export const components = (): Writable<Record<App, any>> => getContext('components');
-
 		export const appInstances = (): Writable<AppInstance[]> => getContext('appInstances');
 		export const selected = (): Writable<number | null> => getContext('selected');
 		export const zstack = (): Writable<number[]> => getContext('zstack');
@@ -83,11 +84,12 @@
 			props?: Record<string, any>
 		) => void) => getContext('addInstance');
 
-		export const fetchNotification = (): ((type: string) => Promise<any>) => getContext('fetchNotification');
+		export const fetchNotification = (): ((type: string) => number) => getContext('fetchNotification');
 
 		export const fetchMe = (): (() => Promise<any>) => getContext('fetchMe');
 		export const fetchFriends = (): (() => Promise<any>) => getContext('fetchFriends');
 		export const fetchFriendRequest = (): (() => Promise<any>) => getContext('fetchFriendRequest');
+		export const fetchGameRequest = (): (() => Promise<any>) => getContext('fetchGameRequest');
 		export const fetchChats = (): (() => Promise<any>) => getContext('fetchChats');
 
 		export const socket = (): Readable<Socket> => getContext('socket');
@@ -126,7 +128,8 @@
 	setContext('fetchWithToken', fetchWithToken);
 
 	const contacts = writable<Context.Contact[]>([]);
-	const friendRequest = writable<Context.FriendRequest[]>([]);
+	const friendRequest = writable<Context.NotifRequest[]>([]);
+	const gameRequest = writable<Context.NotifRequest[]>([]);
 	const openFriendRequest = writable(false);
 	const friendInfo = writable<Context.User | null>(null);
 	const chats = writable<Context.Chat[]>([]);
@@ -135,6 +138,7 @@
 
 	setContext('contacts', contacts);
 	setContext('friendRequest', friendRequest);
+	setContext('gameRequest', gameRequest);
 	setContext('openFriendRequest', openFriendRequest);
 	setContext('friendInfo', friendInfo);
 	setContext('chats', chats);
@@ -203,12 +207,23 @@
 		return data.size;
 	}
 
+	setContext('fetchNotification', fetchNotification);
+
 	async function fetchFriendRequest() {
 		const res = await fetchWithToken('notification/get?type=friend');
 		const data = await res.json();
 		$friendRequest = data;
 		return data;
 	}
+
+	async function fetchGameRequest() {
+		const res = await fetchWithToken('notification/get?type=ask-game');
+		const data = await res.json();
+		$gameRequest = data;
+		return data;
+	}
+
+	setContext('fetchGameRequest', fetchGameRequest);
 
 	async function fetchChats() {
 		const res = await fetchWithToken('chat/allUserChats');

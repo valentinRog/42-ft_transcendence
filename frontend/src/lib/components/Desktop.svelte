@@ -16,7 +16,6 @@
 	const zstack = Context.zstack();
 	const selected = Context.selected();
 	const addInstance = Context.addInstance();
-	const fetchNotification = Context.fetchNotification();
 	const socket = Context.socket();
 
 	function removeInstance(id: number) {
@@ -94,30 +93,23 @@
 	const fetchMe = Context.fetchMe();
 	const fetchFriends = Context.fetchFriends();
 	const fetchChats = Context.fetchChats();
+	const fetchFriendRequest = Context.fetchFriendRequest();
+	const fetchGameRequest = Context.fetchGameRequest();
 
-	let count = 2;
-	$: count = 10;
-
-	let notificationCounts = {
-		icon1: 0,
-		icon2: 0,
-		icon3: 0
-	};
+	const friendRequest = Context.friendRequest();
+	const gameRequest = Context.gameRequest();
 
 	(async () => {
 		await fetchMe();
 		await fetchFriends();
+		await fetchFriendRequest();
+		await fetchGameRequest();
 
 		fetchChats().then(() => {
 			$chats.forEach((chat) => {
 				if (chat.isGroupChat) $socket.emit('joinRoom', { chatId: chat.id });
 			});
 		});
-
-		const iconTypes = ['icon1', 'icon2', 'icon3']; // Replace with your actual icon types
-		for (const type of iconTypes) {
-			//notificationCounts[type] = await fetchNotification(type);
-		}
 	})();
 </script>
 
@@ -138,9 +130,17 @@
 					}}
 				>
 				<img src={v.DesktopProps.icon} alt={v.DesktopProps.name} draggable="false" />
-				{#if k === 'Conversation' || k === 'Contact' || k === 'Pong'}
+				{#if k === 'Conversation'}
 				<span class="notification-badge {k}">
 					<NotificationBadge count={1} />
+				</span>
+				{:else if k === 'Contact'}
+				<span class="notification-badge {k}">
+					<NotificationBadge count={$friendRequest.length} />
+				</span>
+				{:else if k === 'Pong'}
+				<span class="notification-badge {k}">
+					<NotificationBadge count={$gameRequest.length} />
 				</span>
 				{/if}
 					<div class="icon-text">

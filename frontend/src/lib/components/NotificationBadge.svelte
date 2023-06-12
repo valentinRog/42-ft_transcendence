@@ -1,15 +1,5 @@
 <script lang="ts">
-	import { writable } from 'svelte/store';
-
-	export let count = 0; // Initial value for the count
-
-	// Create a separate writable store for each instance of NotificationBadge
-	const countStore = writable(count);
-
-	// Subscribe to changes in the count store
-	countStore.subscribe(value => {
-	  count = value; // Update the exported count value
-	});
+	export let count = 0;
   </script>
 
 {#if count > 0}
@@ -21,7 +11,7 @@
 <style lang="scss">
 	.notification-badge {
 		position: absolute;
-		background-color: red;
+		background-color: rgb(213, 1, 1);
 		color: white;
 		border-radius: 100%;
 		width: 1rem;
