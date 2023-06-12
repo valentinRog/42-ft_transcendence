@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { user } from '$lib/stores';
-	import { onMount } from 'svelte';
-	import type { Socket } from 'socket.io-client';
 	import { Context } from '$lib/components/Context.svelte';
 	import NotificationBadge from '../NotificationBadge.svelte';
 
@@ -21,14 +19,8 @@
 	let friendInput: string = '';
 	let groupChatMode = false;
 	let selectedFriends: string[] = [];
-	let socketInstance: Socket | null = null;
 
-	onMount(() => {
-		socket.subscribe(($socket) => {
-			socketInstance = $socket;
-		});
-		fetchFriends();
-	});
+	fetchFriends();
 
 	async function addFriend(event: Event) {
 		const form = (event.target as HTMLFormElement).friend.value;
@@ -129,17 +121,7 @@
 		<input type="text" name="friend" bind:value={friendInput} placeholder=" Search..." />
 		<input type="submit" value="Add friend" />
 	</form>
-	<div id="centered-buttons">
-		<button on:click={toggleGroupChatMode}>{groupChatMode ? 'Cancel' : 'Create Group Chat'}</button>
-		{#if groupChatMode && selectedFriends.length > 0}
-			<button on:click={createGroupChat}>Confirm</button>
-		{/if}
-		<span class="notification-badge">
-			<NotificationBadge count={$friendRequest.length} />
-		</span>
-		<button on:click={() => openRequest()}>Friend requests</button>
-	</div>
-	<div id="friend-list">
+	<div class="friend-list">
 		{#each $contacts as friend (friend.id)}
 			<div class="friend">
 				{#if groupChatMode}
@@ -210,22 +192,21 @@
 		{#if groupChatMode && selectedFriends.length > 0}
 			<button on:click={createGroupChat}>Confirm</button>
 		{/if}
+		<span class="notification-badge">
+			<NotificationBadge count={$friendRequest.length} />
+		</span>
 		<button on:click={() => openRequest()}>Friend requests</button>
 	</div>
 </div>
 
 <style lang="scss">
-	body {
-		font-family: Arial, sans-serif;
-	}
-
 	.notification-badge {
 		position: relative;
-		top: 0.5rem;
-		left: 8.5rem;
+		top: 0.6rem;
+		left: 9.4rem;
 	}
 
-	#box {
+	.box {
 		display: flex;
 		flex-direction: column;
 		width: 15rem;
