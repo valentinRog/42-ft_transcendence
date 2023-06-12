@@ -1,10 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
-	import DropDown from '$lib/components/drop/DropDown.svelte';
-	import RightDrop from '$lib/components/drop/RightDrop.svelte';
-	import DropButton from '$lib/components/drop/DropButton.svelte';
-	import DropRadios from '$lib/components/drop/DropRadios.svelte';
 
 	const fetchWithToken = Context.fetchWithToken();
 	const socket = Context.socket();
@@ -154,11 +150,11 @@
 	let serverDelta = 0;
 	const tickRate = 30;
 	const delay = 20;
-	let index = 0;
+	export let index: number;
 	let inputs = new Array<Input>();
 	let up = false;
 	let down = false;
-	let room = '';
+	export let room: string;
 	let pingTimer: number | null = null;
 	let gameTimer: number | null = null;
 
@@ -191,7 +187,7 @@
 		player2Score: 0
 	};
 
-	let scale = 1;
+	export let scale = 1;
 
 	function draw(ctx: CanvasRenderingContext2D) {
 		const s = update(state, Date.now() - state.time);
@@ -237,26 +233,24 @@
 		requestAnimationFrame(() => draw(ctx));
 	}
 
-	function enterGame() {
-		setInterval(() => {
-			const input: Input = {
-				room,
-				clientId: $socket.id,
-				stateId: state.id + delay,
-				clientTime: Date.now() + delay,
-				serverTime: Date.now() + delay + serverDelta,
-				up,
-				down
-			};
-			$socket.emit('input', input);
-			inputs.push(input);
-			if (inputs.length > 100) {
-				inputs.shift();
-			}
-		}, 1000 / tickRate);
+	setInterval(() => {
+		const input: Input = {
+			room,
+			clientId: $socket.id,
+			stateId: state.id + delay,
+			clientTime: Date.now() + delay,
+			serverTime: Date.now() + delay + serverDelta,
+			up,
+			down
+		};
+		$socket.emit('input', input);
+		inputs.push(input);
+		if (inputs.length > 100) {
+			inputs.shift();
+		}
+	}, 1000 / tickRate);
 
-		setInterval(() => $socket.emit('ping', Date.now()), 1000);
-	}
+	setInterval(() => $socket.emit('ping', Date.now()), 1000);
 
 	let canvas: HTMLCanvasElement;
 
@@ -270,26 +264,8 @@
 		canvas.height = dimensions.height * scale;
 	}
 
-	fetchWithToken('matchmaking/queue', {
-		method: 'POST'
-	});
-
-	index = 0;
-	room = '';
 	pingTimer = null;
 	gameTimer = null;
-
-	$socket.on('enter-room', (data: { room: string; index: number }) => {
-		room = data.room;
-		index = data.index;
-		$socket.emit('enter-room', data);
-		console.log('enter-room');
-		enterGame();
-	});
-
-	$socket.on('index', (i: number) => {
-		index = i;
-	});
 
 	$socket.on('game-over', (winner: number) => {
 		stopLoop();
@@ -338,7 +314,6 @@
 				method: 'POST'
 			});
 		}
-		$socket.off('enter-room');
 		$socket.off('ping');
 		$socket.off('state');
 		$socket.off('input');
@@ -359,43 +334,16 @@
 			down = false;
 		}
 	}
-
-	let scaleString: string;
-	$: if (scaleString !== undefined) {
-		scale = parseInt(scaleString) / 100;
-	}
 </script>
 
 <svelte:window on:keydown={handleKeyDown} on:keyup={handleKeyUp} />
 
 <div class="container">
-	<div class="menu">
-		<DropDown name="game">
-			<DropButton>matchmaking</DropButton>
-		</DropDown>
-		<DropDown name="settings">
-			<RightDrop name="scale">
-				<DropRadios
-					fields={['60%', '80%', '100%', '120%', '140%', '160%']}
-					def="100%"
-					bind:selected={scaleString}
-				/>
-			</RightDrop>
-		</DropDown>
-	</div>
 	<canvas bind:this={canvas} />
 </div>
 
 <style lang="scss">
-	div.container {
-		padding: 0.2rem;
-
-		div.menu {
-			display: flex;
-		}
-
-		canvas {
-			background-color: black;
-		}
+	canvas {
+		background-color: black;
 	}
 </style>

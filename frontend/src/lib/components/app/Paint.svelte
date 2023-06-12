@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import DropDown from '$lib/components/drop/DropDown.svelte';
-	import DropButton from '../drop/DropButton.svelte';
 
 	let canvas: HTMLCanvasElement;
 	let ctx: CanvasRenderingContext2D;
@@ -54,9 +53,11 @@
 <div>
 	<div class="menu">
 		<DropDown name="File">
-			<DropButton on:click={clear}>New</DropButton>
+			<button class="available" on:click={clear}>New</button>
 		</DropDown>
-		<DropDown name="Edit" />
+		<DropDown name="Edit">
+			<button class="unavailable">Undo</button>
+		</DropDown>
 	</div>
 	<canvas
 		bind:this={canvas}
@@ -80,6 +81,14 @@
 <style lang="scss">
 	div.menu {
 		display: flex;
+
+		button.available {
+			@include dropdown-button;
+		}
+
+		button.unavailable {
+			@include dropdown-button(false);
+		}
 	}
 
 	canvas {

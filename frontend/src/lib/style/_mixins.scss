@@ -151,17 +151,23 @@
 	}
 }
 
-@mixin dropdown-button {
+@mixin dropdown-button($available: true) {
 	@include no-border;
 	background-color: $grey;
-	cursor: url($click), auto;
 	padding: 0.15rem 0.5rem;
 	font-size: medium;
 	min-width: 8rem;
+	text-align: left;
+	width: 100%;
 
-	&:hover {
-		background-color: $blue;
-		color: white;
+	@if $available {
+		cursor: url($click), auto;
+		&:hover {
+			background-color: $blue;
+			color: white;
+		}
+	} @else {
+		color: hsl(0, 0%, 85%);
 	}
 }
 
