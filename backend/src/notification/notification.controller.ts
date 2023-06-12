@@ -25,6 +25,11 @@ export class NotificationController {
       where: { username: dto.friend },
     });
     if (!prisma_friend) throw new ForbiddenException('User not found');
+    const friends = await this.prisma.user.findMany({
+      where: { id: { in: username.friends } },
+    });
+    if (friends.find((friend) => friend.username == dto.friend))
+      throw new ForbiddenException('You are already friends');
     return await this.notifService.notifyEvent(
       prisma_friend.username,
       username,

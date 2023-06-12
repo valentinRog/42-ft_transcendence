@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import type { Socket } from 'socket.io-client';
 	import { Context } from '$lib/components/Context.svelte';
+	import NotificationBadge from '../NotificationBadge.svelte';
 
 	const socket = Context.socket();
 
@@ -26,6 +27,7 @@
 		socket.subscribe(($socket) => {
 			socketInstance = $socket;
 		});
+		fetchFriends();
 	});
 
 	async function addFriend(event: Event) {
@@ -38,7 +40,6 @@
 			body: JSON.stringify({ friend: form })
 		});
 		await res.json();
-		fetchFriends();
 		friendInput = '';
 	}
 
@@ -144,6 +145,9 @@
 		{#if groupChatMode && selectedFriends.length > 0}
 			<button on:click={createGroupChat}>Confirm</button>
 		{/if}
+		<span class="notification-badge">
+			<NotificationBadge count={$friendRequest.length} />
+		</span>
 		<button on:click={() => openRequest()}>Friend requests</button>
 	</div>
 	<div id="friend-list">
@@ -195,6 +199,12 @@
 <style lang="scss">
 	body {
 		font-family: Arial, sans-serif;
+	}
+
+	.notification-badge {
+		position: relative;
+		top: 0.5rem;
+		left: 8.5rem;
 	}
 
 	#box {

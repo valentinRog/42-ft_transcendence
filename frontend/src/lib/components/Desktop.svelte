@@ -131,15 +131,15 @@
 				>
 				<img src={v.DesktopProps.icon} alt={v.DesktopProps.name} draggable="false" />
 				{#if k === 'Conversation'}
-				<span class="notification-badge {k}">
+				<span class="notification-badge">
 					<NotificationBadge count={1} />
 				</span>
 				{:else if k === 'Contact'}
-				<span class="notification-badge {k}">
+				<span class="notification-badge">
 					<NotificationBadge count={$friendRequest.length} />
 				</span>
 				{:else if k === 'Pong'}
-				<span class="notification-badge {k}">
+				<span class="notification-badge">
 					<NotificationBadge count={$gameRequest.length} />
 				</span>
 				{/if}

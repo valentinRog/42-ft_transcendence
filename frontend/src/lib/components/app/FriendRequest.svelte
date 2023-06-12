@@ -3,6 +3,7 @@
 
 	const fetchWithToken = Context.fetchWithToken();
 	const fetchFriendRequest = Context.fetchFriendRequest();
+	const fetchFriends = Context.fetchFriends();
 
 	async function answerFriendRequest(friendUsername: string, response: boolean) {
 		const res = await fetchWithToken('notification/friend-response', {
@@ -14,6 +15,7 @@
 		});
 		await res.json();
 		fetchFriendRequest();
+		fetchFriends();
 	}
 	const friendRequest = Context.friendRequest();
 	fetchFriendRequest();

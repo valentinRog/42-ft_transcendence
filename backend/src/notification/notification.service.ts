@@ -27,7 +27,6 @@ export class NotificationService {
           where: { id: firstNotif.id },
         });
       }
-
       const prisma_friend = await this.prisma.user.findUnique({
         where: { username: friend },
       });
@@ -42,7 +41,6 @@ export class NotificationService {
           type: message,
         },
       });
-
       await this.prisma.user.update({
         where: { username: prisma_friend.username },
         data: {

@@ -246,6 +246,8 @@
 		})
 	);
 
+	// ------- EVENTS --------
+
 	$socket.on('friend', (data: { message: string }) => {
 		console.log('add-friend', data.message);
 		fetchFriendRequest();
@@ -287,6 +289,8 @@
 			console.error(`Received message for unknown chat with id: ${chatId}`);
 		}
 	});
+
+	// ------- END EVENTS --------
 
 	setContext('socket', socket);
 

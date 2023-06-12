@@ -19,7 +19,8 @@
 		display: flex;
 		justify-content: center;
 		align-items: flex-end;
-		margin-top: -12px;
+		//margin-top: -45px; -> right top corner
+		margin-top: -15px;
 		right: 2rem;
 		font-size: 0.8rem;
   	}
