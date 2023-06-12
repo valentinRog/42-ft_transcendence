@@ -74,13 +74,19 @@
 
 <div id="box">
 	<div id="chat-window" bind:this={chatWindow} on:scroll={handleScroll}>
-		<h5>Waiting message...</h5>
+		{#if !currentChat}
+			<h5>Waiting for messages...</h5>
+		{:else}
+			<h5>▪ End of messages ▪</h5>
+		{/if}
 		<ul>
 			{#if currentChat}
 				{#each currentChat?.messages || [] as message, i (i)}
 					<li class={findUser(message.userId, chatIdLocal) === $user?.username ? 'self' : 'other'}>
 						<div class="message-header">
-							<strong>{findUser(message.userId, chatIdLocal)}</strong><span>:</span>
+							{#if i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId}
+								<strong>{findUser(message.userId, chatIdLocal)}</strong>
+							{/if}
 						</div>
 						<div class="message-content">{message.content}</div>
 					</li>
@@ -123,9 +129,7 @@
 	}
 
 	.btn {
-		background: #c0c0c0;
-		border: 1px solid #000;
-		color: #000;
+		padding: 0.1rem 0.4rem;
 	}
 
 	.send-btn {
@@ -144,6 +148,8 @@
 	}
 
 	input[type='text'].message-input {
+		@include tab-border(white, black);
+		background-color: $light-grey;
 		width: 100%;
 		box-sizing: border-box;
 		margin-right: 0.5rem;
@@ -164,12 +170,20 @@
 		flex-direction: column;
 	}
 
+	li.self .message-header {
+		color: white;
+	}
+
 	li.self .message-header,
 	li.self .message-content {
 		align-self: flex-end;
 		display: flex;
 		justify-content: flex-end;
 		width: 9.5rem;
+	}
+
+	li.other .message-header {
+		color: $blue;
 	}
 
 	li.other .message-header,
@@ -193,7 +207,8 @@
 		padding-top: 0.3rem;
 		padding-bottom: 0.3rem;
 		font-size: 0.9em;
-		border-radius: 0.8rem;
+		@include tab-border(white, black);
+		// border-radius: 0.8rem;
 		background-color: rgb(229, 229, 229);
 	}
 

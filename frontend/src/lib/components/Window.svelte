@@ -191,8 +191,11 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		max-width: 8.5rem;
+		&:hover {
+			cursor: url($click), auto;
+		}
 	}
-
+	
 	#group-chat-name::after {
 		content: ' ✎';
 		font-size: 0.8rem;
@@ -211,17 +214,15 @@
 		left: 50%;
 		transform: translate(-50%, -50%);
 		padding: 1.25rem;
-	}
-
-	.dialog button {
-		margin-top: 1.25rem;
-		margin-right: 0.625rem;
-		padding: 0.3rem;
-		float: right;
-	}
-
-	.dialog p {
-		margin-bottom: 1.25rem;
-		font-size: 1rem;
+		button {
+			margin-top: 1.25rem;
+			margin-right: 0.625rem;
+			padding: 0.3rem;
+			float: right;
+		}
+		p {
+			margin-bottom: 1.25rem;
+			font-size: 1rem;
+		}
 	}
 </style>
