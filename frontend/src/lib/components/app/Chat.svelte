@@ -26,8 +26,7 @@
 		else isFriend = true;
 		if (chatIdLocal !== null && chatIdLocal !== undefined) {
 			currentChat = $chats.find((chat) => chat.id === chatIdLocal);
-			if (currentChat.isGroupChat)
-				isFriend = true;
+			if (currentChat.isGroupChat) isFriend = true;
 		}
 	}
 
@@ -208,5 +207,4 @@
 		text-align: center;
 		font-size: 0.9rem;
 	}
-
 </style>

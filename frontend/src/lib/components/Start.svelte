@@ -3,6 +3,7 @@
 	import { Context } from '$lib/components/Context.svelte';
 	import RightDrop from '$lib/components/drop/RightDrop.svelte';
 	import DropButton from '$lib/components/drop/DropButton.svelte';
+	import DropRadios from '$lib/components/drop/DropRadios.svelte';
 
 	export let desktopHeight: number;
 

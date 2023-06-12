@@ -20,20 +20,18 @@
 		if (name === 'Chat') {
 			currentChat = $chats.find((chat) => chat.id === chatIdLocal);
 			if (currentChat?.isGroupChat) typeChat = 'Group';
-			else { 
+			else {
 				typeChat = 'Chat';
-				if (props.friendId) 
+				if (props.friendId)
 					friendUsername = $contacts.find((c) => c.id === props.friendId)?.username;
 				if (currentChat && friendUsername === undefined) {
 					currentChat.chatUsers.forEach((c: any) => {
-						if (c.userId !== $user?.id)
-							friendUsername = c.user.username;
+						if (c.userId !== $user?.id) friendUsername = c.user.username;
 					});
 				}
 			}
 		}
 	}
-
 </script>
 
 <div class="tab" on:click class:active>
