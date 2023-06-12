@@ -73,7 +73,8 @@
 
 		export const components = (): Readable<Record<App, any>> => getContext('components');
 
-		export const appInstances = (): Writable<Map<string, AppInstance>> => getContext('appInstances');
+		export const appInstances = (): Writable<Map<string, AppInstance>> =>
+			getContext('appInstances');
 		export const selected = (): Writable<string | null> => getContext('selected');
 		export const zstack = (): Writable<string[]> => getContext('zstack');
 
@@ -150,7 +151,7 @@
 		Conversation: Conversation
 	});
 
-	const appInstances = writable(new Map<string, Context.AppInstance>);
+	const appInstances = writable(new Map<string, Context.AppInstance>());
 	const zstack = writable<string[]>([]);
 	const selected = writable<string | null>(null);
 
@@ -161,8 +162,7 @@
 	) {
 		const id = uuidv4();
 		$zstack = [...$zstack, id];
-		$appInstances.set(id,
-		{
+		$appInstances.set(id, {
 			componentType: componentType as Context.App,
 			component: $components[componentType as Context.App],
 			visible: true,
@@ -185,7 +185,7 @@
 	setContext('addInstance', addInstance);
 	setContext('removeInstance', removeInstance);
 
-	async function fetchMe() { 
+	async function fetchMe() {
 		const res = await fetchWithToken('users/me');
 		const data = await res.json();
 		$user = {

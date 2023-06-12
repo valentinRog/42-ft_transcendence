@@ -4,6 +4,7 @@
 	import DropDown from '$lib/components/drop/DropDown.svelte';
 	import RightDrop from '$lib/components/drop/RightDrop.svelte';
 	import DropButton from '../drop/DropButton.svelte';
+	import DropRadios from '../drop/DropRadios.svelte';
 
 	const fetchWithToken = Context.fetchWithToken();
 	const socket = Context.socket();
@@ -358,31 +359,43 @@
 			down = false;
 		}
 	}
+
+	let scaleString: string;
+	$: if (scaleString !== undefined) {
+		scale = parseInt(scaleString) / 100;
+	}
 </script>
 
 <svelte:window on:keydown={handleKeyDown} on:keyup={handleKeyUp} />
 
-<div class="menu">
-	<DropDown name="settings">
-		<RightDrop name="scale">
-			<DropButton on:click={() => (scale = 0.6)}>60</DropButton>
-			<DropButton on:click={() => (scale = 0.8)}>80</DropButton>
-			<DropButton on:click={() => (scale = 1)}>100</DropButton>
-			<DropButton on:click={() => (scale = 1.2)}>120</DropButton>
-			<DropButton on:click={() => (scale = 1.4)}>140</DropButton>
-			<DropButton on:click={() => (scale = 1.6)}>160</DropButton>
-		</RightDrop>
-	</DropDown>
+<div class="container">
+	<div class="menu">
+		<DropDown name="game">
+			<DropButton>matchmaking</DropButton>
+		</DropDown>
+		<DropDown name="settings">
+			<RightDrop name="scale">
+				<DropRadios
+					fields={['60%', '80%', '100%', '120%', '140%', '160%']}
+					def="100%"
+					bind:selected={scaleString}
+				/>
+			</RightDrop>
+		</DropDown>
+	</div>
+	<canvas bind:this={canvas} />
 </div>
-<canvas bind:this={canvas} />
 
 <style lang="scss">
-	div.menu {
-		width: fit-content;
-	}
+	div.container {
+		padding: 0.2rem;
 
-	canvas {
-		margin: 0.2rem;
-		background-color: black;
+		div.menu {
+			display: flex;
+		}
+
+		canvas {
+			background-color: black;
+		}
 	}
 </style>

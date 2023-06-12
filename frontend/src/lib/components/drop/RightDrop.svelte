@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, afterUpdate } from 'svelte';
+	import { afterUpdate } from 'svelte';
 
 	export let name: string;
 	export let desktopHeight: number | null = null;
