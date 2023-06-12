@@ -37,8 +37,7 @@ export class NotificationController {
     @GetUser('username') username,
     @Body() dto: ResponseDto,
   ) {
-    this.notifService.removeNotification(dto.friend, 'friend');
-
+    await this.notifService.removeNotification(dto.friend, 'friend');
     if (dto.response) {
       if (username == dto.friend)
         throw new ForbiddenException('You cannot add yourself as a friend');
@@ -48,6 +47,7 @@ export class NotificationController {
       if (!prisma_friend) throw new ForbiddenException('User not found');
       return await this.userService.addFriend(username, prisma_friend.id);
     }
+    return { message: 'declined' };
   }
 
   @Post('ask-game')

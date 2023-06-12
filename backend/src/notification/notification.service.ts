@@ -12,9 +12,6 @@ export class NotificationService {
   ) {}
 
   async notifyEvent(friend: string, username: string, message: string) {
-    if ((await this.userService.getUserStatus(friend)) != 'offline') {
-      this.socketService.sendToUser(friend, username, message);
-    }
     if (message === 'game') {
       throw new ForbiddenException(`${friend} is offline`);
     }
@@ -52,6 +49,9 @@ export class NotificationService {
           notifications: { connect: { id: notif.id } },
         },
       });
+      if ((await this.userService.getUserStatus(friend)) != 'offline') {
+        this.socketService.sendToUser(friend, username, message);
+      }
       return notif;
     } catch (error) {
       throw new ForbiddenException('User not found');

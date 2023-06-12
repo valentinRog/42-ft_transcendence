@@ -12,8 +12,7 @@ import {
   ForbiddenException,
   Get,
   Param,
-  Res,
-  StreamableFile
+  StreamableFile,
 } from '@nestjs/common';
 import { GetUser } from '../auth/decorator';
 import { JwtGuard } from '../auth/guard';
@@ -27,7 +26,7 @@ import { join } from 'path';
 @UseGuards(JwtGuard)
 @Controller('users')
 export class UserController {
-  constructor(private userService: UserService, private prisma: PrismaClient) { }
+  constructor(private userService: UserService, private prisma: PrismaClient) {}
 
   @Get('me')
   getMe(@GetUser() user) {
@@ -36,7 +35,9 @@ export class UserController {
 
   @Get('avatar/me')
   getMyPhoto(@GetUser() user) {
-    const file = createReadStream(join(process.cwd(), '/upload', `${user.login}.png`));
+    const file = createReadStream(
+      join(process.cwd(), '/upload', `${user.login}.png`),
+    );
     return new StreamableFile(file);
   }
 
@@ -49,7 +50,9 @@ export class UserController {
   @Get('avatar/:login')
   async getUserPhoto(@Param('login') login: string) {
     const user = await this.userService.getUser(login);
-    const file = createReadStream(join(process.cwd(), '/upload', `${user.login}.png`));
+    const file = createReadStream(
+      join(process.cwd(), '/upload', `${user.login}.png`),
+    );
     return new StreamableFile(file);
   }
 
@@ -96,14 +99,14 @@ export class UserController {
     return await this.userService.removeFriend(username, prisma_friend.id);
   }
 
-  @Post('add-friend')
-  async addFriend(@GetUser('username') username, @Body() dto: FriendDto) {
-    if (username == dto.friend)
-      throw new ForbiddenException('You cannot add yourself as a friend');
-    const prisma_friend = await this.prisma.user.findUnique({
-      where: { username: dto.friend },
-    });
-    if (!prisma_friend) throw new ForbiddenException('User not found');
-    return await this.userService.addFriend(username, prisma_friend.id);
-  }
+//  @Post('add-friend')
+//  async addFriend(@GetUser('username') username, @Body() dto: FriendDto) {
+//    if (username == dto.friend)
+//      throw new ForbiddenException('You cannot add yourself as a friend');
+//    const prisma_friend = await this.prisma.user.findUnique({
+//      where: { username: dto.friend },
+//    });
+//    if (!prisma_friend) throw new ForbiddenException('User not found');
+//    return await this.userService.addFriend(username, prisma_friend.id);
+//  }
 }

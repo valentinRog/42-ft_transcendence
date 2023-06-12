@@ -30,7 +30,7 @@
 
 	async function addFriend(event: Event) {
 		const form = (event.target as HTMLFormElement).friend.value;
-		const res = await fetchWithToken('users/add-friend', {
+		const res = await fetchWithToken('notification/add-friend', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'

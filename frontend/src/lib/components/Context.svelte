@@ -213,6 +213,7 @@
 		const res = await fetchWithToken('notification/get?type=friend');
 		const data = await res.json();
 		$friendRequest = data;
+		console.log(data);
 		return data;
 	}
 
@@ -247,11 +248,13 @@
 
 	$socket.on('friend', (data: { message: string }) => {
 		console.log('add-friend', data.message);
+		fetchFriendRequest();
 	});
 
 	$socket.on('game', (data: { message: string }) => {
 		console.log('accept-game', data.message);
 		$socket.emit('accept-game', { response: true, friend: data.message });
+		fetchGameRequest();
 	});
 
 	$socket.on('addChat', (chat) => {
