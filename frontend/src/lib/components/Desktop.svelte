@@ -73,6 +73,10 @@
 			TabProps: { name: 'FriendRequest', icon: '/computer.png' },
 			DesktopProps: { name: 'FriendRequest', icon: '/computer.png' }
 		},
+		Forum: {
+			TabProps: { name: 'Forum', icon: '/computer.png' },
+			DesktopProps: { name: 'Forum', icon: '/computer.png' }
+		},
 		Paint: {
 			TabProps: { name: 'Paint', icon: '/paint.png' },
 			DesktopProps: { name: 'Paint', icon: '/paint.png' }
@@ -201,8 +205,8 @@
 
 	.icon-text {
 		color: white;
-		margin-top: 0.19rem; /* Add margin to the top of the text */
-		font-size: 0.9rem; /* Adjust the font size as desired */
+		margin-top: 0.19rem;
+		font-size: 0.9rem;
 	}
 
 	div.desktop {
