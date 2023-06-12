@@ -10,11 +10,10 @@
 
 	let groupName = "";
 	let password = "";
-	let confirmPassword = "";
 	let accessibility = "public"; // default value
 
 	const createChat = async () => {
-		if (groupName.trim() === "" || password !== confirmPassword || ["public", "protected"].indexOf(accessibility) < 0) {
+		if (groupName.trim() === "" || ["public", "protected"].indexOf(accessibility) < 0) {
 			// handle validation errors
 			return;
 		}
@@ -50,10 +49,6 @@
 			<label>
 				Password :
 				<input type="password" bind:value={password} required>
-			</label>
-			<label>
-				Confirm password :
-				<input type="password" bind:value={confirmPassword} required>
 			</label>
 		{/if}
 		<button type="submit">Créer un chat</button>
