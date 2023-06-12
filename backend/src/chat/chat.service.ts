@@ -44,14 +44,15 @@ export class ChatService {
                     user: { connect: { username } },
                     createdAt: new Date(),
                     lastReadMessageId: 0,
-                    isAdmin: index === 0
+                    role: { connect: { id: index === 0 ? 1 : 3 } }
                 }))
             }
         },
         include: {
           chatUsers: {
             include: {
-              user: true
+              user: true,
+              role: true
             }
           },
           messages: true,

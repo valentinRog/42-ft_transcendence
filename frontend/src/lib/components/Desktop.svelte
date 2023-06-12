@@ -10,6 +10,7 @@
 	const chats = Context.chats();
 	const chatId = Context.chatId();
 	const openChatWindow = Context.openChatWindow();
+	const openChatForumWindow = Context.openChatForumWindow();
 	const friendInfoId = Context.friendInfoId();
 
 	const openFriendRequest = Context.openFriendRequest();
@@ -30,6 +31,11 @@
 			addInstance('Chat', { friendId: $friendInfoId });
 			$selected = null;
 			openChatWindow.set(false);
+		}
+		if ($openChatForumWindow) {
+			addInstance('ChatForum');
+			$selected = null;
+			openChatForumWindow.set(false);
 		}
 		if ($openFriendRequest) {
 			addInstance('FriendRequest');
@@ -60,6 +66,10 @@
 		Chat: {
 			TabProps: { name: 'Chat', icon: '/mail3.png' },
 			DesktopProps: { name: 'Chat', icon: '/big-mail.png' }
+		},
+		ChatForum: {
+			TabProps: { name: 'ChatForum', icon: '/mail3.png' },
+			DesktopProps: { name: 'ChatForum', icon: '/big-mail.png' }
 		},
 		Contact: {
 			TabProps: { name: 'Contact', icon: '/phone.png' },
@@ -119,7 +129,7 @@
 >
 	<div class="icons">
 		{#each Object.entries(apps) as [k, v]}
-			{#if k !== 'FriendRequest' && k !== 'Chat'}
+			{#if k !== 'FriendRequest' && k !== 'Chat' && k !== 'ChatForum'}
 				<div
 					class="icon"
 					on:dblclick={() => {

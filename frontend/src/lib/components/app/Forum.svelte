@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { onMount, afterUpdate } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
 	import { user } from '$lib/stores';
 
     const socket = Context.socket();
     const chatId = Context.chatId();
     const chats = Context.chats();
-    const openChatWindow = Context.openChatWindow();
+    const openChatForumWindow = Context.openChatForumWindow();
 
 	let groupName = "";
 	let password = "";
@@ -26,8 +25,13 @@
 		});
 		$socket.on('createChat', (chatNumber: number) => {
 			$chatId = chatNumber;
-			$openChatWindow = true;
+			$openChatForumWindow = true;
 		});
+	}
+
+	function startChat(chatNumber: number) {
+		$chatId = chatNumber;
+		$openChatForumWindow = true;
 	}
 </script>
 
@@ -66,7 +70,7 @@
      <ul>
         {#each $chats as chat (chat.id)}
             {#if chat.accessibility !== 'private'}
-                <li>{chat.name}</li>
+                <li on:click={() => startChat(chat.id)}>{chat.name}</li>
             {/if}
         {/each}
     

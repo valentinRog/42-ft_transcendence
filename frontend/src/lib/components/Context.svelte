@@ -63,12 +63,14 @@
 		export const chats = (): Writable<Chat[]> => getContext('chats');
 		export const chatId = (): Writable<number | null> => getContext('chatId');
 		export const openChatWindow = (): Writable<boolean> => getContext('openChatWindow');
+		export const openChatForumWindow = (): Writable<boolean> => getContext('openChatForumWindow');
 
 
 		export type App =
 			| 'Pong'
 			| 'Paint'
 			| 'Chat'
+			| 'ChatForum'
 			| 'Contact'
 			| 'Profile'
 			| 'Conversation'
@@ -117,6 +119,7 @@
 	import Pong from '$lib/components/app/pong/Pong.svelte';
 	import Paint from '$lib/components/app/Paint.svelte';
 	import Chat from '$lib/components/app/Chat.svelte';
+	import ChatForum from '$lib/components/app/ChatForum.svelte';
 	import Contact from '$lib/components/app/Contact.svelte';
 	import Profile from '$lib/components/app/Profile.svelte';
 	import Forum from '$lib/components/app/Forum.svelte';
@@ -149,6 +152,7 @@
 	const chats = writable<Context.Chat[]>([]);
 	const chatId = writable<number | null>(null);
 	const openChatWindow = writable(false);
+	const openChatForumWindow = writable(false);
 
 	setContext('contacts', contacts);
 	setContext('friendRequest', friendRequest);
@@ -158,11 +162,13 @@
 	setContext('chats', chats);
 	setContext('chatId', chatId);
 	setContext('openChatWindow', openChatWindow);
+	setContext('openChatForumWindow', openChatForumWindow);
 
 	const components = readable({
 		Pong: Pong,
 		Paint: Paint,
 		Chat: Chat,
+		ChatForum: ChatForum,
 		FriendRequest: FriendRequest,
 		Contact: Contact,
 		Profile: Profile,
