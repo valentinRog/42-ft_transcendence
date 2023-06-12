@@ -3,8 +3,8 @@
 	import { Context } from '$lib/components/Context.svelte';
 	import DropDown from '$lib/components/drop/DropDown.svelte';
 	import RightDrop from '$lib/components/drop/RightDrop.svelte';
-	import DropButton from '../drop/DropButton.svelte';
-	import DropRadios from '../drop/DropRadios.svelte';
+	import DropButton from '$lib/components/drop/DropButton.svelte';
+	import DropRadios from '$lib/components/drop/DropRadios.svelte';
 
 	const fetchWithToken = Context.fetchWithToken();
 	const socket = Context.socket();

@@ -2,7 +2,6 @@
 	import Window from '$lib/components/Window.svelte';
 	import Tab from '$lib/components/Tab.svelte';
 	import Start from '$lib/components/Start.svelte';
-	import { user } from '$lib/stores';
 	import { Context } from '$lib/components/Context.svelte';
 	import Clock from './Clock.svelte';
 
@@ -77,6 +76,10 @@
 		Forum: {
 			TabProps: { name: 'Forum', icon: '/computer.png' },
 			DesktopProps: { name: 'Forum', icon: '/computer.png' }
+		},
+		Paint: {
+			TabProps: { name: 'Paint', icon: '/paint.png' },
+			DesktopProps: { name: 'Paint', icon: '/paint.png' }
 		}
 	};
 
@@ -125,7 +128,6 @@
 			{/if}
 		{/each}
 	</div>
-	{JSON.stringify($user)}
 	{#each [...$appInstances.entries()] as [id, { componentType, component, visible, propsWin, props }] (id)}
 		<Window
 			{...apps[componentType].TabProps}
@@ -203,8 +205,8 @@
 
 	.icon-text {
 		color: white;
-		margin-top: 0.19rem; /* Add margin to the top of the text */
-		font-size: 0.9rem; /* Adjust the font size as desired */
+		margin-top: 0.19rem;
+		font-size: 0.9rem;
 	}
 
 	div.desktop {

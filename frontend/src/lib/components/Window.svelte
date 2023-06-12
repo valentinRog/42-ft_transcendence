@@ -195,7 +195,7 @@
 			cursor: url($click), auto;
 		}
 	}
-	
+
 	#group-chat-name::after {
 		content: ' ✎';
 		font-size: 0.8rem;
