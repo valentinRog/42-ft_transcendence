@@ -183,57 +183,7 @@
 <svelte:window on:mouseup={() => (moving = false)} on:mousemove={onMouseMove} />
 
 <style lang="scss">
-<<<<<<< HEAD
-
-	section {
-		position: absolute;
-		top: 5rem;
-		left: 5rem;
-		border: 0.2rem solid black;
-		user-select: none;
-		@include tab-contour;
-		background-color: $grey;
-	}
-
-	div.window {
-		display: flex;
-		height: 1.5rem;
-		margin: 0.2rem 0.2rem;
-		background-color: $dark-grey;
-		align-items: center;
-
-		.title {
-			margin-right: 0.3rem;
-			margin-top: 0.2rem;
-		}
-
-		&:hover {
-			cursor: url($grab), auto;
-		}
-
-		.buttons {
-			margin-left: auto;
-			margin-right: 0.2rem;
-		}
-		img {
-			margin-left: 0.5rem;
-			margin-right: 0.5rem;
-			height: 1rem;
-			width: auto;
-		}
-
-		button {
-			@include tab-contour;
-			@include tab-contour-active;
-			background-color: $grey;
-			.border-inside {
-				padding: 0.08rem 0.25rem;
-			}
-		}
-	}
-=======
 	@include window-95;
->>>>>>> main
 
 	#group-chat-name {
 		white-space: nowrap;
