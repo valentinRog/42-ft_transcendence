@@ -63,7 +63,8 @@
 			<div class="chat" on:click={() => startChat(chat.id, chat)}>
 				<div class="chat-header">
 					{#if chat.isGroupChat}
-						<h4>{chat.name}
+						<h4>
+							{chat.name}
 							<h5>
 								{#each chat.chatUsers as chatUser, i}
 									{#if chatUser.user.username != $user?.username}
@@ -73,7 +74,9 @@
 							</h5>
 						</h4>
 					{:else}
-						<h4>{chat.chatUsers.find((chatUser) => chatUser.userId !== $user?.id)?.user?.username}</h4>
+						<h4>
+							{chat.chatUsers.find((chatUser) => chatUser.userId !== $user?.id)?.user?.username}
+						</h4>
 					{/if}
 				</div>
 				<div class="chat-content">

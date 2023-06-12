@@ -61,7 +61,14 @@
 		export const chatId = (): Writable<number | null> => getContext('chatId');
 		export const openChatWindow = (): Writable<boolean> => getContext('openChatWindow');
 
-		export type App = 'Pong' | 'Chat' | 'Contact' | 'Profile' | 'Conversation' | 'FriendRequest';
+		export type App =
+			| 'Pong'
+			| 'Paint'
+			| 'Chat'
+			| 'Contact'
+			| 'Profile'
+			| 'Conversation'
+			| 'FriendRequest';
 
 		export interface AppInstance {
 			readonly componentType: App;
@@ -102,6 +109,7 @@
 	import { writable, readable } from 'svelte/store';
 	import { setContext } from 'svelte';
 	import Pong from '$lib/components/app/Pong.svelte';
+	import Paint from '$lib/components/app/Paint.svelte';
 	import Chat from '$lib/components/app/Chat.svelte';
 	import Contact from '$lib/components/app/Contact.svelte';
 	import Profile from '$lib/components/app/Profile.svelte';
@@ -144,6 +152,7 @@
 
 	const components = readable({
 		Pong: Pong,
+		Paint: Paint,
 		Chat: Chat,
 		FriendRequest: FriendRequest,
 		Contact: Contact,

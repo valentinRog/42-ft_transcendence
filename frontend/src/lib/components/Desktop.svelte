@@ -2,7 +2,6 @@
 	import Window from '$lib/components/Window.svelte';
 	import Tab from '$lib/components/Tab.svelte';
 	import Start from '$lib/components/Start.svelte';
-	import { user } from '$lib/stores';
 	import { Context } from '$lib/components/Context.svelte';
 	import Clock from './Clock.svelte';
 
@@ -73,6 +72,10 @@
 		FriendRequest: {
 			TabProps: { name: 'FriendRequest', icon: '/computer.png' },
 			DesktopProps: { name: 'FriendRequest', icon: '/computer.png' }
+		},
+		Paint: {
+			TabProps: { name: 'Paint', icon: '/paint.png' },
+			DesktopProps: { name: 'Paint', icon: '/paint.png' }
 		}
 	};
 
@@ -121,7 +124,6 @@
 			{/if}
 		{/each}
 	</div>
-	{JSON.stringify($user)}
 	{#each [...$appInstances.entries()] as [id, { componentType, component, visible, propsWin, props }] (id)}
 		<Window
 			{...apps[componentType].TabProps}
