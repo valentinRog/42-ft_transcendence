@@ -44,8 +44,7 @@ export class ChatService {
                     user: { connect: { username } },
                     createdAt: new Date(),
                     lastReadMessageId: 0,
-                    isAdmin: index === 0, 
-                    isBanned: false, 
+                    isAdmin: index === 0
                 }))
             }
         },

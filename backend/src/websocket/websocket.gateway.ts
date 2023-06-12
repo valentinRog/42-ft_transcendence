@@ -69,6 +69,7 @@ export abstract class SocketGateway
       memberUsernames: string[];
       isGroupChat: boolean;
       accessibility: string;
+      password?: string;
     },
   ) {
     const user = this.webSocketService.getClientName(client);
@@ -76,7 +77,8 @@ export abstract class SocketGateway
       payload.groupName,
       payload.memberUsernames,
       payload.isGroupChat,
-      payload.accessibility
+      payload.accessibility,
+      payload.password
     );
 
     for (const member of newGroupChat.chatUsers) {

@@ -60,47 +60,49 @@
 			const dateB = new Date(chatB.messages.length > 0 ? chatB.messages[chatB.messages.length - 1].createdAt : chatB.createdAt);
 			return dateB.getTime() - dateA.getTime();
 		}) as chat (chat.id)}
-			<div class="chat" on:click={() => startChat(chat.id, chat)}>
-				<div class="chat-header">
-					{#if chat.isGroupChat}
-						<h4>
-							{chat.name}
-							<h5>
-								{#each chat.chatUsers as chatUser, i}
-									{#if chatUser.user.username != $user?.username}
-										{chatUser.user.username + (chat.chatUsers.length - i > 1 ? ', ' : '')}
-									{/if}
-								{/each}
-							</h5>
-						</h4>
-					{:else}
-						<h4>
-							{chat.chatUsers.find((chatUser) => chatUser.userId !== $user?.id)?.user?.username}
-						</h4>
-					{/if}
+			{#if chat.accessibility === 'private'}
+				<div class="chat" on:click={() => startChat(chat.id, chat)}>
+					<div class="chat-header">
+						{#if chat.isGroupChat}
+							<h4>
+								{chat.name}
+								<h5>
+									{#each chat.chatUsers as chatUser, i}
+										{#if chatUser.user.username != $user?.username}
+											{chatUser.user.username + (chat.chatUsers.length - i > 1 ? ', ' : '')}
+										{/if}
+									{/each}
+								</h5>
+							</h4>
+						{:else}
+							<h4>
+								{chat.chatUsers.find((chatUser) => chatUser.userId !== $user?.id)?.user?.username}
+							</h4>
+						{/if}
+					</div>
+					<div class="chat-content">
+						{#if chat.messages.length > 0}
+							<div class="message-details">
+								<p>{getLastMessageSender(chat)}: {chat.messages[chat.messages.length - 1].content}</p>
+								<span class="timestamp"
+									>{timeDifference(
+										now,
+										new Date(chat.messages[chat.messages.length - 1].createdAt)
+									)}</span
+								>
+							</div>
+							<p class="unread-messages">
+								{getUnreadMessagesCount(
+									chat,
+									chat.chatUsers.find((chatUser) => chatUser.userId === $user?.id)
+								)}
+							</p>
+						{:else}
+							<p>No messages yet</p>
+						{/if}
+					</div>
 				</div>
-				<div class="chat-content">
-					{#if chat.messages.length > 0}
-						<div class="message-details">
-							<p>{getLastMessageSender(chat)}: {chat.messages[chat.messages.length - 1].content}</p>
-							<span class="timestamp"
-								>{timeDifference(
-									now,
-									new Date(chat.messages[chat.messages.length - 1].createdAt)
-								)}</span
-							>
-						</div>
-						<p class="unread-messages">
-							{getUnreadMessagesCount(
-								chat,
-								chat.chatUsers.find((chatUser) => chatUser.userId === $user?.id)
-							)}
-						</p>
-					{:else}
-						<p>No messages yet</p>
-					{/if}
-				</div>
-			</div>
+			{/if}
 		{/each}
 	</div>
 </div>

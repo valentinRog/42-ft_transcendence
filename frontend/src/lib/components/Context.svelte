@@ -27,6 +27,8 @@
 			id: number;
 			isGroupChat: boolean;
 			name: string;
+			accessibility: string;
+			password: string;
 			updatedAt: string;
 		};
 
