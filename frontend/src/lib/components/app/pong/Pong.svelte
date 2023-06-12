@@ -19,7 +19,9 @@
 		scale = parseInt(scaleString) / 100;
 	}
 
+	let matchmaking = false;
 	function matchmake() {
+		matchmaking = true;
 		fetchWithToken('matchmaking/queue', {
 			method: 'POST'
 		});
@@ -45,7 +47,14 @@
 <div class="container">
 	<div class="menu">
 		<DropDown name="game">
-			<button on:click={matchmake}>matchmaking</button>
+			{#if matchmaking === false}
+				<button on:click={matchmake}>matchmaking</button>
+			{:else}
+				<button class="unavailable">matchmake</button>
+			{/if}
+			<button class="unavailable">
+				invitations
+			</button>
 		</DropDown>
 		<DropDown name="settings">
 			<RightDrop name="scale">
@@ -69,8 +78,12 @@
 		div.menu {
 			display: flex;
 
-			button {
+			button:not(.unavailable) {
 				@include dropdown-button;
+			}
+
+			button.unavailable {
+				@include dropdown-button(false);
 			}
 		}
 	}

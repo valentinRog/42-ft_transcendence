@@ -16,14 +16,7 @@
 	}
 </script>
 
-<div
-	class="navbar-start"
-	on:click={(event) => {
-		event.stopPropagation();
-		active = !active;
-	}}
-	class:active
->
+<div class="navbar-start" on:click|stopPropagation={() => (active = !active)} class:active>
 	<div class="border-inside">
 		<img src="/start.png" alt="start" draggable="false" />
 		<p class="start">Start</p>

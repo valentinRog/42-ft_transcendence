@@ -53,7 +53,7 @@
 <div>
 	<div class="menu">
 		<DropDown name="File">
-			<button class="available" on:click={clear}>New</button>
+			<button on:click={clear}>New</button>
 		</DropDown>
 		<DropDown name="Edit">
 			<button class="unavailable">Undo</button>
@@ -82,7 +82,7 @@
 	div.menu {
 		display: flex;
 
-		button.available {
+		button:not(.unavailable) {
 			@include dropdown-button;
 		}
 

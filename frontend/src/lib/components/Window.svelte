@@ -3,7 +3,6 @@
 	import { createEventDispatcher } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
 	import { user } from '$lib/stores';
-	import type { Socket } from 'socket.io-client';
 
 	const dispatch = createEventDispatcher();
 	const chatId = Context.chatId();
