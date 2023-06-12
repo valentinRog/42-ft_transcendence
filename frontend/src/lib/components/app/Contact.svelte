@@ -235,7 +235,7 @@
 			padding: 0.25rem;
 			.status {
 				height: 0.8rem;
-				margin: 0.2rem 0.4rem auto auto;
+				margin: 0.2rem 0.4rem auto auto; 
 			}
 			.option-icons {
 				margin: 0.15rem;
