@@ -43,10 +43,12 @@
 
 @mixin no-border {
 	border: none;
+
 	&::before {
 		width: 0;
 		height: 0;
 	}
+
 	&::after {
 		width: 0;
 		height: 0;
@@ -55,6 +57,7 @@
 
 @mixin tab-contour {
 	@include tab-border(black, white); //border around the navbar element in outside mode
+
 	.border-inside {
 		@include tab-border($dark-grey, $light-grey); //border around the navbar element in outside mode
 	}
@@ -62,20 +65,21 @@
 
 @mixin tab-contour-hollow {
 	@include tab-border(white, black); //border around the navbar element in outside mode
+
 	.border-inside {
 		@include tab-border($light-grey, $dark-grey); //border around the navbar element in outside mode
 	}
 }
 
 @mixin tab-contour-active {
+
 	&:active,
 	&.active {
 		@include tab-border(white, black);
+
 		.border-inside {
-			@include tab-border(
-				$light-grey,
-				$dark-grey
-			); //border around the navbar element in outside mode
+			@include tab-border($light-grey,
+				$dark-grey); //border around the navbar element in outside mode
 		}
 	}
 }
@@ -92,6 +96,7 @@
 
 	@include tab-contour();
 	@include tab-contour-active();
+
 	.border-inside {
 		padding: 0.2rem 0.8rem;
 		flex: 1;
@@ -100,6 +105,7 @@
 		align-items: center;
 		white-space: nowrap;
 		overflow: hidden;
+
 		a {
 			color: inherit;
 			text-decoration: none;
@@ -108,6 +114,7 @@
 			overflow: hidden;
 			text-overflow: ellipsis;
 		}
+
 		img {
 			@include tab-logo;
 		}
@@ -137,9 +144,11 @@
 		align-items: center;
 
 		@include nav-border;
+
 		&::after {
 			@include tab-top-line(white);
 		}
+
 		.navbar-tabs {
 			flex-basis: calc(100% - 13.25rem); // 7 +  5.5 + 0.25 * 4 (1)
 			flex-shrink: 1;
@@ -151,17 +160,23 @@
 	}
 }
 
-@mixin dropdown-button {
+@mixin dropdown-button($available: true) {
 	@include no-border;
 	background-color: $grey;
-	cursor: url($click), auto;
 	padding: 0.15rem 0.5rem;
 	font-size: medium;
 	min-width: 8rem;
+	text-align: left;
+	width: 100%;
 
-	&:hover {
-		background-color: $blue;
-		color: white;
+	@if $available {
+		cursor: url($click), auto;
+		&:hover {
+			background-color: $blue;
+			color: white;
+		}
+	} @else {
+		color: hsl(0, 0%, 85%);
 	}
 }
 
@@ -171,10 +186,10 @@
 
 @mixin form-95 {
 	width: 100%;
-	border: 2px inset #d5d5d5;
-	color: #424242;
-	background: #fff;
-	box-shadow: -1px -1px 0 0 #828282;
+	border: 2px inset $light-grey;
+	color: $dark-grey;
+	background: white;
+	box-shadow: -1px -1px 0 0 $grey;
 }
 
 @mixin window-95 {
@@ -202,6 +217,7 @@
 		.buttons {
 			margin: 0.2rem 0.2rem 0.2rem auto;
 		}
+
 		img {
 			margin: 0 0.5rem;
 			height: 1rem;
@@ -212,9 +228,29 @@
 			@include tab-contour;
 			@include tab-contour-active;
 			background-color: $grey;
+
 			.border-inside {
 				padding: 0 0.25rem;
 			}
 		}
 	}
+}
+
+
+// ------------------------------------------------
+// -------------------- INPUT ---------------------
+// ------------------------------------------------
+
+@mixin input-text {
+	margin: 0.25rem;
+	height: 1.5rem;
+	@include tab-border(white, black);
+	outline: none;
+}
+
+@mixin input-submit {
+	margin: 0.25rem;
+	padding: 0.25rem 0.5rem;
+	height: 1.5rem;
+	outline: none;
 }

@@ -1,0 +1,77 @@
+<script lang="ts">
+	import { Context } from '$lib/components/Context.svelte';
+	import DropDown from '$lib/components/drop/DropDown.svelte';
+	import RightDrop from '$lib/components/drop/RightDrop.svelte';
+	import DropRadios from '$lib/components/drop/DropRadios.svelte';
+	import PongGame from '$lib/components/app/pong/PongGame.svelte';
+	import { onDestroy } from 'svelte';
+
+	const socket = Context.socket();
+	const fetchWithToken = Context.fetchWithToken();
+
+	let index = 0;
+	let room = '';
+
+	let scale = 1;
+
+	let scaleString: string;
+	$: if (scaleString !== undefined) {
+		scale = parseInt(scaleString) / 100;
+	}
+
+	function matchmake() {
+		fetchWithToken('matchmaking/queue', {
+			method: 'POST'
+		});
+	}
+
+	$socket.on('enter-room', (data: { room: string; index: number }) => {
+		room = data.room;
+		index = data.index;
+		$socket.emit('enter-room', data);
+		console.log('enter-room');
+	});
+
+	$socket.on('index', (i: number) => {
+		index = i;
+	});
+
+	onDestroy(() => {
+		$socket.off('enter-room');
+		$socket.off('index');
+	});
+</script>
+
+<div class="container">
+	<div class="menu">
+		<DropDown name="game">
+			<button on:click={matchmake}>matchmaking</button>
+		</DropDown>
+		<DropDown name="settings">
+			<RightDrop name="scale">
+				<DropRadios
+					fields={['60%', '80%', '100%', '120%', '140%', '160%']}
+					def="100%"
+					bind:selected={scaleString}
+				/>
+			</RightDrop>
+		</DropDown>
+	</div>
+	{#if room !== ''}
+		<PongGame {scale} {index} {room} />
+	{/if}
+</div>
+
+<style lang="scss">
+	div.container {
+		padding: 0.2rem;
+
+		div.menu {
+			display: flex;
+
+			button {
+				@include dropdown-button;
+			}
+		}
+	}
+</style>

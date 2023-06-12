@@ -112,7 +112,7 @@
 <script lang="ts">
 	import { writable, readable } from 'svelte/store';
 	import { setContext } from 'svelte';
-	import Pong from '$lib/components/app/Pong.svelte';
+	import Pong from '$lib/components/app/pong/Pong.svelte';
 	import Paint from '$lib/components/app/Paint.svelte';
 	import Chat from '$lib/components/app/Chat.svelte';
 	import Contact from '$lib/components/app/Contact.svelte';

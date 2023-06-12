@@ -2,8 +2,6 @@
 	import { logout } from '$lib/utils/connect';
 	import { Context } from '$lib/components/Context.svelte';
 	import RightDrop from '$lib/components/drop/RightDrop.svelte';
-	import DropButton from '$lib/components/drop/DropButton.svelte';
-	import DropRadios from '$lib/components/drop/DropRadios.svelte';
 
 	export let desktopHeight: number;
 
@@ -36,16 +34,16 @@
 	<RightDrop name="trucs" {desktopHeight} />
 	<RightDrop name="trucs" {desktopHeight}>
 		<RightDrop name="trucs" {desktopHeight}>
-			<DropButton on:click={logout}>logout</DropButton>
-			<DropButton on:click={enable2fa}>enable 2fa</DropButton>
+			<button on:click={logout}>logout</button>
+			<button on:click={enable2fa}>enable 2fa</button>
 		</RightDrop>
 		<RightDrop name="trucs" {desktopHeight}>
-			<DropButton on:click={logout}>logout</DropButton>
-			<DropButton on:click={enable2fa}>enable 2fa</DropButton>
+			<button on:click={logout}>logout</button>
+			<button on:click={enable2fa}>enable 2fa</button>
 		</RightDrop>
 		<RightDrop name="trucs" {desktopHeight}>
-			<DropButton on:click={logout}>logout</DropButton>
-			<DropButton on:click={enable2fa}>enable 2fa</DropButton>
+			<button on:click={logout}>logout</button>
+			<button on:click={enable2fa}>enable 2fa</button>
 		</RightDrop>
 	</RightDrop>
 </div>
@@ -73,5 +71,9 @@
 		position: absolute;
 		bottom: $navbar-height;
 		left: 0;
+
+		button {
+			@include dropdown-button;
+		}
 	}
 </style>
