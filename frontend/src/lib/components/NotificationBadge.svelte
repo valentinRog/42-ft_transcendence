@@ -1,12 +1,22 @@
-<script>
-	export let count = 1;
+<script lang="ts">
+	import { writable } from 'svelte/store';
+
+	export let count = 0; // Initial value for the count
+
+	// Create a separate writable store for each instance of NotificationBadge
+	const countStore = writable(count);
+
+	// Subscribe to changes in the count store
+	countStore.subscribe(value => {
+	  count = value; // Update the exported count value
+	});
   </script>
 
+{#if count > 0}
   <div class="notification-badge">
-	{#if count > 0}
-		<span class="count">{count}</span>
-	{/if}
+	  <span class="count">{count}</span>
   </div>
+{/if}
 
 <style lang="scss">
 	.notification-badge {
