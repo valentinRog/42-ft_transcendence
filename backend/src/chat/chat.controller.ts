@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Query } from '@nestjs/common';
+import { Controller, Post, Get, Query, Param } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { JwtGuard } from '../auth/guard';
 import { UseGuards } from '@nestjs/common';
@@ -20,6 +20,13 @@ export class ChatController {
   async getPublicChats(@Query('start') start: string, @Query('limit') limit: string) {
     const chats = this.chatService.getChatsPublic(Number(start), Number(limit));
     return chats;
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(':chatId')
+  async findChatById(@Param('chatId') chatId: string) {
+    const chat = await this.chatService.findChatById(Number(chatId));
+    return chat;
   }
 
   // @UseGuards(JwtGuard)

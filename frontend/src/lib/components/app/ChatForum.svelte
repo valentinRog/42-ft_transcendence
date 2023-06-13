@@ -35,6 +35,10 @@
 		return 'Unknown';
 	}
 
+	async function updateRole(chatUserId: number, newRoleId: number) {
+		$socket.emit('updateRole', { chatUserId: chatUserId, newRoleId: newRoleId, chatId: chatIdLocal });
+	}
+
     function selectUser(user: any) {
         selectedUser = user;
     }
@@ -78,7 +82,7 @@
                         {#if selectedUser === chatUser}
                                 <button>Check Profile</button>
                             {#if roleId <= 1 && roleId < chatUser.roleId}
-                                <button>Make Admin</button>
+								<button>Make Admin</button>
                             {/if}
                             {#if roleId <= 2 && roleId < chatUser.roleId}
                                 <div>
