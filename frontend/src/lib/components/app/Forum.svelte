@@ -1,15 +1,27 @@
 <script lang="ts">
+	import { onMount, afterUpdate } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
 	import { user } from '$lib/stores';
+	import Contact from './Contact.svelte';
 
     const socket = Context.socket();
     const chatId = Context.chatId();
     const chats = Context.chats();
+	const chatsPublic = Context.chatsPublic();
+	const fetchPublicChats = Context.fetchPublicChats();
+	const fetchChats = Context.fetchChats();
     const openChatForumWindow = Context.openChatForumWindow();
 
+	let currentView = 'public';
+	let start = 0;
+	const limit = 5;
 	let groupName = "";
 	let password = "";
-	let accessibility = "public"; // default value
+	let accessibility = "public";
+
+	onMount(() => {
+		fetchPublicChats(start, limit);
+	});
 
 	const createChat = async () => {
 		if (groupName.trim() === "" || ["public", "protected"].indexOf(accessibility) < 0) {
@@ -32,6 +44,15 @@
 	function startChat(chatNumber: number) {
 		$chatId = chatNumber;
 		$openChatForumWindow = true;
+	}
+
+	function switchView(view: string) {
+		currentView = view;
+	}
+
+	function nextChats() {
+		start += limit;
+		fetchPublicChats(start, limit);
 	}
 </script>
 
@@ -57,24 +78,25 @@
 		{/if}
 		<button type="submit">Créer un chat</button>
 	</form>
-     <!-- Public chats -->
-     <h3>Public Topics</h3>
-     <ul>
-         <!-- {#each publicChats as chat (chat)}
-             <li>{chat}</li>
-         {/each} -->
-     </ul>
- 
-     <!-- My chats public-->
-     <h3>My Topics</h3>
-     <ul>
-        {#each $chats as chat (chat.id)}
-            {#if chat.accessibility !== 'private'}
-                <li on:click={() => startChat(chat.id)}>{chat.name}</li>
-            {/if}
-        {/each}
-    
-     </ul>
+	<button on:click={() => switchView('public')}>Public Topics</button>
+	<button on:click={() => switchView('my')}>My Topics</button>
+	{#if currentView === 'public'}
+		<h3>Public Topics</h3>
+		<ul>
+			{#each $chatsPublic as chat (chat)}
+				<li on:click={() => startChat(chat.id)}>{chat.name}</li>
+			{/each}
+		</ul>
+	{:else if currentView === 'my'}
+		<h3>My Topics</h3>
+		<ul>
+			{#each $chats as chat (chat.id)}
+				{#if chat.accessibility !== 'private'}
+					<li on:click={() => startChat(chat.id)}>{chat.name}</li>
+				{/if}
+			{/each}
+		</ul>
+	{/if}
 </div>
 
 <style lang="scss">

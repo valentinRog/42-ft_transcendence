@@ -61,6 +61,7 @@
 		export const openFriendRequest = (): Writable<boolean> => getContext('openFriendRequest');
 		export const friendInfoId = (): Writable<number | null> => getContext('friendInfoId');
 		export const chats = (): Writable<Chat[]> => getContext('chats');
+		export const chatsPublic = (): Writable<Chat[]> => getContext('chatsPublic');
 		export const chatId = (): Writable<number | null> => getContext('chatId');
 		export const openChatWindow = (): Writable<boolean> => getContext('openChatWindow');
 		export const openChatForumWindow = (): Writable<boolean> => getContext('openChatForumWindow');
@@ -105,6 +106,9 @@
 		export const fetchFriendRequest = (): (() => Promise<any>) => getContext('fetchFriendRequest');
 		export const fetchGameRequest = (): (() => Promise<any>) => getContext('fetchGameRequest');
 		export const fetchChats = (): (() => Promise<any>) => getContext('fetchChats');
+		export const fetchPublicChats = (): ((start: number, limit: number) => Promise<any>) =>
+			getContext('fetchPublicChats');
+		
 
 		export const socket = (): Readable<Socket> => getContext('socket');
 
@@ -150,6 +154,7 @@
 	const openFriendRequest = writable(false);
 	const friendInfoId = writable<Context.User | null>(null);
 	const chats = writable<Context.Chat[]>([]);
+	const chatsPublic = writable<Context.Chat[]>([]);
 	const chatId = writable<number | null>(null);
 	const openChatWindow = writable(false);
 	const openChatForumWindow = writable(false);
@@ -160,6 +165,7 @@
 	setContext('openFriendRequest', openFriendRequest);
 	setContext('friendInfoId', friendInfoId);
 	setContext('chats', chats);
+	setContext('chatsPublic', chatsPublic);
 	setContext('chatId', chatId);
 	setContext('openChatWindow', openChatWindow);
 	setContext('openChatForumWindow', openChatForumWindow);
@@ -257,6 +263,15 @@
 		const res = await fetchWithToken('chat/allUserChats');
 		const data = await res.json();
 		$chats = data;
+		return data;
+	}
+
+	setContext('fetchPublicChats', fetchPublicChats);
+
+	async function fetchPublicChats(start: number, limit: number) {
+		const response = await fetchWithToken(`chat/publicChats?start=${start}&limit=${limit}`);
+		const data = await response.json();
+		$chatsPublic = data;
 		return data;
 	}
 

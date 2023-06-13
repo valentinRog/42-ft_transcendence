@@ -94,22 +94,17 @@ export abstract class SocketGateway
   @SubscribeMessage('sendMessage')
   async handleMessage(
     client: Socket,
-    payload: { chatId: number; content: string; friendUsername: string },
+    payload: { chatId: number; content: string; friendUsername?: string },
   ) {
     const chat = await this.chatService.findChatById(payload.chatId);
     const username = this.webSocketService.getClientName(client);
     const user = await this.userService.getUser(username);
 
+    
     const otherChatUser = chat
-      ? chat.chatUsers.find(
-          (chatUser) => (chatUser as any).user.username !== username,
-        )
-      : null;
+      ? chat.chatUsers.find((c) => (c as any).user.username !== username,) : null;
     const socket = this.webSocketService.getSocket(
-      otherChatUser
-        ? (otherChatUser as any).user.username
-        : payload.friendUsername,
-    );
+      otherChatUser ? (otherChatUser as any).user.username : payload.friendUsername,);
 
     const sendMessage = async () => {
       const newMessage = await this.chatService.addMessageToDatabase(
@@ -147,7 +142,10 @@ export abstract class SocketGateway
       }
       client.emit('addChat', newchat);
       client.emit('updateChat', newchat.id);
-    } else await sendMessage();
+    } 
+    else { 
+      await sendMessage();
+    }
   }
 
   @SubscribeMessage('leaveGroup')
