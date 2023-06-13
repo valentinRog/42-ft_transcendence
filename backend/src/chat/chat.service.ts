@@ -173,5 +173,4 @@ export class ChatService {
           include: { user: true },
       });
   }
-
 }

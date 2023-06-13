@@ -2,6 +2,7 @@
     import { onMount, onDestroy } from 'svelte';
     import { Context } from '$lib/components/Context.svelte';
     import { user } from '$lib/stores';
+	import { construct_svelte_component_dev } from 'svelte/internal';
 
     const socket = Context.socket();
     const chats = Context.chats();
@@ -22,6 +23,10 @@
 		$socket.emit('joinRoom', { chatId: chatIdLocal });
 	});
 
+	onDestroy(() => {
+		$socket.emit('leaveRoom', { chatId: chatIdLocal });
+	});
+
     async function sendMessage() {
 		if (messageContent.trim() === '') return;
             $socket.emit('sendMessage', {
@@ -39,17 +44,9 @@
 		return 'Unknown';
 	}
 
-	async function updateRole(chatUserId: number, newRoleId: number) {
-		$socket.emit('updateRole', { chatUserId: chatUserId, newRoleId: newRoleId, chatId: chatIdLocal });
-	}
-
     function selectUser(user: any) {
         selectedUser = user;
     }
-
-	onDestroy(() => {
-		$socket.emit('leaveRoom', { chatId: chatIdLocal }); //ATTENTION
-	});
 </script>
 
 <div id="box">
