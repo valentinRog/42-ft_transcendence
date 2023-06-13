@@ -3,7 +3,6 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { HttpModule } from '@nestjs/axios';
 import { PrismaClient } from '@prisma/client';
-import { WebSocketService } from '../websocket/websocket.service';
 import { WebSocketModule } from '../websocket/websocket.module';
 
 @Module({
