@@ -24,10 +24,20 @@
 
 	const friends = Context.contacts();
 
-	$: if (login)
+	if (login) {
 		fetchWithToken(`users/avatar/${login}`)
-			.then((res) => res.blob())
-			.then((blob) => (imgUrl = URL.createObjectURL(blob)));
+			.then((res) => {
+			if (res.status === 200 || res.status === 201) {
+				return res.blob();
+			} else {
+				throw new Error('Avatar fetch failed');
+			}
+			})
+			.then((blob) => (imgUrl = URL.createObjectURL(blob)))
+			.catch(() => {
+				imgUrl = '/avatar.png';
+			});
+		}
 </script>
 
 <div id="box">

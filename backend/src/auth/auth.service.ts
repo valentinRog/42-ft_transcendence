@@ -136,7 +136,7 @@ export class AuthService {
       delete user.hash;
       return user;
     } catch (error) {
-      return null; // Invalid token
+      return null;
     }
   }
 }

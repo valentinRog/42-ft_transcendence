@@ -10,6 +10,7 @@ import {
   FileTypeValidator,
   MaxFileSizeValidator,
   ForbiddenException,
+  NotFoundException,
   Get,
   Param,
   StreamableFile,
@@ -22,6 +23,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { PrismaClient } from '@prisma/client';
 import { createReadStream } from 'fs';
 import { join } from 'path';
+import * as fs from 'fs';
 
 @UseGuards(JwtGuard)
 @Controller('users')
@@ -35,6 +37,10 @@ export class UserController {
 
   @Get('avatar/me')
   getMyPhoto(@GetUser() user) {
+    const path = join(process.cwd(), '/upload', `${user.login}.png`);
+    if (!fs.existsSync(path)) {
+      throw new NotFoundException('avatar not found');
+    }
     const file = createReadStream(
       join(process.cwd(), '/upload', `${user.login}.png`),
     );
@@ -48,8 +54,13 @@ export class UserController {
   }
 
   @Get('avatar/:login')
+  @UseInterceptors()
   async getUserPhoto(@Param('login') login: string) {
     const user = await this.userService.getUser(login);
+    const path = join(process.cwd(), '/upload', `${user.login}.png`);
+    if (!fs.existsSync(path)) {
+      throw new NotFoundException('avatar not found');
+    }
     const file = createReadStream(
       join(process.cwd(), '/upload', `${user.login}.png`),
     );
@@ -97,15 +108,4 @@ export class UserController {
     if (!prisma_friend) throw new ForbiddenException('User not found');
     return await this.userService.removeFriend(username, prisma_friend.id);
   }
-
-//  @Post('add-friend')
-//  async addFriend(@GetUser('username') username, @Body() dto: FriendDto) {
-//    if (username == dto.friend)
-//      throw new ForbiddenException('You cannot add yourself as a friend');
-//    const prisma_friend = await this.prisma.user.findUnique({
-//      where: { username: dto.friend },
-//    });
-//    if (!prisma_friend) throw new ForbiddenException('User not found');
-//    return await this.userService.addFriend(username, prisma_friend.id);
-//  }
 }
