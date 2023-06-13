@@ -56,8 +56,8 @@
 	<div id="formular">
 		<div class="top-bar">
 			<div class="buttons">
-				<button>&nbsp?&nbsp</button>
-				<button>&nbspX&nbsp</button>
+				<button class="border-inside">?</button>
+				<button class="border-inside">X</button>
 			</div>
 		</div>
 		<div class="content">
@@ -136,7 +136,6 @@
 			label {
 				color: black;
 				width: 7rem;
-				color: #000000;
 			}
 		}
 
@@ -158,10 +157,15 @@
 			height: 1.5rem;
 			display: flex;
 			align-items: center;
-
+			@include window-95;
 			.buttons {
+				button {
+					@include tab-contour;
+					@include tab-contour-active;
+					background-color: $grey;
+					padding: 0.1rem 0.25rem;
+				}
 				margin-left: auto;
-				margin-right: 0.2rem;
 			}
 		}
 
@@ -201,6 +205,7 @@
 		}
 
 		.button-container button {
+			background-color: $light-grey;
 			font-size: inherit;
 			padding: 0.3rem 1rem;
 			width: 10rem;

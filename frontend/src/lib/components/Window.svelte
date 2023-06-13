@@ -201,14 +201,14 @@
 		font-size: 0.8rem;
 		position: relative;
 		opacity: 0.7;
-		color: rgb(71, 71, 71);
+		color: $dark-grey;
 	}
 
 	.dialog {
 		width: 18.75rem;
 		height: 9.375rem;
-		border: 0.0625rem solid #000;
-		background-color: #c0c0c0;
+		border: 0.0625rem solid black;
+		background-color: $grey;
 		position: fixed;
 		top: 50%;
 		left: 50%;

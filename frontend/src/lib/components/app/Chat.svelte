@@ -200,7 +200,7 @@
 		padding-bottom: 0.3rem;
 		font-size: 0.9em;
 		@include tab-border(white, black);
-		background-color: rgb(229, 229, 229);
+		background-color: white
 	}
 
 	.send-message-form {

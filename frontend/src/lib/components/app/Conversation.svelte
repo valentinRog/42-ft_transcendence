@@ -110,7 +110,7 @@
 
 <style lang="scss">
 	#box {
-		width: 30rem;
+		width: 25rem;
 	}
 
 	#chat-window {
@@ -174,6 +174,6 @@
 
 	.timestamp {
 		font-size: 0.8rem;
-		color: rgb(58, 58, 58);
+		color: $dark-grey;
 	}
 </style>

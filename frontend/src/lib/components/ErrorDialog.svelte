@@ -36,7 +36,7 @@
 		background-color: $grey;
 	}
 	dialog::backdrop {
-		background: rgba(0, 0, 0, 0.3);
+		background: black;
 	}
 
 	.icon-and-paragraph {
