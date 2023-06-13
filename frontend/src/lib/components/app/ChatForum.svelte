@@ -2,6 +2,7 @@
     import { onMount, onDestroy } from 'svelte';
     import { Context } from '$lib/components/Context.svelte';
     import { user } from '$lib/stores';
+	import { construct_svelte_component_dev } from 'svelte/internal';
 
     const socket = Context.socket();
     const chats = Context.chats();
@@ -22,6 +23,10 @@
 		$socket.emit('joinRoom', { chatId: chatIdLocal });
 	});
 
+	onDestroy(() => {
+		$socket.emit('leaveRoom', { chatId: chatIdLocal });
+	});
+
     async function sendMessage() {
 		if (messageContent.trim() === '') return;
             $socket.emit('sendMessage', {
@@ -39,17 +44,9 @@
 		return 'Unknown';
 	}
 
-	async function updateRole(chatUserId: number, newRoleId: number) {
-		$socket.emit('updateRole', { chatUserId: chatUserId, newRoleId: newRoleId, chatId: chatIdLocal });
-	}
-
     function selectUser(user: any) {
         selectedUser = user;
     }
-
-	onDestroy(() => {
-		$socket.emit('leaveRoom', { chatId: chatIdLocal }); //ATTENTION
-	});
 </script>
 
 <div id="box">
@@ -108,10 +105,6 @@
 
 <style lang="scss">
 	#box {
-		background: #c0c0c0;
-		color: #000;
-		font-family: 'MS Sans Serif', sans-serif;
-		box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, 0.5);
 		width: 15rem;
 		height: 17rem;
 	}
@@ -144,7 +137,7 @@
 	h5 {
 		margin: 0;
 		text-align: center;
-		color: rgba(51, 51, 51, 0.814);
+		color: $dark-grey;
 	}
 
 	input[type='text'].message-input {
@@ -208,7 +201,7 @@
 		padding-bottom: 0.3rem;
 		font-size: 0.9em;
 		@include tab-border(white, black);
-		background-color: rgb(229, 229, 229);
+		background-color: white
 	}
 
 	.send-message-form {

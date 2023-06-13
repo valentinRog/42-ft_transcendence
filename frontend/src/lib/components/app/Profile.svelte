@@ -149,6 +149,7 @@
 			@include tab-contour-hollow;
 			background-color: white;
 			div {
+				margin-bottom: 0.2rem;
 				display: flex;
 				align-items: center;
 				.status {
