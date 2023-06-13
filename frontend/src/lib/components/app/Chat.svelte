@@ -112,14 +112,15 @@
 	}
 
 	#chat-window {
-		height: 90%;
+		height: 91%;
+		margin-right: 0.2rem;
 		overflow-y: auto;
 		overflow-x: hidden;
-		padding: 0 0.5rem;
+		padding: 0 0.3rem;
 	}
 
 	#sendMessage-window {
-		padding: 0.5rem;
+		padding: 0.4rem 0.2rem 0.2rem 0.2rem;
 	}
 
 	.btn {

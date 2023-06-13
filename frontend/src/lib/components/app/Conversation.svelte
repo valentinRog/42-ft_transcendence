@@ -82,7 +82,9 @@
 					<div class="chat-content">
 						{#if chat.messages.length > 0}
 							<div class="message-details">
-								<p>{getLastMessageSender(chat)}: {chat.messages[chat.messages.length - 1].content}</p>
+								<p>
+									{getLastMessageSender(chat) === $user?.username ? "you" : getLastMessageSender(chat)}
+									: {chat.messages[chat.messages.length - 1].content}</p>
 								<span class="timestamp"
 									>{timeDifference(
 										now,
@@ -107,51 +109,33 @@
 </div>
 
 <style lang="scss">
-	@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
-	body {
-		font-family: 'Press Start 2P', cursive;
-		background: #008080;
-		color: black;
-	}
-
 	#box {
-		width: 15rem;
-		background: #c0c0c0;
-		border-right-color: #fff;
-		border-bottom-color: #fff;
+		width: 30rem;
 	}
 
 	#chat-window {
 		height: 22rem;
 		overflow-y: auto;
 		overflow-x: hidden;
-		margin-bottom: 0.4rem;
-		padding: 1rem;
+		margin: 0.2rem;
+		padding: 0.3rem;
 	}
 
 	.chat {
-		border: 2px solid #000;
-		border-right-color: #fff;
-		border-bottom-color: #fff;
-		padding: 1rem;
-		margin-bottom: 1rem;
+		@include tab-border($light-grey, $dark-grey);
+		padding: 0.5rem;
+		margin-bottom: 0.2rem;
 	}
 
 	h4 {
-		color: #000080;
-		margin-bottom: 0.5rem;
-
+		color: $blue;
+		margin-bottom: 0.2rem;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		max-width: 9.5rem;
 	}
-
-	p {
-		color: #000;
-	}
-
+	
 	.chat-content {
 		position: relative;
 		display: flex;
@@ -163,6 +147,7 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		max-width: 8.6rem;
+		margin-bottom: 0.2rem;
 	}
 
 	.chat-content {
