@@ -143,7 +143,7 @@ export abstract class SocketGateway
       client.emit('addChat', newchat);
       client.emit('updateChat', newchat.id);
     } 
-    else { 
+    else {
       await sendMessage();
     }
   }

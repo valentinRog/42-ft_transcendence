@@ -123,7 +123,14 @@ export class ChatService {
   async getChatsPublic(start: number, limit: number) : Promise<Chat[]>{
     const chats = await this.prisma.chat.findMany({
       where: {
-        accessibility: 'public'
+        OR: [
+          {
+            accessibility: 'public'
+          },
+          {
+            accessibility: 'protected'
+          }
+        ]
       },
       include: {
         messages: true,
@@ -132,10 +139,13 @@ export class ChatService {
             user: true
           }
         }
-      }
+      },
+      skip: start,
+      take: limit
     });
     return chats;
   }
+  
 
   //add chatuser to chat
   async addUserToChat(chatId: number, userId: number) {
