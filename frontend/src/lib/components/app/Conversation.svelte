@@ -68,7 +68,7 @@
 								<h5>
 									{#each chat.chatUsers as chatUser, i}
 										{#if chatUser.user.username != $user?.username}
-											{chatUser.user.username + (chat.chatUsers.length - i > 1 ? ', ' : '')}
+											{chatUser.user.username + (chat.chatUsers.length - 1 - i > 1 ? ', ' : '')}
 										{/if}
 									{/each}
 								</h5>
@@ -110,7 +110,7 @@
 
 <style lang="scss">
 	#box {
-		width: 25rem;
+		width: 20rem;
 	}
 
 	#chat-window {
@@ -133,7 +133,12 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		max-width: 9.5rem;
+		max-width: 12rem;
+		h5 {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			max-width: 15rem;
+		}
 	}
 	
 	.chat-content {

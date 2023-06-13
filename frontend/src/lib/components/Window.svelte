@@ -155,7 +155,9 @@
 			<div class="buttons">
 				{#if name === 'Chat' && currentChat && currentChat.isGroupChat && currentChat.accessibility === "private"}
 					<button on:click={() => leaveGroup()}>
-						<i class="fas fa-sign-out-alt" />
+						<div class="border-inside">
+							<i class="fas fa-sign-out-alt" />
+						</div>
 						<dialog bind:this={dialog} class="dialog" open={isDialogOpen}>
 							<p>Voulez-vous vraiment quitter le groupe {currentChat?.name} ?</p>
 							<button on:click={() => leaveGroupConfirm()}>Oui</button>
@@ -190,7 +192,7 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		max-width: 8.5rem;
+		max-width: 13rem;
 		&:hover {
 			cursor: url($click), auto;
 		}
@@ -203,7 +205,7 @@
 		opacity: 0.7;
 		color: $dark-grey;
 	}
-
+	
 	.dialog {
 		width: 18.75rem;
 		height: 9.375rem;

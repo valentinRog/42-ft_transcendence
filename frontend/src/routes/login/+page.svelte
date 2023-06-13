@@ -56,8 +56,16 @@
 	<div id="formular">
 		<div class="top-bar">
 			<div class="buttons">
-				<button class="border-inside">?</button>
-				<button class="border-inside">X</button>
+				<button>
+					<div class="border-inside">
+						?
+					</div>
+					</button>
+				<button>
+					<div class="border-inside">
+						X
+					</div>
+					</button>
 			</div>
 		</div>
 		<div class="content">
@@ -163,9 +171,12 @@
 					@include tab-contour;
 					@include tab-contour-active;
 					background-color: $grey;
-					padding: 0.1rem 0.25rem;
+					div {
+						padding: 0.1rem 0.25rem;
+					}
 				}
 				margin-left: auto;
+				margin-right: 0.2rem;
 			}
 		}
 
