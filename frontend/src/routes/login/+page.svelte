@@ -99,32 +99,34 @@
 						}}>{signup ? 'I have an account' : 'Create an account'}</button
 					>
 					<button type="submit"
-					>{#if signup}Sign Up{:else}Sign In{/if}</button
+						>{#if signup}Sign Up{:else}Sign In{/if}</button
 					>
-					<div class="login-42">
-						<a href="{PUBLIC_BACKEND_URL}/auth/42login">Login with 
-							<img src="/422.png"/>
-						</a>
-					</div>
+					<a href="{PUBLIC_BACKEND_URL}/auth/42login">
+						<div>
+							<p>Login with</p>
+							<img src="/42.png" />
+						</div>
+					</a>
 				</div>
 			</form>
-			
 		</div>
 	</div>
 </div>
 
 <style lang="scss">
 	div#formular {
-
 		@include form-95;
+		@include tab-border($dark-grey, $light-grey);
+		padding: 0.2rem;
 		background-color: $grey;
 		form {
+			@include tab-border($light-grey, $dark-grey);
 			display: flex;
 			flex-direction: column;
 			gap: 0.8rem;
 			padding: 1rem;
 			width: 25rem;
-			margin-top: 1rem;
+			margin-top: 0.2rem;
 
 			.row-icon img {
 				margin-right: 10px;
@@ -137,20 +139,20 @@
 				color: #000000;
 			}
 		}
-		
+
 		.form-group {
 			display: flex;
 			align-items: center;
 		}
 	}
-	
+
 	div#login {
 		@include tab-contour;
 		background-color: $grey;
 		width: fit-content;
 		margin: 0 auto;
 		margin-top: 10rem;
-		
+
 		div.top-bar {
 			background-color: $blue;
 			height: 1.5rem;
@@ -162,7 +164,7 @@
 				margin-right: 0.2rem;
 			}
 		}
-		
+
 		.button-container {
 			display: flex;
 			justify-content: center;
@@ -170,26 +172,31 @@
 			align-items: center;
 			gap: 0.5rem;
 			margin-top: 1rem;
-			.login-42 {
+			align-items: center;
+			a {
+				@include tab-border;
+				color: black;
+				background-color: $light-grey;
+				text-decoration: none;
+				height: 1.8rem;
+				width: 10rem;
 				display: flex;
 				align-items: center;
-				a {
-					@include tab-border;
-					color: black;
-					background-color: $light-grey;
-					text-decoration: none;
-					height: 1.8rem;
-					width: 10rem;
-					// padding: 0.3rem 1rem;
+				flex-direction: row;
+				div {
+					display: flex;
+					padding: 0.3rem;
+					align-content: center;
+					justify-content: center;
 					img {
-						height: 1rem;
+						margin-left: 0.3rem;
+						height: 1.2rem;
 						width: auto;
-	
 					}
 				}
 			}
 		}
-		
+
 		.button-container button {
 			font-size: inherit;
 			padding: 0.3rem 1rem;
@@ -197,7 +204,6 @@
 		}
 
 		div.content {
-			padding: 1rem;
 			a {
 				display: block;
 				text-align: center;
