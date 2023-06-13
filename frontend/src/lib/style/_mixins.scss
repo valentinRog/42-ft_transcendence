@@ -189,7 +189,6 @@
 	border: 2px inset $light-grey;
 	color: $dark-grey;
 	background: white;
-	box-shadow: -1px -1px 0 0 $grey;
 }
 
 @mixin window-95 {
@@ -233,6 +232,11 @@
 				padding: 0 0.25rem;
 			}
 		}
+	}
+
+	.selected {
+		background-color: $blue;
+		color: white;
 	}
 }
 
