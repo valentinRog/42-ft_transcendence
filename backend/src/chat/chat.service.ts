@@ -127,7 +127,7 @@ export class ChatService {
     return result;
   }
 
-  async getChatsPublic(start: number, limit: number) : Promise<Chat[]>{
+  async getChatsPublic(start: number, limit: number) : Promise<any>{
     const chats = await this.prisma.chat.findMany({
       where: {
         OR: [
@@ -139,13 +139,13 @@ export class ChatService {
           }
         ]
       },
-      include: {
-        messages: true,
-        chatUsers: {
-          include: {
-            user: true
-          }
-        }
+      select: {
+        id: true,
+        accessibility: true,
+        password: true,
+        name: true,
+        chatUsers: true,
+        bans: true,
       },
       skip: start,
       take: limit
@@ -165,4 +165,13 @@ export class ChatService {
     });
     return chatUser;
   }
+
+  async updateRole(chatUserId: number, newRoleId: number): Promise<any> {
+      return await this.prisma.chatUser.update({
+          where: { id: chatUserId },
+          data: { roleId: newRoleId },
+          include: { user: true },
+      });
+  }
+
 }

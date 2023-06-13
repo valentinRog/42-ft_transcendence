@@ -134,6 +134,7 @@
 			label {
 				color: black;
 				width: 7rem;
+				color: #000000;
 			}
 		}
 		

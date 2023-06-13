@@ -61,6 +61,11 @@ export abstract class SocketGateway
     client.join(`chat-${payload.chatId}`);
   }
 
+  @SubscribeMessage('leaveRoom')
+  handleLeaveChatRoom(client: Socket, payload: { chatId: number }) {
+    client.leave(`chat-${payload.chatId}`);
+  }
+
   @SubscribeMessage('joinChat')
   async handleJoinChat(client: any, payload: any) {
     const chatId = payload.chatId;
@@ -70,8 +75,15 @@ export abstract class SocketGateway
     const chat = await this.chatService.findChatById(chatId);
 
     client.join(`chat-${payload.chatId}`);
-    //a modif pour all
     client.emit('addChat', chat);
+  }
+
+  @SubscribeMessage('updateRole')
+  async handleUpdateRole(client: any, payload: any) {
+      const { chatUserId, newRoleId, chatId } = payload;
+      //need protection 
+      const chatUser = await this.chatService.updateRole(chatUserId, newRoleId);
+      this.server.to(`chat-${chatId}`).emit('roleUpdated', chatUser);
   }
 
   @SubscribeMessage('createGroupChat')

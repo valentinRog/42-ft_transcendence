@@ -106,6 +106,7 @@
 		export const fetchFriendRequest = (): (() => Promise<any>) => getContext('fetchFriendRequest');
 		export const fetchGameRequest = (): (() => Promise<any>) => getContext('fetchGameRequest');
 		export const fetchChats = (): (() => Promise<any>) => getContext('fetchChats');
+		export const fetchChatById = (): ((chatId: number) => Promise<any>) => getContext('fetchChatById');
 		export const fetchPublicChats = (): ((start: number, limit: number) => Promise<any>) =>
 			getContext('fetchPublicChats');
 		
@@ -258,18 +259,27 @@
 		return data;
 	}
 
+	async function fetchChatById(chatId: number) {
+		const res = await fetchWithToken(`chat/${chatId}`);
+		if (!res.ok) throw new Error(res.statusText);
+		const data = await res.json();
+		return data;
+	}
+
 	setContext('fetchPublicChats', fetchPublicChats);
 
 	async function fetchPublicChats(start: number, limit: number) {
 		const response = await fetchWithToken(`chat/publicChats?start=${start}&limit=${limit}`);
 		const data = await response.json();
 		$chatsPublic = data;
+		console.log(data);
 		return data;
 	}
 
 	setContext('fetchMe', fetchMe);
 	setContext('fetchFriends', fetchFriends);
 	setContext('fetchFriendRequest', fetchFriendRequest);
+	setContext('fetchChatById', fetchChatById);
 	setContext('fetchChats', fetchChats);
 
 	const socket = readable<Socket>(
@@ -334,7 +344,7 @@
 
 	function getUnreadMessagesCount(chat: any, chatUser: any) {
 		if (chat.messages.length > 0) {
-			const lastReadMessageId = chatUser.lastReadMessageId || 0;
+			const lastReadMessageId = chatUser ? chatUser.lastReadMessageId || 0 : 0;
 			const unreadMessages = chat.messages.filter((message: any) => message.id > lastReadMessageId);
 			const unreadCount = unreadMessages.length;
 

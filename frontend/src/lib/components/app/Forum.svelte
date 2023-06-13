@@ -1,16 +1,14 @@
 <script lang="ts">
-	import { onMount, afterUpdate } from 'svelte';
+	import { onMount } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
 	import { user } from '$lib/stores';
-	import Contact from './Contact.svelte';
-	import { logout } from '$lib/utils/connect';
 
     const socket = Context.socket();
     const chatId = Context.chatId();
     const chats = Context.chats();
 	const chatsPublic = Context.chatsPublic();
 	const fetchPublicChats = Context.fetchPublicChats();
-	const fetchChats = Context.fetchChats();
+	const fetchChatById = Context.fetchChatById();
     const openChatForumWindow = Context.openChatForumWindow();
 
 	let currentView = 'public';
@@ -21,14 +19,14 @@
 	let accessibility = "public";
 	let selectedChat: any = null;
     let chatPassword = "";
+	let chatsCount = 0;
 
 	onMount(() => {
-		fetchPublicChats(start, limit);
+		fetchPublicChats(start, limit).then(chats => chatsCount = chats.length);
 	});
 
 	const createChat = async () => {
 		if (groupName.trim() === "" || ["public", "protected"].indexOf(accessibility) < 0) {
-			// handle validation errors
 			return;
 		}
         $socket.emit('createGroupChat', {
@@ -44,11 +42,15 @@
 		});
 	}
 
-	function startChat(chat : Context.Chat) {
+	async function startChat(chat : Context.Chat) {
         if (chat.accessibility === 'protected' 
-			&& !chat.chatUsers.find((c: any) => c.user.username === $user?.username)) {
+			&& !chat.chatUsers.find((c: any) => c.userId === $user?.id)) {
             selectedChat = chat;
         } else {
+			const newchat = await fetchChatById(chat.id);
+			if ($chats.find((c: any) => c.id === newchat.id))
+				$chats.splice($chats.findIndex((c: any) => c.id === newchat.id), 1);
+			$chats.push(newchat);
             $chatId = chat.id;
             $openChatForumWindow = true;
         }
@@ -72,9 +74,16 @@
 		currentView = view;
 	}
 
+	function previousChats() {
+		if (start > 0) {
+			start -= limit;
+			fetchPublicChats(start, limit).then(chats => chatsCount = chats.length);
+		}
+	}
+
 	function nextChats() {
 		start += limit;
-		fetchPublicChats(start, limit);
+		fetchPublicChats(start, limit).then(chats => chatsCount = chats.length);
 	}
 </script>
 
@@ -103,7 +112,7 @@
 	<button on:click={() => switchView('public')}>Public Topics</button>
 	<button on:click={() => switchView('my')}>My Topics</button>
 	{#if currentView === 'public'}
-    <h3>Public Topics</h3>
+    	<h3>Public Topics</h3>
 		<ul>
 			{#each $chatsPublic as chat (chat.id)}
 				<li>
@@ -111,6 +120,12 @@
 				</li>
 			{/each}
 		</ul>
+		{#if start >= limit}
+            <button on:click={previousChats}>Previous</button>
+        {/if}
+        {#if chatsCount === limit}
+            <button on:click={nextChats}>Next</button>
+        {/if}
 	{:else if currentView === 'my'}
 		<h3>My Topics</h3>
 		<ul>
@@ -121,14 +136,13 @@
 			{/each}
 		</ul>
 	{/if}
-
-{#if selectedChat !== null}
-    <label>
-        Enter Password for {selectedChat.name} :
-        <input type="password" bind:value={chatPassword} required>
-        <button on:click={enterChat}>Enter</button>
-    </label>
-{/if}
+	{#if selectedChat !== null}
+		<label>
+			Enter Password for {selectedChat.name} :
+			<input type="password" bind:value={chatPassword} required>
+			<button on:click={enterChat}>Enter</button>
+		</label>
+	{/if}
 </div>
 
 <style lang="scss">
