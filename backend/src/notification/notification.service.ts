@@ -1,4 +1,8 @@
-import { Injectable, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { WebSocketService } from 'src/websocket/websocket.service';
 import { UserService } from 'src/user/user.service';
@@ -52,7 +56,7 @@ export class NotificationService {
       }
       return notif;
     } catch (error) {
-      throw new ForbiddenException('User not found');
+      throw new NotFoundException('User not found');
     }
   }
 

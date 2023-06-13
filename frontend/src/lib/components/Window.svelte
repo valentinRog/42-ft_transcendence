@@ -9,6 +9,7 @@
 	const chats = Context.chats();
 	const contacts = Context.contacts();
 	const socket = Context.socket();
+	const selected = Context.selected();
 
 	export let props: Record<string, any>;
 	export let name: string;
@@ -124,7 +125,7 @@
 >
 	<div class="border-inside">
 		<div
-			class="window"
+			class="window "
 			on:mousedown={() => {
 				moving = true;
 			}}

@@ -126,9 +126,7 @@
 		height: 22rem;
 		overflow-y: auto;
 		overflow-x: hidden;
-		border-right-color: #fff;
-		border-bottom-color: #fff;
-		margin-bottom: 1rem;
+		margin-bottom: 0.4rem;
 		padding: 1rem;
 	}
 

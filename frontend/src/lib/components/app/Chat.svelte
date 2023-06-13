@@ -107,20 +107,15 @@
 
 <style lang="scss">
 	#box {
-		background: #c0c0c0;
-		color: #000;
-		font-family: 'MS Sans Serif', sans-serif;
-		box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, 0.5);
-		width: 15rem;
-		height: 17rem;
+		width: 20rem;
+		height: 25rem;
 	}
 
 	#chat-window {
-		height: 85%;
+		height: 90%;
 		overflow-y: auto;
 		overflow-x: hidden;
-		padding: 0.5rem;
-		border-bottom: 1px solid #000;
+		padding: 0 0.5rem;
 	}
 
 	#sendMessage-window {
@@ -137,29 +132,30 @@
 	}
 
 	h5 {
-		margin: 0;
+		margin: 0.2rem 0 0 0;
 		text-align: center;
-		color: rgba(51, 51, 51, 0.814);
+		color: $dark-grey;
 	}
 
 	input[type='text'].message-input {
 		@include tab-border(white, black);
-		background-color: $light-grey;
+		background-color: white;
+		height: 1.5rem;
 		width: 100%;
 		box-sizing: border-box;
 		margin-right: 0.5rem;
 		order: 1;
+		outline: none;
 	}
 
 	ul {
 		list-style: none;
-		padding: 0;
 		display: flex;
 		flex-direction: column;
 	}
 
 	li {
-		margin-bottom: 0.5rem;
+		margin-top: 0.1rem;
 		word-break: break-word;
 		display: flex;
 		flex-direction: column;
@@ -174,7 +170,7 @@
 		align-self: flex-end;
 		display: flex;
 		justify-content: flex-end;
-		width: 9.5rem;
+		width: 75%;
 	}
 
 	li.other .message-header {
@@ -186,7 +182,7 @@
 		align-self: flex-start;
 		display: flex;
 		justify-content: flex-start;
-		width: 9.5rem;
+		width: 75%;
 	}
 
 	.message-header {

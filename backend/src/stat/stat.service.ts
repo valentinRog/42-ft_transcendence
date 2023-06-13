@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { UpdateStatDto } from './dto';
+import { NotFoundException } from '@nestjs/common';
 import Elo from '@studimax/elo';
 
 @Injectable()
@@ -80,7 +81,7 @@ export class StatService {
       );
       return sortedMatches;
     } catch (error) {
-      throw new Error('Error retrieving matches');
+      throw new NotFoundException('Error retrieving matches');
     }
   }
 
@@ -92,8 +93,7 @@ export class StatService {
       });
       return user.stat;
     } catch (error) {
-      console.error('Error retrieving stats:', error);
-      throw error;
+      throw new NotFoundException('Error retrieving stats');
     }
   }
 }

@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { Chat, ChatUser, Message, User } from '../chat/model/chat.model';
+import { Chat, Message } from '../chat/model/chat.model';
 
 @Injectable()
 export class ChatService {
@@ -13,87 +12,95 @@ export class ChatService {
         chatUsers: {
           some: {
             user: {
-              username: username
-            }
-          }
-        }
+              username: username,
+            },
+          },
+        },
       },
       include: {
         messages: true,
         chatUsers: {
           include: {
-            user: true
-          }
-        }
-      }
+            user: true,
+          },
+        },
+      },
     });
     return chats;
   }
 
-  async createChat(groupName: string, memberUsernames: string[], isGroupChat: boolean, accessibility: string, password?: string) : Promise<Chat | null> {
+  async createChat(
+    groupName: string,
+    memberUsernames: string[],
+    isGroupChat: boolean,
+    accessibility: string,
+    password?: string,
+  ): Promise<Chat | null> {
     const newGroupChat = await this.prisma.chat.create({
-          data: {
-            isGroupChat: isGroupChat,
-            name: groupName,
-            accessibility: accessibility,
-            password: password,
-            updatedAt: new Date(),
+      data: {
+        isGroupChat: isGroupChat,
+        name: groupName,
+        accessibility: accessibility,
+        password: password,
+        updatedAt: new Date(),
+        createdAt: new Date(),
+        chatUsers: {
+          create: memberUsernames.map((username, index) => ({
+            user: { connect: { username } },
             createdAt: new Date(),
-            chatUsers: {
-                create: memberUsernames.map((username, index) => ({
-                    user: { connect: { username } },
-                    createdAt: new Date(),
-                    lastReadMessageId: 0,
-                    role: { connect: { id: index === 0 ? 1 : 3 } }
-                }))
-            }
+            lastReadMessageId: 0,
+            role: { connect: { id: index === 0 ? 1 : 3 } },
+          })),
         },
-        include: {
-          chatUsers: {
-            include: {
-              user: true,
-              role: true
-            }
+      },
+      include: {
+        chatUsers: {
+          include: {
+            user: true,
+            role: true,
           },
-          messages: true,
-        }
+        },
+        messages: true,
+      },
     });
     return newGroupChat;
   }
 
-
-  async findChatById(id: number | null) : Promise<Chat | null> {
-    if (id === undefined || id === null) 
-      return null;
+  async findChatById(id: number | null): Promise<Chat | null> {
+    if (id === undefined || id === null) return null;
     const chat = await this.prisma.chat.findUnique({
-        where: {
-            id: id,
+      where: {
+        id: id,
+      },
+      include: {
+        chatUsers: {
+          include: {
+            user: true,
+          },
         },
-        include: {
-            chatUsers: {
-              include: {
-                user: true,
-              },
-            },
-            messages: true,
-        },
+        messages: true,
+      },
     });
     return chat;
   }
 
-  async addMessageToDatabase(chatId: number, content: string, userId: number): Promise<Message> {
+  async addMessageToDatabase(
+    chatId: number,
+    content: string,
+    userId: number,
+  ): Promise<Message> {
     const newMessage = await this.prisma.message.create({
       data: {
         content: content,
         chat: {
-          connect: { id: chatId }
+          connect: { id: chatId },
         },
         user: {
-          connect: { id: userId }
+          connect: { id: userId },
         },
         createdAt: new Date(),
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
     return newMessage;
   }
@@ -102,8 +109,8 @@ export class ChatService {
     const result = await this.prisma.chatUser.deleteMany({
       where: {
         userId: userId,
-        chatId: chatId
-      }
+        chatId: chatId,
+      },
     });
     return result;
   }
@@ -111,11 +118,11 @@ export class ChatService {
   async changeChatName(chatId: number, newName: string): Promise<any> {
     const result = await this.prisma.chat.update({
       where: {
-        id: chatId
+        id: chatId,
       },
       data: {
-        name: newName
-      }
+        name: newName,
+      },
     });
     return result;
   }
@@ -146,7 +153,6 @@ export class ChatService {
     return chats;
   }
 
-  
   async addUserToChat(chatId: number, userId: number) {
     const chatUser = await this.prisma.chatUser.create({
       data: {
@@ -160,7 +166,7 @@ export class ChatService {
     return chatUser;
   }
 
-  async updateRole(chatUserId: number, newRoleId: number): Promise<ChatUser> {
+  async updateRole(chatUserId: number, newRoleId: number): Promise<any> {
       return await this.prisma.chatUser.update({
           where: { id: chatUserId },
           data: { roleId: newRoleId },
