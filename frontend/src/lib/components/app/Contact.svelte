@@ -44,10 +44,6 @@
 		friendInput = '';
 	}
 
-	async function openRequest() {
-		$openFriendRequest = true;
-	}
-
 	async function removeFriend(friendUsername: string) {
 		const res = await fetchWithToken('users/remove-friend', {
 			method: 'PATCH',
@@ -148,14 +144,12 @@
 						on:click={selectFriend}
 					/>
 				{/if}
-				<div
-					class="name-options"
+				<div class="name-options"
 					on:mouseleave={() => {
 						visible = 0;
 					}}
 				>
-					<p
-						class="username"
+					<p class="username"
 						on:click={() => {
 							visible = visible === friend.id ? 0 : friend.id;
 						}}
@@ -213,7 +207,7 @@
 		<span class="notification-badge">
 			<NotificationBadge count={$friendRequest.length} />
 		</span>
-		<button on:click={() => openRequest()}>Friend requests</button>
+		<button on:click={() => $openFriendRequest = true}>Friend requests</button>
 	</div>
 </div>
 
