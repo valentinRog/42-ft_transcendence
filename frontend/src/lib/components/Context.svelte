@@ -59,6 +59,7 @@
 		export const friendRequest = (): Writable<NotifRequest[]> => getContext('friendRequest');
 		export const gameRequest = (): Writable<NotifRequest[]> => getContext('gameRequest');
 		export const openFriendRequest = (): Writable<boolean> => getContext('openFriendRequest');
+		export const openPongWindow = (): Writable<boolean> => getContext('openPongWindow');
 		export const friendInfoId = (): Writable<number | null> => getContext('friendInfoId');
 		export const chats = (): Writable<Chat[]> => getContext('chats');
 		export const chatsPublic = (): Writable<Chat[]> => getContext('chatsPublic');
@@ -111,6 +112,8 @@
 		export const fetchPublicChats = (): ((start: number, limit: number) => Promise<any>) =>
 			getContext('fetchPublicChats');
 
+
+
 		export const socket = (): Readable<Socket> => getContext('socket');
 
 		export const getUnreadMessagesCount = (): ((chat: any, chatUser: any) => number) =>
@@ -154,6 +157,7 @@
 	const friendRequest = writable<Context.NotifRequest[]>([]);
 	const gameRequest = writable<Context.NotifRequest[]>([]);
 	const openFriendRequest = writable(false);
+	const openPongWindow = writable(false);
 	const friendInfoId = writable<Context.User | null>(null);
 	const chats = writable<Context.Chat[]>([]);
 	const chatsPublic = writable<Context.Chat[]>([]);
@@ -165,6 +169,7 @@
 	setContext('friendRequest', friendRequest);
 	setContext('gameRequest', gameRequest);
 	setContext('openFriendRequest', openFriendRequest);
+	setContext('openPongWindow', openPongWindow);
 	setContext('friendInfoId', friendInfoId);
 	setContext('chats', chats);
 	setContext('chatsPublic', chatsPublic);

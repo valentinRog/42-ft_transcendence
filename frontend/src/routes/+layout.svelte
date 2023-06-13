@@ -43,29 +43,57 @@
 		cursor: url($click), auto;
 	}
 
-
 	::-webkit-scrollbar {
 		width: 1rem;
 	}
 	::-webkit-scrollbar-track {
-		background-image: url("/scroll-back.png");
+		background-image: url('/scroll-back.png');
 		background-repeat: repeat;
-	}	
+	}
 	::-webkit-scrollbar-thumb {
 		margin: 0 0.2rem;
 		background-color: $grey;
 		@include tab-border;
-	}	
+	}
 	::-webkit-scrollbar-button {
-		background-image: url("/arrow-down.png");
+		background-image: url('/arrow-down.png');
 		background-size: 0.5rem;
 		background-repeat: no-repeat;
-		background-position: center; 
+		background-position: center;
 		background-color: $grey;
 		@include tab-border;
 	}
-	
+
 	::-webkit-scrollbar-button:vertical:decrement {
-		background-image: url("/arrow-up.png");
+		background-image: url('/arrow-up.png');
+	}
+
+	// a vérifier !!!
+	scrollbar {
+		width: 1rem;
+	}
+
+	scrollbartrack {
+		background-image: url('/scroll-back.png');
+		background-repeat: repeat;
+	}
+
+	scrollbarthumb {
+		margin: 0 0.2rem;
+		background-color: $grey;
+		@include tab-border;
+	}
+
+	scrollbarbutton {
+		background-image: url('/arrow-down.png');
+		background-size: 0.5rem;
+		background-repeat: no-repeat;
+		background-position: center;
+		background-color: $grey;
+		@include tab-border;
+	}
+
+	scrollbarbutton[orient='vertical'][type='decrement'] {
+		background-image: url('/arrow-up.png');
 	}
 </style>

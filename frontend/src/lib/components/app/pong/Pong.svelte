@@ -52,9 +52,7 @@
 			{:else}
 				<button class="unavailable">matchmake</button>
 			{/if}
-			<button class="unavailable">
-				invitations
-			</button>
+			<button class="unavailable"> invitations </button>
 		</DropDown>
 		<DropDown name="settings">
 			<RightDrop name="scale">
@@ -68,6 +66,15 @@
 	</div>
 	{#if room !== ''}
 		<PongGame {scale} {index} {room} />
+	{:else}
+		<div class="empty-background">
+			<div>
+				<div class="smiley">
+					<img src="offline.png" />
+				</div>
+				<p>Sorry, no game at the moment.</p>
+			</div>
+		</div>
 	{/if}
 </div>
 
@@ -76,16 +83,46 @@
 		padding: 0.2rem;
 
 		div.menu {
-		@include tab-border(white, $dark-grey);
-
+			@include tab-border(white, $dark-grey);
 			display: flex;
-
 			button:not(.unavailable) {
 				@include dropdown-button;
 			}
 
 			button.unavailable {
 				@include dropdown-button(false);
+			}
+		}
+		.empty-background {
+			margin: 0.2rem 0;
+			width: 30rem;
+			height: 20rem;
+			@include tab-border(white, $dark-grey);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			div {
+				@include tab-border(white, $dark-grey);
+				width: 15rem;
+				height: 8rem;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-direction: column;
+				.smiley {
+					height: fit-content;
+					width: fit-content;
+					@include tab-border;
+					img {
+						height: 2rem;
+						width: 2rem;
+						padding: 0.3rem;
+						@include tab-border($dark-grey, $light-grey);
+					}
+				}
+				p {
+					margin: 0.5rem;
+				}
 			}
 		}
 	}

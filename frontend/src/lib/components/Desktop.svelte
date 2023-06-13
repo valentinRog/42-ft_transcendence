@@ -10,7 +10,7 @@
 	const openChatWindow = Context.openChatWindow();
 	const openChatForumWindow = Context.openChatForumWindow();
 	const friendInfoId = Context.friendInfoId();
-
+	const openPongWindow = Context.openPongWindow();
 	const openFriendRequest = Context.openFriendRequest();
 	const appInstances = Context.appInstances();
 	const zstack = Context.zstack();
@@ -39,6 +39,11 @@
 			addInstance('FriendRequest');
 			$selected = null;
 			openFriendRequest.set(false);
+		}
+		if ($openPongWindow) {
+			addInstance('Pong');
+			$selected = null;
+			openPongWindow.set(false);
 		}
 	}
 

@@ -27,36 +27,34 @@
 	if (login) {
 		fetchWithToken(`users/avatar/${login}`)
 			.then((res) => {
-			if (res.status === 200 || res.status === 201) {
-				return res.blob();
-			} else {
-				throw new Error('Avatar fetch failed');
-			}
+				if (res.status === 200 || res.status === 201) {
+					return res.blob();
+				} else {
+					throw new Error('Avatar fetch failed');
+				}
 			})
 			.then((blob) => (imgUrl = URL.createObjectURL(blob)))
 			.catch(() => {
 				imgUrl = '/avatar.png';
 			});
-		}
+	}
 
+	let fileinput: HTMLInputElement;
 
-	let fileinput : HTMLInputElement;
-
-	const onFileSelected = (e : any)=>{
+	const onFileSelected = (e: any) => {
 		let image = e.target.files[0];
 		const formData = new FormData();
-        formData.append('file', image);
+		formData.append('file', image);
 
 		fetchWithToken('users/upload', {
 			method: 'POST',
 			body: formData
 		})
-		.then((res) => res.json())
+			.then((res) => res.json())
 			.then((data) => {
 				imgUrl = URL.createObjectURL(image);
 			});
-	}
-
+	};
 </script>
 
 <div id="box">
@@ -67,8 +65,14 @@
 				<li class="box">Login: {currentUser.login || ''}</li>
 			</div>
 			<li class="pic">
-				<input type="file" id="file-upload" accept=".jpg, .jpeg, .png" on:change={(e)=>onFileSelected(e)} bind:this={fileinput}>
-				<img src={imgUrl}>
+				<input
+					type="file"
+					id="file-upload"
+					accept=".jpg, .jpeg, .png"
+					on:change={(e) => onFileSelected(e)}
+					bind:this={fileinput}
+				/>
+				<img src={imgUrl} />
 			</li>
 		</div>
 		{#if username === $user?.username}
@@ -126,7 +130,7 @@
 					width: auto;
 				}
 
-				input[type="file"] {
+				input[type='file'] {
 					position: absolute;
 					top: 0;
 					left: 0;
@@ -149,6 +153,7 @@
 			@include tab-contour-hollow;
 			background-color: white;
 			div {
+				margin-bottom: 0.2rem;
 				display: flex;
 				align-items: center;
 				.status {

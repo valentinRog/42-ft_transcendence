@@ -147,10 +147,6 @@
 
 <style lang="scss">
 	#box {
-		background: #c0c0c0;
-		color: #000;
-		font-family: 'MS Sans Serif', sans-serif;
-		box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, 0.5);
 		width: 30rem;
 		height: 17rem;
 	}

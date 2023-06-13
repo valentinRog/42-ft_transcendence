@@ -68,7 +68,7 @@
 								<h5>
 									{#each chat.chatUsers as chatUser, i}
 										{#if chatUser.user.username != $user?.username}
-											{chatUser.user.username + (chat.chatUsers.length - i > 1 ? ', ' : '')}
+											{chatUser.user.username + (chat.chatUsers.length - 1 - i > 1 ? ', ' : '')}
 										{/if}
 									{/each}
 								</h5>
@@ -83,8 +83,11 @@
 						{#if chat.messages.length > 0}
 							<div class="message-details">
 								<p>
-									{getLastMessageSender(chat) === $user?.username ? "you" : getLastMessageSender(chat)}
-									: {chat.messages[chat.messages.length - 1].content}</p>
+									{getLastMessageSender(chat) === $user?.username
+										? 'you'
+										: getLastMessageSender(chat)}
+									: {chat.messages[chat.messages.length - 1].content}
+								</p>
 								<span class="timestamp"
 									>{timeDifference(
 										now,
@@ -110,7 +113,7 @@
 
 <style lang="scss">
 	#box {
-		width: 30rem;
+		width: 20rem;
 	}
 
 	#chat-window {
@@ -133,9 +136,14 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		max-width: 9.5rem;
+		max-width: 12rem;
+		h5 {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			max-width: 15rem;
+		}
 	}
-	
+
 	.chat-content {
 		position: relative;
 		display: flex;
@@ -174,6 +182,6 @@
 
 	.timestamp {
 		font-size: 0.8rem;
-		color: rgb(58, 58, 58);
+		color: $dark-grey;
 	}
 </style>
