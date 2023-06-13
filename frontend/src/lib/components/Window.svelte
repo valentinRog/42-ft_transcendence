@@ -125,7 +125,7 @@
 >
 	<div class="border-inside">
 		<div
-			class="window "
+			class="window"
 			on:mousedown={() => {
 				moving = true;
 			}}
@@ -153,7 +153,7 @@
 				<p class="title">{name}</p>
 			{/if}
 			<div class="buttons">
-				{#if name === 'Chat' && currentChat && currentChat.isGroupChat && currentChat.accessibility === "private"}
+				{#if name === 'Chat' && currentChat && currentChat.isGroupChat && currentChat.accessibility === 'private'}
 					<button on:click={() => leaveGroup()}>
 						<div class="border-inside">
 							<i class="fas fa-sign-out-alt" />
@@ -205,7 +205,7 @@
 		opacity: 0.7;
 		color: $dark-grey;
 	}
-	
+
 	.dialog {
 		width: 18.75rem;
 		height: 9.375rem;

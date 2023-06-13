@@ -15,6 +15,7 @@
 	const contacts = Context.contacts();
 	const friendRequest = Context.friendRequest();
 	const openFriendRequest = Context.openFriendRequest();
+	const openPongWindow = Context.openPongWindow();
 	const friendInfoId = Context.friendInfoId();
 
 	let friendInput: string = '';
@@ -41,10 +42,6 @@
 			showModal = true;
 		}
 		friendInput = '';
-	}
-
-	async function openRequest() {
-		$openFriendRequest = true;
 	}
 
 	async function removeFriend(friendUsername: string) {
@@ -122,6 +119,12 @@
 	const addInstance = Context.addInstance();
 	const selected = Context.selected();
 	let visible: number = 0;
+
+	function spectateGame(friend : string) {
+		$socket.emit('spectate', { friend: friend });
+		$openPongWindow = true;
+	}
+
 </script>
 
 <div class="box">
@@ -141,14 +144,12 @@
 						on:click={selectFriend}
 					/>
 				{/if}
-				<div
-					class="name-options"
+				<div class="name-options"
 					on:mouseleave={() => {
 						visible = 0;
 					}}
 				>
-					<p
-						class="username"
+					<p class="username"
 						on:click={() => {
 							visible = visible === friend.id ? 0 : friend.id;
 						}}
@@ -166,7 +167,7 @@
 									$selected = null;
 								}}
 							/>
-							{#if friend.status === 'online' || friend.status === 'in-game' || friend.status === 'spectator'}
+							{#if friend.status === 'online'|| friend.status == 'in-game' || friend.status === 'spectator'}
 								<img
 									class="option-icons"
 									src="/joystick.png"
@@ -183,11 +184,13 @@
 					</div>
 				</div>
 				{#if friend.status === 'online'}
-					<img class="status" src="/online.png" alt="online" />
+				<img class="status" src="/online.png" alt="online" />
 				{:else if friend.username === 'vrogiste' && friend.status === 'in-game'}
 					<img class="status" src="/in-game-val.png" alt="in-game" />
 				{:else if friend.status === 'in-game'}
+				<a href="#" on:click={() => spectateGame(friend.username)}>
 					<img class="status" src="/in-game.png" alt="in-game" />
+				</a>
 				{:else if friend.status === 'spectator'}
 					<img class="status" src="/spectator.png" alt="spectator" />
 				{:else}
@@ -204,7 +207,7 @@
 		<span class="notification-badge">
 			<NotificationBadge count={$friendRequest.length} />
 		</span>
-		<button on:click={() => openRequest()}>Friend requests</button>
+		<button on:click={() => $openFriendRequest = true}>Friend requests</button>
 	</div>
 </div>
 

@@ -7,6 +7,7 @@ import {
 import { Socket } from 'socket.io';
 import { SocketGateway } from '../websocket/websocket.gateway';
 import { PongGame } from './pong.class';
+import e from 'express';
 
 type Input = {
   room: string;
@@ -26,6 +27,7 @@ type Input = {
 })
 export class PongGateway extends SocketGateway {
   private games: Map<string, PongGame> = new Map();
+  private rooms: Map<string, string> = new Map(); // map clientid and room
 
   @SubscribeMessage('ping')
   handlePing(@ConnectedSocket() client: Socket, @MessageBody() data: number) {
@@ -40,16 +42,25 @@ export class PongGateway extends SocketGateway {
       this.games.set(data.room, game);
     }
     if (data.index === 0) {
+      this.rooms.set(client.id, data.room);
       this.games.get(data.room).setPlayer1(client);
       const p1 = this.webSocketService.getClientName(client);
       this.userService.updateUserStatus(p1, 'in-game');
       client.emit('index', 0);
     } else if (data.index === 1) {
+      this.rooms.set(client.id, data.room);
       this.games.get(data.room).setPlayer2(client);
       const p2 = this.webSocketService.getClientName(client);
       this.userService.updateUserStatus(p2, 'in-game');
       client.emit('index', 1);
     }
+  }
+
+  @SubscribeMessage('spectate')
+  handleSpecate(client: Socket, data: { friend: string }) {
+    console.log('spectate', data);
+    const friend = this.webSocketService.getSocket(data.friend);
+    client.emit('enter-room', { room: this.rooms.get(friend.id), index: 2 });
   }
 
   @SubscribeMessage('input')
@@ -94,11 +105,11 @@ export class PongGateway extends SocketGateway {
 
   @SubscribeMessage('leave-room')
   async handleLeaveRoom(client: Socket, data: { room: string; index: number }) {
-    console.log('leave-room', data);
     client.leave(data.room);
     const game = this.games.get(data.room);
     if (game) {
       if (data.index === 0 || data.index === 1) {
+        this.rooms.delete(client.id);
         await this.gameEnd(game);
         this.games.delete(data.room);
         const result = data.index === 0 ? 1 : 0;
