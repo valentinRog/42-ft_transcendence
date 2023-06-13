@@ -83,8 +83,11 @@
 						{#if chat.messages.length > 0}
 							<div class="message-details">
 								<p>
-									{getLastMessageSender(chat) === $user?.username ? "you" : getLastMessageSender(chat)}
-									: {chat.messages[chat.messages.length - 1].content}</p>
+									{getLastMessageSender(chat) === $user?.username
+										? 'you'
+										: getLastMessageSender(chat)}
+									: {chat.messages[chat.messages.length - 1].content}
+								</p>
 								<span class="timestamp"
 									>{timeDifference(
 										now,
@@ -140,7 +143,7 @@
 			max-width: 15rem;
 		}
 	}
-	
+
 	.chat-content {
 		position: relative;
 		display: flex;

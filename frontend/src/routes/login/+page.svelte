@@ -57,15 +57,11 @@
 		<div class="top-bar">
 			<div class="buttons">
 				<button>
-					<div class="border-inside">
-						?
-					</div>
-					</button>
+					<div class="border-inside">?</div>
+				</button>
 				<button>
-					<div class="border-inside">
-						X
-					</div>
-					</button>
+					<div class="border-inside">X</div>
+				</button>
 			</div>
 		</div>
 		<div class="content">
