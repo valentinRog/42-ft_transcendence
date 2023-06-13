@@ -66,7 +66,6 @@
 		export const openChatWindow = (): Writable<boolean> => getContext('openChatWindow');
 		export const openChatForumWindow = (): Writable<boolean> => getContext('openChatForumWindow');
 
-
 		export type App =
 			| 'Pong'
 			| 'Paint'
@@ -76,7 +75,8 @@
 			| 'Profile'
 			| 'Conversation'
 			| 'Forum'
-			| 'FriendRequest';
+			| 'FriendRequest'
+			| 'Internet';
 
 		export interface AppInstance {
 			readonly componentType: App;
@@ -106,10 +106,10 @@
 		export const fetchFriendRequest = (): (() => Promise<any>) => getContext('fetchFriendRequest');
 		export const fetchGameRequest = (): (() => Promise<any>) => getContext('fetchGameRequest');
 		export const fetchChats = (): (() => Promise<any>) => getContext('fetchChats');
-		export const fetchChatById = (): ((chatId: number) => Promise<any>) => getContext('fetchChatById');
+		export const fetchChatById = (): ((chatId: number) => Promise<any>) =>
+			getContext('fetchChatById');
 		export const fetchPublicChats = (): ((start: number, limit: number) => Promise<any>) =>
 			getContext('fetchPublicChats');
-		
 
 		export const socket = (): Readable<Socket> => getContext('socket');
 
@@ -129,6 +129,7 @@
 	import Profile from '$lib/components/app/Profile.svelte';
 	import Forum from '$lib/components/app/Forum.svelte';
 	import Conversation from '$lib/components/app/Conversation.svelte';
+	import Internet from '$lib/components/app/Internet.svelte';
 	import FriendRequest from '$lib/components/app/FriendRequest.svelte';
 	import { token, user } from '$lib/stores';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
@@ -181,6 +182,7 @@
 		Profile: Profile,
 		Conversation: Conversation,
 		Forum: Forum,
+		Internet: Internet
 	});
 
 	const appInstances = writable(new Map<string, Context.AppInstance>());

@@ -2,7 +2,6 @@
 	import Window from '$lib/components/Window.svelte';
 	import Tab from '$lib/components/Tab.svelte';
 	import Start from '$lib/components/Start.svelte';
-	import { user } from '$lib/stores';
 	import { Context } from '$lib/components/Context.svelte';
 	import Clock from './Clock.svelte';
 	import NotificationBadge from './NotificationBadge.svelte';
@@ -89,6 +88,10 @@
 		Paint: {
 			TabProps: { name: 'Paint', icon: '/paint.png' },
 			DesktopProps: { name: 'Paint', icon: '/paint.png' }
+		},
+		Internet: {
+			TabProps: { name: 'Internet', icon: '/internet.png' },
+			DesktopProps: { name: 'Internet', icon: '/internet.png' }
 		}
 	};
 
@@ -136,20 +139,20 @@
 						$selected = null;
 					}}
 				>
-				<img src={v.DesktopProps.icon} alt={v.DesktopProps.name} draggable="false" />
-				{#if k === 'Conversation'}
-				<span class="notification-badge">
-					<NotificationBadge count={0} />
-				</span>
-				{:else if k === 'Contact'}
-				<span class="notification-badge">
-					<NotificationBadge count={$friendRequest.length} />
-				</span>
-				{:else if k === 'Pong'}
-				<span class="notification-badge">
-					<NotificationBadge count={$gameRequest.length} />
-				</span>
-				{/if}
+					<img src={v.DesktopProps.icon} alt={v.DesktopProps.name} draggable="false" />
+					{#if k === 'Conversation'}
+						<span class="notification-badge">
+							<NotificationBadge count={0} />
+						</span>
+					{:else if k === 'Contact'}
+						<span class="notification-badge">
+							<NotificationBadge count={$friendRequest.length} />
+						</span>
+					{:else if k === 'Pong'}
+						<span class="notification-badge">
+							<NotificationBadge count={$gameRequest.length} />
+						</span>
+					{/if}
 					<div class="icon-text">
 						<span>{v.DesktopProps.name}</span>
 					</div>
