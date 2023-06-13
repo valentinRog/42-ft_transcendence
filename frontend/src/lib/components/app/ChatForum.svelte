@@ -2,7 +2,6 @@
     import { onMount, onDestroy } from 'svelte';
     import { Context } from '$lib/components/Context.svelte';
     import { user } from '$lib/stores';
-	import { construct_svelte_component_dev } from 'svelte/internal';
 
     const socket = Context.socket();
     const chats = Context.chats();
@@ -13,13 +12,31 @@
     let chatIdLocal: number | null = $chatId;
     let messageContent = '';
     let roleId: number;
+	let isUserBanned = false;
+	let disabled = false;
 
     $: {
-        currentChat = $chats.find((chat) => chat.id === chatIdLocal);
+    	currentChat = $chats.find((chat) => chat.id === chatIdLocal);
         roleId = currentChat?.chatUsers.find((cu: any) => cu.userId === $user?.id)?.roleId;
+
+		if (currentChat) {
+			const chatUser = currentChat.chatUsers.find((cu: any) => cu.userId === $user?.id);
+			if (chatUser && chatUser.bans) {
+				const ban = chatUser.bans.find((ban: any) => ban.userId === $user?.id 
+					&& (ban.expiresAt == null || new Date(ban.expiresAt) > new Date()));
+				isUserBanned = !!ban;
+			}
+		}
+		disabled = isUserBanned;
     }
 	
 	onMount(() => {
+		if (currentChat && currentChat.bans) {
+			const ban = currentChat.bans.find((ban: any) => ban.userId === $user?.id 
+				&& (ban.expiresAt == null || new Date(ban.expiresAt) > new Date()));
+			isUserBanned = !!ban;
+			if (isUserBanned) chatIdLocal = null;
+		} else
 		$socket.emit('joinRoom', { chatId: chatIdLocal });
 	});
 
@@ -47,34 +64,47 @@
     function selectUser(user: any) {
         selectedUser = user;
     }
+
+	function banUser(userId: number, duration: number | null) {
+		$socket.emit('banUser', { chatId: chatIdLocal, userId, duration });
+	}
+
+	function unbanUser(userId: number) {
+		$socket.emit('unbanUser', { chatId: chatIdLocal, userId });
+	}
+
+	$socket.on('userBan', (data: any) => {
+		if (data.chatId === chatIdLocal)
+			isUserBanned = true;
+		chatIdLocal = null;
+	});
 </script>
 
 <div id="box">
 	<div id="chat-window">
-		{#if !currentChat}
-			<h5>Waiting for messages...</h5>
+		{#if isUserBanned && chatIdLocal === null}
+			<p>You are banned from this Topics</p>
 		{:else}
-			<h5>▪ End of messages ▪</h5>
+			<ul>
+				{#if currentChat}
+					{#each currentChat?.messages || [] as message, i (i)}
+						<li class={findUser(message.userId, chatIdLocal) === $user?.username ? 'self' : 'other'}>
+							<div class="message-header">
+								{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
+									<strong>{findUser(message.userId, chatIdLocal)}</strong>
+								{/if}
+							</div>
+							<div class="message-content">{message.content}</div>
+						</li>
+					{/each}
+				{/if}
+			</ul>
 		{/if}
-		<ul>
-			{#if currentChat}
-				{#each currentChat?.messages || [] as message, i (i)}
-					<li class={findUser(message.userId, chatIdLocal) === $user?.username ? 'self' : 'other'}>
-						<div class="message-header">
-							{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
-								<strong>{findUser(message.userId, chatIdLocal)}</strong>
-							{/if}
-						</div>
-						<div class="message-content">{message.content}</div>
-					</li>
-				{/each}
-			{/if}
-		</ul>
 	</div>
 	<div id="sendMessage-window">
 		<form on:submit|preventDefault={sendMessage} class="send-message-form">
-			<input type="text" bind:value={messageContent} class="message-input" />
-			<button type="submit" class="btn send-btn">Send</button>
+			<input type="text" bind:value={messageContent} class="message-input" disabled={disabled} />
+			<button type="submit" class="btn send-btn" disabled={disabled}>Send</button>
 		</form>
 	</div>
     <div id="user-list">
@@ -92,7 +122,7 @@
                             {#if roleId <= 2 && roleId < chatUser.roleId}
                                 <div>
                                     <button>TimeOut</button>
-                                    <button>Ban</button>
+                                    <button on:click={() => banUser(chatUser.userId, null)} >Ban</button>
                                 </div>
                             {/if}
                         {/if}

@@ -117,7 +117,6 @@ export abstract class SocketGateway
     const username = this.webSocketService.getClientName(client);
     const user = await this.userService.getUser(username);
 
-    
     const otherChatUser = chat
       ? chat.chatUsers.find((c) => (c as any).user.username !== username,) : null;
     const socket = this.webSocketService.getSocket(
@@ -162,7 +161,7 @@ export abstract class SocketGateway
     } 
     else {
       if (!chat.chatUsers.find((c) => (c as any).user.id === user.id)) {
-        const newUser = await this.chatService.addUserToChat(chat.id, user.id);
+        await this.chatService.addUserToChat(chat.id, user.id);
         const newchat = await this.chatService.findChatById(chat.id);
         
         client.join(`chat-${chat.id}`);
@@ -201,6 +200,32 @@ export abstract class SocketGateway
         .to(`chat-${data.chatId}`)
         .emit('updateChatName', { chatId: data.chatId, newName: data.newName });
     }
+  }
+
+  //BAN//
+
+  @SubscribeMessage('banUser')
+  async handleBanUser(
+    client: Socket, 
+    payload: { chatId: number; userId: number; duration: number | null }
+    ) {
+    const { chatId, userId, duration } = payload;
+    await this.chatService.banUser(chatId, userId, duration);
+
+    const user = await this.userService.getUserById(userId);
+    const socket = await this.webSocketService.getSocket(user.username);
+
+    if (socket) 
+      socket.emit('userBan', { chatId, duration });
+
+    return ;
+  }
+
+  @SubscribeMessage('unbanUser')
+  async handleUnbanUser(client: Socket, payload: { chatId: number; userId: number }) {
+    const { chatId, userId } = payload;
+    await this.chatService.unbanUser(chatId, userId);
+    return ;
   }
 
 

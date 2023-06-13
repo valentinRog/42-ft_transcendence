@@ -79,6 +79,7 @@ export class ChatService {
           },
         },
         messages: true,
+        bans: true,
       },
     });
     return chat;
@@ -172,5 +173,43 @@ export class ChatService {
           data: { roleId: newRoleId },
           include: { user: true },
       });
+  }
+
+
+  //BAN//
+
+  async banUser(chatId: number, userId: number, duration: number | null) {
+    const expiresAt = duration ? new Date(Date.now() + duration * 1000) : null;
+
+    await this.prisma.ban.create({
+      data: {
+        chatId,
+        userId,
+        expiresAt,
+      },
+    });
+  }
+
+  async unbanUser(chatId: number, userId: number) {
+    const ban = await this.prisma.ban.findUnique({
+      where: {
+        chatId_userId: {
+          chatId,
+          userId,
+        },
+      },
+    });
+
+    if (!ban)
+      console.log('No ban found');
+
+    await this.prisma.ban.delete({
+      where: {
+        chatId_userId: {
+          chatId,
+          userId,
+        },
+      },
+    });
   }
 }
