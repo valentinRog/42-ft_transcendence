@@ -91,7 +91,7 @@ export class UserService {
 
   async removeFriend(userName: string, friendId: number) {
     if (!(await this.findFriend(userName, friendId))) {
-      throw new ForbiddenException('User not in friends list');
+      throw new NotFoundException('User not in friends list');
     }
     try {
       const user = await this.prisma.user.update({
@@ -107,7 +107,6 @@ export class UserService {
           },
         },
       });
-      // Remove the user from the friend's friend list
       const friend = await this.prisma.user.update({
         where: { id: friendId },
         data: {
@@ -121,7 +120,6 @@ export class UserService {
           },
         },
       });
-      // Notify the friend that the user has removed them
       if ((await this.getUserStatus(friend.username)) != 'offline') {
         this.socketService.sendToUser(friend.username, userName, 'friend');
       }

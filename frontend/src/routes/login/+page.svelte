@@ -136,11 +136,6 @@
 			display: flex;
 			align-items: center;
 		}
-
-		input {
-			@include form-95;
-			margin-left: 10px;
-		}
 	}
 
 	div#login {

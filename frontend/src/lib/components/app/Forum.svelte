@@ -3,6 +3,7 @@
 	import { Context } from '$lib/components/Context.svelte';
 	import { user } from '$lib/stores';
 	import Contact from './Contact.svelte';
+	import { logout } from '$lib/utils/connect';
 
     const socket = Context.socket();
     const chatId = Context.chatId();
@@ -18,6 +19,8 @@
 	let groupName = "";
 	let password = "";
 	let accessibility = "public";
+	let selectedChat: any = null;
+    let chatPassword = "";
 
 	onMount(() => {
 		fetchPublicChats(start, limit);
@@ -41,12 +44,31 @@
 		});
 	}
 
-	function startChat(chatNumber: number) {
-		$chatId = chatNumber;
-		$openChatForumWindow = true;
-	}
+	function startChat(chat : Context.Chat) {
+        if (chat.accessibility === 'protected' 
+			&& !chat.chatUsers.find((c: any) => c.user.username === $user?.username)) {
+            selectedChat = chat;
+        } else {
+            $chatId = chat.id;
+            $openChatForumWindow = true;
+        }
+    }
+
+	function enterChat() {
+        if (chatPassword === selectedChat.password) {
+            $chatId = selectedChat.id;
+			$socket.emit('joinChat', { chatId: selectedChat.id, userId: $user?.id });
+            $openChatForumWindow = true;
+            selectedChat = null;
+            chatPassword = "";
+        } else {
+            alert("Wrong password");
+        }
+    }
 
 	function switchView(view: string) {
+		if (view === "my")
+			selectedChat = null;
 		currentView = view;
 	}
 
@@ -81,10 +103,12 @@
 	<button on:click={() => switchView('public')}>Public Topics</button>
 	<button on:click={() => switchView('my')}>My Topics</button>
 	{#if currentView === 'public'}
-		<h3>Public Topics</h3>
+    <h3>Public Topics</h3>
 		<ul>
-			{#each $chatsPublic as chat (chat)}
-				<li on:click={() => startChat(chat.id)}>{chat.name}</li>
+			{#each $chatsPublic as chat (chat.id)}
+				<li>
+					<span on:click={() => startChat(chat)}>{chat.name}</span>
+				</li>
 			{/each}
 		</ul>
 	{:else if currentView === 'my'}
@@ -92,11 +116,19 @@
 		<ul>
 			{#each $chats as chat (chat.id)}
 				{#if chat.accessibility !== 'private'}
-					<li on:click={() => startChat(chat.id)}>{chat.name}</li>
+					<li on:click={() => startChat(chat)}>{chat.name}</li>
 				{/if}
 			{/each}
 		</ul>
 	{/if}
+
+{#if selectedChat !== null}
+    <label>
+        Enter Password for {selectedChat.name} :
+        <input type="password" bind:value={chatPassword} required>
+        <button on:click={enterChat}>Enter</button>
+    </label>
+{/if}
 </div>
 
 <style lang="scss">
