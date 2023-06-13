@@ -61,6 +61,11 @@ export abstract class SocketGateway
     client.join(`chat-${payload.chatId}`);
   }
 
+  @SubscribeMessage('leaveRoom')
+  handleLeaveChatRoom(client: Socket, payload: { chatId: number }) {
+    client.leave(`chat-${payload.chatId}`);
+  }
+
   @SubscribeMessage('joinChat')
   async handleJoinChat(client: any, payload: any) {
     const chatId = payload.chatId;

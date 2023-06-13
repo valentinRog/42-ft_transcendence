@@ -344,7 +344,7 @@
 
 	function getUnreadMessagesCount(chat: any, chatUser: any) {
 		if (chat.messages.length > 0) {
-			const lastReadMessageId = chatUser.lastReadMessageId || 0;
+			const lastReadMessageId = chatUser ? chatUser.lastReadMessageId || 0 : 0;
 			const unreadMessages = chat.messages.filter((message: any) => message.id > lastReadMessageId);
 			const unreadCount = unreadMessages.length;
 

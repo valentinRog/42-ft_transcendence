@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount, afterUpdate } from 'svelte';
+    import { onMount, onDestroy } from 'svelte';
     import { Context } from '$lib/components/Context.svelte';
     import { user } from '$lib/stores';
 
@@ -17,6 +17,10 @@
         currentChat = $chats.find((chat) => chat.id === chatIdLocal);
         roleId = currentChat?.chatUsers.find((cu: any) => cu.userId === $user?.id)?.roleId;
     }
+	
+	onMount(() => {
+		$socket.emit('joinRoom', { chatId: chatIdLocal });
+	});
 
     async function sendMessage() {
 		if (messageContent.trim() === '') return;
@@ -42,6 +46,10 @@
     function selectUser(user: any) {
         selectedUser = user;
     }
+
+	onDestroy(() => {
+		$socket.emit('leaveRoom', { chatId: chatIdLocal }); //ATTENTION
+	});
 </script>
 
 <div id="box">
