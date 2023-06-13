@@ -183,6 +183,9 @@
 				display: flex;
 				align-items: center;
 				flex-direction: row;
+				&:active {
+					@include tab-border(white, black);
+				}
 				div {
 					display: flex;
 					padding: 0.3rem;
