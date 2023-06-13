@@ -38,6 +38,25 @@
 				imgUrl = '/avatar.png';
 			});
 		}
+
+
+	let fileinput : HTMLInputElement;
+
+	const onFileSelected = (e : any)=>{
+		let image = e.target.files[0];
+		const formData = new FormData();
+        formData.append('file', image);
+
+		fetchWithToken('users/upload', {
+			method: 'POST',
+			body: formData
+		})
+		.then((res) => res.json())
+			.then((data) => {
+				imgUrl = URL.createObjectURL(image);
+			});
+	}
+
 </script>
 
 <div id="box">
@@ -48,7 +67,8 @@
 				<li class="box">Login: {currentUser.login || ''}</li>
 			</div>
 			<li class="pic">
-				<img class="profile-pic" src={imgUrl} alt="profile picture" />
+				<input type="file" id="file-upload" accept=".jpg, .jpeg, .png" on:change={(e)=>onFileSelected(e)} bind:this={fileinput}>
+				<img src={imgUrl} alt="Clickable Image">
 			</li>
 		</div>
 		{#if username === $user?.username}
@@ -88,6 +108,10 @@
 			display: flex;
 			align-items: center;
 			.pic {
+				display: inline-block;
+				position: relative;
+				cursor: pointer;
+
 				@include tab-contour-hollow;
 				padding: 0.15rem;
 				margin-right: 0.25rem;
@@ -100,6 +124,16 @@
 					margin: 0 auto;
 					height: 4.5rem;
 					width: auto;
+				}
+
+				input[type="file"] {
+					position: absolute;
+					top: 0;
+					left: 0;
+					opacity: 0;
+					cursor: pointer;
+					width: 100%;
+					height: 100%;
 				}
 			}
 		}
