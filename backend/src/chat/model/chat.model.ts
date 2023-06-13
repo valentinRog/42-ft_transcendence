@@ -5,6 +5,8 @@ export type Chat = {
     id: number;
     isGroupChat: boolean;
     name: string;
+    accessibility: string;
+    password: string;
     updatedAt: Date;
 };
 

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount, afterUpdate } from 'svelte';
-	import type { Socket } from 'socket.io-client';
 	import { Context } from '$lib/components/Context.svelte';
 	import { user } from '$lib/stores';
 
@@ -137,10 +136,6 @@
 		order: 2;
 	}
 
-	.leave-group {
-		float: right;
-	}
-
 	h5 {
 		margin: 0;
 		text-align: center;
@@ -208,7 +203,6 @@
 		padding-bottom: 0.3rem;
 		font-size: 0.9em;
 		@include tab-border(white, black);
-		// border-radius: 0.8rem;
 		background-color: rgb(229, 229, 229);
 	}
 

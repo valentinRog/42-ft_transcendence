@@ -8,7 +8,6 @@
 	import NotificationBadge from './NotificationBadge.svelte';
 
 	const chats = Context.chats();
-	const chatId = Context.chatId();
 	const openChatWindow = Context.openChatWindow();
 	const openChatForumWindow = Context.openChatForumWindow();
 	const friendInfoId = Context.friendInfoId();

@@ -68,7 +68,7 @@
 			</div>
 			<li class="pic">
 				<input type="file" id="file-upload" accept=".jpg, .jpeg, .png" on:change={(e)=>onFileSelected(e)} bind:this={fileinput}>
-				<img src={imgUrl} alt="Clickable Image">
+				<img src={imgUrl}>
 			</li>
 		</div>
 		{#if username === $user?.username}

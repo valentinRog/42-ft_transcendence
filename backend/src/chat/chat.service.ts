@@ -6,7 +6,7 @@ import { Chat, Message } from '../chat/model/chat.model';
 export class ChatService {
   constructor(private prisma: PrismaService) {}
 
-  async getAllUserChats(username: string) {
+  async getAllUserChats(username: string) : Promise<Chat[]>{
     const chats = await this.prisma.chat.findMany({
       where: {
         chatUsers: {
@@ -125,5 +125,44 @@ export class ChatService {
       },
     });
     return result;
+  }
+
+  async getChatsPublic(start: number, limit: number) : Promise<Chat[]>{
+    const chats = await this.prisma.chat.findMany({
+      where: {
+        OR: [
+          {
+            accessibility: 'public'
+          },
+          {
+            accessibility: 'protected'
+          }
+        ]
+      },
+      include: {
+        messages: true,
+        chatUsers: {
+          include: {
+            user: true
+          }
+        }
+      },
+      skip: start,
+      take: limit
+    });
+    return chats;
+  }
+
+  async addUserToChat(chatId: number, userId: number) {
+    const chatUser = await this.prisma.chatUser.create({
+      data: {
+        chatId: chatId,
+        userId: userId,
+        roleId: 3,
+        createdAt: new Date(),
+        lastReadMessageId: 0,
+      },
+    });
+    return chatUser;
   }
 }
