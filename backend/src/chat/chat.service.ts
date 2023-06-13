@@ -146,24 +146,16 @@ export class ChatService {
     return chats;
   }
   
-
-  //add chatuser to chat
   async addUserToChat(chatId: number, userId: number) {
     const chatUser = await this.prisma.chatUser.create({
       data: {
-        chat: {
-          connect: { id: chatId }
-        },
-        user: {
-          connect: { id: userId }
-        },
+        chatId: chatId,
+        userId: userId,
+        roleId: 3,
         createdAt: new Date(),
         lastReadMessageId: 0,
-        role: {
-          connect: { id: 3 }
-        }
-      }
+      },
     });
     return chatUser;
-  }
+  }  
 }

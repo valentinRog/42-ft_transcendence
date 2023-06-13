@@ -61,6 +61,19 @@ export abstract class SocketGateway
     client.join(`chat-${payload.chatId}`);
   }
 
+  @SubscribeMessage('joinChat')
+  async handleJoinChat(client: any, payload: any) {
+    const chatId = payload.chatId;
+    const userId = payload.userId;
+
+    const newChatUser = await this.chatService.addUserToChat(chatId, userId);
+    const chat = await this.chatService.findChatById(chatId);
+
+    client.join(`chat-${payload.chatId}`);
+    //a modif pour all
+    client.emit('addChat', chat);
+  }
+
   @SubscribeMessage('createGroupChat')
   async handleCreateChat(
     client: Socket,
@@ -144,6 +157,12 @@ export abstract class SocketGateway
       client.emit('updateChat', newchat.id);
     } 
     else {
+      if (!chat.chatUsers.find((c) => (c as any).user.id === user.id)) {
+        const newChatUser = await this.chatService.addUserToChat(chat.id, user.id);
+        const newchat = await this.chatService.findChatById(chat.id);
+        client.join(`chat-${chat.id}`);
+        client.emit('addChat', newchat);
+      }
       await sendMessage();
     }
   }

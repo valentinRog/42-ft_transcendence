@@ -57,6 +57,7 @@
 	function enterChat() {
         if (chatPassword === selectedChat.password) {
             $chatId = selectedChat.id;
+			$socket.emit('joinChat', { chatId: selectedChat.id, userId: $user?.id });
             $openChatForumWindow = true;
             selectedChat = null;
             chatPassword = "";
@@ -66,6 +67,8 @@
     }
 
 	function switchView(view: string) {
+		if (view === "my")
+			selectedChat = null;
 		currentView = view;
 	}
 
