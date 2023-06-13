@@ -11,7 +11,7 @@
 <style lang="scss">
 	.notification-badge {
 		position: absolute;
-		background-color: rgb(213, 1, 1);
+		background-color: rgb(1, 213, 107);
 		color: white;
 		border-radius: 100%;
 		width: 1rem;

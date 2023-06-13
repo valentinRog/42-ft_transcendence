@@ -2,6 +2,7 @@
 	import { user } from '$lib/stores';
 	import { Context } from '$lib/components/Context.svelte';
 	import NotificationBadge from '../NotificationBadge.svelte';
+	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
 
 	const socket = Context.socket();
 
@@ -22,6 +23,9 @@
 
 	fetchFriends();
 
+	let errorMessage: string | null = null;
+	let showModal = false;
+
 	async function addFriend(event: Event) {
 		const form = (event.target as HTMLFormElement).friend.value;
 		const res = await fetchWithToken('notification/add-friend', {
@@ -31,7 +35,11 @@
 			},
 			body: JSON.stringify({ friend: form })
 		});
-		await res.json();
+		const json= await res.json();
+		if (res.status !== 200 && res.status !== 201) {
+			errorMessage = json.message;
+			showModal = true;
+		}
 		friendInput = '';
 	}
 
@@ -117,6 +125,7 @@
 </script>
 
 <div class="box">
+	<ErrorDialog {showModal} {errorMessage} on:close={() => (showModal = false)} />
 	<form on:submit|preventDefault={addFriend} class="add-friend-form">
 		<input type="text" name="friend" bind:value={friendInput} placeholder=" Search..." />
 		<input type="submit" value="Add friend" />

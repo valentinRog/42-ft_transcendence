@@ -222,14 +222,6 @@
 		return data;
 	}
 
-	async function fetchNotification(type : string) {
-		const res = await fetchWithToken('notification/get?type=' + type);
-		const data = await res.json();
-		return data.size;
-	}
-
-	setContext('fetchNotification', fetchNotification);
-
 	async function fetchFriendRequest() {
 		const res = await fetchWithToken('notification/get?type=friend');
 		const data = await res.json();
@@ -270,7 +262,6 @@
 	// ------- EVENTS --------
 
 	$socket.on('friend', (data: { message: string }) => {
-		console.log('add-friend', data.message);
 		fetchFriendRequest();
 		fetchFriends();
 	});
