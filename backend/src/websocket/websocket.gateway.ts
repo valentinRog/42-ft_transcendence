@@ -78,14 +78,6 @@ export abstract class SocketGateway
     client.emit('addChat', chat);
   }
 
-  @SubscribeMessage('updateRole')
-  async handleUpdateRole(client: any, payload: any) {
-      const { chatUserId, newRoleId, chatId } = payload;
-      //need protection 
-      const chatUser = await this.chatService.updateRole(chatUserId, newRoleId);
-      this.server.to(`chat-${chatId}`).emit('roleUpdated', chatUser);
-  }
-
   @SubscribeMessage('createGroupChat')
   async handleCreateChat(
     client: Socket,
@@ -170,8 +162,9 @@ export abstract class SocketGateway
     } 
     else {
       if (!chat.chatUsers.find((c) => (c as any).user.id === user.id)) {
-        const newChatUser = await this.chatService.addUserToChat(chat.id, user.id);
+        const newUser = await this.chatService.addUserToChat(chat.id, user.id);
         const newchat = await this.chatService.findChatById(chat.id);
+        
         client.join(`chat-${chat.id}`);
         client.emit('addChat', newchat);
       }
