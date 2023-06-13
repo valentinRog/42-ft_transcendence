@@ -99,11 +99,16 @@
 						}}>{signup ? 'I have an account' : 'Create an account'}</button
 					>
 					<button type="submit"
-						>{#if signup}Sign Up{:else}Sign In{/if}</button
+					>{#if signup}Sign Up{:else}Sign In{/if}</button
 					>
+					<div class="login-42">
+						<a href="{PUBLIC_BACKEND_URL}/auth/42login">Login with 
+							<img src="/422.png"/>
+						</a>
+					</div>
 				</div>
 			</form>
-			<a href="{PUBLIC_BACKEND_URL}/auth/42login">login with 42</a>
+			
 		</div>
 	</div>
 </div>
@@ -112,7 +117,7 @@
 	div#formular {
 
 		@include form-95;
-
+		background-color: $grey;
 		form {
 			display: flex;
 			flex-direction: column;
@@ -126,25 +131,25 @@
 				width: 25px;
 				height: 25px;
 			}
-
 			label {
+				color: black;
 				width: 7rem;
 			}
 		}
-
+		
 		.form-group {
 			display: flex;
 			align-items: center;
 		}
 	}
-
+	
 	div#login {
 		@include tab-contour;
 		background-color: $grey;
 		width: fit-content;
 		margin: 0 auto;
 		margin-top: 10rem;
-
+		
 		div.top-bar {
 			background-color: $blue;
 			height: 1.5rem;
@@ -156,15 +161,34 @@
 				margin-right: 0.2rem;
 			}
 		}
-
+		
 		.button-container {
 			display: flex;
 			justify-content: center;
+			flex-direction: column;
 			align-items: center;
 			gap: 0.5rem;
 			margin-top: 1rem;
+			.login-42 {
+				display: flex;
+				align-items: center;
+				a {
+					@include tab-border;
+					color: black;
+					background-color: $light-grey;
+					text-decoration: none;
+					height: 1.8rem;
+					width: 10rem;
+					// padding: 0.3rem 1rem;
+					img {
+						height: 1rem;
+						width: auto;
+	
+					}
+				}
+			}
 		}
-
+		
 		.button-container button {
 			font-size: inherit;
 			padding: 0.3rem 1rem;
