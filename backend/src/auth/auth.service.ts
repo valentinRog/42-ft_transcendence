@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
@@ -48,7 +52,7 @@ export class AuthService {
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code == 'P2002') {
-          throw new ForbiddenException('user already exists');
+          throw new ForbiddenException('User already exists');
         }
       }
       throw error;
@@ -74,7 +78,7 @@ export class AuthService {
         error instanceof PrismaClientKnownRequestError &&
         error.code === 'P2002'
       ) {
-        throw new ForbiddenException('credentials taken');
+        throw new ForbiddenException('Credentials taken');
       }
       throw error;
     }
@@ -82,11 +86,11 @@ export class AuthService {
 
   async signin(dto: LogDto) {
     const prisma_user = await this.userService.findUser(dto.login);
-    if (!prisma_user) throw new ForbiddenException('please signup first');
+    if (!prisma_user) throw new NotFoundException('Please signup first');
     if (prisma_user.logFrom42)
-      throw new ForbiddenException('please login with 42');
+      throw new ForbiddenException('Please login with 42');
     const pwMatches = await argon.verify(prisma_user.hash, dto.password);
-    if (!pwMatches) throw new ForbiddenException('credentials incorrect');
+    if (!pwMatches) throw new ForbiddenException('Credentials incorrect');
     if (prisma_user.twoFactorEnabled)
       return this.is2faCodeValid(prisma_user, dto.twoFactor);
     return this.signToken(prisma_user.id, prisma_user.login);

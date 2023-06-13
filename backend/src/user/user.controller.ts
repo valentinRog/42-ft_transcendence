@@ -39,7 +39,7 @@ export class UserController {
   getMyPhoto(@GetUser() user) {
     const path = join(process.cwd(), '/upload', `${user.login}.png`);
     if (!fs.existsSync(path)) {
-      throw new NotFoundException('avatar not found');
+      throw new NotFoundException('Avatar not found');
     }
     const file = createReadStream(
       join(process.cwd(), '/upload', `${user.login}.png`),
@@ -59,7 +59,7 @@ export class UserController {
     const user = await this.userService.getUser(login);
     const path = join(process.cwd(), '/upload', `${user.login}.png`);
     if (!fs.existsSync(path)) {
-      throw new NotFoundException('avatar not found');
+      throw new NotFoundException('Avatar not found');
     }
     const file = createReadStream(
       join(process.cwd(), '/upload', `${user.login}.png`),
@@ -105,7 +105,7 @@ export class UserController {
     const prisma_friend = await this.prisma.user.findUnique({
       where: { username: dto.friend },
     });
-    if (!prisma_friend) throw new ForbiddenException('User not found');
+    if (!prisma_friend) throw new NotFoundException('User not found');
     return await this.userService.removeFriend(username, prisma_friend.id);
   }
 }

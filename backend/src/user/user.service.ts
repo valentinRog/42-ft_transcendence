@@ -91,7 +91,7 @@ export class UserService {
 
   async removeFriend(userName: string, friendId: number) {
     if (!(await this.findFriend(userName, friendId))) {
-      throw new ForbiddenException('User not in friends list');
+      throw new NotFoundException('User not in friends list');
     }
     try {
       const user = await this.prisma.user.update({
