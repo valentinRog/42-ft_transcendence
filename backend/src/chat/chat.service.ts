@@ -180,17 +180,29 @@ export class ChatService {
 
   async banUser(chatId: number, userId: number, duration: number | null) {
     const expiresAt = duration ? new Date(Date.now() + duration * 1000) : null;
-
-    await this.prisma.ban.create({
-      data: {
-        chatId,
-        userId,
-        expiresAt,
-      },
+  
+    const existingBan = await this.prisma.ban.findUnique({
+      where: { chatId_userId: { chatId: chatId, userId: userId } },
     });
-  }
+  
+    if (existingBan) {
+      await this.prisma.ban.update({
+        where: { chatId_userId: { chatId: chatId, userId: userId } },
+        data: { expiresAt: expiresAt },
+      });
+    } else {
+      await this.prisma.ban.create({
+        data: {
+          chatId,
+          userId,
+          expiresAt,
+        },
+      });
+    }
+    return expiresAt;
+  } 
 
-  async unbanUser(chatId: number, userId: number) {
+  async unBanUser(chatId: number, userId: number) {
     const ban = await this.prisma.ban.findUnique({
       where: {
         chatId_userId: {
@@ -201,9 +213,57 @@ export class ChatService {
     });
 
     if (!ban)
-      console.log('No ban found');
+      return ;
 
     await this.prisma.ban.delete({
+      where: {
+        chatId_userId: {
+          chatId,
+          userId,
+        },
+      },
+    });
+  }
+
+  //MUTE//
+
+  async muteUser(chatId: number, userId: number, duration: number | null) {
+    const expiresAt = duration ? new Date(Date.now() + duration * 1000) : null;
+    const existingMute = await this.prisma.mute.findUnique({
+      where: { chatId_userId: { chatId: chatId, userId: userId } },
+    });
+  
+    if (existingMute) {
+      await this.prisma.mute.update({
+        where: { chatId_userId: { chatId: chatId, userId: userId } },
+        data: { expiresAt: expiresAt },
+      });
+    } else {
+      await this.prisma.mute.create({
+        data: {
+          chatId,
+          userId,
+          expiresAt,
+        },
+      });
+    }
+    return expiresAt;
+  }  
+
+  async unMuteUser(chatId: number, userId: number) {
+    const mute = await this.prisma.mute.findUnique({
+      where: {
+        chatId_userId: {
+          chatId,
+          userId,
+        },
+      },
+    });
+
+    if (!mute)
+      return;
+
+    await this.prisma.mute.delete({
       where: {
         chatId_userId: {
           chatId,

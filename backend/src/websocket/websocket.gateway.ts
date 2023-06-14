@@ -210,21 +210,45 @@ export abstract class SocketGateway
     payload: { chatId: number; userId: number; duration: number | null }
     ) {
     const { chatId, userId, duration } = payload;
-    await this.chatService.banUser(chatId, userId, duration);
+    const expiresAt = await this.chatService.banUser(chatId, userId, duration);
 
     const user = await this.userService.getUserById(userId);
     const socket = await this.webSocketService.getSocket(user.username);
 
     if (socket) 
-      socket.emit('userBan', { chatId, duration });
+      socket.emit('userBan', { chatId, expiresAt });
 
     return ;
   }
 
-  @SubscribeMessage('unbanUser')
+  @SubscribeMessage('unBanUser')
   async handleUnbanUser(client: Socket, payload: { chatId: number; userId: number }) {
     const { chatId, userId } = payload;
-    await this.chatService.unbanUser(chatId, userId);
+    await this.chatService.unBanUser(chatId, userId);
+    return ;
+  }
+
+  //MUTE//
+
+  @SubscribeMessage('muteUser')
+  async handleMuteUser(
+    client: Socket, 
+    payload: { chatId: number; userId: number; duration: number | null }
+    ) {
+    const { chatId, userId, duration } = payload;
+    const expiresAt = await this.chatService.muteUser(chatId, userId, duration);
+    const user = await this.userService.getUserById(userId);
+    const socket = await this.webSocketService.getSocket(user.username);
+    if (socket) 
+      socket.emit('userMute', { chatId, expiresAt });
+
+    return ;
+  }
+
+  @SubscribeMessage('unMuteUser')
+  async handleUnMuteUser(client: Socket, payload: { chatId: number; userId: number }) {
+    const { chatId, userId } = payload;
+    await this.chatService.unMuteUser(chatId, userId);
     return ;
   }
 

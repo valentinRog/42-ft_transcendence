@@ -13,8 +13,13 @@
     let messageContent = '';
     let roleId: number;
 	let isUserBanned = false;
+	let isUserMuted = false;
 	let disabled = false;
 	let banExpiresAt: Date | null = null;
+	let muteExpiresAt: Date | null = null;
+
+	let banDuration: number | null = null;
+	let muteDuration: number | null = null;
 
     $: {
     	currentChat = $chats.find((chat) => chat.id === chatIdLocal);
@@ -27,18 +32,28 @@
 			if (isUserBanned) chatIdLocal = null;
 		}
 
-		disabled = isUserBanned;
+		disabled = isUserBanned || isUserMuted;
     }
 	
 	onMount(() => {
 		if (currentChat && currentChat.bans) {
 			const ban = currentChat.bans.find((ban: any) => ban.userId === $user?.id 
 				&& (ban.expiresAt == null || new Date(ban.expiresAt) > new Date()));
+
+			const mute = currentChat.mutes.find((mute: any) => mute.userId === $user?.id 
+				&& (mute.expiresAt == null || new Date(mute.expiresAt) > new Date()));
+
 			isUserBanned = !!ban;
+			isUserMuted = !!mute;
 			if (isUserBanned) {
 				banExpiresAt = ban.expiresAt ? new Date(ban.expiresAt) : null;
 				chatIdLocal = null;
 			}
+			if (isUserMuted) {
+				muteExpiresAt = mute.expiresAt ? new Date(mute.expiresAt) : null;
+				$socket.emit('joinRoom', { chatId: chatIdLocal });
+			}
+
 		} else
 		$socket.emit('joinRoom', { chatId: chatIdLocal });
 	});
@@ -69,11 +84,19 @@
     }
 
 	function banUser(userId: number, duration: number | null) {
-		$socket.emit('banUser', { chatId: chatIdLocal, userId, duration });
+		$socket.emit('banUser', { chatId: chatIdLocal, userId, duration : banDuration });
 	}
 
-	function unbanUser(userId: number) {
-		$socket.emit('unbanUser', { chatId: chatIdLocal, userId });
+	function unBanUser(userId: number) {
+		$socket.emit('unBanUser', { chatId: chatIdLocal, userId });
+	}
+
+	function muteUser(userId: number, duration: number | null) {
+		$socket.emit('muteUser', { chatId: chatIdLocal, userId, duration : muteDuration });
+	}
+
+	function unMuteUser(userId: number) {
+		$socket.emit('unMuteUser', { chatId: chatIdLocal, userId });
 	}
 
 	$socket.on('userBan', (data: any) => {
@@ -83,6 +106,13 @@
 			chatIdLocal = null;
 		}
 	});	
+
+	$socket.on('userMute', (data: any) => {
+		if (data.chatId === chatIdLocal) {
+			isUserMuted = true;
+			muteExpiresAt = data.expiresAt ? new Date(data.expiresAt) : null;
+		}
+	});
 </script>
 
 <div id="box">
@@ -107,11 +137,15 @@
 		{/if}
 	</div>
 	<div id="sendMessage-window">
-		<form on:submit|preventDefault={sendMessage} class="send-message-form">
-			<input type="text" bind:value={messageContent} class="message-input" disabled={disabled} />
-			<button type="submit" class="btn send-btn" disabled={disabled}>Send</button>
-		</form>
-	</div>
+        {#if isUserMuted}
+            <p>You are muted in this Topics {muteExpiresAt ? `until ${muteExpiresAt.toLocaleString()}` : 'indefinitely'}.</p>
+        {:else}
+            <form on:submit|preventDefault={sendMessage} class="send-message-form">
+                <input type="text" bind:value={messageContent} class="message-input" disabled={disabled} />
+                <button type="submit" class="btn send-btn" disabled={disabled}>Send</button>
+            </form>
+        {/if}
+    </div>
     <div id="user-list">
         {#if currentChat}
             <h5>Users in this chat:</h5>
@@ -120,17 +154,21 @@
                     <li on:click={() => selectUser(chatUser)}>
                         {chatUser.user.username}
                         {#if selectedUser === chatUser}
-                                <button>Check Profile</button>
-                            {#if roleId <= 1 && roleId < chatUser.roleId}
+							<button>Check Profile</button>
+							{#if roleId <= 1 && roleId < chatUser.roleId}
 								<button>Make Admin</button>
-                            {/if}
-                            {#if roleId <= 2 && roleId < chatUser.roleId}
-                                <div>
-                                    <button>TimeOut</button>
-                                    <button on:click={() => banUser(chatUser.userId, null)} >Ban</button>
-                                </div>
-                            {/if}
-                        {/if}
+							{/if}
+							{#if roleId <= 2 && roleId < chatUser.roleId}
+								<div>
+									<button on:click={() => muteUser(chatUser.userId, null)}>Mute</button>
+									<button on:click={() => banUser(chatUser.userId, null)}>Ban</button>
+									<button on:click={() => unMuteUser(chatUser.userId)}>Unmute</button>
+									<button on:click={() => unBanUser(chatUser.userId)}>Unban</button>
+									<input type="number" bind:value={banDuration} placeholder="Ban duration in seconds" min="0" />
+    								<input type="number" bind:value={muteDuration} placeholder="Mute duration in seconds" min="0" />
+								</div>
+							{/if}
+						{/if}
                     </li>
                 {/each}
             </ul>
