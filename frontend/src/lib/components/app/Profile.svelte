@@ -9,10 +9,6 @@
 		"Match history",
 	];
 
-	onMount(() => {
-		activeTabIndex = 0;
-	});
-
 </script>
 
 <div class="window-body">
