@@ -83,6 +83,7 @@
 		padding: 0.2rem;
 
 		div.menu {
+			height: 1.5rem;
 			@include tab-border(white, $dark-grey);
 			display: flex;
 			button:not(.unavailable) {

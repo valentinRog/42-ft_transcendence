@@ -36,7 +36,7 @@
 			},
 			body: JSON.stringify({ friend: form })
 		});
-		const json= await res.json();
+		const json = await res.json();
 		if (res.status !== 200 && res.status !== 201) {
 			errorMessage = json.message;
 			showModal = true;
@@ -87,7 +87,7 @@
 			groupName: groupName,
 			memberUsernames: selectedFriends,
 			isGroupChat: true,
-			accessibility: "private"
+			accessibility: 'private'
 		});
 		$socket.on('createChat', (chatNumber: number) => {
 			$chatId = chatNumber;
@@ -120,14 +120,15 @@
 	const selected = Context.selected();
 	let visible: number = 0;
 
-	function spectateGame(friend : string) {
+	function spectateGame(friend: string) {
 		$socket.emit('spectate', { friend: friend });
 		$openPongWindow = true;
 	}
-
 </script>
 
-<div class="box">
+<svelte:window on:mousedown={() => (visible = 0)} />
+
+<div class="box" on:mousedown={() => (visible = 0)}>
 	<ErrorDialog {showModal} {errorMessage} on:close={() => (showModal = false)} />
 	<form on:submit|preventDefault={addFriend} class="add-friend-form">
 		<input type="text" name="friend" bind:value={friendInput} placeholder=" Search..." />
@@ -144,18 +145,19 @@
 						on:click={selectFriend}
 					/>
 				{/if}
-				<div class="name-options"
-					on:mouseleave={() => {
-						visible = 0;
-					}}
-				>
-					<p class="username"
-						on:click={() => {
+				<div class="name-options">
+					<p
+						class="username"
+						on:mousedown|stopPropagation={() => {
 							visible = visible === friend.id ? 0 : friend.id;
 						}}
 					>
 						{friend.username}
+						{#if visible === friend.id}
+						▴
+						{:else}
 						▾
+						{/if}
 					</p>
 					<div class="buttons">
 						{#if visible === friend.id}
@@ -167,7 +169,7 @@
 									$selected = null;
 								}}
 							/>
-							{#if friend.status === 'online'|| friend.status == 'in-game' || friend.status === 'spectator'}
+							{#if friend.status === 'online' || friend.status == 'in-game' || friend.status === 'spectator'}
 								<img
 									class="option-icons"
 									src="/joystick.png"
@@ -183,19 +185,22 @@
 						{/if}
 					</div>
 				</div>
-				{#if friend.status === 'online'}
-				<img class="status" src="/online.png" alt="online" />
-				{:else if friend.username === 'vrogiste' && friend.status === 'in-game'}
-					<img class="status" src="/in-game-val.png" alt="in-game" />
-				{:else if friend.status === 'in-game'}
-				<a href="#" on:click={() => spectateGame(friend.username)}>
-					<img class="status" src="/in-game.png" alt="in-game" />
-				</a>
-				{:else if friend.status === 'spectator'}
-					<img class="status" src="/spectator.png" alt="spectator" />
-				{:else}
-					<img class="status" src="/offline.png" alt="offline" />
-				{/if}
+				<div class="status-img">
+					<p class="status">{friend.status}</p>
+					{#if friend.status === 'online'}
+						<img src="/online.png" alt="online" />
+					{:else if friend.username === 'vrogiste' && friend.status === 'in-game'}
+						<img src="/in-game-val.png" alt="in-game" />
+					{:else if friend.status === 'in-game'}
+						<a href="#" on:click={() => spectateGame(friend.username)}>
+							<img src="/in-game.png" alt="in-game" />
+						</a>
+					{:else if friend.status === 'spectator'}
+						<img src="/spectator.png" alt="spectator" />
+					{:else}
+						<img src="/offline.png" alt="offline" />
+					{/if}
+				</div>
 			</div>
 		{/each}
 	</div>
@@ -207,7 +212,7 @@
 		<span class="notification-badge">
 			<NotificationBadge count={$friendRequest.length} />
 		</span>
-		<button on:click={() => $openFriendRequest = true}>Friend requests</button>
+		<button on:click={() => ($openFriendRequest = true)}>Friend requests</button>
 	</div>
 </div>
 
@@ -254,9 +259,18 @@
 			justify-content: space-between;
 			white-space: nowrap;
 			padding: 0.25rem;
-			.status {
-				height: 0.8rem;
-				margin: 0.2rem 0.4rem auto auto;
+			.status-img {
+				margin-bottom: auto;
+				display: flex;
+				align-items: center;
+				
+				.status {
+					margin-left: auto;
+				}
+				img {
+					height: 0.9rem;
+					padding-left: 0.5rem;
+				}
 			}
 			.option-icons {
 				margin: 0.15rem;
@@ -273,7 +287,6 @@
 			display: flex;
 			align-items: right;
 		}
-
 	}
 	button {
 		padding: 0.3rem 0.625rem;

@@ -205,7 +205,7 @@
 			componentType: componentType as Context.App,
 			component: $components[componentType as Context.App],
 			visible: true,
-			propsWin,
+			propsWin: { ...propsWin, appId: id },
 			props
 		});
 		$appInstances = $appInstances;

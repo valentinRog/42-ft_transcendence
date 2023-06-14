@@ -107,13 +107,6 @@
 	}
 </script>
 
-<head>
-	<link
-		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
-		rel="stylesheet"
-	/>
-</head>
-
 <section
 	style:left={`${left}px`}
 	style:top={`${top}px`}
@@ -125,7 +118,7 @@
 >
 	<div class="border-inside">
 		<div
-			class="window"
+			class="window {$selected === props.appId ? 'selected' : ''}"
 			on:mousedown={() => {
 				moving = true;
 			}}
@@ -226,5 +219,8 @@
 			margin-bottom: 1.25rem;
 			font-size: 1rem;
 		}
+	}
+	.selected {
+		background-color: $blue !important; 
 	}
 </style>
