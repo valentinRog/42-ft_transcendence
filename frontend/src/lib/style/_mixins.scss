@@ -265,13 +265,13 @@
 @mixin onglet {
 
 	$margin1: 0.05rem;
-	$margin2: 2px;
-	$margin3: 3px;
+	$margin2: 0.12rem;
+	$margin3: 0.1rem;
 
 	.window {
 		box-shadow: inset -0.05rem -0.05rem black,
 		inset $margin1 $margin1 $light-grey,
-		inset ($margin2 * -1) ($margin2 * -1) grey,
+		inset ($margin2 * -1) ($margin2 * -1) $grey,
 		inset $margin2 $margin2 white;
 		padding: 3px;
 	}
@@ -295,11 +295,10 @@
 	}
 
 	menu[role=tablist] > li {
-	  border-top-left-radius: $margin3;
-	  border-top-right-radius: $margin3;
+
 	  box-shadow: inset $margin1 * -1 0,
 	  inset $margin1 $margin1 $light-grey,
-	  inset ($margin2 * -1) 0 grey,
+	  inset ($margin2 * -1) 0 $grey,
 	  inset $margin2 $margin2 white;
 	  z-index: 1;
 	}
