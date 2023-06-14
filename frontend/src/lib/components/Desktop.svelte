@@ -47,60 +47,7 @@
 		}
 	}
 
-	interface Props {
-		readonly name: string;
-		readonly icon: string;
-	}
-
-	interface AppProps {
-		readonly TabProps: Props;
-		readonly DesktopProps: Props;
-	}
-
-	const apps: Record<Context.App, AppProps> = {
-		Profile: {
-			TabProps: { name: 'Profile', icon: '/computer.png' },
-			DesktopProps: { name: 'Profile', icon: '/computer.png' }
-		},
-		Conversation: {
-			TabProps: { name: 'Conversation', icon: '/mail3.png' },
-			DesktopProps: { name: 'Conversation', icon: '/big-mail.png' }
-		},
-		Chat: {
-			TabProps: { name: 'Chat', icon: '/mail3.png' },
-			DesktopProps: { name: 'Chat', icon: '/big-mail.png' }
-		},
-		ChatForum: {
-			TabProps: { name: 'ChatForum', icon: '/mail3.png' },
-			DesktopProps: { name: 'ChatForum', icon: '/big-mail.png' }
-		},
-		Contact: {
-			TabProps: { name: 'Contact', icon: '/phone.png' },
-			DesktopProps: { name: 'Contact', icon: '/phone.png' }
-		},
-		Pong: {
-			TabProps: { name: 'Pong', icon: '/pong.png' },
-			DesktopProps: { name: 'Pong', icon: '/big-pong.png' }
-		},
-		FriendRequest: {
-			TabProps: { name: 'FriendRequest', icon: '/computer.png' },
-			DesktopProps: { name: 'FriendRequest', icon: '/computer.png' }
-		},
-		Forum: {
-			TabProps: { name: 'Forum', icon: '/computer.png' },
-			DesktopProps: { name: 'Forum', icon: '/computer.png' }
-		},
-		Paint: {
-			TabProps: { name: 'Paint', icon: '/paint.png' },
-			DesktopProps: { name: 'Paint', icon: '/paint.png' }
-		},
-		Internet: {
-			TabProps: { name: 'Internet', icon: '/internet.png' },
-			DesktopProps: { name: 'Internet', icon: '/internet.png' }
-		}
-	};
-
-	Object.freeze(apps);
+	const apps = Context.apps();
 
 	let width: number;
 	let height: number;
@@ -135,7 +82,7 @@
 	on:mousedown={() => ($selected = null)}
 >
 	<div class="icons">
-		{#each Object.entries(apps) as [k, v]}
+		{#each Object.entries($apps) as [k, v]}
 			{#if k !== 'FriendRequest' && k !== 'Chat' && k !== 'ChatForum'}
 				<div
 					class="icon"
@@ -167,7 +114,7 @@
 	</div>
 	{#each [...$appInstances.entries()] as [id, { componentType, component, visible, propsWin, props }] (id)}
 		<Window
-			{...apps[componentType].TabProps}
+			{...$apps[componentType].TabProps}
 			props={propsWin}
 			parentWidth={width}
 			parentHeight={height}
@@ -196,7 +143,7 @@
 	<div class="navbar-tabs">
 		{#each [...$appInstances.entries()] as [id, { componentType, visible, propsWin }]}
 			<Tab
-				{...apps[componentType].TabProps}
+				{...$apps[componentType].TabProps}
 				props={propsWin}
 				active={$selected === id}
 				on:click={() => {
