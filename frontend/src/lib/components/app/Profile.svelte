@@ -25,7 +25,6 @@
 		  <div class="window-body">
 			<ProfileInfo />
 		  </div>
-
 		  {:else if activeTabIndex === 1}
 			<p class="tab-content">{"stat"}</p>
 		  {:else if activeTabIndex === 1}
@@ -34,7 +33,6 @@
 	  </div>
 	</div>
   </div>
-
 
 <style lang="scss">
 

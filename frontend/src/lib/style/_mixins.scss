@@ -266,38 +266,14 @@
 
 	:root {
 		/* Color */
-		--text-color: #222222;
 		--surface: #c0c0c0;
 		--button-highlight: #ffffff;
 		--button-face: #dfdfdf;
 		--button-shadow: #808080;
 		--window-frame: #0a0a0a;
-		--dialog-blue: #000080;
-		--dialog-blue-light: #1084d0;
-		--dialog-gray: #808080;
-		--dialog-gray-light: #b5b5b5;
-		--link-blue: #0000ff;
 
 		/* Spacing */
 		--element-spacing: 8px;
-		--grouped-button-spacing: 4px;
-		--grouped-element-spacing: 6px;
-		--radio-width: 12px;
-		--checkbox-width: 13px;
-		--radio-label-spacing: 6px;
-		--range-track-height: 4px;
-		--range-spacing: 10px;
-
-		/* Borders */
-		--border-width: 1px;
-		--border-raised-outer: inset -1px -1px var(--window-frame),
-		  inset 1px 1px var(--button-highlight);
-		--border-raised-inner: inset -2px -2px var(--button-shadow),
-		  inset 2px 2px var(--button-face);
-		--border-sunken-outer: inset -1px -1px var(--button-highlight),
-		  inset 1px 1px var(--window-frame);
-		--border-sunken-inner: inset -2px -2px var(--button-face),
-		  inset 2px 2px var(--button-shadow);
 
 		/* Window borders flip button-face and button-highlight */
 		--border-window-outer: inset -1px -1px var(--window-frame),
@@ -305,17 +281,12 @@
 		--border-window-inner: inset -2px -2px var(--button-shadow),
 		  inset 2px 2px var(--button-highlight);
 
-		/* Field borders (checkbox, input, etc) flip window-frame and button-shadow */
-		--border-field: inset -1px -1px var(--button-highlight),
-		  inset 1px 1px var(--button-shadow), inset -2px -2px var(--button-face),
-		  inset 2px 2px var(--window-frame);
-
 		/* Tabs */
 		--border-tab: inset -1px 0 var(--window-frame),
 		  inset 1px 1px var(--button-face),
 		  inset -2px 0 var(--button-shadow),
 		  inset 2px 2px var(--button-highlight)
-	  }
+	}
 
 
 	.window {
@@ -347,13 +318,15 @@
 	  border-top-left-radius: 3px;
 	  border-top-right-radius: 3px;
 	  box-shadow: var(--border-tab);
+	  //@include tab-border($light-grey, $grey);
+	  //box-shadow: $light-grey 0px 0px 0px 1px inset;
 	  z-index: 1;
 	}
 
 	menu[role=tablist] > li[aria-selected=true] {
 	  padding-bottom: 2px;
 	  margin-top: -2px;
-	  background-color: var(--surface);
+	  background-color: $grey;
 	  position: relative;
 	  z-index: 8;
 	  margin-left: -3px;
@@ -364,17 +337,6 @@
 	  color: #222;
 	  margin: 6px;
 	  text-decoration: none;
-	}
-	menu[role=tablist] > li[aria-selected=true] > a:focus {
-	  outline: none;
-	}
-	menu[role=tablist] > li > a:focus {
-	  outline: 1px dotted #222;
-	}
-
-	menu[role=tablist].multirows > li {
-	  flex-grow: 1;
-	  text-align: center;
 	}
   }
 
