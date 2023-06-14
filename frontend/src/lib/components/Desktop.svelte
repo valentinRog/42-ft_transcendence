@@ -82,34 +82,32 @@
 	on:mousedown={() => ($selected = null)}
 >
 	<div class="icons">
-		{#each Object.entries($apps) as [k, v]}
-			{#if k !== 'FriendRequest' && k !== 'Chat' && k !== 'ChatForum'}
-				<div
-					class="icon"
-					on:dblclick={() => {
-						addInstance(k);
-						$selected = null;
-					}}
-				>
-					<img src={v.DesktopProps.icon} alt={v.DesktopProps.name} draggable="false" />
-					{#if k === 'Conversation'}
-						<span class="notification-badge">
-							<NotificationBadge count={0} />
-						</span>
-					{:else if k === 'Contact'}
-						<span class="notification-badge">
-							<NotificationBadge count={$friendRequest.length} />
-						</span>
-					{:else if k === 'Pong'}
-						<span class="notification-badge">
-							<NotificationBadge count={$gameRequest.length} />
-						</span>
-					{/if}
-					<div class="icon-text">
-						<span>{v.DesktopProps.name}</span>
-					</div>
+		{#each Object.entries($apps).filter(([k, _]) => k !== 'FriendRequest' && k !== 'Chat' && k !== 'ChatForum') as [k, v]}
+			<div
+				class="icon"
+				on:dblclick={() => {
+					addInstance(k);
+					$selected = null;
+				}}
+			>
+				<img src={v.DesktopProps.icon} alt={v.DesktopProps.name} draggable="false" />
+				{#if k === 'Conversation'}
+					<span class="notification-badge">
+						<NotificationBadge count={0} />
+					</span>
+				{:else if k === 'Contact'}
+					<span class="notification-badge">
+						<NotificationBadge count={$friendRequest.length} />
+					</span>
+				{:else if k === 'Pong'}
+					<span class="notification-badge">
+						<NotificationBadge count={$gameRequest.length} />
+					</span>
+				{/if}
+				<div class="icon-text">
+					<span>{v.DesktopProps.name}</span>
 				</div>
-			{/if}
+			</div>
 		{/each}
 	</div>
 	{#each [...$appInstances.entries()] as [id, { componentType, component, visible, propsWin, props }] (id)}

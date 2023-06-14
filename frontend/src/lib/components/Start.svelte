@@ -27,7 +27,7 @@
 	</div>
 </div>
 <div class="menu" class:hidden={!active}>
-	{#each Object.entries($apps) as [k, v]}
+	{#each Object.entries($apps).filter(([k, _]) => k !== 'FriendRequest' && k !== 'Chat' && k !== 'ChatForum') as [k, v]}
 		<button class="app-button" on:click|stopPropagation={() => addInstance(k)}>
 			<img src={v.TabProps.icon} alt={v.TabProps.name} draggable="false" />
 			{v.TabProps.name}</button
