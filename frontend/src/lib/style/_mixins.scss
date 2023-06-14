@@ -72,14 +72,15 @@
 }
 
 @mixin tab-contour-active {
-
 	&:active,
 	&.active {
 		@include tab-border(white, black);
 
 		.border-inside {
-			@include tab-border($light-grey,
-				$dark-grey); //border around the navbar element in outside mode
+			@include tab-border(
+				$light-grey,
+				$dark-grey
+			); //border around the navbar element in outside mode
 		}
 	}
 }
@@ -194,7 +195,7 @@
 		width: 100%;
 		height: 1.5rem;
 		border: 2px inset $light-grey;
-		color : black;
+		color: black;
 		background: white;
 		margin-left: 10px;
 	}
@@ -203,10 +204,10 @@
 	textarea:focus,
 	textarea.form-control:focus,
 	input.form-control:focus,
-	input[type=text]:focus,
-	input[type=password]:focus,
-	[type=text].form-control:focus,
-	[type=password].form-control:focus,
+	input[type='text']:focus,
+	input[type='password']:focus,
+	[type='text'].form-control:focus,
+	[type='password'].form-control:focus,
 	[contenteditable].form-control:focus {
 		outline: 0 !important;
 	}
@@ -261,72 +262,22 @@
 	}
 }
 
-
 @mixin onglet {
 
-	:root {
-		/* Color */
-		--text-color: #222222;
-		--surface: #c0c0c0;
-		--button-highlight: #ffffff;
-		--button-face: #dfdfdf;
-		--button-shadow: #808080;
-		--window-frame: #0a0a0a;
-		--dialog-blue: #000080;
-		--dialog-blue-light: #1084d0;
-		--dialog-gray: #808080;
-		--dialog-gray-light: #b5b5b5;
-		--link-blue: #0000ff;
-
-		/* Spacing */
-		--element-spacing: 8px;
-		--grouped-button-spacing: 4px;
-		--grouped-element-spacing: 6px;
-		--radio-width: 12px;
-		--checkbox-width: 13px;
-		--radio-label-spacing: 6px;
-		--range-track-height: 4px;
-		--range-spacing: 10px;
-
-		/* Borders */
-		--border-width: 1px;
-		--border-raised-outer: inset -1px -1px var(--window-frame),
-		  inset 1px 1px var(--button-highlight);
-		--border-raised-inner: inset -2px -2px var(--button-shadow),
-		  inset 2px 2px var(--button-face);
-		--border-sunken-outer: inset -1px -1px var(--button-highlight),
-		  inset 1px 1px var(--window-frame);
-		--border-sunken-inner: inset -2px -2px var(--button-face),
-		  inset 2px 2px var(--button-shadow);
-
-		/* Window borders flip button-face and button-highlight */
-		--border-window-outer: inset -1px -1px var(--window-frame),
-		  inset 1px 1px var(--button-face);
-		--border-window-inner: inset -2px -2px var(--button-shadow),
-		  inset 2px 2px var(--button-highlight);
-
-		/* Field borders (checkbox, input, etc) flip window-frame and button-shadow */
-		--border-field: inset -1px -1px var(--button-highlight),
-		  inset 1px 1px var(--button-shadow), inset -2px -2px var(--button-face),
-		  inset 2px 2px var(--window-frame);
-
-		/* Tabs */
-		--border-tab: inset -1px 0 var(--window-frame),
-		  inset 1px 1px var(--button-face),
-		  inset -2px 0 var(--button-shadow),
-		  inset 2px 2px var(--button-highlight)
-	  }
-
+	$margin1: 0.06rem;
+	$margin2: 0.126rem;
+	$margin3: 0.1rem;
 
 	.window {
-		box-shadow: var(--border-window-outer), var(--border-window-inner);
-		background: var(--surface);
+		box-shadow: inset -0.05rem -0.05rem black,
+		inset $margin1 $margin1 $light-grey,
+		inset ($margin2 * -1) ($margin2 * -1) $grey,
+		inset $margin2 $margin2 white;
 		padding: 3px;
 	}
 
-
 	.window-body {
-		margin: var(--element-spacing);
+		margin : 0.5rem;
 	  }
 
 	.window[role=tabpanel] {
@@ -336,45 +287,36 @@
 
 	menu[role=tablist] {
 	  position: relative;
-	  margin: 0 0 -2px 0;
+	  margin: 0 0 ($margin2 * -1) 0;
 	  text-indent: 0;
 	  list-style-type: none;
 	  display: flex;
-	  padding-left: 3px;
+	  padding-left: $margin3;
 	}
 
 	menu[role=tablist] > li {
-	  border-top-left-radius: 3px;
-	  border-top-right-radius: 3px;
-	  box-shadow: var(--border-tab);
+
+	  box-shadow: inset $margin1 * -1 0,
+	  inset $margin1 $margin1 $light-grey,
+	  inset ($margin2 * -1) 0 $grey,
+	  inset $margin2 $margin2 white;
 	  z-index: 1;
 	}
 
 	menu[role=tablist] > li[aria-selected=true] {
-	  padding-bottom: 2px;
-	  margin-top: -2px;
-	  background-color: var(--surface);
+	  padding-bottom: $margin2;
+	  margin-top: ($margin2 * -1);
+	  background-color: $grey;
 	  position: relative;
 	  z-index: 8;
-	  margin-left: -3px;
+	  margin-left: -$margin3;
 	}
 
 	menu[role=tablist] > li > a {
 	  display: block;
-	  color: #222;
-	  margin: 6px;
+	  color: black;
+	  margin: 0.4rem;
 	  text-decoration: none;
-	}
-	menu[role=tablist] > li[aria-selected=true] > a:focus {
-	  outline: none;
-	}
-	menu[role=tablist] > li > a:focus {
-	  outline: 1px dotted #222;
-	}
-
-	menu[role=tablist].multirows > li {
-	  flex-grow: 1;
-	  text-align: center;
 	}
   }
 

@@ -1,9 +1,10 @@
 <script lang="ts">
-
-	import { user } from '$lib/stores';
+	import { token, user } from '$lib/stores';
 	import { Context } from '$lib/components/Context.svelte';
 
 	const fetchWithToken = Context.fetchWithToken();
+	const addInstance = Context.addInstance();
+	const fetchMe = Context.fetchMe();
 
 	export let username: string | null | undefined = null;
 	let login: string | null | undefined = null;
@@ -28,22 +29,21 @@
 	if (login) {
 		fetchWithToken(`users/avatar/${login}`)
 			.then((res) => {
-			if (res.status === 200 || res.status === 201) {
-				return res.blob();
-			} else {
-				throw new Error('Avatar fetch failed');
-			}
+				if (res.status === 200 || res.status === 201) {
+					return res.blob();
+				} else {
+					throw new Error('Avatar fetch failed');
+				}
 			})
 			.then((blob) => (imgUrl = URL.createObjectURL(blob)))
 			.catch(() => {
 				imgUrl = '/avatar.png';
 			});
-		}
+	}
 
+	let fileinput: HTMLInputElement;
 
-	let fileinput : HTMLInputElement;
-
-	const onFileSelected = (e : any)=>{
+	const onFileSelected = (e: any) => {
 		let image = e.target.files[0];
 		const formData = new FormData();
 		formData.append('file', image);
@@ -52,10 +52,34 @@
 			method: 'POST',
 			body: formData
 		})
-		.then((res) => res.json())
+			.then((res) => res.json())
 			.then((data) => {
 				imgUrl = URL.createObjectURL(image);
 			});
+	};
+
+	async function enable2fa() {
+		const res = await fetchWithToken('2fa/enable', {
+			method: 'POST'
+		});
+		const data = await res.json();
+		addInstance('Internet', {}, { url: data.qrcode });
+		$token = data.token;
+		sessionStorage.setItem('token', data.token);
+		fetchMe();
+	}
+
+	async function disable2fa() {
+		await fetchWithToken('users/edit', {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				twoFactorEnabled: false
+			})
+		});
+		fetchMe();
 	}
 </script>
 
@@ -67,10 +91,21 @@
 				<li class="box">Login: {currentUser.login || ''}</li>
 			</div>
 			<li class="pic">
-				<input type="file" id="file-upload" accept=".jpg, .jpeg, .png" on:change={(e)=>onFileSelected(e)} bind:this={fileinput}>
-				<img src={imgUrl}>
+				<input
+					type="file"
+					id="file-upload"
+					accept=".jpg, .jpeg, .png"
+					on:change={(e) => onFileSelected(e)}
+					bind:this={fileinput}
+				/>
+				<img src={imgUrl} />
 			</li>
 		</div>
+		{#if $user?.twoFactorEnabled}
+			<button class="two-factor" on:click={disable2fa}>disable 2fa</button>
+		{:else}
+			<button class="two-factor" on:click={enable2fa}>enable 2fa</button>
+		{/if}
 		{#if username === $user?.username}
 			<li class="box friends">
 				<p>My friends</p>
@@ -101,68 +136,75 @@
 </div>
 
 <style lang="scss">
-#box {
-	width: 20rem;
-	height: 20rem;
-	.pic-username-login {
-		display: flex;
-		align-items: center;
-		.pic {
-			display: inline-block;
-			position: relative;
-			cursor: pointer;
-
-			@include tab-contour-hollow;
-			padding: 0.15rem;
-			margin-right: 0.25rem;
-			margin-left: auto;
-			background-color: white;
-			height: 5rem;
-			width: 7.5rem;
-			display: flex;
-			img {
-				margin: 0 auto;
-				height: 4.5rem;
-				width: auto;
-			}
-
-			input[type="file"] {
-				position: absolute;
-				top: 0;
-				left: 0;
-				opacity: 0;
-				cursor: pointer;
-				width: 100%;
-				height: 100%;
-			}
-		}
-	}
-	li {
-		list-style: none;
-	}
-	li.box {
-		padding: 0.5rem;
-		margin: 0.25rem;
-		@include tab-contour-hollow;
-	}
-	li.friends {
-		@include tab-contour-hollow;
-		background-color: white;
-		div {
-			margin-bottom: 0.2rem;
+	#box {
+		width: 20rem;
+		height: 20rem;
+		.pic-username-login {
 			display: flex;
 			align-items: center;
-			.status {
+			.pic {
+				display: inline-block;
+				position: relative;
+				cursor: pointer;
+
+				@include tab-contour-hollow;
+				padding: 0.15rem;
+				margin-right: 0.25rem;
 				margin-left: auto;
-			}
-			img {
-				padding-left: 0.5rem;
+				background-color: white;
+				height: 5rem;
+				width: 7.5rem;
+				display: flex;
+				img {
+					margin: 0 auto;
+					height: 4.5rem;
+					width: auto;
+				}
+
+				input[type='file'] {
+					position: absolute;
+					top: 0;
+					left: 0;
+					opacity: 0;
+					cursor: pointer;
+					width: 100%;
+					height: 100%;
+				}
 			}
 		}
+		li {
+			list-style: none;
+		}
+		li.box {
+			padding: 0.5rem;
+			margin: 0.25rem;
+			@include tab-contour-hollow;
+		}
+		li.friends {
+			@include tab-contour-hollow;
+			background-color: white;
+			div {
+				margin-bottom: 0.2rem;
+				display: flex;
+				align-items: center;
+				.status {
+					margin-left: auto;
+				}
+				img {
+					padding-left: 0.5rem;
+				}
+			}
+		}
+		.img-status {
+			height: 0.8rem;
+			width: auto;
+		}
+		button.two-factor {
+			margin: 0.25rem;
+			padding: 0.25rem;
+			@include tab-contour;
+			@include tab-contour-active;
+			background-color: $grey;
+		}
 	}
-	.img-status {
-		height: 0.8rem;
-		width: auto;
-	}
-}
 </style>

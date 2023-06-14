@@ -1,17 +1,17 @@
 <script lang="ts">
-    import { onMount, onDestroy } from 'svelte';
-    import { Context } from '$lib/components/Context.svelte';
-    import { user } from '$lib/stores';
+	import { onMount, onDestroy } from 'svelte';
+	import { Context } from '$lib/components/Context.svelte';
+	import { user } from '$lib/stores';
 
-    const socket = Context.socket();
-    const chats = Context.chats();
-    const chatId = Context.chatId();
+	const socket = Context.socket();
+	const chats = Context.chats();
+	const chatId = Context.chatId();
 
-    let currentChat: any = null;
-    let selectedUser: any = null;
-    let chatIdLocal: number | null = $chatId;
-    let messageContent = '';
-    let roleId: number;
+	let currentChat: any = null;
+	let selectedUser: any = null;
+	let chatIdLocal: number | null = $chatId;
+	let messageContent = '';
+	let roleId: number;
 	let isUserBanned = false;
 	let isUserMuted = false;
 	let disabled = false;
@@ -21,27 +21,36 @@
 	let banDuration: number | null = null;
 	let muteDuration: number | null = null;
 
-    $: {
-    	currentChat = $chats.find((chat) => chat.id === chatIdLocal);
-        roleId = currentChat?.chatUsers.find((cu: any) => cu.userId === $user?.id)?.roleId;
+	$: {
+		currentChat = $chats.find((chat) => chat.id === chatIdLocal);
+		roleId = currentChat?.chatUsers.find((cu: any) => cu.userId === $user?.id)?.roleId;
 
 		if (currentChat && currentChat.bans) {
-			const ban = currentChat.bans.find((ban: any) => ban.userId === $user?.id 
-				&& (ban.expiresAt == null || new Date(ban.expiresAt) > new Date()));
+			const ban = currentChat.bans.find(
+				(ban: any) =>
+					ban.userId === $user?.id &&
+					(ban.expiresAt == null || new Date(ban.expiresAt) > new Date())
+			);
 			isUserBanned = !!ban;
 			if (isUserBanned) chatIdLocal = null;
 		}
 
 		disabled = isUserBanned || isUserMuted;
-    }
-	
+	}
+
 	onMount(() => {
 		if (currentChat && currentChat.bans) {
-			const ban = currentChat.bans.find((ban: any) => ban.userId === $user?.id 
-				&& (ban.expiresAt == null || new Date(ban.expiresAt) > new Date()));
+			const ban = currentChat.bans.find(
+				(ban: any) =>
+					ban.userId === $user?.id &&
+					(ban.expiresAt == null || new Date(ban.expiresAt) > new Date())
+			);
 
-			const mute = currentChat.mutes.find((mute: any) => mute.userId === $user?.id 
-				&& (mute.expiresAt == null || new Date(mute.expiresAt) > new Date()));
+			const mute = currentChat.mutes.find(
+				(mute: any) =>
+					mute.userId === $user?.id &&
+					(mute.expiresAt == null || new Date(mute.expiresAt) > new Date())
+			);
 
 			isUserBanned = !!ban;
 			isUserMuted = !!mute;
@@ -53,25 +62,23 @@
 				muteExpiresAt = mute.expiresAt ? new Date(mute.expiresAt) : null;
 				$socket.emit('joinRoom', { chatId: chatIdLocal });
 			}
-
-		} else
-		$socket.emit('joinRoom', { chatId: chatIdLocal });
+		} else $socket.emit('joinRoom', { chatId: chatIdLocal });
 	});
 
 	onDestroy(() => {
 		$socket.emit('leaveRoom', { chatId: chatIdLocal });
 	});
 
-    async function sendMessage() {
+	async function sendMessage() {
 		if (messageContent.trim() === '') return;
-            $socket.emit('sendMessage', {
-                chatId: chatIdLocal,
-                content: messageContent,
+		$socket.emit('sendMessage', {
+			chatId: chatIdLocal,
+			content: messageContent
 		});
 		messageContent = '';
 	}
 
-    function findUser(userId: number, chatId: number | null) {
+	function findUser(userId: number, chatId: number | null) {
 		if (currentChat) {
 			let chatUser = currentChat.chatUsers.find((cu: any) => cu.userId === userId);
 			return chatUser ? chatUser.user.username : 'Unknown';
@@ -79,12 +86,12 @@
 		return 'Unknown';
 	}
 
-    function selectUser(user: any) {
-        selectedUser = user;
-    }
+	function selectUser(user: any) {
+		selectedUser = user;
+	}
 
 	function banUser(userId: number, duration: number | null) {
-		$socket.emit('banUser', { chatId: chatIdLocal, userId, duration : banDuration });
+		$socket.emit('banUser', { chatId: chatIdLocal, userId, duration: banDuration });
 	}
 
 	function unBanUser(userId: number) {
@@ -92,7 +99,7 @@
 	}
 
 	function muteUser(userId: number, duration: number | null) {
-		$socket.emit('muteUser', { chatId: chatIdLocal, userId, duration : muteDuration });
+		$socket.emit('muteUser', { chatId: chatIdLocal, userId, duration: muteDuration });
 	}
 
 	function unMuteUser(userId: number) {
@@ -105,7 +112,7 @@
 			banExpiresAt = data.expiresAt ? new Date(data.expiresAt) : null;
 			chatIdLocal = null;
 		}
-	});	
+	});
 
 	$socket.on('userMute', (data: any) => {
 		if (data.chatId === chatIdLocal) {
@@ -118,12 +125,18 @@
 <div id="box">
 	<div id="chat-window">
 		{#if isUserBanned && chatIdLocal === null}
-		<p>You are banned from this Topics {banExpiresAt ? `until ${banExpiresAt.toLocaleString()}` : 'indefinitely'}.</p>
+			<p>
+				You are banned from this Topics {banExpiresAt
+					? `until ${banExpiresAt.toLocaleString()}`
+					: 'indefinitely'}.
+			</p>
 		{:else}
 			<ul>
 				{#if currentChat}
 					{#each currentChat?.messages || [] as message, i (i)}
-						<li class={findUser(message.userId, chatIdLocal) === $user?.username ? 'self' : 'other'}>
+						<li
+							class={findUser(message.userId, chatIdLocal) === $user?.username ? 'self' : 'other'}
+						>
 							<div class="message-header">
 								{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
 									<strong>{findUser(message.userId, chatIdLocal)}</strong>
@@ -137,23 +150,27 @@
 		{/if}
 	</div>
 	<div id="sendMessage-window">
-        {#if isUserMuted}
-            <p>You are muted in this Topics {muteExpiresAt ? `until ${muteExpiresAt.toLocaleString()}` : 'indefinitely'}.</p>
-        {:else}
-            <form on:submit|preventDefault={sendMessage} class="send-message-form">
-                <input type="text" bind:value={messageContent} class="message-input" disabled={disabled} />
-                <button type="submit" class="btn send-btn" disabled={disabled}>Send</button>
-            </form>
-        {/if}
-    </div>
-    <div id="user-list">
-        {#if currentChat}
-            <h5>Users in this chat:</h5>
-            <ul>
-                {#each currentChat.chatUsers as chatUser (chatUser.userId)}
-                    <li on:click={() => selectUser(chatUser)}>
-                        {chatUser.user.username}
-                        {#if selectedUser === chatUser}
+		{#if isUserMuted}
+			<p>
+				You are muted in this Topics {muteExpiresAt
+					? `until ${muteExpiresAt.toLocaleString()}`
+					: 'indefinitely'}.
+			</p>
+		{:else}
+			<form on:submit|preventDefault={sendMessage} class="send-message-form">
+				<input type="text" bind:value={messageContent} class="message-input" {disabled} />
+				<button type="submit" class="btn send-btn" {disabled}>Send</button>
+			</form>
+		{/if}
+	</div>
+	<div id="user-list">
+		{#if currentChat}
+			<h5>Users in this chat:</h5>
+			<ul>
+				{#each currentChat.chatUsers as chatUser (chatUser.userId)}
+					<li on:click={() => selectUser(chatUser)}>
+						{chatUser.user.username}
+						{#if selectedUser === chatUser}
 							<button>Check Profile</button>
 							{#if roleId <= 1 && roleId < chatUser.roleId}
 								<button>Make Admin</button>
@@ -164,16 +181,26 @@
 									<button on:click={() => banUser(chatUser.userId, null)}>Ban</button>
 									<button on:click={() => unMuteUser(chatUser.userId)}>Unmute</button>
 									<button on:click={() => unBanUser(chatUser.userId)}>Unban</button>
-									<input type="number" bind:value={banDuration} placeholder="Ban duration in seconds" min="0" />
-    								<input type="number" bind:value={muteDuration} placeholder="Mute duration in seconds" min="0" />
+									<input
+										type="number"
+										bind:value={banDuration}
+										placeholder="Ban duration in seconds"
+										min="0"
+									/>
+									<input
+										type="number"
+										bind:value={muteDuration}
+										placeholder="Mute duration in seconds"
+										min="0"
+									/>
 								</div>
 							{/if}
 						{/if}
-                    </li>
-                {/each}
-            </ul>
-        {/if}
-    </div>
+					</li>
+				{/each}
+			</ul>
+		{/if}
+	</div>
 </div>
 
 <style lang="scss">
@@ -274,7 +301,7 @@
 		padding-bottom: 0.3rem;
 		font-size: 0.9em;
 		@include tab-border(white, black);
-		background-color: white
+		background-color: white;
 	}
 
 	.send-message-form {
@@ -288,18 +315,17 @@
 		font-size: 0.9rem;
 	}
 
-    #user-list {
-        padding: 0.5rem;
-        ul {
-            list-style: none;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-        }
-        li {
-            margin-bottom: 0.2rem;
-            font-size: 0.9em;
-        }
-    }
-
+	#user-list {
+		padding: 0.5rem;
+		ul {
+			list-style: none;
+			padding: 0;
+			display: flex;
+			flex-direction: column;
+		}
+		li {
+			margin-bottom: 0.2rem;
+			font-size: 0.9em;
+		}
+	}
 </style>

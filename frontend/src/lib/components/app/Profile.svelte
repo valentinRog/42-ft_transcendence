@@ -14,7 +14,7 @@
 	<menu role="tablist">
 	  {#each tabTitle as content, index}
 		<li role="tab" aria-selected={index === activeTabIndex} on:click={() => activeTabIndex = index}>
-		  <a href="#tabs">{content}</a>
+		  <a>{content}</a>
 		</li>
 	  {/each}
 	</menu>
@@ -25,7 +25,6 @@
 		  <div class="window-body">
 			<ProfileInfo />
 		  </div>
-
 		  {:else if activeTabIndex === 1}
 			<p class="tab-content">{"stat"}</p>
 		  {:else if activeTabIndex === 1}
@@ -34,7 +33,6 @@
 	  </div>
 	</div>
   </div>
-
 
 <style lang="scss">
 
