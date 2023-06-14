@@ -80,6 +80,7 @@ export class ChatService {
         },
         messages: true,
         bans: true,
+        mutes: true,
       },
     });
     return chat;
@@ -146,7 +147,6 @@ export class ChatService {
         password: true,
         name: true,
         chatUsers: true,
-        bans: true,
       },
       skip: start,
       take: limit

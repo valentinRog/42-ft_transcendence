@@ -12,7 +12,7 @@ export type Chat = {
 
 export type ChatUser = {
     id: number;
-    createdAt: Date;  // Change this from string to Date
+    createdAt: Date;
     userId: number;
     chatId: number;
     lastReadMessageId: number | null;

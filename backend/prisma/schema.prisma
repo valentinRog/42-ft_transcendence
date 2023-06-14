@@ -28,6 +28,7 @@ model User {
   messages         Message[]
   chats            ChatUser[]
   bans             Ban[]
+  mutes            Mute[]
 }
 
 model Notification {
@@ -82,7 +83,8 @@ model Chat {
 
   messages       Message[]
   chatUsers      ChatUser[]
-  bans           Ban[] 
+  bans           Ban[]
+  mutes          Mute[]
 }
 
 model Role {
@@ -107,6 +109,18 @@ model ChatUser {
 }
 
 model Ban {
+  chatId         Int
+  userId         Int
+  createdAt      DateTime  @default(now())
+  expiresAt      DateTime?
+
+  chat           Chat  @relation(fields: [chatId], references: [id])
+  user           User  @relation(fields: [userId], references: [id])
+
+  @@id([chatId, userId]) 
+}
+
+model Mute {
   chatId         Int
   userId         Int
   createdAt      DateTime  @default(now())

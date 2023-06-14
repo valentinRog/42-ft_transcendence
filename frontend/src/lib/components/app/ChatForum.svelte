@@ -14,19 +14,19 @@
     let roleId: number;
 	let isUserBanned = false;
 	let disabled = false;
+	let banExpiresAt: Date | null = null;
 
     $: {
     	currentChat = $chats.find((chat) => chat.id === chatIdLocal);
         roleId = currentChat?.chatUsers.find((cu: any) => cu.userId === $user?.id)?.roleId;
 
-		if (currentChat) {
-			const chatUser = currentChat.chatUsers.find((cu: any) => cu.userId === $user?.id);
-			if (chatUser && chatUser.bans) {
-				const ban = chatUser.bans.find((ban: any) => ban.userId === $user?.id 
-					&& (ban.expiresAt == null || new Date(ban.expiresAt) > new Date()));
-				isUserBanned = !!ban;
-			}
+		if (currentChat && currentChat.bans) {
+			const ban = currentChat.bans.find((ban: any) => ban.userId === $user?.id 
+				&& (ban.expiresAt == null || new Date(ban.expiresAt) > new Date()));
+			isUserBanned = !!ban;
+			if (isUserBanned) chatIdLocal = null;
 		}
+
 		disabled = isUserBanned;
     }
 	
@@ -35,7 +35,10 @@
 			const ban = currentChat.bans.find((ban: any) => ban.userId === $user?.id 
 				&& (ban.expiresAt == null || new Date(ban.expiresAt) > new Date()));
 			isUserBanned = !!ban;
-			if (isUserBanned) chatIdLocal = null;
+			if (isUserBanned) {
+				banExpiresAt = ban.expiresAt ? new Date(ban.expiresAt) : null;
+				chatIdLocal = null;
+			}
 		} else
 		$socket.emit('joinRoom', { chatId: chatIdLocal });
 	});
@@ -74,16 +77,18 @@
 	}
 
 	$socket.on('userBan', (data: any) => {
-		if (data.chatId === chatIdLocal)
+		if (data.chatId === chatIdLocal) {
 			isUserBanned = true;
-		chatIdLocal = null;
-	});
+			banExpiresAt = data.expiresAt ? new Date(data.expiresAt) : null;
+			chatIdLocal = null;
+		}
+	});	
 </script>
 
 <div id="box">
 	<div id="chat-window">
 		{#if isUserBanned && chatIdLocal === null}
-			<p>You are banned from this Topics</p>
+		<p>You are banned from this Topics {banExpiresAt ? `until ${banExpiresAt.toLocaleString()}` : 'indefinitely'}.</p>
 		{:else}
 			<ul>
 				{#if currentChat}
