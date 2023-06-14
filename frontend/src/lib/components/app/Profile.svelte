@@ -61,12 +61,9 @@
 
 	let activeTabIndex = 0;
 	const tabContents = [
-		"Desktop content",
-		"My computer content",
-		"Control panel content",
-		"Devices manager content",
-		"Hardware profiles content",
-		"Performance content"
+		"Information",
+		"Statistics",
+		"Match history",
 	];
 
 	function activateTab(index) {
@@ -81,8 +78,6 @@
 </script>
 
 <div class="window-body">
-	<p>Hello, world!</p>
-
 	<menu role="tablist">
 	  {#each tabContents as content, index}
 		<li role="tab" aria-selected={index === activeTabIndex} on:click={() => activateTab(index)}>

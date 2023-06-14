@@ -264,6 +264,32 @@
 
 @mixin onglet {
 
+	:root {
+	/* Color */
+	--text-color: #222222;
+	--surface: #c0c0c0;
+	--button-highlight: #ffffff;
+	--button-face: #dfdfdf;
+	--button-shadow: #808080;
+	--window-frame: #0a0a0a;
+
+	/* Spacing */
+	--element-spacing: 8px;
+	--grouped-button-spacing: 4px;
+	--grouped-element-spacing: 6px;
+	--radio-width: 12px;
+	--checkbox-width: 13px;
+	--radio-label-spacing: 6px;
+	--range-track-height: 4px;
+	--range-spacing: 10px;
+
+	/* Tabs */
+	--border-tab: inset -1px 0 var(--window-frame),
+		inset 1px 1px var(--button-face),
+		inset -2px 0 var(--button-shadow),
+		inset 2px 2px var(--button-highlight)
+	}
+
 	.window-body {
 		margin: var(--element-spacing);
 	  }
@@ -315,47 +341,6 @@
 	  flex-grow: 1;
 	  text-align: center;
 	}
-	.sunken-panel {
-	  box-sizing: border-box;
-	  border: 2px groove transparent;
-	  border-image: svg-load("./icon/sunken-panel-border.svg") 2;
-	  overflow: auto;
-	  background-color: #fff;
-	}
-
-	table {
-	  border-collapse: collapse;
-	  position: relative;
-	  text-align: left;
-	  white-space: nowrap;
-	  background-color: #fff;
-	}
-
-	table > thead > tr > * {
-	  position: sticky;
-	  top: 0;
-	  height: 17px;
-	  box-shadow: var(--border-raised-outer), var(--border-raised-inner);
-	  background: var(--surface);
-	  box-sizing: border-box;
-	  font-weight: normal;
-	  padding: 0 var(--grouped-element-spacing);
-	}
-
-	table.interactive > tbody > tr {
-	  cursor: pointer;
-	}
-
-	table > tbody > tr.highlighted {
-	  color: #fff;
-	  background-color: var(--dialog-blue);
-	}
-
-	table > tbody > tr > * {
-	  padding: 0 var(--grouped-element-spacing);
-	  height: 14px;
-	}
-
   }
 
 // ------------------------------------------------
