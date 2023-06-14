@@ -60,7 +60,7 @@
 	import { onMount } from 'svelte';
 
 	let activeTabIndex = 0;
-	const tabContents = [
+	const tabTitle = [
 		"Information",
 		"Statistics",
 		"Match history",
@@ -79,7 +79,7 @@
 
 <div class="window-body">
 	<menu role="tablist">
-	  {#each tabContents as content, index}
+	  {#each tabTitle as content, index}
 		<li role="tab" aria-selected={index === activeTabIndex} on:click={() => activateTab(index)}>
 		  <a href="#tabs">{content}</a>
 		</li>
@@ -88,16 +88,9 @@
 
 	<div class="window" role="tabpanel">
 	  <div class="window-body">
-		{#each tabContents as content, index}
-		  {#if index === activeTabIndex}
-			<p class="tab-content">{content}</p>
-		  {/if}
-		{/each}
-	  </div>
-	</div>
-  </div>
-
-<!--<div id="box">
+		  {#if activeTabIndex === 0}
+		  <div class="window-body">
+			<div id="box">
 	<ul>
 		<div class="pic-username-login">
 			<div class="username-login">
@@ -136,74 +129,85 @@
 			</li>
 		{/if}
 	</ul>
-</div>-->
+</div>
+		  </div>
+
+		  {:else if activeTabIndex === 1}
+			<p class="tab-content">{"stat"}</p>
+		  {:else if activeTabIndex === 1}
+			<p class="tab-content">{"stat"}</p>
+		  {/if}
+	  </div>
+	</div>
+  </div>
+
 
 <style lang="scss">
 
 	@include onglet;
 
-	//#box {
-	//	width: 20rem;
-	//	height: 20rem;
-	//	.pic-username-login {
-	//		display: flex;
-	//		align-items: center;
-	//		.pic {
-	//			display: inline-block;
-	//			position: relative;
-	//			cursor: pointer;
+	#box {
+		width: 20rem;
+		height: 20rem;
+		.pic-username-login {
+			display: flex;
+			align-items: center;
+			.pic {
+				display: inline-block;
+				position: relative;
+				cursor: pointer;
 
-	//			@include tab-contour-hollow;
-	//			padding: 0.15rem;
-	//			margin-right: 0.25rem;
-	//			margin-left: auto;
-	//			background-color: white;
-	//			height: 5rem;
-	//			width: 7.5rem;
-	//			display: flex;
-	//			img {
-	//				margin: 0 auto;
-	//				height: 4.5rem;
-	//				width: auto;
-	//			}
+				@include tab-contour-hollow;
+				padding: 0.15rem;
+				margin-right: 0.25rem;
+				margin-left: auto;
+				background-color: white;
+				height: 5rem;
+				width: 7.5rem;
+				display: flex;
+				img {
+					margin: 0 auto;
+					height: 4.5rem;
+					width: auto;
+				}
 
-	//			input[type="file"] {
-	//				position: absolute;
-	//				top: 0;
-	//				left: 0;
-	//				opacity: 0;
-	//				cursor: pointer;
-	//				width: 100%;
-	//				height: 100%;
-	//			}
-	//		}
-	//	}
-	//	li {
-	//		list-style: none;
-	//	}
-	//	li.box {
-	//		padding: 0.5rem;
-	//		margin: 0.25rem;
-	//		@include tab-contour-hollow;
-	//	}
-	//	li.friends {
-	//		@include tab-contour-hollow;
-	//		background-color: white;
-	//		div {
-	//			margin-bottom: 0.2rem;
-	//			display: flex;
-	//			align-items: center;
-	//			.status {
-	//				margin-left: auto;
-	//			}
-	//			img {
-	//				padding-left: 0.5rem;
-	//			}
-	//		}
-	//	}
-	//	.img-status {
-	//		height: 0.8rem;
-	//		width: auto;
-	//	}
-	//}
+				input[type="file"] {
+					position: absolute;
+					top: 0;
+					left: 0;
+					opacity: 0;
+					cursor: pointer;
+					width: 100%;
+					height: 100%;
+				}
+			}
+		}
+		li {
+			list-style: none;
+		}
+		li.box {
+			padding: 0.5rem;
+			margin: 0.25rem;
+			@include tab-contour-hollow;
+		}
+		li.friends {
+			@include tab-contour-hollow;
+			background-color: white;
+			div {
+				margin-bottom: 0.2rem;
+				display: flex;
+				align-items: center;
+				.status {
+					margin-left: auto;
+				}
+				img {
+					padding-left: 0.5rem;
+				}
+			}
+		}
+		.img-status {
+			height: 0.8rem;
+			width: auto;
+		}
+	}
 </style>
