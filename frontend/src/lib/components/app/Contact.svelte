@@ -159,7 +159,12 @@
 							▾
 						{/if}
 					</p>
-					<div class="buttons">
+					<div
+						class="buttons"
+						on:mousedown|stopPropagation={() => {
+							visible = visible;
+						}}
+					>
 						{#if visible === friend.id}
 							<img
 								class="option-icons"
