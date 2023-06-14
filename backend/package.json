@@ -53,6 +53,7 @@
     "dotenv-cli": "^7.2.1",
     "express-session": "^1.17.3",
     "multer": "^1.4.5-lts.1",
+    "mute": "^2.0.6",
     "nest": "^0.1.6",
     "pactum": "^3.4.0",
     "passport": "^0.6.0",

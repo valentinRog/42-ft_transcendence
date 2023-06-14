@@ -22,14 +22,15 @@
 
 	div.container {
 		position: relative;
+		&:hover {
+			@include tab-border($dark-grey, $light-grey);
+		}
 
 		div.drop {
 			padding: 0.2rem 0.65rem;
 
 			&:hover {
-				cursor: pointer;
-				background-color: $blue;
-				color: white;
+				cursor: url($click), auto;
 			}
 		}
 

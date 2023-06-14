@@ -89,6 +89,18 @@
 
 		export const components = (): Readable<Record<App, any>> => getContext('components');
 
+		interface Props {
+			readonly name: string;
+			readonly icon: string;
+		}
+
+		export interface AppProps {
+			readonly TabProps: Props;
+			readonly DesktopProps: Props;
+		}
+
+		export const apps = (): Readable<Record<App, AppProps>> => getContext('apps');
+
 		export const appInstances = (): Writable<Map<string, AppInstance>> =>
 			getContext('appInstances');
 		export const selected = (): Writable<string | null> => getContext('selected');
@@ -111,8 +123,6 @@
 			getContext('fetchChatById');
 		export const fetchPublicChats = (): ((start: number, limit: number) => Promise<any>) =>
 			getContext('fetchPublicChats');
-
-
 
 		export const socket = (): Readable<Socket> => getContext('socket');
 
@@ -205,7 +215,7 @@
 			componentType: componentType as Context.App,
 			component: $components[componentType as Context.App],
 			visible: true,
-			propsWin,
+			propsWin: { ...propsWin, appId: id },
 			props
 		});
 		$appInstances = $appInstances;
@@ -223,6 +233,51 @@
 	setContext('selected', selected);
 	setContext('addInstance', addInstance);
 	setContext('removeInstance', removeInstance);
+
+	const apps = readable<Record<Context.App, Context.AppProps>>({
+		Profile: {
+			TabProps: { name: 'Profile', icon: '/computer.png' },
+			DesktopProps: { name: 'Profile', icon: '/computer.png' }
+		},
+		Conversation: {
+			TabProps: { name: 'Conversation', icon: '/mail3.png' },
+			DesktopProps: { name: 'Conversation', icon: '/big-mail.png' }
+		},
+		Chat: {
+			TabProps: { name: 'Chat', icon: '/mail3.png' },
+			DesktopProps: { name: 'Chat', icon: '/big-mail.png' }
+		},
+		ChatForum: {
+			TabProps: { name: 'ChatForum', icon: '/mail3.png' },
+			DesktopProps: { name: 'ChatForum', icon: '/big-mail.png' }
+		},
+		Contact: {
+			TabProps: { name: 'Contact', icon: '/phone.png' },
+			DesktopProps: { name: 'Contact', icon: '/phone.png' }
+		},
+		Pong: {
+			TabProps: { name: 'Pong', icon: '/pong.png' },
+			DesktopProps: { name: 'Pong', icon: '/big-pong.png' }
+		},
+		FriendRequest: {
+			TabProps: { name: 'FriendRequest', icon: '/computer.png' },
+			DesktopProps: { name: 'FriendRequest', icon: '/computer.png' }
+		},
+		Forum: {
+			TabProps: { name: 'Forum', icon: '/computer.png' },
+			DesktopProps: { name: 'Forum', icon: '/computer.png' }
+		},
+		Paint: {
+			TabProps: { name: 'Paint', icon: '/paint.png' },
+			DesktopProps: { name: 'Paint', icon: '/paint.png' }
+		},
+		Internet: {
+			TabProps: { name: 'Internet', icon: '/internet.png' },
+			DesktopProps: { name: 'Internet', icon: '/internet.png' }
+		}
+	});
+
+	setContext('apps', apps);
 
 	async function fetchMe() {
 		const res = await fetchWithToken('users/me');
