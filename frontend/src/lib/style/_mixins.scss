@@ -262,6 +262,102 @@
 }
 
 
+@mixin onglet {
+
+	.window-body {
+		margin: var(--element-spacing);
+	  }
+
+	.window[role=tabpanel] {
+	  position: relative;
+	  z-index: 2;
+	}
+
+	menu[role=tablist] {
+	  position: relative;
+	  margin: 0 0 -2px 0;
+	  text-indent: 0;
+	  list-style-type: none;
+	  display: flex;
+	  padding-left: 3px;
+	}
+
+	menu[role=tablist] > li {
+	  border-top-left-radius: 3px;
+	  border-top-right-radius: 3px;
+	  box-shadow: var(--border-tab);
+	  z-index: 1;
+	}
+
+	menu[role=tablist] > li[aria-selected=true] {
+	  padding-bottom: 2px;
+	  margin-top: -2px;
+	  background-color: var(--surface);
+	  position: relative;
+	  z-index: 8;
+	  margin-left: -3px;
+	}
+
+	menu[role=tablist] > li > a {
+	  display: block;
+	  color: #222;
+	  margin: 6px;
+	  text-decoration: none;
+	}
+	menu[role=tablist] > li[aria-selected=true] > a:focus {
+	  outline: none;
+	}
+	menu[role=tablist] > li > a:focus {
+	  outline: 1px dotted #222;
+	}
+
+	menu[role=tablist].multirows > li {
+	  flex-grow: 1;
+	  text-align: center;
+	}
+	.sunken-panel {
+	  box-sizing: border-box;
+	  border: 2px groove transparent;
+	  border-image: svg-load("./icon/sunken-panel-border.svg") 2;
+	  overflow: auto;
+	  background-color: #fff;
+	}
+
+	table {
+	  border-collapse: collapse;
+	  position: relative;
+	  text-align: left;
+	  white-space: nowrap;
+	  background-color: #fff;
+	}
+
+	table > thead > tr > * {
+	  position: sticky;
+	  top: 0;
+	  height: 17px;
+	  box-shadow: var(--border-raised-outer), var(--border-raised-inner);
+	  background: var(--surface);
+	  box-sizing: border-box;
+	  font-weight: normal;
+	  padding: 0 var(--grouped-element-spacing);
+	}
+
+	table.interactive > tbody > tr {
+	  cursor: pointer;
+	}
+
+	table > tbody > tr.highlighted {
+	  color: #fff;
+	  background-color: var(--dialog-blue);
+	}
+
+	table > tbody > tr > * {
+	  padding: 0 var(--grouped-element-spacing);
+	  height: 14px;
+	}
+
+  }
+
 // ------------------------------------------------
 // -------------------- INPUT ---------------------
 // ------------------------------------------------
