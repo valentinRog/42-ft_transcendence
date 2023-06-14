@@ -14,7 +14,7 @@
 	<menu role="tablist">
 	  {#each tabTitle as content, index}
 		<li role="tab" aria-selected={index === activeTabIndex} on:click={() => activeTabIndex = index}>
-		  <a href="#tabs">{content}</a>
+		  <a>{content}</a>
 		</li>
 	  {/each}
 	</menu>
