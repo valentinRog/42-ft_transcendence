@@ -264,40 +264,16 @@
 
 @mixin onglet {
 
-	:root {
-		/* Color */
-		--surface: #c0c0c0;
-		--button-highlight: #ffffff;
-		--button-face: #dfdfdf;
-		--button-shadow: #808080;
-		--window-frame: #0a0a0a;
-
-		/* Spacing */
-		--element-spacing: 8px;
-
-		/* Window borders flip button-face and button-highlight */
-		--border-window-outer: inset -1px -1px var(--window-frame),
-		  inset 1px 1px var(--button-face);
-		--border-window-inner: inset -2px -2px var(--button-shadow),
-		  inset 2px 2px var(--button-highlight);
-
-		/* Tabs */
-		--border-tab: inset -1px 0 var(--window-frame),
-		  inset 1px 1px var(--button-face),
-		  inset -2px 0 var(--button-shadow),
-		  inset 2px 2px var(--button-highlight)
-	}
-
-
 	.window {
-		box-shadow: var(--border-window-outer), var(--border-window-inner);
-		background: var(--surface);
+		box-shadow: inset -0.05rem -0.05rem black,
+		inset 0.05rem 0.05rem $light-grey,
+		inset -2px -2px grey,
+		inset 2px 2px white;
 		padding: 3px;
 	}
 
-
 	.window-body {
-		margin: var(--element-spacing);
+		margin : 0.5rem;
 	  }
 
 	.window[role=tabpanel] {
@@ -317,9 +293,10 @@
 	menu[role=tablist] > li {
 	  border-top-left-radius: 3px;
 	  border-top-right-radius: 3px;
-	  box-shadow: var(--border-tab);
-	  //@include tab-border($light-grey, $grey);
-	  //box-shadow: $light-grey 0px 0px 0px 1px inset;
+	  box-shadow: inset -0.05rem 0,
+	  inset 0.05rem 0.05rem $light-grey,
+	  inset -2px 0 grey,
+	  inset 2px 2px white;
 	  z-index: 1;
 	}
 
@@ -334,8 +311,8 @@
 
 	menu[role=tablist] > li > a {
 	  display: block;
-	  color: #222;
-	  margin: 6px;
+	  color: black;
+	  margin: 0.4rem;
 	  text-decoration: none;
 	}
   }
