@@ -4,10 +4,16 @@ import { PrismaService } from './../../prisma/prisma.service';
 import { JwtGuard } from '../guard';
 import { GetUser } from '../decorator';
 import { User } from '@prisma/client';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('2fa')
 export class TwoFactorController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private config: ConfigService,
+    private jwt: JwtService,
+  ) {}
 
   @Post('enable')
   @UseGuards(JwtGuard)
@@ -27,7 +33,20 @@ export class TwoFactorController {
       where: { login: user.login },
       data: { twoFactorEnabled: true, twoFactorAuthSecret: secret.base32 },
     });
-    return { qrcode: qrCodeUrl };
+    const token = await this.jwt.signAsync(
+      {
+        sub: user.id,
+        login: user.login,
+        twoFactor: true,
+        isTwoFactorAuthenticated: true,
+      },
+      {
+        expiresIn: '1d',
+        secret: this.config.get('JWT_SECRET'),
+      },
+    );
+    console.log('yo ', token);
+    return { qrcode: qrCodeUrl, token };
   }
 
   @Post('test')

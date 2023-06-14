@@ -154,9 +154,9 @@
 					>
 						{friend.username}
 						{#if visible === friend.id}
-						▴
+							▴
 						{:else}
-						▾
+							▾
 						{/if}
 					</p>
 					<div class="buttons">
@@ -263,7 +263,7 @@
 				margin-bottom: auto;
 				display: flex;
 				align-items: center;
-				
+
 				.status {
 					margin-left: auto;
 				}
