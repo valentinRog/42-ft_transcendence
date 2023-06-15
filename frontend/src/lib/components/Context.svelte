@@ -301,12 +301,11 @@
 		const res = await fetchWithToken('notification/get?type=friend');
 		const data = await res.json();
 		$friendRequest = data;
-		console.log(data);
 		return data;
 	}
 
 	async function fetchGameRequest() {
-		const res = await fetchWithToken('notification/get?type=ask-game');
+		const res = await fetchWithToken('notification/get?type=game');
 		const data = await res.json();
 		$gameRequest = data;
 		return data;
@@ -361,7 +360,7 @@
 
 	$socket.on('game', (data: { message: string }) => {
 		console.log('accept-game', data.message);
-		$socket.emit('accept-game', { response: true, friend: data.message });
+		//$socket.emit('accept-game', { response: true, friend: data.message });
 		fetchGameRequest();
 	});
 

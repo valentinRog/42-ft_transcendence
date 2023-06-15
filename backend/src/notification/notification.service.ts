@@ -16,9 +16,6 @@ export class NotificationService {
   ) {}
 
   async notifyEvent(friend: string, username: string, message: string) {
-    if (message === 'game') {
-      throw new ForbiddenException(`${friend} is offline`);
-    }
     try {
       const firstNotif = await this.prisma.notification.findFirst({
         where: {
