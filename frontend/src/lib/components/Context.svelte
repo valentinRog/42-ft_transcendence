@@ -285,7 +285,8 @@
 		$user = {
 			id: data.id,
 			username: data.username,
-			login: data.login
+			login: data.login,
+			twoFactorEnabled: data.twoFactorEnabled
 		};
 		return data;
 	}

@@ -221,6 +221,6 @@
 		}
 	}
 	.selected {
-		background-color: $blue !important; 
+		background-color: $blue !important;
 	}
 </style>

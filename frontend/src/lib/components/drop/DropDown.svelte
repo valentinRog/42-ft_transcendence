@@ -1,5 +1,6 @@
 <script lang="ts">
 	export let name: string;
+	export let notif = 0;
 
 	let visible = false;
 </script>
@@ -9,7 +10,12 @@
 	on:mouseenter={() => (visible = true)}
 	on:mouseleave={() => (visible = false)}
 >
-	<div class="drop">{name}</div>
+	<div class="drop">
+		{name}
+		{#if notif !== 0}
+			({notif})
+		{/if}
+	</div>
 	<div class="content" class:hidden={!visible}>
 		<slot />
 	</div>

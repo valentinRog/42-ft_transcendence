@@ -3,6 +3,7 @@
 
 	export let name: string;
 	export let desktopHeight: number | null = null;
+	export let notif = 0;
 
 	let visible = false;
 	let content: HTMLElement | null = null;
@@ -21,7 +22,12 @@
 	on:mouseenter={() => (visible = true)}
 	on:mouseleave={() => (visible = false)}
 >
-	<div class="drop" class:path={visible}>{name}</div>
+	<div class="drop" class:path={visible}>
+		{name}
+		{#if notif !== 0}
+			({notif})
+		{/if}
+	</div>
 	<div class="content" class:hide={!visible} bind:this={content}>
 		<slot />
 	</div>

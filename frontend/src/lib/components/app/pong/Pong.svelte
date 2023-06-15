@@ -42,17 +42,30 @@
 		$socket.off('enter-room');
 		$socket.off('index');
 	});
+
+	let req = ["quelqu'un", "quelqu'un d'autre", 'someone', 'someone else'];
 </script>
 
 <div class="container">
 	<div class="menu">
-		<DropDown name="game">
+		<DropDown name="game" notif={req.length}>
 			{#if matchmaking === false}
 				<button on:click={matchmake}>matchmaking</button>
 			{:else}
 				<button class="unavailable">matchmake</button>
 			{/if}
-			<button class="unavailable"> invitations </button>
+			{#if req.length > 0}
+				<RightDrop name="invitations" notif={req.length}>
+					{#each req as r (r)}
+						<RightDrop name={r}>
+							<button on:click={() => (req = req.filter((x) => x !== r))}>accept</button>
+							<button on:click={() => (req = req.filter((x) => x !== r))}>decline</button>
+						</RightDrop>
+					{/each}
+				</RightDrop>
+			{:else}
+				<button class="unavailable"> invitations </button>
+			{/if}
 		</DropDown>
 		<DropDown name="settings">
 			<RightDrop name="scale">
