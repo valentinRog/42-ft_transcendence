@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  ForbiddenException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { WebSocketService } from 'src/websocket/websocket.service';
 import { UserService } from 'src/user/user.service';
@@ -17,10 +13,14 @@ export class NotificationService {
 
   async notifyEvent(friend: string, username: string, message: string) {
     try {
+      const prisma_friend = await this.prisma.user.findUnique({
+        where: { username: friend },
+      });
       const firstNotif = await this.prisma.notification.findFirst({
         where: {
           sender: username,
           type: message,
+          userId: prisma_friend.id,
         },
       });
       if (firstNotif) {
@@ -28,9 +28,6 @@ export class NotificationService {
           where: { id: firstNotif.id },
         });
       }
-      const prisma_friend = await this.prisma.user.findUnique({
-        where: { username: friend },
-      });
       const notif = await this.prisma.notification.create({
         data: {
           user: {
@@ -58,11 +55,18 @@ export class NotificationService {
   }
 
   async removeNotification(friend: string, message: string) {
+    const userToNotify = await this.prisma.notification.findMany({
+      where: {
+        sender: friend,
+        type: message,
+      },
+    });
     await this.prisma.notification.deleteMany({
       where: {
         sender: friend,
         type: message,
       },
     });
+    return userToNotify.map((item) => item.userId);
   }
 }

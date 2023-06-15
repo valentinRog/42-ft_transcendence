@@ -9,6 +9,7 @@ import { WebSocketModule } from '../websocket/websocket.module';
 import { StatModule } from 'src/stat/stat.module';
 import { StatService } from 'src/stat/stat.service';
 import { PrismaClient } from '@prisma/client';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Module({
   imports: [JwtModule.register({}), HttpModule, WebSocketModule, StatModule],
@@ -19,6 +20,7 @@ import { PrismaClient } from '@prisma/client';
     ChatService,
     PrismaClient,
     StatService,
+    NotificationService,
   ],
 })
 export class PongModule {}

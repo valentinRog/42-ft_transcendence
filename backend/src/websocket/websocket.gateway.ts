@@ -14,6 +14,7 @@ import { UserService } from 'src/user/user.service';
 import { ChatService } from 'src/chat/chat.service';
 import { StatService } from 'src/stat/stat.service';
 import { Chat, ChatUser, Message, User } from '../chat/model/chat.model';
+import { NotificationService } from 'src/notification/notification.service';
 
 @WebSocketGateway({
   cors: {
@@ -32,6 +33,7 @@ export abstract class SocketGateway
     protected readonly userService: UserService,
     protected readonly chatService: ChatService,
     protected readonly statService: StatService,
+    protected readonly notificationService: NotificationService,
   ) {}
 
   async handleConnection(client: Socket) {
@@ -48,6 +50,16 @@ export abstract class SocketGateway
     console.log(`${user.username} connected`);
     this.webSocketService.addSocket(user.username, client);
     this.userService.updateUserStatus(user.username, 'online');
+    const userToNotify = await this.notificationService.removeNotification(
+      user.username,
+      'game',
+    );
+    for (const id of userToNotify) {
+      const user = await this.userService.getUserById(id);
+      this.webSocketService
+        .getSocket(user.username)
+        .emit('game', user.username);
+    }
   }
 
   handleDisconnect(client: Socket) {
