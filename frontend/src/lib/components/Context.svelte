@@ -139,7 +139,7 @@
 	import Chat from '$lib/components/app/Chat.svelte';
 	import ChatForum from '$lib/components/app/ChatForum.svelte';
 	import Contact from '$lib/components/app/Contact.svelte';
-	import Profile from '$lib/components/app/Profile.svelte';
+	import Profile from '$lib/components/app/Profile/Profile.svelte';
 	import Forum from '$lib/components/app/Forum.svelte';
 	import Conversation from '$lib/components/app/Conversation.svelte';
 	import Internet from '$lib/components/app/Internet.svelte';

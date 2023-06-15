@@ -3,7 +3,7 @@
 
 	let activeTabIndex = 0;
 	const tabTitle = [
-		"Information",
+		"Informations",
 		"Statistics",
 		"Match history",
 	];

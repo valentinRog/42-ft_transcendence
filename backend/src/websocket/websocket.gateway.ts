@@ -13,7 +13,6 @@ import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
 import { ChatService } from 'src/chat/chat.service';
 import { StatService } from 'src/stat/stat.service';
-import { Chat, ChatUser, Message, User } from '../chat/model/chat.model';
 import { NotificationService } from 'src/notification/notification.service';
 
 @WebSocketGateway({
@@ -81,9 +80,7 @@ export abstract class SocketGateway
   @SubscribeMessage('joinChat')
   async handleJoinChat(client: any, payload: any) {
     const chatId = payload.chatId;
-    const userId = payload.userId;
 
-    const newChatUser = await this.chatService.addUserToChat(chatId, userId);
     const chat = await this.chatService.findChatById(chatId);
 
     client.join(`chat-${payload.chatId}`);
@@ -101,7 +98,6 @@ export abstract class SocketGateway
       password?: string;
     },
   ) {
-    const user = this.webSocketService.getClientName(client);
     const newGroupChat = await this.chatService.createChat(
       payload.groupName,
       payload.memberUsernames,
