@@ -95,15 +95,15 @@
 					</div>
 				{/if}
 				<div class="button-container">
+					<button type="submit"
+						>{#if signup}Sign Up{:else}Sign In{/if}</button
+					>
 					<button
 						type="button"
 						on:click={() => {
 							signup = !signup;
 							updateActionUrl();
 						}}>{signup ? 'I have an account' : 'Create an account'}</button
-					>
-					<button type="submit"
-						>{#if signup}Sign Up{:else}Sign In{/if}</button
 					>
 					<a href="{PUBLIC_BACKEND_URL}/auth/42login">
 						<div>
@@ -222,6 +222,7 @@
 			a {
 				display: block;
 				text-align: center;
+				height: 1.7rem;
 			}
 		}
 	}
