@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import DropDown from '$lib/components/drop/DropDown.svelte';
-	import { writable } from 'svelte/store';
 
 	let canvas: HTMLCanvasElement;
 	let ctx: CanvasRenderingContext2D;

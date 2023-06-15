@@ -77,7 +77,8 @@
 			| 'Conversation'
 			| 'Forum'
 			| 'FriendRequest'
-			| 'Internet';
+			| 'Internet'
+			| 'Notepad';
 
 		export interface AppInstance {
 			readonly componentType: App;
@@ -143,6 +144,7 @@
 	import Forum from '$lib/components/app/Forum.svelte';
 	import Conversation from '$lib/components/app/Conversation.svelte';
 	import Internet from '$lib/components/app/Internet.svelte';
+	import Notepad from '$lib/components/app/Notepad.svelte';
 	import FriendRequest from '$lib/components/app/FriendRequest.svelte';
 	import { token, user } from '$lib/stores';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
@@ -197,7 +199,8 @@
 		Profile: Profile,
 		Conversation: Conversation,
 		Forum: Forum,
-		Internet: Internet
+		Internet: Internet,
+		Notepad: Notepad
 	});
 
 	const appInstances = writable(new Map<string, Context.AppInstance>());
@@ -274,6 +277,10 @@
 		Internet: {
 			TabProps: { name: 'Internet', icon: '/internet.png' },
 			DesktopProps: { name: 'Internet', icon: '/internet.png' }
+		},
+		Notepad: {
+			TabProps: { name: 'Notepad', icon: '/notepad.png' },
+			DesktopProps: { name: 'Notepad', icon: '/notepad.png' }
 		}
 	});
 
