@@ -95,7 +95,7 @@ export abstract class SocketGateway
       payload.memberUsernames,
       payload.isGroupChat,
       payload.accessibility,
-      payload.password
+      payload.password,
     );
 
     for (const member of newGroupChat.chatUsers) {
@@ -118,9 +118,13 @@ export abstract class SocketGateway
     const user = await this.userService.getUser(username);
 
     const otherChatUser = chat
-      ? chat.chatUsers.find((c) => (c as any).user.username !== username,) : null;
+      ? chat.chatUsers.find((c) => (c as any).user.username !== username)
+      : null;
     const socket = this.webSocketService.getSocket(
-      otherChatUser ? (otherChatUser as any).user.username : payload.friendUsername,);
+      otherChatUser
+        ? (otherChatUser as any).user.username
+        : payload.friendUsername,
+    );
 
     const sendMessage = async () => {
       const newMessage = await this.chatService.addMessageToDatabase(
@@ -144,7 +148,7 @@ export abstract class SocketGateway
         `${username}-${payload.friendUsername}`,
         [username, payload.friendUsername],
         false,
-        "private"
+        'private',
       );
       const newMessage = await this.chatService.addMessageToDatabase(
         newchat.id,
@@ -158,12 +162,11 @@ export abstract class SocketGateway
       }
       client.emit('addChat', newchat);
       client.emit('updateChat', newchat.id);
-    } 
-    else {
+    } else {
       if (!chat.chatUsers.find((c) => (c as any).user.id === user.id)) {
         await this.chatService.addUserToChat(chat.id, user.id);
         const newchat = await this.chatService.findChatById(chat.id);
-        
+
         client.join(`chat-${chat.id}`);
         client.emit('addChat', newchat);
       }
@@ -206,59 +209,61 @@ export abstract class SocketGateway
 
   @SubscribeMessage('banUser')
   async handleBanUser(
-    client: Socket, 
-    payload: { chatId: number; userId: number; duration: number | null }
-    ) {
+    client: Socket,
+    payload: { chatId: number; userId: number; duration: number | null },
+  ) {
     const { chatId, userId, duration } = payload;
     const expiresAt = await this.chatService.banUser(chatId, userId, duration);
 
     const user = await this.userService.getUserById(userId);
     const socket = await this.webSocketService.getSocket(user.username);
 
-    if (socket) 
-      socket.emit('userBan', { chatId, expiresAt });
+    if (socket) socket.emit('userBan', { chatId, expiresAt });
 
-    return ;
+    return;
   }
 
   @SubscribeMessage('unBanUser')
-  async handleUnbanUser(client: Socket, payload: { chatId: number; userId: number }) {
+  async handleUnbanUser(
+    client: Socket,
+    payload: { chatId: number; userId: number },
+  ) {
     const { chatId, userId } = payload;
     await this.chatService.unBanUser(chatId, userId);
-    return ;
+    return;
   }
 
   //MUTE//
 
   @SubscribeMessage('muteUser')
   async handleMuteUser(
-    client: Socket, 
-    payload: { chatId: number; userId: number; duration: number | null }
-    ) {
+    client: Socket,
+    payload: { chatId: number; userId: number; duration: number | null },
+  ) {
     const { chatId, userId, duration } = payload;
     const expiresAt = await this.chatService.muteUser(chatId, userId, duration);
     const user = await this.userService.getUserById(userId);
     const socket = await this.webSocketService.getSocket(user.username);
-    if (socket) 
-      socket.emit('userMute', { chatId, expiresAt });
+    if (socket) socket.emit('userMute', { chatId, expiresAt });
 
-    return ;
+    return;
   }
 
   @SubscribeMessage('unMuteUser')
-  async handleUnMuteUser(client: Socket, payload: { chatId: number; userId: number }) {
+  async handleUnMuteUser(
+    client: Socket,
+    payload: { chatId: number; userId: number },
+  ) {
     const { chatId, userId } = payload;
     await this.chatService.unMuteUser(chatId, userId);
-    return ;
+    return;
   }
 
-
-  @SubscribeMessage('accept-friend')
+  @SubscribeMessage('response-friend')
   async handleAcceptFriend(
     @MessageBody() data: { response: boolean; friend: string },
     @ConnectedSocket() client: Socket,
   ) {
-    console.log('accept-friend');
     const username = this.webSocketService.getClientName(client);
     const user = await this.userService.getUser(data.friend);
     if (!user) return { error: 'User not found' };
@@ -268,15 +273,12 @@ export abstract class SocketGateway
     client.emit('friend-accepted', data.friend);
   }
 
-  @SubscribeMessage('accept-game')
+  @SubscribeMessage('response-game')
   async handleMatch(
     @MessageBody() data: { response: boolean; friend: string },
     @ConnectedSocket() client: Socket,
   ) {
     const username = this.webSocketService.getClientName(client);
-    const user = await this.userService.getUser(username);
-    if (!user) return { error: 'User not found' };
-    if (user.status !== 'online') return { error: 'User is not ready' };
     if (data.response) {
       this.webSocketService.createRoom(username, data.friend);
     }

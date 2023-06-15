@@ -360,8 +360,7 @@
 	});
 
 	$socket.on('game', (data: { message: string }) => {
-		console.log('accept-game', data.message);
-		//$socket.emit('accept-game', { response: true, friend: data.message });
+		//$socket.emit('response', { response: true, friend: data.message });
 		fetchGameRequest();
 	});
 
