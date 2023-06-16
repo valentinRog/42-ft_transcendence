@@ -31,17 +31,14 @@
 		</tr>
 	  </thead>
 	  <tbody>
-		<tr>
-		  <td>MySQL ODBC 3.51 Driver</td>
-		  <td>3.51.11.00</td>
-		  <td>MySQL AB</td>
-		</tr>
-		<tr>
-		  <td>SQL Server</td>
-		  <td>3.70.06.23</td>
-		  <td>Microsoft Corporation</td>
-		</tr>
-	  </tbody>
+		{#each Object.values($history) as row}
+			<tr>
+				{#each Object.values(row) as cell}
+					<td>{cell}</td>
+				{/each}
+			</tr>
+		{/each}
+	</tbody>
 	</table>
 </div>
 

@@ -6,6 +6,11 @@
 		export const fetchWithToken = (): ((url: string, options?: RequestInit) => Promise<Response>) =>
 			getContext('fetchWithToken');
 
+		export type Match = {
+			result : string;
+			opponent: string;
+			createdAt: string;
+		}
 		export interface Contact {
 			id: number;
 			username: string;
@@ -58,7 +63,7 @@
 		export const contacts = (): Writable<Contact[]> => getContext('contacts');
 		export const friendRequest = (): Writable<NotifRequest[]> => getContext('friendRequest');
 		export const gameRequest = (): Writable<NotifRequest[]> => getContext('gameRequest');
-		export const history = (): Writable<any[]> => getContext('history');
+		export const history = (): Writable<Match[]> => getContext('history');
 		export const openFriendRequest = (): Writable<boolean> => getContext('openFriendRequest');
 		export const openPongWindow = (): Writable<boolean> => getContext('openPongWindow');
 		export const friendInfoId = (): Writable<number | null> => getContext('friendInfoId');
@@ -170,7 +175,7 @@
 	const contacts = writable<Context.Contact[]>([]);
 	const friendRequest = writable<Context.NotifRequest[]>([]);
 	const gameRequest = writable<Context.NotifRequest[]>([]);
-	const history = writable<any[]>([]);
+	const history = writable<Context.Match[]>([]);
 	const openFriendRequest = writable(false);
 	const openPongWindow = writable(false);
 	const friendInfoId = writable<Context.User | null>(null);
@@ -326,6 +331,11 @@
 	async function fetchHistory() {
 		const res = await fetchWithToken('stat/get-history');
 		const data = await res.json();
+		data.forEach(function(element : any, index : number) {
+			data[index] = { result : $user?.username === element.winnerName ? "Win" : "Lose",
+			opponent : $user?.username === element.winnerName ? element.loserName : element.winnerName, createdAt: element.createdAt}
+		});
+
 		$history = data;
 		return data;
 	}
