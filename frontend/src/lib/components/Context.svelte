@@ -335,9 +335,11 @@
 			data[index] = { result : $user?.username === element.winnerName ? "Win" : "Lose",
 			opponent : $user?.username === element.winnerName ? element.loserName : element.winnerName, createdAt: element.createdAt}
 		});
-
 		$history = data;
-		return data;
+		console.log(data);
+		return new Promise((resolve, reject) => {
+			resolve(data);
+		});
 	}
 
 	async function fetchChats() {
@@ -353,7 +355,6 @@
 		const data = await res.json();
 		return data;
 	}
-
 
 	async function fetchPublicChats(start: number, limit: number) {
 		const response = await fetchWithToken(`chat/publicChats?start=${start}&limit=${limit}`);

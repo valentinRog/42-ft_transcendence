@@ -105,7 +105,6 @@ export class PongGateway extends SocketGateway {
 
   @SubscribeMessage('leave-room')
   async handleLeaveRoom(client: Socket, data: { room: string; index: number }) {
-    client.leave(data.room);
     const game = this.games.get(data.room);
     if (game) {
       if (data.index === 0 || data.index === 1) {
@@ -117,5 +116,6 @@ export class PongGateway extends SocketGateway {
         this.updateStat(game, client, data, result);
       }
     }
+    client.leave(data.room);
   }
 }

@@ -79,7 +79,6 @@ export class StatService {
       const sortedMatches = allMatches.sort(
         (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
       );
-      console.log(sortedMatches);
       return sortedMatches;
     } catch (error) {
       throw new NotFoundException('Error retrieving matches');
