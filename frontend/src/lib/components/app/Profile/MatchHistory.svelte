@@ -9,8 +9,8 @@
 	//});
 </script>
 
-
-<div class="sunken-panel" style="height: 200px; width: 300px;">
+<div class="sunken-panel" style="height: 120px; width: 240px;">
+<!--<div class="sunken-panel" style="height: 20rem; width: 20rem;">-->
 	<table class="interactive">
 	  <thead>
 		<tr>

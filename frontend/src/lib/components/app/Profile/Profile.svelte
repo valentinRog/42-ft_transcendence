@@ -1,6 +1,6 @@
 <script lang="ts">
 	import MatchHistory from './MatchHistory.svelte';
-	import ProfileInfo from './ProfileInfo.svelte';
+	import ProfileInfo from './Information.svelte';
 
 	let activeTabIndex = 0;
 	const tabTitle = [

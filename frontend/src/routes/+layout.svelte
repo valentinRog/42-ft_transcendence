@@ -68,6 +68,16 @@
 		background-image: url('/arrow-up.png');
 	}
 
+	::-webkit-scrollbar-button:horizontal:decrement {
+    	background-image: url('/arrow-left.png');
+		background-size: 25% auto;
+	}
+
+	::-webkit-scrollbar-button:horizontal:increment {
+		background-image: url('/arrow-right.png');
+		background-size: 25% auto;
+	}
+
 	// a vérifier !!!
 	scrollbar {
 		width: 1rem;
@@ -82,18 +92,5 @@
 		margin: 0 0.2rem;
 		background-color: $grey;
 		@include tab-border;
-	}
-
-	scrollbarbutton {
-		background-image: url('/arrow-down.png');
-		background-size: 0.5rem;
-		background-repeat: no-repeat;
-		background-position: center;
-		background-color: $grey;
-		@include tab-border;
-	}
-
-	scrollbarbutton[orient='vertical'][type='decrement'] {
-		background-image: url('/arrow-up.png');
 	}
 </style>

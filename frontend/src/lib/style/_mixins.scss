@@ -344,12 +344,42 @@
 
 @mixin table {
 
+	:root {
+		/* Color */
+		--text-color: #222222;
+		--surface: #c0c0c0;
+		--button-highlight: #ffffff;
+		--button-face: #dfdfdf;
+		--button-shadow: #808080;
+		--window-frame: #0a0a0a;
+		--dialog-blue: #000080;
+		--dialog-blue-light: #1084d0;
+		--dialog-gray: #808080;
+		--dialog-gray-light: #b5b5b5;
+		--link-blue: #0000ff;
+
+		/* Spacing */
+		--element-spacing: 8px;
+		--grouped-button-spacing: 4px;
+		--grouped-element-spacing: 6px;
+
+		/* Borders */
+		--border-width: 1px;
+		--border-raised-outer: inset -1px -1px var(--window-frame),
+		  inset 1px 1px var(--button-highlight);
+		--border-raised-inner: inset -2px -2px var(--button-shadow),
+		  inset 2px 2px var(--button-face);
+		--border-sunken-outer: inset -1px -1px var(--button-highlight),
+		  inset 1px 1px var(--window-frame);
+		--border-sunken-inner: inset -2px -2px var(--button-face),
+		  inset 2px 2px var(--button-shadow);
+
+	  }
+
 	.sunken-panel {
 		box-sizing: border-box;
 		border: 2px groove transparent;
-		border-image: svg-load("./icon/sunken-panel-border.svg") 2;
 		overflow: auto;
-		background-color: #fff;
 	}
 
 	table {
@@ -357,7 +387,7 @@
 		position: relative;
 		text-align: left;
 		white-space: nowrap;
-		background-color: #fff;
+		background-color: white;
 	}
 
 	table > thead > tr > * {
@@ -365,10 +395,10 @@
 		top: 0;
 		height: 17px;
 		box-shadow: var(--border-raised-outer), var(--border-raised-inner);
-		background: var(--surface);
+		background: $grey;
 		box-sizing: border-box;
 		font-weight: normal;
-		padding: 0 var(--grouped-element-spacing);
+		padding: 0 0.5rem;
 	}
 
 	table.interactive > tbody > tr {
@@ -376,12 +406,12 @@
 	}
 
 	table > tbody > tr.highlighted {
-		color: #fff;
-		background-color: var(--dialog-blue);
+		color: white;
+		background-color: #1084d0;
 	}
 
 	table > tbody > tr > * {
-		padding: 0 var(--grouped-element-spacing);
+		padding: 0 0.5rem;
 		height: 14px;
 	}
 }
