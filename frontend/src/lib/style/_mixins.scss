@@ -358,21 +358,10 @@
 		--dialog-gray-light: #b5b5b5;
 		--link-blue: #0000ff;
 
-		/* Spacing */
-		--element-spacing: 8px;
-		--grouped-button-spacing: 4px;
-		--grouped-element-spacing: 6px;
-
-		/* Borders */
-		--border-width: 1px;
 		--border-raised-outer: inset -1px -1px var(--window-frame),
 		  inset 1px 1px var(--button-highlight);
 		--border-raised-inner: inset -2px -2px var(--button-shadow),
 		  inset 2px 2px var(--button-face);
-		--border-sunken-outer: inset -1px -1px var(--button-highlight),
-		  inset 1px 1px var(--window-frame);
-		--border-sunken-inner: inset -2px -2px var(--button-face),
-		  inset 2px 2px var(--button-shadow);
 
 	  }
 
