@@ -1,4 +1,5 @@
 <script lang="ts">
+	import MatchHistory from './MatchHistory.svelte';
 	import ProfileInfo from './ProfileInfo.svelte';
 
 	let activeTabIndex = 0;
@@ -27,8 +28,8 @@
 		  </div>
 		  {:else if activeTabIndex === 1}
 			<p class="tab-content">{"stat"}</p>
-		  {:else if activeTabIndex === 1}
-			<p class="tab-content">{"stat"}</p>
+		  {:else if activeTabIndex === 2}
+		  	<MatchHistory />
 		  {/if}
 	  </div>
 	</div>
