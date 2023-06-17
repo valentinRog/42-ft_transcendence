@@ -6,6 +6,11 @@
 		export const fetchWithToken = (): ((url: string, options?: RequestInit) => Promise<Response>) =>
 			getContext('fetchWithToken');
 
+		export type Match = {
+			result : string;
+			opponent: string;
+			createdAt: string;
+		}
 		export interface Contact {
 			id: number;
 			username: string;
@@ -58,6 +63,7 @@
 		export const contacts = (): Writable<Contact[]> => getContext('contacts');
 		export const friendRequest = (): Writable<NotifRequest[]> => getContext('friendRequest');
 		export const gameRequest = (): Writable<NotifRequest[]> => getContext('gameRequest');
+		export const history = (): Writable<Match[]> => getContext('history');
 		export const openFriendRequest = (): Writable<boolean> => getContext('openFriendRequest');
 		export const openPongWindow = (): Writable<boolean> => getContext('openPongWindow');
 		export const friendInfoId = (): Writable<number | null> => getContext('friendInfoId');
@@ -115,6 +121,7 @@
 
 		export const removeInstance = (): ((id: string) => void) => getContext('removeInstance');
 
+		export const fetchHistory = (): (() => Promise<any>) => getContext('fetchHistory');
 		export const fetchMe = (): (() => Promise<any>) => getContext('fetchMe');
 		export const fetchFriends = (): (() => Promise<any>) => getContext('fetchFriends');
 		export const fetchFriendRequest = (): (() => Promise<any>) => getContext('fetchFriendRequest');
@@ -168,6 +175,7 @@
 	const contacts = writable<Context.Contact[]>([]);
 	const friendRequest = writable<Context.NotifRequest[]>([]);
 	const gameRequest = writable<Context.NotifRequest[]>([]);
+	const history = writable<Context.Match[]>([]);
 	const openFriendRequest = writable(false);
 	const openPongWindow = writable(false);
 	const friendInfoId = writable<Context.User | null>(null);
@@ -180,6 +188,7 @@
 	setContext('contacts', contacts);
 	setContext('friendRequest', friendRequest);
 	setContext('gameRequest', gameRequest);
+	setContext('history', history);
 	setContext('openFriendRequest', openFriendRequest);
 	setContext('openPongWindow', openPongWindow);
 	setContext('friendInfoId', friendInfoId);
@@ -319,7 +328,19 @@
 		return data;
 	}
 
-	setContext('fetchGameRequest', fetchGameRequest);
+	async function fetchHistory() {
+		const res = await fetchWithToken('stat/get-history');
+		const data = await res.json();
+		data.forEach(function(element : any, index : number) {
+			data[index] = { result : $user?.username === element.winnerName ? "Win" : "Lose",
+			opponent : $user?.username === element.winnerName ? element.loserName : element.winnerName, createdAt: element.createdAt}
+		});
+		$history = data;
+		console.log(data);
+		return new Promise((resolve, reject) => {
+			resolve(data);
+		});
+	}
 
 	async function fetchChats() {
 		const res = await fetchWithToken('chat/allUserChats');
@@ -335,8 +356,6 @@
 		return data;
 	}
 
-	setContext('fetchPublicChats', fetchPublicChats);
-
 	async function fetchPublicChats(start: number, limit: number) {
 		const response = await fetchWithToken(`chat/publicChats?start=${start}&limit=${limit}`);
 		const data = await response.json();
@@ -345,6 +364,9 @@
 		return data;
 	}
 
+	setContext('fetchPublicChats', fetchPublicChats);
+	setContext('fetchGameRequest', fetchGameRequest);
+	setContext('fetchHistory', fetchHistory);
 	setContext('fetchMe', fetchMe);
 	setContext('fetchFriends', fetchFriends);
 	setContext('fetchFriendRequest', fetchFriendRequest);

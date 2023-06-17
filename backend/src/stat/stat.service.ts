@@ -45,20 +45,20 @@ export class StatService {
       },
     });
 
-    const winnerId = dto.result === 1 ? userId : playerB.id;
-    const loserId = dto.result === 1 ? playerB.id : userId;
+    const winnerName = dto.result === 1 ? playerA.username : playerB.username;
+    const loserName = dto.result === 1 ? playerB.username : playerA.username;
     const match = await this.prisma.match.create({
       data: {
-        winnerId: winnerId,
-        loserId: loserId,
+        winnerName: winnerName,
+        loserName: loserName,
       },
     });
     await this.prisma.user.update({
-      where: { id: winnerId },
+      where: { username: winnerName },
       data: { matchesAsWinner: { connect: { id: match.id } } },
     });
     await this.prisma.user.update({
-      where: { id: loserId },
+      where: { username: loserName },
       data: { matchesAsLoser: { connect: { id: match.id } } },
     });
     return match;

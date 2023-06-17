@@ -31,6 +31,15 @@ model User {
   mutes            Mute[]
 }
 
+model Match {
+  id         Int       @id @default(autoincrement())
+  createdAt  DateTime  @default(now())
+  winner     User      @relation("Winner", fields: [winnerName], references: [username])
+  loser      User      @relation("Loser", fields: [loserName], references: [username])
+  winnerName String
+  loserName  String
+}
+
 model Notification {
   id        Int       @id @default(autoincrement())
   createdAt DateTime  @default(now())
@@ -39,15 +48,6 @@ model Notification {
   sender    String    @default("system")
   userId   	Int
   @@unique([userId, sender, type])
-}
-
-model Match {
-  id         Int       @id @default(autoincrement())
-  createdAt  DateTime  @default(now())
-  winner     User      @relation("Winner", fields: [winnerId], references: [id])
-  loser      User      @relation("Loser", fields: [loserId], references: [id])
-  winnerId   Int
-  loserId    Int
 }
 
 model Stat {
@@ -79,7 +79,7 @@ model Chat {
   name           String
   isGroupChat    Boolean   @default(false)
   accessibility  String    @default("public")
-  password       String? 
+  password       String?
 
   messages       Message[]
   chatUsers      ChatUser[]
@@ -117,7 +117,7 @@ model Ban {
   chat           Chat  @relation(fields: [chatId], references: [id])
   user           User  @relation(fields: [userId], references: [id])
 
-  @@id([chatId, userId]) 
+  @@id([chatId, userId])
 }
 
 model Mute {
@@ -129,5 +129,5 @@ model Mute {
   chat           Chat  @relation(fields: [chatId], references: [id])
   user           User  @relation(fields: [userId], references: [id])
 
-  @@id([chatId, userId]) 
+  @@id([chatId, userId])
 }
