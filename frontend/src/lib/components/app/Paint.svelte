@@ -8,7 +8,7 @@
 
 	interface toolProps {
 		readonly name: string;
-		readonly size: number;
+		readonly lineWidth: number;
 		readonly color: string;
 		readonly lineCap: CanvasLineCap;
 		readonly lineJoin: CanvasLineJoin;
@@ -23,7 +23,7 @@
 	let tools: Record<Tool, toolProps> = {
 		Pen: {
 			name: 'pen',
-			size: 5,
+			lineWidth: 5,
 			color: 'red',
 			lineCap: 'round',
 			lineJoin: 'round',
@@ -36,7 +36,7 @@
 		},
 		Brush: {
 			name: 'brush',
-			size: 15,
+			lineWidth: 15,
 			color: 'blue',
 			lineCap: 'square',
 			lineJoin: 'miter',
@@ -49,7 +49,7 @@
 		},
 		Blob: {
 			name: 'blob',
-			size: 5,
+			lineWidth: 5,
 			color: 'red',
 			lineCap: 'butt',
 			lineJoin: 'miter',
@@ -62,7 +62,7 @@
 		},
 		Plop: {
 			name: 'plop',
-			size: 15,
+			lineWidth: 15,
 			color: 'blue',
 			lineCap: 'butt',
 			lineJoin: 'miter',
@@ -88,7 +88,7 @@
 		'#FFFFFF'
 	];
 
-	let color = colors[0];
+	let color: string = colors[0];
 
 	onMount(() => {
 		canvas.width = 800;
@@ -101,6 +101,8 @@
 		startY: number;
 		endX: number;
 		endY: number;
+		lineWidth: number;
+		color: string;
 	};
 
 	type Rectangle = {
@@ -108,6 +110,8 @@
 		startY: number;
 		width: number;
 		height: number;
+		lineWidth: number;
+		color: string;
 	};
 
 	let lines: Line[] = [];
@@ -118,7 +122,7 @@
 		toolSelected.startX = event.offsetX;
 		toolSelected.startY = event.offsetY;
 		ctx.strokeStyle = color;
-		ctx.lineWidth = toolSelected.size;
+		ctx.lineWidth = toolSelected.lineWidth;
 		ctx.beginPath();
 		ctx.moveTo(toolSelected.startX, toolSelected.startY);
 	}
@@ -127,36 +131,47 @@
 		if (!isDrawing) return;
 		const { offsetX, offsetY } = event;
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
-
 		rectangles.forEach((rect) => {
-			ctx.strokeRect(rect.startX, rect.startY, rect.width, rect.height);
+			if (rect.startX !== 0 && rect.startY !== 0) {
+				ctx.lineWidth = rect.lineWidth;
+				ctx.strokeStyle = rect.color;
+				ctx.strokeRect(rect.startX, rect.startY, rect.width, rect.height);
+			}
 		});
 
 		lines.forEach((line) => {
+			ctx.lineWidth = line.lineWidth;
 			ctx.beginPath();
 			ctx.moveTo(line.startX, line.startY);
 			ctx.lineTo(line.endX, line.endY);
+			ctx.strokeStyle = line.color;
 			ctx.stroke();
 		});
-
+		
 		ctx.beginPath();
+		ctx.lineWidth = toolSelected.lineWidth;
+		ctx.strokeStyle = color;
 		const width = offsetX - toolSelected.startX;
 		const height = offsetY - toolSelected.startY;
 		ctx.strokeRect(toolSelected.startX, toolSelected.startY, width, height);
 	}
 
+	
 	function draw(event: MouseEvent) {
 		if (!isDrawing) return;
 		const { offsetX, offsetY } = event;
 		ctx.lineCap = toolSelected.lineCap;
 		ctx.lineJoin = toolSelected.lineJoin;
 		ctx.lineTo(offsetX, offsetY);
+		ctx.strokeStyle = color;
 		ctx.stroke();
 		lines.push({
 			startX: toolSelected.startX,
 			startY: toolSelected.startY,
 			endX: offsetX,
-			endY: offsetY
+			endY: offsetY,
+			lineWidth: toolSelected.lineWidth,
+			color: color
 		});
 		toolSelected.startX = offsetX;
 		toolSelected.startY = offsetY;
@@ -166,7 +181,16 @@
 		isDrawing = false;
 		const width = event.offsetX - toolSelected.startX;
 		const height = event.offsetY - toolSelected.startY;
-		rectangles.push({ startX: toolSelected.startX, startY: toolSelected.startY, width, height });
+		rectangles.push({
+			startX: toolSelected.startX,
+			startY: toolSelected.startY,
+			width,
+			height,
+			lineWidth: toolSelected.lineWidth,
+			color: color
+		});
+		toolSelected.startX = 0;
+		toolSelected.startY = 0;
 	}
 
 	function clear() {
@@ -230,12 +254,7 @@
 	</div>
 	<div class="color-pick">
 		{#each colors as c}
-			<div
-				class="color"
-				class:selected={color === c}
-				style:background={c}
-				on:click={() => (color = c)}
-			/>
+			<div class="color" style:background={c} on:click={() => (color = c)} />
 		{/each}
 	</div>
 </div>
