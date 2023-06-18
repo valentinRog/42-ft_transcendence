@@ -1,17 +1,10 @@
 <script lang="ts">
 	import { Context } from '$lib/components/Context.svelte';
 
-	//document.querySelectorAll('table.interactive').forEach(element => {
-	//  element.addEventListener('click', (event) => {
-	//	const row = event.path.find(element => element.tagName === 'TR' && element.parentElement.tagName === 'TBODY');
-	//	if (row) {
-	//	  row.classList.toggle('highlighted');
-	//	}
-	//  })
-	//});
-
 	const fetchHistory = Context.fetchHistory();
 	const history = Context.history();
+
+	let current: Context.Match | null = null;
 
 	(async () => {
 		await fetchHistory();
@@ -19,8 +12,7 @@
 	})();
 </script>
 
-<div class="sunken-panel" style="height: 150px; width: 240px;">
-	<!--<div class="sunken-panel" style="height: 20rem; width: 20rem;">-->
+<div class="sunken-panel" style="height: 15rem; width: 18rem;">
 	<table class="interactive">
 		<thead>
 			<tr>
@@ -31,7 +23,8 @@
 		</thead>
 		<tbody>
 			{#each Object.values($history) as row}
-				<tr>
+				<tr class="{current === row ? 'highlighted' : ''}"
+				on:click={() => current === row ? (current = null ) : (current = row) }>
 					{#each Object.values(row) as cell}
 						<td>{cell}</td>
 					{/each}
@@ -42,5 +35,7 @@
 </div>
 
 <style lang="scss">
+
 	@include table-95;
+
 </style>

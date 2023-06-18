@@ -364,7 +364,7 @@
 		cursor: pointer;
 	}
 
-	table > tbody > tr.highlighted {
+	table.interactive > tbody > tr.highlighted {
 		color: white;
 		background-color: #1084d0;
 	}
