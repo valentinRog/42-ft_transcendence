@@ -333,11 +333,11 @@
 // -------------------- TABLE ---------------------
 // ------------------------------------------------
 
-@mixin table {
+@mixin table-95 {
 
 	.sunken-panel {
+		@include tab-border(white, black);
 		box-sizing: border-box;
-		//border: 2px groove transparent;
 		overflow: auto;
 	}
 
@@ -371,5 +371,6 @@
 
 	table > tbody > tr > * {
 		padding: 0 0.5rem;
+		height: 1.2rem;
 	}
 }

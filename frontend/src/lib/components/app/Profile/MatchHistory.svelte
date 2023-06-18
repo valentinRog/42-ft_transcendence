@@ -42,5 +42,5 @@
 </div>
 
 <style lang="scss">
-	@include table;
+	@include table-95;
 </style>
