@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 export class WebSocketService {
   private websockets: Map<string, Socket> = new Map();
   private reverseMap: Map<string, string> = new Map();
+  private userStatus: Map<string, string> = new Map();
 
   addSocket(clientName: string, socket: Socket): void {
     this.websockets.set(clientName, socket);
@@ -74,5 +75,21 @@ export class WebSocketService {
   sendToUser(userToNotify: string, message: string, event: string) {
     const socket = this.getSocket(userToNotify);
     socket?.emit(event, { message: message });
+  }
+
+  setStatus(username: string, status: string) {
+    if (status === 'offline') {
+      this.userStatus.delete(username);
+    } else {
+      this.userStatus.set(username, status);
+    }
+  }
+
+  getStatus(username: string): string {
+    return this.userStatus.get(username) || 'offline';
+  }
+
+  getAllStatus(): Map<string, string> {
+    return this.userStatus;
   }
 }

@@ -70,8 +70,11 @@ export class UserController {
   @UseGuards(JwtGuard)
   @Get('me/friends')
   async getUserFriends(@GetUser() user) {
-    const friends = await this.prisma.user.findMany({
+    const friends = (await this.prisma.user.findMany({
       where: { id: { in: user.friends } },
+    })) as any;
+    friends.forEach((friend) => {
+      friend.status = this.userService.getStatus(friend.username);
     });
     return friends;
   }

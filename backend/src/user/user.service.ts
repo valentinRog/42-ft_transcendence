@@ -25,7 +25,7 @@ export class UserService {
   }
 
   async getUserById(userId: number) {
-    return this.prisma.user.findUnique({ where: { id : userId } });
+    return this.prisma.user.findUnique({ where: { id: userId } });
   }
 
   async editUser(userId: number, dto: EditUserDto) {
@@ -83,9 +83,8 @@ export class UserService {
     try {
       const user = await this.prisma.user.findUnique({
         where: { username: username },
-        select: { status: true },
       });
-      return user.status;
+      return this.socketService.getStatus(user.username);
     } catch (error) {
       throw new NotFoundException(
         `User with username '${username}' not found.`,
@@ -173,36 +172,20 @@ export class UserService {
   }
 
   async getQueueUsers() {
+    const inqueue = [...this.socketService.getAllStatus().entries()]
+      .filter(([_, status]) => status === 'queue')
+      .map(([username, _]) => username);
     const users = await this.prisma.user.findMany({
       where: {
-        status: 'queue',
+        username: {
+          in: inqueue,
+        },
       },
     });
     return users;
   }
 
-  async updateUserStatus(username: string, status: string) {
-    try {
-      const user = await this.prisma.user.update({
-        where: {
-          username: username,
-        },
-        data: {
-          status: status,
-        },
-      });
-
-      if (!user) {
-        throw new NotFoundException(
-          `User with username '${username}' not found.`,
-        );
-      }
-      delete user.hash;
-      return user;
-    } catch (error) {
-      throw new NotFoundException(
-        `User with username '${username}' not found.`,
-      );
-    }
+  getStatus(username: string) {
+    return this.socketService.getStatus(username);
   }
 }
