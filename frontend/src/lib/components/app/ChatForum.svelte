@@ -45,6 +45,13 @@
 					ban.userId === $user?.id &&
 					(ban.expiresAt == null || new Date(ban.expiresAt) > new Date())
 			);
+			
+			isUserBanned = !!ban;
+			if (isUserBanned) {
+				banExpiresAt = ban.expiresAt ? new Date(ban.expiresAt) : null;
+				chatIdLocal = null;
+				return ;
+			}
 
 			const mute = currentChat.mutes.find(
 				(mute: any) =>
@@ -52,17 +59,11 @@
 					(mute.expiresAt == null || new Date(mute.expiresAt) > new Date())
 			);
 
-			isUserBanned = !!ban;
 			isUserMuted = !!mute;
-			if (isUserBanned) {
-				banExpiresAt = ban.expiresAt ? new Date(ban.expiresAt) : null;
-				chatIdLocal = null;
-			}
-			if (isUserMuted) {
+			if (isUserMuted)
 				muteExpiresAt = mute.expiresAt ? new Date(mute.expiresAt) : null;
-				$socket.emit('joinRoom', { chatId: chatIdLocal });
-			}
-		} else $socket.emit('joinRoom', { chatId: chatIdLocal });
+			$socket.emit('joinRoom', { chatId: chatIdLocal });
+		}
 	});
 
 	onDestroy(() => {
@@ -120,6 +121,11 @@
 			muteExpiresAt = data.expiresAt ? new Date(data.expiresAt) : null;
 		}
 	});
+
+	function changeRole(userId: number, newRoleId: number) {
+  		$socket.emit('changeRole', { chatId: chatIdLocal, userId, newRoleId });
+	}
+
 </script>
 
 <div id="box">
@@ -163,6 +169,8 @@
 			</form>
 		{/if}
 	</div>
+
+
 	<div id="user-list">
 		{#if currentChat}
 			<h5>Users in this chat:</h5>
@@ -173,7 +181,8 @@
 						{#if selectedUser === chatUser}
 							<button>Check Profile</button>
 							{#if roleId <= 1 && roleId < chatUser.roleId}
-								<button>Make Admin</button>
+								<button on:click={() => changeRole(chatUser.userId, 2)}>Made Moderator</button>
+								<button on:click={() => changeRole(chatUser.userId, 3)}>Make User</button>
 							{/if}
 							{#if roleId <= 2 && roleId < chatUser.roleId}
 								<div>
@@ -193,7 +202,7 @@
 										placeholder="Mute duration in seconds"
 										min="0"
 									/>
-								</div>
+								</div>						  
 							{/if}
 						{/if}
 					</li>

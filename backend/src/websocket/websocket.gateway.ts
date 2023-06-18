@@ -267,6 +267,16 @@ export abstract class SocketGateway
     return;
   }
 
+  @SubscribeMessage('changeRole')
+  async handleChangeRole(
+    client: Socket,
+    payload: { chatId: number; userId: number, newRoleId : number },
+  ) {
+    const { chatId, userId, newRoleId } = payload;
+    await this.chatService.changeRole(chatId, userId, newRoleId);
+    return;
+  }
+
   @SubscribeMessage('response-friend')
   async handleAcceptFriend(
     @MessageBody() data: { response: boolean; friend: string },

@@ -167,12 +167,23 @@ export class ChatService {
     return chatUser;
   }
 
-  async updateRole(chatUserId: number, newRoleId: number): Promise<any> {
-      return await this.prisma.chatUser.update({
-          where: { id: chatUserId },
-          data: { roleId: newRoleId },
-          include: { user: true },
-      });
+  async changeRole(chatId: number, userId: number, newRoleId: number) {
+    const chatUser = await this.prisma.chatUser.findFirst({
+      where: {
+        chatId: chatId,
+        userId: userId,
+      },
+    });
+
+    if (!chatUser)
+      return ;
+
+    const updatedChatUser = await this.prisma.chatUser.update({
+      where: { id: chatUser.id },
+      data: { roleId: newRoleId },
+    });
+
+    return updatedChatUser;
   }
 
 
