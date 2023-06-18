@@ -263,13 +263,10 @@
 }
 
 @mixin onglet {
-	$margin1: 0.06rem;
-	$margin2: 0.126rem;
-	$margin3: 0.1rem;
+
 
 	.window {
-		box-shadow: inset -0.05rem -0.05rem black, inset $margin1 $margin1 $light-grey,
-			inset ($margin2 * -1) ($margin2 * -1) $grey, inset $margin2 $margin2 white;
+		box-shadow: $box-shadow;
 		padding: 3px;
 	}
 
@@ -337,28 +334,10 @@
 // ------------------------------------------------
 
 @mixin table {
-	:root {
-		/* Color */
-		--text-color: #222222;
-		--surface: #c0c0c0;
-		--button-highlight: #ffffff;
-		--button-face: #dfdfdf;
-		--button-shadow: #808080;
-		--window-frame: #0a0a0a;
-		--dialog-blue: #000080;
-		--dialog-blue-light: #1084d0;
-		--dialog-gray: #808080;
-		--dialog-gray-light: #b5b5b5;
-		--link-blue: #0000ff;
-
-		--border-raised-outer: inset -1px -1px var(--window-frame),
-			inset 1px 1px var(--button-highlight);
-		--border-raised-inner: inset -2px -2px var(--button-shadow), inset 2px 2px var(--button-face);
-	}
 
 	.sunken-panel {
 		box-sizing: border-box;
-		border: 2px groove transparent;
+		//border: 2px groove transparent;
 		overflow: auto;
 	}
 
@@ -373,8 +352,8 @@
 	table > thead > tr > * {
 		position: sticky;
 		top: 0;
-		height: 17px;
-		box-shadow: var(--border-raised-outer), var(--border-raised-inner);
+		height: 1.5rem;
+		box-shadow: $box-shadow;
 		background: $grey;
 		box-sizing: border-box;
 		font-weight: normal;
@@ -392,6 +371,5 @@
 
 	table > tbody > tr > * {
 		padding: 0 0.5rem;
-		height: 14px;
 	}
 }

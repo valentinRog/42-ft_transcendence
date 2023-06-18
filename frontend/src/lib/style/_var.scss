@@ -22,3 +22,10 @@ $tab-height: 2.1rem;
 // NAVBAR
 $navbar-height: 2.5rem;
 $line-width: 0.1rem;
+
+// BORDER
+$margin1: 0.06rem;
+$margin2: 0.126rem;
+$margin3: 0.1rem;
+$box-shadow: inset -0.05rem -0.05rem black, inset $margin1 $margin1 $light-grey,
+inset ($margin2 * -1) ($margin2 * -1) $grey, inset $margin2 $margin2 white;
