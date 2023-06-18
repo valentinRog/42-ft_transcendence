@@ -147,7 +147,7 @@
 			ctx.strokeStyle = line.color;
 			ctx.stroke();
 		});
-		
+
 		ctx.beginPath();
 		ctx.lineWidth = toolSelected.lineWidth;
 		ctx.strokeStyle = color;
@@ -156,7 +156,6 @@
 		ctx.strokeRect(toolSelected.startX, toolSelected.startY, width, height);
 	}
 
-	
 	function draw(event: MouseEvent) {
 		if (!isDrawing) return;
 		const { offsetX, offsetY } = event;

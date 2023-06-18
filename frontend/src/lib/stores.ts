@@ -6,4 +6,5 @@ export const user = writable<{
 	username: string;
 	login: string;
 	twoFactorEnabled: boolean;
+	logFrom42: boolean;
 } | null>(null);

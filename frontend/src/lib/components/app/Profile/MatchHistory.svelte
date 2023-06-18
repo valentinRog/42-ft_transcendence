@@ -17,34 +17,30 @@
 		await fetchHistory();
 		console.log($history);
 	})();
-
 </script>
 
 <div class="sunken-panel" style="height: 150px; width: 240px;">
-<!--<div class="sunken-panel" style="height: 20rem; width: 20rem;">-->
+	<!--<div class="sunken-panel" style="height: 20rem; width: 20rem;">-->
 	<table class="interactive">
-	  <thead>
-		<tr>
-		  <th>Result</th>
-		  <th>Opponent</th>
-		  <th>Date</th>
-		</tr>
-	  </thead>
-	  <tbody>
-		{#each Object.values($history) as row}
+		<thead>
 			<tr>
-				{#each Object.values(row) as cell}
-					<td>{cell}</td>
-				{/each}
+				<th>Result</th>
+				<th>Opponent</th>
+				<th>Date</th>
 			</tr>
-		{/each}
-	</tbody>
+		</thead>
+		<tbody>
+			{#each Object.values($history) as row}
+				<tr>
+					{#each Object.values(row) as cell}
+						<td>{cell}</td>
+					{/each}
+				</tr>
+			{/each}
+		</tbody>
 	</table>
 </div>
 
-
 <style lang="scss">
-
 	@include table;
-
 </style>

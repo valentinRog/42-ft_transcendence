@@ -8,6 +8,7 @@
 
 	const socket = Context.socket();
 	const fetchWithToken = Context.fetchWithToken();
+	const gameRequest = Context.gameRequest();
 
 	let index = 0;
 	let room = '';
@@ -43,23 +44,26 @@
 		$socket.off('index');
 	});
 
-	let req = ["quelqu'un", "quelqu'un d'autre", 'someone', 'someone else'];
+	function responseGame(sender: string, accept: boolean) {
+		$gameRequest = $gameRequest.filter((x) => x.sender !== sender);
+		$socket.emit('response-game', { response: accept, friend: sender });
+	}
 </script>
 
 <div class="container">
 	<div class="menu">
-		<DropDown name="game" notif={req.length}>
+		<DropDown name="game" notif={$gameRequest.length}>
 			{#if matchmaking === false}
 				<button on:click={matchmake}>matchmaking</button>
 			{:else}
 				<button class="unavailable">matchmake</button>
 			{/if}
-			{#if req.length > 0}
-				<RightDrop name="invitations" notif={req.length}>
-					{#each req as r (r)}
-						<RightDrop name={r}>
-							<button on:click={() => (req = req.filter((x) => x !== r))}>accept</button>
-							<button on:click={() => (req = req.filter((x) => x !== r))}>decline</button>
+			{#if $gameRequest.length > 0}
+				<RightDrop name="invitations" notif={$gameRequest.length}>
+					{#each $gameRequest as r (r.id)}
+						<RightDrop name={r.sender}>
+							<button on:click={() => responseGame(r.sender, true)}>accept</button>
+							<button on:click={() => responseGame(r.sender, false)}>decline</button>
 						</RightDrop>
 					{/each}
 				</RightDrop>

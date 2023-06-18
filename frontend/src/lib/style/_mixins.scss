@@ -263,62 +263,56 @@
 }
 
 @mixin onglet {
-
 	$margin1: 0.06rem;
 	$margin2: 0.126rem;
 	$margin3: 0.1rem;
 
 	.window {
-		box-shadow: inset -0.05rem -0.05rem black,
-		inset $margin1 $margin1 $light-grey,
-		inset ($margin2 * -1) ($margin2 * -1) $grey,
-		inset $margin2 $margin2 white;
+		box-shadow: inset -0.05rem -0.05rem black, inset $margin1 $margin1 $light-grey,
+			inset ($margin2 * -1) ($margin2 * -1) $grey, inset $margin2 $margin2 white;
 		padding: 3px;
 	}
 
 	.window-body {
-		margin : 0.5rem;
-	  }
-
-	.window[role=tabpanel] {
-	  position: relative;
-	  z-index: 2;
+		margin: 0.5rem;
 	}
 
-	menu[role=tablist] {
-	  position: relative;
-	  margin: 0 0 ($margin2 * -1) 0;
-	  text-indent: 0;
-	  list-style-type: none;
-	  display: flex;
-	  padding-left: $margin3;
+	.window[role='tabpanel'] {
+		position: relative;
+		z-index: 2;
 	}
 
-	menu[role=tablist] > li {
-
-	  box-shadow: inset $margin1 * -1 0,
-	  inset $margin1 $margin1 $light-grey,
-	  inset ($margin2 * -1) 0 $grey,
-	  inset $margin2 $margin2 white;
-	  z-index: 1;
+	menu[role='tablist'] {
+		position: relative;
+		margin: 0 0 ($margin2 * -1) 0;
+		text-indent: 0;
+		list-style-type: none;
+		display: flex;
+		padding-left: $margin3;
 	}
 
-	menu[role=tablist] > li[aria-selected=true] {
-	  padding-bottom: $margin2;
-	  margin-top: ($margin2 * -1);
-	  background-color: $grey;
-	  position: relative;
-	  z-index: 8;
-	  margin-left: -$margin3;
+	menu[role='tablist'] > li {
+		box-shadow: inset $margin1 * -1 0, inset $margin1 $margin1 $light-grey,
+			inset ($margin2 * -1) 0 $grey, inset $margin2 $margin2 white;
+		z-index: 1;
 	}
 
-	menu[role=tablist] > li > a {
-	  display: block;
-	  color: black;
-	  margin: 0.4rem;
-	  text-decoration: none;
+	menu[role='tablist'] > li[aria-selected='true'] {
+		padding-bottom: $margin2;
+		margin-top: ($margin2 * -1);
+		background-color: $grey;
+		position: relative;
+		z-index: 8;
+		margin-left: -$margin3;
 	}
-  }
+
+	menu[role='tablist'] > li > a {
+		display: block;
+		color: black;
+		margin: 0.4rem;
+		text-decoration: none;
+	}
+}
 
 // ------------------------------------------------
 // -------------------- INPUT ---------------------
@@ -343,7 +337,6 @@
 // ------------------------------------------------
 
 @mixin table {
-
 	:root {
 		/* Color */
 		--text-color: #222222;
@@ -359,11 +352,9 @@
 		--link-blue: #0000ff;
 
 		--border-raised-outer: inset -1px -1px var(--window-frame),
-		  inset 1px 1px var(--button-highlight);
-		--border-raised-inner: inset -2px -2px var(--button-shadow),
-		  inset 2px 2px var(--button-face);
-
-	  }
+			inset 1px 1px var(--button-highlight);
+		--border-raised-inner: inset -2px -2px var(--button-shadow), inset 2px 2px var(--button-face);
+	}
 
 	.sunken-panel {
 		box-sizing: border-box;

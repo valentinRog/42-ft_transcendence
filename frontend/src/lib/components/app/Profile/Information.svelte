@@ -101,10 +101,12 @@
 				<img src={imgUrl} />
 			</li>
 		</div>
-		{#if $user?.twoFactorEnabled}
-			<button class="two-factor" on:click={disable2fa}>disable 2fa</button>
-		{:else}
-			<button class="two-factor" on:click={enable2fa}>enable 2fa</button>
+		{#if !$user?.logFrom42}
+			{#if $user?.twoFactorEnabled}
+				<button class="two-factor" on:click={disable2fa}>disable 2fa</button>
+			{:else}
+				<button class="two-factor" on:click={enable2fa}>enable 2fa</button>
+			{/if}
 		{/if}
 		{#if username === $user?.username}
 			<li class="box friends">

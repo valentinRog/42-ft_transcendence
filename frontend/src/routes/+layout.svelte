@@ -69,7 +69,7 @@
 	}
 
 	::-webkit-scrollbar-button:horizontal:decrement {
-    	background-image: url('/arrow-left.png');
+		background-image: url('/arrow-left.png');
 		background-size: 25% auto;
 	}
 

@@ -7,10 +7,10 @@
 			getContext('fetchWithToken');
 
 		export type Match = {
-			result : string;
+			result: string;
 			opponent: string;
 			createdAt: string;
-		}
+		};
 		export interface Contact {
 			id: number;
 			username: string;
@@ -302,7 +302,8 @@
 			id: data.id,
 			username: data.username,
 			login: data.login,
-			twoFactorEnabled: data.twoFactorEnabled
+			twoFactorEnabled: data.twoFactorEnabled,
+			logFrom42: data.logFrom42
 		};
 		return data;
 	}
@@ -325,15 +326,19 @@
 		const res = await fetchWithToken('notification/get?type=game');
 		const data = await res.json();
 		$gameRequest = data;
+		console.log($gameRequest);
 		return data;
 	}
 
 	async function fetchHistory() {
 		const res = await fetchWithToken('stat/get-history');
 		const data = await res.json();
-		data.forEach(function(element : any, index : number) {
-			data[index] = { result : $user?.username === element.winnerName ? "Win" : "Lose",
-			opponent : $user?.username === element.winnerName ? element.loserName : element.winnerName, createdAt: element.createdAt}
+		data.forEach(function (element: any, index: number) {
+			data[index] = {
+				result: $user?.username === element.winnerName ? 'Win' : 'Lose',
+				opponent: $user?.username === element.winnerName ? element.loserName : element.winnerName,
+				createdAt: element.createdAt
+			};
 		});
 		$history = data;
 		console.log(data);
@@ -389,7 +394,6 @@
 	});
 
 	$socket.on('game', (data: { message: string }) => {
-		//$socket.emit('response', { response: true, friend: data.message });
 		fetchGameRequest();
 	});
 

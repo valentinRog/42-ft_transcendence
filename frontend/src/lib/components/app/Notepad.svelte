@@ -1,13 +1,12 @@
 <script lang="ts">
 	import DropDown from '$lib/components/drop/DropDown.svelte';
 
-	let textareaValue = "";
+	let textareaValue = '';
 
 	function clear() {
-		textareaValue = "";
+		textareaValue = '';
 	}
 </script>
-
 
 <div class="window-body">
 	<div class="menu">
@@ -20,10 +19,9 @@
 		</DropDown>
 	</div>
 	<div class="content">
-		<textarea bind:value={textareaValue}></textarea>
+		<textarea bind:value={textareaValue} />
 	</div>
 </div>
-
 
 <style lang="scss">
 	div.menu {
