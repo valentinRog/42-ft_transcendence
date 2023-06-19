@@ -120,7 +120,7 @@ export abstract class SocketGateway
     client.emit('createChat', newGroupChat.id);
   }
 
-  @SubscribeMessage('friendAddChat')
+  @SubscribeMessage('otherAddChat')
   async handleFriendAddChat(
     client: Socket,
     payload: { chat: any, userId: number}

@@ -59,7 +59,7 @@
 			if (!chatExists) {
 			 	$chats.push(chat);
 				chatIdLocal = chat.id;
-				$socket.emit('friendAddChat', { chat: chat, userId: friendId });
+				$socket.emit('otherAddChat', { chat: chat, userId: friendId });
 			}
 		}
 		$socket.emit('sendMessage', {
