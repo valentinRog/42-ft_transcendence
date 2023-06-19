@@ -32,7 +32,7 @@ export class ChatController {
   @Post('verifyPassword')
   async verifyPassword(@Body() body: { chatId: string, password: string }) {
     const chat = await this.chatService.findChatById(Number(body.chatId));
-    if (chat.accessibility === "public")
+    if (chat.accessibility === "public" || chat.accessibility === "private")
       return true;
     if (chat.accessibility === "protected" && chat.password && chat.password === body.password)
       return true;
