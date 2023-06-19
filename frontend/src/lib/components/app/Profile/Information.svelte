@@ -3,8 +3,7 @@
 	import { Context } from '$lib/components/Context.svelte';
 
 	const fetchWithToken = Context.fetchWithToken();
-	const addInstance = Context.addInstance();
-	const fetchMe = Context.fetchMe();
+	const openEditProfile = Context.openEditProfile();
 
 	export let username: string | null | undefined = null;
 	let login: string | null | undefined = null;
@@ -58,29 +57,10 @@
 			});
 	};
 
-	async function enable2fa() {
-		const res = await fetchWithToken('2fa/enable', {
-			method: 'POST'
-		});
-		const data = await res.json();
-		addInstance('Internet', {}, { url: data.qrcode });
-		$token = data.token;
-		sessionStorage.setItem('token', data.token);
-		fetchMe();
+	function updateActionUrl() {
+		//
 	}
 
-	async function disable2fa() {
-		await fetchWithToken('users/edit', {
-			method: 'PATCH',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				twoFactorEnabled: false
-			})
-		});
-		fetchMe();
-	}
 </script>
 
 <div id="box">
@@ -101,13 +81,15 @@
 				<img src={imgUrl} />
 			</li>
 		</div>
-		{#if !$user?.logFrom42}
+		<!--{#if !$user?.logFrom42}
 			{#if $user?.twoFactorEnabled}
 				<button class="two-factor" on:click={disable2fa}>disable 2fa</button>
 			{:else}
 				<button class="two-factor" on:click={enable2fa}>enable 2fa</button>
 			{/if}
-		{/if}
+		{/if}-->
+		<button type="button"
+		on:click={() => ($openEditProfile = true)}>Edit Profile</button>
 		{#if username === $user?.username}
 			<li class="box friends">
 				<p>My friends</p>
