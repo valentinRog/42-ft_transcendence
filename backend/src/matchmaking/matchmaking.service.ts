@@ -51,13 +51,10 @@ export class MatchmakingService {
     const user = await this.prisma.user.findUnique({
       where: { username: player.username },
     });
-    if (user.status !== 'online') {
+    if (this.socketService.getStatus(user.username) !== 'online') {
       return 'User is not ready';
     }
-    this.prisma.user.update({
-      where: { username: player.username },
-      data: { status: 'queue' },
-    });
+    this.socketService.setStatus(player.username, 'queue');
 
     if (this.queue.isPlayerInQueue(player)) {
       throw new ForbiddenException('Player already in queue');
@@ -89,13 +86,10 @@ export class MatchmakingService {
     const user = await this.prisma.user.findUnique({
       where: { username: userName },
     });
-    if (user.status !== 'online') {
+    if (this.socketService.getStatus(user.username) !== 'online') {
       throw new ForbiddenException('User is not ready');
     }
-    this.prisma.user.update({
-      where: { username: userName },
-      data: { status: 'spectate' },
-    });
+    this.socketService.setStatus(user.username, 'spectate');
 
     return this.socketService.joinRoom(userName, room);
   }
@@ -104,13 +98,13 @@ export class MatchmakingService {
     const user = await this.prisma.user.findUnique({
       where: { username: userName },
     });
-    if (user.status !== 'online') {
+    if (this.socketService.getStatus(user.username) !== 'online') {
       throw new ForbiddenException('User is not ready');
     }
     const friend = await this.prisma.user.findUnique({
       where: { username: opponent },
     });
-    if (friend.status !== 'online') {
+    if (this.socketService.getStatus(friend.username) !== 'online') {
       throw new ForbiddenException('Friend is not ready');
     }
 

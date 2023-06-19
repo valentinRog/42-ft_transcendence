@@ -48,7 +48,8 @@ export abstract class SocketGateway
     }
     console.log(`${user.username} connected`);
     this.webSocketService.addSocket(user.username, client);
-    this.userService.updateUserStatus(user.username, 'online');
+    this.webSocketService.setStatus(user.username, 'online');
+    this.webSocketService.setStatus(user.username, 'online');
     const userToNotify = await this.notificationService.removeNotification(
       user.username,
       'game',
@@ -63,7 +64,7 @@ export abstract class SocketGateway
 
   handleDisconnect(client: Socket) {
     const username = this.webSocketService.getClientName(client);
-    if (username) this.userService.updateUserStatus(username, 'offline');
+    if (username) this.webSocketService.setStatus(username, 'offline');
     console.log(`${username} disconnected`);
   }
 
@@ -264,6 +265,16 @@ export abstract class SocketGateway
   ) {
     const { chatId, userId } = payload;
     await this.chatService.unMuteUser(chatId, userId);
+    return;
+  }
+
+  @SubscribeMessage('changeRole')
+  async handleChangeRole(
+    client: Socket,
+    payload: { chatId: number; userId: number; newRoleId: number },
+  ) {
+    const { chatId, userId, newRoleId } = payload;
+    await this.chatService.changeRole(chatId, userId, newRoleId);
     return;
   }
 

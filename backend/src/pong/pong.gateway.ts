@@ -7,7 +7,6 @@ import {
 import { Socket } from 'socket.io';
 import { SocketGateway } from '../websocket/websocket.gateway';
 import { PongGame } from './pong.class';
-import e from 'express';
 
 type Input = {
   room: string;
@@ -45,13 +44,13 @@ export class PongGateway extends SocketGateway {
       this.rooms.set(client.id, data.room);
       this.games.get(data.room).setPlayer1(client);
       const p1 = this.webSocketService.getClientName(client);
-      this.userService.updateUserStatus(p1, 'in-game');
+      this.webSocketService.setStatus(p1, 'in-game');
       client.emit('index', 0);
     } else if (data.index === 1) {
       this.rooms.set(client.id, data.room);
       this.games.get(data.room).setPlayer2(client);
       const p2 = this.webSocketService.getClientName(client);
-      this.userService.updateUserStatus(p2, 'in-game');
+      this.webSocketService.setStatus(p2, 'in-game');
       client.emit('index', 1);
     }
   }
@@ -73,12 +72,12 @@ export class PongGateway extends SocketGateway {
     }
   }
 
-  async gameEnd(game: PongGame) {
+  gameEnd(game: PongGame) {
     const p1 = this.webSocketService.getClientName(game.getPlayer1());
     const p2 = this.webSocketService.getClientName(game.getPlayer2());
     if (p1 && p2) {
-      await this.userService.updateUserStatus(p1, 'online');
-      await this.userService.updateUserStatus(p2, 'online');
+      this.webSocketService.setStatus(p1, 'online');
+      this.webSocketService.setStatus(p2, 'online');
     } else {
       console.log('players not found');
     }
