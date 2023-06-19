@@ -25,8 +25,8 @@
 	let muteDuration: number | null = null;
 
 	//PASSWORD
-	let password : any = '';
-	let setPassword = false;
+	let password : any = undefined;
+	let newPassword : string = '';
 	let passwordModalVisible = false;
 	let isProtected: any;
 
@@ -86,24 +86,25 @@
 
 	function closePasswordModal() {
 		passwordModalVisible = false;
-		password = '';
+		password = undefined;
 	}
 
 	async function toggleAccess() {
 		if (!isProtected && !currentChat.password && !password)
 			openPasswordModal();
 		else {
-			//$socket.emit('setAccess', { chatId: chatIdLocal, isProtected: !isProtected, password });
-			if (isProtected)
-				password = '';
+			$socket.emit('setAccess', { chatId: chatIdLocal, isProtected, password });
+			password = undefined;
 			closePasswordModal();
 			isProtected = !isProtected;
 		}
 	}
 
-	async function ChangePassword() {
-		if (password.trim() === '') return;
-		$socket.emit('changePassword', { chatId: chatIdLocal, password });
+	async function changePassword() {
+		if (password) {
+			$socket.emit('setPassword', { chatId: chatIdLocal, password });
+			password = undefined;
+		}
 	}
 
 	function updatePassword(event : any) {
@@ -222,20 +223,31 @@
 			<div id="access-control">
 				{#if isProtected}
 					<button on:click={toggleAccess}>Switch to Public</button>
+					<div id="password-change-form">
+						<label>
+							Enter new password:
+							<input type="password" bind:value={password} on:input={updatePassword} />
+						</label>
+						<button on:click={changePassword}>Submite</button>
+					</div>
 				{:else}
 					<button on:click={toggleAccess}>Switch to Protected</button>
 				{/if}
 				{#if passwordModalVisible}
 					<div id="password-modal">
 						<label>
-							Enter password to switch to Protected:
+							{#if isProtected}
+								Enter new password:
+							{:else}
+								Enter password to switch to Protected:
+							{/if}
 							<input type="password" on:input={updatePassword} />
 						</label>
 						<button on:click={toggleAccess}>Submit</button>
 						<button on:click={closePasswordModal}>Cancel</button>
 					</div>
 				{/if}
-			</div>		
+			</div>
 		{/if}
 		{#if currentChat}
 			<h5>Users in this chat:</h5>

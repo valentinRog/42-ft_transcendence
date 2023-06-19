@@ -288,4 +288,26 @@ export class ChatService {
       },
     });
   }
+
+
+  async setAccess(chatId: number, isProtected: boolean, password?: string): Promise<void> {
+    let accessibility = isProtected ? 'public' : 'protected';
+    
+    let updateData = { accessibility, };
+
+    if (password !== undefined)
+      updateData['password'] = password;
+
+    await this.prisma.chat.update({
+      where: { id: chatId },
+      data: updateData,
+    });
+  }
+
+  async setPassword(chatId: number, password: string): Promise<void> {  
+    await this.prisma.chat.update({
+      where: { id: chatId },
+      data: { password },
+    });
+  }
 }

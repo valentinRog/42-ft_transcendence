@@ -284,8 +284,14 @@ export abstract class SocketGateway
     payload: { chatId: number, isProtected: boolean, password?: string },
   ) {
     const { chatId, isProtected, password } = payload;
-    //await this.chatService.setAccess(chatId, isProtected, password);
+    await this.chatService.setAccess(chatId, isProtected, password);
     return;
+  }
+
+  @SubscribeMessage('setPassword')
+  async setPassword(client: any, payload: { chatId: number, password: string }): Promise<void> {
+    const { chatId, password } = payload;
+    await this.chatService.setPassword(chatId, password);
   }
 
   @SubscribeMessage('response-friend')
