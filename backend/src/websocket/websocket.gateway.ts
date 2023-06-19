@@ -120,6 +120,20 @@ export abstract class SocketGateway
     client.emit('createChat', newGroupChat.id);
   }
 
+  @SubscribeMessage('otherAddChat')
+  async handleFriendAddChat(
+    client: Socket,
+    payload: { chat: any, userId: number}
+  ) {
+    const { chat, userId} = payload;
+
+    const user = await this.userService.getUserById(userId);
+    const socket = await this.webSocketService.getSocket(user.username);
+
+    socket.emit('addChat', chat);
+    socket.emit('updateChat', chat.id);
+  }
+
   @SubscribeMessage('sendMessage')
   async handleMessage(
     client: Socket,
@@ -155,35 +169,15 @@ export abstract class SocketGateway
       }
     };
 
-    if (!chat) {
-      const newchat = await this.chatService.createChat(
-        `${username}-${payload.friendUsername}`,
-        [username, payload.friendUsername],
-        false,
-        'private',
-      );
-      const newMessage = await this.chatService.addMessageToDatabase(
-        newchat.id,
-        payload.content,
-        user.id,
-      );
-      newchat.messages.push(newMessage);
-      if (socket) {
-        socket.emit('addChat', newchat);
-        socket.emit('updateChat', newchat.id);
-      }
+    if (!chat.chatUsers.find((c) => (c as any).user.id === user.id)) {
+      const chatUser = await this.chatService.addUserToChat(chat.id, user.id);
+      const newchat = await this.chatService.findChatById(chat.id);
+      client.join(`chat-${chat.id}`);
+      this.server.to(`chat-${chat.id}`).emit('chatUserAdded', { chatId: chat.id, chatUser})
       client.emit('addChat', newchat);
-      client.emit('updateChat', newchat.id);
-    } else {
-      if (!chat.chatUsers.find((c) => (c as any).user.id === user.id)) {
-        const chatUser = await this.chatService.addUserToChat(chat.id, user.id);
-        const newchat = await this.chatService.findChatById(chat.id);
-        client.join(`chat-${chat.id}`);
-        this.server.to(`chat-${chat.id}`).emit('chatUserAdded', { chatId: chat.id, chatUser})
-        client.emit('addChat', newchat);
-      }
-      await sendMessage();
     }
+    await sendMessage();
+    
   }
 
   @SubscribeMessage('leaveGroup')

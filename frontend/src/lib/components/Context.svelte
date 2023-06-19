@@ -133,11 +133,15 @@
 			getContext('fetchPublicChats');
 		export const fetchVerifyPassword = (): ((chatId: number, password: string) => Promise<any>) => 
 			getContext('fetchVerifyPassword');
+		export const fetchCreateChat = (): ((memberUsernames : any, isGroupChat : any, accessibility : string, password?: string) 
+			=> Promise<any>) => getContext('fetchCreateChat');
 
 		export const socket = (): Readable<Socket> => getContext('socket');
 
 		export const getUnreadMessagesCount = (): ((chat: any, chatUser: any) => number) =>
 			getContext('getUnreadMessagesCount');
+
+			
 	}
 </script>
 
@@ -356,6 +360,28 @@
 		return data;
 	}
 
+	async function fetchCreateChat(memberUsernames : any, isGroupChat : any, accessibility : string, password?: string) {
+		console.log(accessibility);
+		const response = await fetchWithToken('chat/create-chat', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				memberUsernames,
+				isGroupChat,
+				accessibility,
+				password,
+			}),
+		});
+
+		if (!response.ok)
+			throw new Error(`Error: ${response.statusText}`);
+		const newGroupChat = await response.json();
+		return newGroupChat;
+			
+	}
+
 	async function fetchChatById(chatId: number) {
 		const res = await fetchWithToken(`chat/${chatId}`);
 		if (!res.ok) throw new Error(res.statusText);
@@ -395,6 +421,7 @@
 	setContext('fetchFriendRequest', fetchFriendRequest);
 	setContext('fetchChatById', fetchChatById);
 	setContext('fetchChats', fetchChats);
+	setContext('fetchCreateChat', fetchCreateChat);
 	setContext('fetchVerifyPassword', fetchVerifyPassword);
 
 	const socket = readable<Socket>(
