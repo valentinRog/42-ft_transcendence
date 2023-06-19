@@ -16,4 +16,6 @@ EXPOSE 80
 
 RUN chmod +x ./entrypoint.sh
 
+ENTRYPOINT [ "./entrypoint.sh" ]
+
 CMD ["nginx", "-g", "daemon off;"]
