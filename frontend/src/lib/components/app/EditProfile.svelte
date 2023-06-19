@@ -24,6 +24,13 @@
 	let showModal = false;
 	let errorMessage: string | null = null;
 
+	let changes = false;
+
+	let inputLogin = $user?.login;
+	let inputUsername = $user?.username;
+
+	let checkboxValue = $user?.twoFactorEnabled;
+
 	async function handleSubmit(event: Event) {
 		const form = event.target as HTMLFormElement;
 		const data = new FormData(form);
@@ -74,6 +81,10 @@
 		fetchMe();
 	}
 
+	function handleChange() {
+		changes = inputLogin !== $user?.login || inputUsername !== $user?.username || checkboxValue !== $user?.twoFactorEnabled;
+	}
+
 </script>
 
 <div class="window-body">
@@ -87,21 +98,21 @@
 			>
 				<div class="form-group">
 						<label for="username">Username:</label>
-						<input type="text" id="username" name="username" value={$user?.username} />
+						<input type="text" id="username" name="username" bind:value="{inputUsername}" on:input="{handleChange}" />
 				</div>
 				{#if !$user?.logFrom42}
 					<div class="form-group">
 						<label for="login">Login:</label>
-						<input type="text" id="login" name="login" value={$user?.login}/>
+						<input type="text" id="login" name="login" bind:value="{inputLogin}" on:input="{handleChange}"/>
 					</div>
-					{#if $user?.twoFactorEnabled}
-						<input type="checkbox" id="2fa">
-					{:else}
-						<input type="checkbox" id="2fa" checked>
-					{/if}
+					<input type="checkbox" id="2fa" bind:checked="{checkboxValue}" on:change="{handleChange}">
 					<label for="2fa">2fa</label>
 				{/if}
+				{#if changes}
 				<button type="submit">Save</button>
+				{:else}
+				<button disabled type="submit">Save</button>
+				{/if}
 			</form>
 		</div>
 	</div>
@@ -126,7 +137,6 @@
 			width: 18rem;
 			margin-top: 0.2rem;
 
-
 			label {
 				color: black;
 				width: 7rem;
@@ -137,8 +147,15 @@
 			display: flex;
 			align-items: center;
 		}
+
+		button {
+			@include tab-contour;
+			@include tab-contour-active;
+			width: 4rem;
+			height: 1.5rem;
+			font-size: 1rem;
+			align-self: center;
+		}
 	}
-
-
 
 </style>
