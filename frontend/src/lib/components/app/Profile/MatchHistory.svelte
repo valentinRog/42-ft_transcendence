@@ -8,7 +8,6 @@
 
 	(async () => {
 		await fetchHistory();
-		console.log($history);
 	})();
 </script>
 
