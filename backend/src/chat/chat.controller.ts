@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Query, Param } from '@nestjs/common';
+import { Controller, Post, Get, Query, Param, Body } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { JwtGuard } from '../auth/guard';
 import { UseGuards } from '@nestjs/common';
@@ -27,6 +27,17 @@ export class ChatController {
   async findChatById(@Param('chatId') chatId: string) {
     const chat = await this.chatService.findChatById(Number(chatId));
     return chat;
+  }
+
+  @Post('verifyPassword')
+  async verifyPassword(@Body() body: { chatId: string, password: string }) {
+    const chat = await this.chatService.findChatById(Number(body.chatId));
+    if (chat.accessibility === "public")
+      return true;
+    if (chat.accessibility === "protected" && chat.password && chat.password === body.password)
+      return true;
+    else
+      return false;
   }
 
   // @UseGuards(JwtGuard)

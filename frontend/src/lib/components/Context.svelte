@@ -131,6 +131,8 @@
 			getContext('fetchChatById');
 		export const fetchPublicChats = (): ((start: number, limit: number) => Promise<any>) =>
 			getContext('fetchPublicChats');
+		export const fetchVerifyPassword = (): ((chatId: number, password: string) => Promise<any>) => 
+			getContext('fetchVerifyPassword');
 
 		export const socket = (): Readable<Socket> => getContext('socket');
 
@@ -369,6 +371,22 @@
 		return data;
 	}
 
+	async function fetchVerifyPassword(chatId: number, password: string) {
+		const response = await fetchWithToken('chat/verifyPassword', {
+			method: 'POST',
+			headers: {
+			'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+			chatId,
+			password,
+			}),
+		});
+
+		const data = await response.json();
+		return data;
+	}
+
 	setContext('fetchPublicChats', fetchPublicChats);
 	setContext('fetchGameRequest', fetchGameRequest);
 	setContext('fetchHistory', fetchHistory);
@@ -377,6 +395,7 @@
 	setContext('fetchFriendRequest', fetchFriendRequest);
 	setContext('fetchChatById', fetchChatById);
 	setContext('fetchChats', fetchChats);
+	setContext('fetchVerifyPassword', fetchVerifyPassword);
 
 	const socket = readable<Socket>(
 		ioClient(PUBLIC_BACKEND_URL, {

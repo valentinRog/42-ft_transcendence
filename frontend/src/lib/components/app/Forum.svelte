@@ -9,6 +9,7 @@
 	const chatsPublic = Context.chatsPublic();
 	const fetchPublicChats = Context.fetchPublicChats();
 	const fetchChatById = Context.fetchChatById();
+	const fetchVerifyPassword = Context.fetchVerifyPassword();
 	const openChatForumWindow = Context.openChatForumWindow();
 
 	let currentView = 'public';
@@ -43,26 +44,28 @@
 	};
 
 	async function startChat(chat: Context.Chat) {
+		const updatedChat = await fetchChatById(chat.id);
 		if (
-			chat.accessibility === 'protected' &&
-			!chat.chatUsers.find((c: any) => c.userId === $user?.id)
+			updatedChat.accessibility === 'protected' &&
+			!updatedChat.chatUsers.find((c: any) => c.userId === $user?.id)
 		) {
-			selectedChat = chat;
+			selectedChat = updatedChat;
 		} else {
-			const newchat = await fetchChatById(chat.id);
-			if ($chats.find((c: any) => c.id === newchat.id))
+			if ($chats.find((c: any) => c.id === updatedChat.id))
 				$chats.splice(
-					$chats.findIndex((c: any) => c.id === newchat.id),
+					$chats.findIndex((c: any) => c.id === updatedChat.id),
 					1
 				);
-			$chats.push(newchat);
+			$chats.push(updatedChat);
 			$chatId = chat.id;
 			$openChatForumWindow = true;
 		}
 	}
 
-	function enterChat() {
-		if (chatPassword === selectedChat.password) {
+	async function enterChat() {
+		const isValidPassword = await fetchVerifyPassword(selectedChat.id, chatPassword);
+
+		if (isValidPassword) {
 			$chatId = selectedChat.id;
 			$socket.emit('joinChat', { chatId: selectedChat.id, userId: $user?.id });
 			$openChatForumWindow = true;
@@ -72,6 +75,7 @@
 			alert('Wrong password');
 		}
 	}
+
 
 	function switchView(view: string) {
 		if (view === 'my') selectedChat = null;

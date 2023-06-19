@@ -87,7 +87,6 @@ export class ChatService {
       return chat;
   }
 
-
   async addMessageToDatabase(
     chatId: number,
     content: string,
