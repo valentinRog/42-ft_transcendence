@@ -173,10 +173,10 @@ export abstract class SocketGateway
       client.emit('updateChat', newchat.id);
     } else {
       if (!chat.chatUsers.find((c) => (c as any).user.id === user.id)) {
-        await this.chatService.addUserToChat(chat.id, user.id);
+        const chatUser = await this.chatService.addUserToChat(chat.id, user.id);
         const newchat = await this.chatService.findChatById(chat.id);
-
         client.join(`chat-${chat.id}`);
+        this.server.to(`chat-${chat.id}`).emit('chatUserAdded', { chatId: chat.id, chatUser})
         client.emit('addChat', newchat);
       }
       await sendMessage();
@@ -275,6 +275,16 @@ export abstract class SocketGateway
   ) {
     const { chatId, userId, newRoleId } = payload;
     await this.chatService.changeRole(chatId, userId, newRoleId);
+    return;
+  }
+
+  @SubscribeMessage('setAccess')
+  async handleSetAccess(
+    client: Socket,
+    payload: { chatId: number, isProtected: boolean, password?: string },
+  ) {
+    const { chatId, isProtected, password } = payload;
+    //await this.chatService.setAccess(chatId, isProtected, password);
     return;
   }
 

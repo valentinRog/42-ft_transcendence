@@ -67,24 +67,26 @@ export class ChatService {
   }
 
   async findChatById(id: number | null): Promise<Chat | null> {
-    if (id === undefined || id === null) return null;
-    const chat = await this.prisma.chat.findUnique({
-      where: {
-        id: id,
-      },
-      include: {
-        chatUsers: {
-          include: {
-            user: true,
-          },
+      if (id === undefined || id === null) return null;
+      const chat = await this.prisma.chat.findUnique({
+        where: {
+          id: id,
         },
-        messages: true,
-        bans: true,
-        mutes: true,
-      },
-    });
-    return chat;
+        include: {
+          chatUsers: {
+            include: {
+              user: true,
+              role: true,
+            },
+          },
+          messages: true,
+          bans: true,
+          mutes: true,
+        },
+      });
+      return chat;
   }
+
 
   async addMessageToDatabase(
     chatId: number,
@@ -162,6 +164,9 @@ export class ChatService {
         roleId: 3,
         createdAt: new Date(),
         lastReadMessageId: 0,
+      },
+      include: {
+        user: true,
       },
     });
     return chatUser;

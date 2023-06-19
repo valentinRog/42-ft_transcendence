@@ -12,18 +12,28 @@
 	let chatIdLocal: number | null = $chatId;
 	let messageContent = '';
 	let roleId: number;
+	let disabled = false;
+
+	//BAN AND MUTE
 	let isUserBanned = false;
 	let isUserMuted = false;
-	let disabled = false;
+
 	let banExpiresAt: Date | null = null;
 	let muteExpiresAt: Date | null = null;
 
 	let banDuration: number | null = null;
 	let muteDuration: number | null = null;
 
+	//PASSWORD
+	let password : any = '';
+	let setPassword = false;
+	let passwordModalVisible = false;
+	let isProtected: any;
+
 	$: {
 		currentChat = $chats.find((chat) => chat.id === chatIdLocal);
 		roleId = currentChat?.chatUsers.find((cu: any) => cu.userId === $user?.id)?.roleId;
+		isProtected = currentChat ? currentChat.accessibility === 'protected' : false;
 
 		if (currentChat && currentChat.bans) {
 			const ban = currentChat.bans.find(
@@ -70,6 +80,36 @@
 		$socket.emit('leaveRoom', { chatId: chatIdLocal });
 	});
 
+	function openPasswordModal() {
+		passwordModalVisible = true;
+	}
+
+	function closePasswordModal() {
+		passwordModalVisible = false;
+		password = '';
+	}
+
+	async function toggleAccess() {
+		if (!isProtected && !currentChat.password && !password)
+			openPasswordModal();
+		else {
+			//$socket.emit('setAccess', { chatId: chatIdLocal, isProtected: !isProtected, password });
+			if (isProtected)
+				password = '';
+			closePasswordModal();
+			isProtected = !isProtected;
+		}
+	}
+
+	async function ChangePassword() {
+		if (password.trim() === '') return;
+		$socket.emit('changePassword', { chatId: chatIdLocal, password });
+	}
+
+	function updatePassword(event : any) {
+		password = event.target.value;
+	}
+
 	async function sendMessage() {
 		if (messageContent.trim() === '') return;
 		$socket.emit('sendMessage', {
@@ -89,6 +129,10 @@
 
 	function selectUser(user: any) {
 		selectedUser = user;
+	}
+
+	function changeRole(userId: number, newRoleId: number) {
+  		$socket.emit('changeRole', { chatId: chatIdLocal, userId, newRoleId });
 	}
 
 	function banUser(userId: number, duration: number | null) {
@@ -122,10 +166,12 @@
 		}
 	});
 
-	function changeRole(userId: number, newRoleId: number) {
-  		$socket.emit('changeRole', { chatId: chatIdLocal, userId, newRoleId });
-	}
+	$socket.on('chatUserAdded', (data: any) => {
+		if (data.chatId === chatIdLocal) {
+			currentChat.chatUsers = [...currentChat.chatUsers, data.chatUser];
+    }
 
+});
 </script>
 
 <div id="box">
@@ -172,12 +218,31 @@
 
 
 	<div id="user-list">
+		{#if roleId <= 1}
+			<div id="access-control">
+				{#if isProtected}
+					<button on:click={toggleAccess}>Switch to Public</button>
+				{:else}
+					<button on:click={toggleAccess}>Switch to Protected</button>
+				{/if}
+				{#if passwordModalVisible}
+					<div id="password-modal">
+						<label>
+							Enter password to switch to Protected:
+							<input type="password" on:input={updatePassword} />
+						</label>
+						<button on:click={toggleAccess}>Submit</button>
+						<button on:click={closePasswordModal}>Cancel</button>
+					</div>
+				{/if}
+			</div>		
+		{/if}
 		{#if currentChat}
 			<h5>Users in this chat:</h5>
 			<ul>
 				{#each currentChat.chatUsers as chatUser (chatUser.userId)}
 					<li on:click={() => selectUser(chatUser)}>
-						{chatUser.user.username}
+						({chatUser.role.name}) {chatUser.user?.username}
 						{#if selectedUser === chatUser}
 							<button>Check Profile</button>
 							{#if roleId <= 1 && roleId < chatUser.roleId}
