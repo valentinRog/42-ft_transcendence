@@ -38,8 +38,8 @@
 		for (const pair of data) {
 			body.append(pair[0], pair[1] as string);
 		}
-		const res = await fetch( `${PUBLIC_BACKEND_URL}/users/edit`, {
-			method: form.method,
+		const res = await fetchWithToken( 'users/edit', {
+			method: 'PATCH',
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded'
 			},
@@ -55,6 +55,10 @@
 			if (browser) sessionStorage.setItem('token', json.access_token);
 			goto('/');
 		}
+		if ($user?.twoFactorEnabled && !checkboxValue)
+			disable2fa();
+		else if (!$user?.twoFactorEnabled && checkboxValue)
+			enable2fa();
 	}
 
 	async function enable2fa() {
