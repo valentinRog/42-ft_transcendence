@@ -2,6 +2,50 @@
 // --------------- TAB ------------------
 //---------------------------------------
 
+:root {
+	/* Color */
+	--text-color: #222222;
+	--surface: #c0c0c0;
+	--button-highlight: #ffffff;
+	--button-face: #dfdfdf;
+	--button-shadow: #808080;
+	--window-frame: #0a0a0a;
+
+	// BORDER
+	--margin1: 0.06rem;
+	--margin2: 0.126rem;
+	--margin3: 0.1rem;
+
+	/* Spacing */
+	--checkbox-width: 0.82rem;
+	--checkbox-total-width-precalc: var(--checkbox-width) + 0.3rem;
+	--checkbox-total-width: calc(var(--checkbox-total-width-precalc));
+
+	/* Borders */
+	--border-width: 1px;
+	--border-raised-outer: inset -1px -1px var(--window-frame),
+	  inset 1px 1px var(--button-highlight);
+	--border-raised-inner: inset -2px -2px var(--button-shadow),
+	  inset 2px 2px var(--button-face);
+	--border-sunken-outer: inset -1px -1px var(--button-highlight),
+	  inset 1px 1px var(--window-frame);
+	--border-sunken-inner: inset -2px -2px var(--button-face),
+	  inset 2px 2px var(--button-shadow);
+
+	/* Window borders flip button-face and button-highlight */
+	--border-window-outer: inset -1px -1px var(--window-frame),
+	  inset 1px 1px var(--button-face);
+	--border-window-inner: inset -2px -2px var(--button-shadow),
+	  inset 2px 2px var(--button-highlight);
+
+	   /* Tabs */
+	--border-tab: inset -1px 0 var(--window-frame),
+	inset 1px 1px var(--button-face),
+	inset -2px 0 var(--button-shadow),
+	inset 2px 2px var(--button-highlight)
+
+}
+
 @mixin tab-border($right-bottom: black, $left-top: white) {
 	border-style: solid;
 	border-right-color: $right-bottom;
@@ -260,11 +304,11 @@
 
 @mixin onglet {
 
-
 	.window {
-		box-shadow: $box-shadow;
+		box-shadow: var(--border-window-outer), var(--border-window-inner);
+		background: var(--surface);
 		padding: 3px;
-	}
+	  }
 
 	.window-body {
 		margin: 0.5rem;
@@ -277,26 +321,27 @@
 
 	menu[role='tablist'] {
 		position: relative;
-		margin: 0 0 ($margin2 * -1) 0;
+		margin: 0 0 calc(var(--margin2) * -1) 0;
 		text-indent: 0;
 		list-style-type: none;
 		display: flex;
-		padding-left: $margin3;
+		padding-left: var(--margin3);
 	}
 
 	menu[role='tablist'] > li {
-		box-shadow: inset $margin1 * -1 0, inset $margin1 $margin1 $light-grey,
-			inset ($margin2 * -1) 0 $grey, inset $margin2 $margin2 white;
+		border-top-left-radius: 3px;
+ 		border-top-right-radius: 3px;
+		box-shadow: var(--border-tab);
 		z-index: 1;
 	}
 
 	menu[role='tablist'] > li[aria-selected='true'] {
-		padding-bottom: $margin2;
-		margin-top: ($margin2 * -1);
+		padding-bottom: var(--margin2);
+		margin-top: calc(var(--margin2) * -1);
 		background-color: $grey;
 		position: relative;
 		z-index: 8;
-		margin-left: -$margin3;
+		margin-left: calc(var(--margin3) * -1);
 	}
 
 	menu[role='tablist'] > li > a {
@@ -309,34 +354,6 @@
 
 
 @mixin checkbox {
-
-	:root {
-		/* Color */
-		--text-color: #222222;
-		--surface: #c0c0c0;
-		--button-highlight: #ffffff;
-		--button-face: #dfdfdf;
-		--button-shadow: #808080;
-		--window-frame: #0a0a0a;
-
-		/* Spacing */
-		--checkbox-width: 13px;
-		--radio-label-spacing: 6px;
-
-		--checkbox-total-width-precalc: var(--checkbox-width) +
-		  var(--radio-label-spacing);
-		--checkbox-total-width: calc(var(--checkbox-total-width-precalc));
-		--checkbox-left: calc(-1 * var(--checkbox-total-width-precalc));
-		--checkmark-width: 7px;
-		--checkmark-top: 3px;
-		--checkmark-left: 3px;
-
-		/* Field borders (checkbox, input, etc) flip window-frame and button-shadow */
-		--border-field: inset -1px -1px var(--button-highlight),
-		  inset 1px 1px var(--button-shadow), inset -2px -2px var(--button-face),
-		  inset 2px 2px var(--window-frame);
-
-	  }
 
 	input[type="checkbox"] {
 		appearance: none;
@@ -369,28 +386,26 @@
 		display: inline-block;
 		width: var(--checkbox-width);
 		height: var(--checkbox-width);
-		background: var(--button-highlight);
-		box-shadow: var(--border-field);
-		margin-right: var(--radio-label-spacing);
+		background: white;
+		box-shadow: inset -1px -1px var(--button-highlight),
+		inset 1px 1px var(--button-shadow), inset -2px -2px var(--button-face),
+		inset 2px 2px black;
 	}
 
 	input[type="checkbox"]:active + label::before {
-		background: var(--surface);
+		background: $light-grey;
 	}
 
 	input[type="checkbox"]:checked + label::after {
 		content: "";
 		display: block;
-		width: var(--checkmark-width);
-		height: var(--checkmark-width);
+		width: 0.45rem;
+		height: 0.45rem;
 		position: absolute;
-		top: var(--checkmark-top);
+		top: 0.2rem;
 		left: calc(
-			-1 * (var(--checkbox-total-width-precalc)) + var(--checkmark-left)
-		);
-		//background: svg-load("./checkmark.svg");
+			-1 * (var(--checkbox-total-width-precalc)) + 0.2rem);
 		background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23000' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26 2.974 7.25 8 2.193z'/%3e%3c/svg%3e");
-
 	}
 
 }
@@ -437,8 +452,8 @@
 		position: sticky;
 		top: 0;
 		height: 1.5rem;
-		box-shadow: $box-shadow;
-		background: $grey;
+		box-shadow: var(--border-raised-outer), var(--border-raised-inner);
+		background: $grey;;
 		box-sizing: border-box;
 		font-weight: normal;
 		padding: 0 0.5rem;
