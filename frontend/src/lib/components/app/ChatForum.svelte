@@ -254,7 +254,7 @@
 			<ul>
 				{#each currentChat.chatUsers as chatUser (chatUser.userId)}
 					<li on:click={() => selectUser(chatUser)}>
-						({chatUser.role.name}) {chatUser.user?.username}
+						({chatUser.role?.name}) {chatUser.user?.username}
 						{#if selectedUser === chatUser}
 							<button>Check Profile</button>
 							{#if roleId <= 1 && roleId < chatUser.roleId}

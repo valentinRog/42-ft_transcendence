@@ -167,6 +167,7 @@ export class ChatService {
       },
       include: {
         user: true,
+        role: true,
       },
     });
     return chatUser;
