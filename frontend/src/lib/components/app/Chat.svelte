@@ -9,6 +9,7 @@
 	const chatId = Context.chatId();
 	const friendInfoId = Context.friendInfoId();
 	const contacts = Context.contacts();
+	const fetchCreateChat = Context.fetchCreateChat();
 
 	let chatIdLocal: number | null = $chatId;
 	let currentChat: any = null;
@@ -50,6 +51,17 @@
 
 	async function sendMessage() {
 		if (messageContent.trim() === '') return;
+		if (!chatIdLocal) {
+			const memberUsernames = [$user?.username, friendUsername];
+			const chat = await fetchCreateChat(memberUsernames, false, 'private');
+			const chatExists = $chats.some(existingChat => existingChat.id === chat.id);
+			
+			if (!chatExists) {
+			 	$chats.push(chat);
+				chatIdLocal = chat.id;
+				$socket.emit('friendAddChat', { chat: chat, userId: friendId });
+			}
+		}
 		$socket.emit('sendMessage', {
 			chatId: chatIdLocal,
 			content: messageContent,
@@ -66,9 +78,6 @@
 		return 'Unknown';
 	}
 
-	async function leaveGroup() {
-		$socket.emit('leaveGroup', { chatId: chatIdLocal });
-	}
 </script>
 
 <div id="box">

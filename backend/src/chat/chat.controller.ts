@@ -40,15 +40,20 @@ export class ChatController {
       return false;
   }
 
-  // @UseGuards(JwtGuard)
-  // @Post('create-chat')
-  // async createChat(
-  //   @Body('groupName') groupName: string,
-  //   @Body('memberUsernames') memberUsernames: string[],
-  //   @Body('isGroupChat') isGroupChat: boolean
-  // ) {
-  //   const newGroupChat = await this.chatService.createChat(groupName, memberUsernames, isGroupChat);
-  //   return newGroupChat;
-  // }
+  @UseGuards(JwtGuard)
+  @Post('create-chat')
+  async createChat(
+    @Body('memberUsernames') memberUsernames: string[],
+    @Body('isGroupChat') isGroupChat: boolean,
+    @Body('accessibility') accessibility: string,
+    @Body('password') password?: string,
+  ) {
+
+    const groupName = memberUsernames.join('-');
+    console.log(accessibility);
+    const newGroupChat = await this.chatService.createChat(groupName, memberUsernames, isGroupChat, accessibility, password);
+    return newGroupChat;
+  }
+
 
 }
