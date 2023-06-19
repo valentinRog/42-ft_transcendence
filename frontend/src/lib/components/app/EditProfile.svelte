@@ -5,6 +5,7 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
+	import { user } from '$lib/stores';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
 
@@ -75,9 +76,9 @@
 
 </script>
 
-<!--<div class="window-body">
+<div class="window-body">
 	<ErrorDialog {showModal} {errorMessage} on:close={() => (showModal = false)} />
-	<div id="formular">
+		<div id="formular">
 		<div class="content">
 			<form
 				on:submit|preventDefault={handleSubmit}
@@ -85,30 +86,59 @@
 				enctype="application/x-www-form-urlencoded"
 			>
 				<div class="form-group">
-					<div class="row-icon"><img src="/user.png" /></div>
-					<label for="login">Login:</label>
-					<input type="text" id="login" name="login" />
-				</div>
-				<div class="form-group">
-					<div class="row-icon"><img src="/keys-3.png" /></div>
-					<label for="password">Password:</label>
-					<input type="password" id="password" name="password" />
-				</div>
-				<div class="form-group">
-						<div class="row-icon"><img src="/agent.png" /></div>
 						<label for="username">Username:</label>
-						<input type="text" id="username" name="username" />
+						<input type="text" id="username" name="username" value={$user?.username} />
 				</div>
-				<button type="submit">Submit Changes</button>
-
+				{#if !$user?.logFrom42}
+					<div class="form-group">
+						<label for="login">Login:</label>
+						<input type="text" id="login" name="login" value={$user?.login}/>
+					</div>
+					{#if $user?.twoFactorEnabled}
+						<input type="checkbox" id="2fa">
+					{:else}
+						<input type="checkbox" id="2fa" checked>
+					{/if}
+					<label for="2fa">2fa</label>
+				{/if}
+				<button type="submit">Save</button>
 			</form>
 		</div>
 	</div>
-</div>-->
+</div>
 
-<input type="checkbox" id="example1">
-<label for="example1">2fa</label>
 
 <style lang="scss">
-	@include checkbox;
+
+	div#formular {
+		@include checkbox;
+		@include form-95;
+		@include tab-border($dark-grey, $light-grey);
+
+		padding: 0.2rem;
+		background-color: $grey;
+		form {
+			@include tab-border($light-grey, $dark-grey);
+			display: flex;
+			flex-direction: column;
+			gap: 0.8rem;
+			padding: 1rem;
+			width: 18rem;
+			margin-top: 0.2rem;
+
+
+			label {
+				color: black;
+				width: 7rem;
+			}
+		}
+
+		.form-group {
+			display: flex;
+			align-items: center;
+		}
+	}
+
+
+
 </style>

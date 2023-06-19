@@ -343,6 +343,7 @@
 		position: fixed;
 		opacity: 0;
 		border: none;
+		pointer-events: none;
 	}
 
 	input[type="checkbox"] + label {
