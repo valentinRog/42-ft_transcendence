@@ -79,6 +79,8 @@
 			});
 		});
 	})();
+
+	const notVisible = ['FriendRequest', 'Chat', 'ChatForum', 'EditProfile'];
 </script>
 
 <div
@@ -88,7 +90,7 @@
 	on:mousedown={() => ($selected = null)}
 >
 	<div class="icons">
-		{#each Object.entries($apps).filter(([k, _]) => k !== 'FriendRequest' && k !== 'Chat' && k !== 'ChatForum') as [k, v]}
+		{#each Object.entries($apps).filter(([k, _]) => !notVisible.includes(k) ) as [k, v]}
 			<div
 				class="icon"
 				on:dblclick={() => {
