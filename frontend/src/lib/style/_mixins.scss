@@ -203,7 +203,6 @@
 // ------------------------------------------------
 
 @mixin form-95 {
-
 	input {
 		font-size: 1rem;
 		width: 100%;
@@ -276,16 +275,12 @@
 }
 
 @mixin onglet {
-
-
 	.window {
-		box-shadow: inset -1px -1px var(--window-frame),
-		inset 1px 1px var(--button-face),
-		inset -2px -2px var(--button-shadow),
-		inset 2px 2px white;
+		box-shadow: inset -1px -1px var(--window-frame), inset 1px 1px var(--button-face),
+			inset -2px -2px var(--button-shadow), inset 2px 2px white;
 		background: $grey;
 		padding: 3px;
-	  }
+	}
 
 	.window-body {
 		margin: 0.5rem;
@@ -307,11 +302,9 @@
 
 	menu[role='tablist'] > li {
 		border-top-left-radius: 3px;
- 		border-top-right-radius: 3px;
-		box-shadow: inset -1px 0 var(--window-frame),
-		inset 1px 1px var(--button-face),
-		inset -2px 0 var(--button-shadow),
-		inset 2px 2px white;
+		border-top-right-radius: 3px;
+		box-shadow: inset -1px 0 var(--window-frame), inset 1px 1px var(--button-face),
+			inset -2px 0 var(--button-shadow), inset 2px 2px white;
 		z-index: 1;
 	}
 
@@ -332,10 +325,8 @@
 	}
 }
 
-
 @mixin checkbox {
-
-	input[type="checkbox"] {
+	input[type='checkbox'] {
 		appearance: none;
 		-webkit-appearance: none;
 		-moz-appearance: none;
@@ -347,38 +338,37 @@
 		pointer-events: none;
 	}
 
-	input[type="checkbox"] + label {
+	input[type='checkbox'] + label {
 		line-height: 13px;
 	}
 
-	input[type="checkbox"]:focus + label {
+	input[type='checkbox']:focus + label {
 		outline: 1px dotted #000000;
 	}
 
-	input[type="checkbox"] + label {
+	input[type='checkbox'] + label {
 		position: relative;
 		margin-left: var(--checkbox-total-width);
 	}
 
-	input[type="checkbox"] + label::before {
-		content: "";
+	input[type='checkbox'] + label::before {
+		content: '';
 		position: absolute;
 		left: calc(-1 * (var(--checkbox-total-width-precalc)));
 		display: inline-block;
 		width: var(--checkbox-width);
 		height: var(--checkbox-width);
 		background: white;
-		box-shadow: inset -1px -1px white,
-		inset 1px 1px var(--button-shadow), inset -2px -2px var(--button-face),
-		inset 2px 2px black;
+		box-shadow: inset -1px -1px white, inset 1px 1px var(--button-shadow),
+			inset -2px -2px var(--button-face), inset 2px 2px black;
 	}
 
-	input[type="checkbox"]:active + label::before {
+	input[type='checkbox']:active + label::before {
 		background: $light-grey;
 	}
 
-	input[type="checkbox"]:checked + label::after {
-		content: "";
+	input[type='checkbox']:checked + label::after {
+		content: '';
 		display: block;
 		width: 0.45rem;
 		height: 0.45rem;
@@ -387,7 +377,6 @@
 		left: calc(-1 * (var(--checkbox-total-width-precalc)) + 0.2rem);
 		background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23000' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26 2.974 7.25 8 2.193z'/%3e%3c/svg%3e");
 	}
-
 }
 
 // ------------------------------------------------
@@ -413,7 +402,6 @@
 // ------------------------------------------------
 
 @mixin table-95 {
-
 	.sunken-panel {
 		@include tab-border(white, black);
 		box-sizing: border-box;
@@ -433,10 +421,8 @@
 		top: 0;
 		height: 1.5rem;
 		box-shadow: inset -1px -1px var(--window-frame),
-		inset 1px 1px white
-		inset -2px -2px var(--button-shadow),
-		inset 2px 2px var(--button-face);
-		background: $grey;;
+			inset 1px 1px white inset -2px -2px var(--button-shadow), inset 2px 2px var(--button-face);
+		background: $grey;
 		box-sizing: border-box;
 		font-weight: normal;
 		padding: 0 0.5rem;

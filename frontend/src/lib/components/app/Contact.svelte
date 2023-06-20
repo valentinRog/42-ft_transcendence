@@ -170,7 +170,7 @@
 								class="option-icons"
 								src="/profile2.png"
 								on:click={() => {
-									addInstance('Profile', { username: friend.username }, { username: friend.id });
+									addInstance('Profile', { }, { username: friend.username });
 									$selected = null;
 								}}
 							/>

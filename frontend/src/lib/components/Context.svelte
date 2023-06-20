@@ -74,6 +74,13 @@
 		export const openChatWindow = (): Writable<boolean> => getContext('openChatWindow');
 		export const openChatForumWindow = (): Writable<boolean> => getContext('openChatForumWindow');
 
+		export interface Settings {
+			up: string;
+			down: string;
+		}
+
+		export const settings = (): Writable<Settings> => getContext('settings');
+
 		export type App =
 			| 'Pong'
 			| 'Paint'
@@ -133,17 +140,19 @@
 			getContext('fetchChatById');
 		export const fetchPublicChats = (): ((start: number, limit: number) => Promise<any>) =>
 			getContext('fetchPublicChats');
-		export const fetchVerifyPassword = (): ((chatId: number, password: string) => Promise<any>) => 
+		export const fetchVerifyPassword = (): ((chatId: number, password: string) => Promise<any>) =>
 			getContext('fetchVerifyPassword');
-		export const fetchCreateChat = (): ((memberUsernames : any, isGroupChat : any, accessibility : string, password?: string) 
-			=> Promise<any>) => getContext('fetchCreateChat');
+		export const fetchCreateChat = (): ((
+			memberUsernames: any,
+			isGroupChat: any,
+			accessibility: string,
+			password?: string
+		) => Promise<any>) => getContext('fetchCreateChat');
 
 		export const socket = (): Readable<Socket> => getContext('socket');
 
 		export const getUnreadMessagesCount = (): ((chat: any, chatUser: any) => number) =>
 			getContext('getUnreadMessagesCount');
-
-			
 	}
 </script>
 
@@ -208,6 +217,13 @@
 	setContext('chatId', chatId);
 	setContext('openChatWindow', openChatWindow);
 	setContext('openChatForumWindow', openChatForumWindow);
+
+	const settings = writable<Context.Settings>({
+		up: 'ArrowUp',
+		down: 'ArrowDown'
+	});
+
+	setContext('settings', settings);
 
 	const components = readable({
 		Pong: Pong,
@@ -370,26 +386,29 @@
 		return data;
 	}
 
-	async function fetchCreateChat(memberUsernames : any, isGroupChat : any, accessibility : string, password?: string) {
+	async function fetchCreateChat(
+		memberUsernames: any,
+		isGroupChat: any,
+		accessibility: string,
+		password?: string
+	) {
 		console.log(accessibility);
 		const response = await fetchWithToken('chat/create-chat', {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'application/json',
+				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
 				memberUsernames,
 				isGroupChat,
 				accessibility,
-				password,
-			}),
+				password
+			})
 		});
 
-		if (!response.ok)
-			throw new Error(`Error: ${response.statusText}`);
+		if (!response.ok) throw new Error(`Error: ${response.statusText}`);
 		const newGroupChat = await response.json();
 		return newGroupChat;
-			
 	}
 
 	async function fetchChatById(chatId: number) {
@@ -411,12 +430,12 @@
 		const response = await fetchWithToken('chat/verifyPassword', {
 			method: 'POST',
 			headers: {
-			'Content-Type': 'application/json',
+				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
-			chatId,
-			password,
-			}),
+				chatId,
+				password
+			})
 		});
 
 		const data = await response.json();

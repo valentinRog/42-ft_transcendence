@@ -11,6 +11,7 @@ import { ChatModule } from './chat/chat.module';
 import { MatchmakingModule } from './matchmaking/matchmaking.module';
 import { WebSocketModule } from './websocket/websocket.module';
 import { NotificationModule } from './notification/notification.module';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { NotificationModule } from './notification/notification.module';
     ChatModule,
     MatchmakingModule,
     NotificationModule,
+    SettingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

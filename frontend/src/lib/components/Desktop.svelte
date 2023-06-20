@@ -81,6 +81,11 @@
 	})();
 
 	const notVisible = ['FriendRequest', 'Chat', 'ChatForum', 'EditProfile'];
+
+	const fetchWithToken = Context.fetchWithToken();
+	fetchWithToken('settings/get-settings')
+		.then((res) => res.json())
+		.then((data) => console.log(data));
 </script>
 
 <div
@@ -90,7 +95,7 @@
 	on:mousedown={() => ($selected = null)}
 >
 	<div class="icons">
-		{#each Object.entries($apps).filter(([k, _]) => !notVisible.includes(k) ) as [k, v]}
+		{#each Object.entries($apps).filter(([k, _]) => !notVisible.includes(k)) as [k, v]}
 			<div
 				class="icon"
 				on:dblclick={() => {

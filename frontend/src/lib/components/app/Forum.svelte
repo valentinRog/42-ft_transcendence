@@ -76,7 +76,6 @@
 		}
 	}
 
-
 	function switchView(view: string) {
 		if (view === 'my') selectedChat = null;
 		currentView = view;

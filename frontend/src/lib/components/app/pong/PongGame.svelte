@@ -5,6 +5,7 @@
 	const fetchHistory = Context.fetchHistory();
 	const fetchWithToken = Context.fetchWithToken();
 	const socket = Context.socket();
+	const settings = Context.settings();
 
 	interface Dimensions {
 		readonly width: number;
@@ -322,17 +323,17 @@
 	});
 
 	function handleKeyDown(e: KeyboardEvent) {
-		if (e.key === 'ArrowUp') {
+		if (e.key === $settings.up) {
 			up = true;
-		} else if (e.key === 'ArrowDown') {
+		} else if (e.key === $settings.down) {
 			down = true;
 		}
 	}
 
 	function handleKeyUp(e: KeyboardEvent) {
-		if (e.key === 'ArrowUp') {
+		if (e.key === $settings.up) {
 			up = false;
-		} else if (e.key === 'ArrowDown') {
+		} else if (e.key === $settings.down) {
 			down = false;
 		}
 	}

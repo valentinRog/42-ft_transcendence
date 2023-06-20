@@ -54,10 +54,10 @@
 		if (!chatIdLocal) {
 			const memberUsernames = [$user?.username, friendUsername];
 			const chat = await fetchCreateChat(memberUsernames, false, 'private');
-			const chatExists = $chats.some(existingChat => existingChat.id === chat.id);
-			
+			const chatExists = $chats.some((existingChat) => existingChat.id === chat.id);
+
 			if (!chatExists) {
-			 	$chats.push(chat);
+				$chats.push(chat);
 				chatIdLocal = chat.id;
 				$socket.emit('otherAddChat', { chat: chat, userId: friendId });
 			}

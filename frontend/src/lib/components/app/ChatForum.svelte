@@ -25,8 +25,8 @@
 	let muteDuration: number | null = null;
 
 	//PASSWORD
-	let password : any = undefined;
-	let newPassword : string = '';
+	let password: any = undefined;
+	let newPassword: string = '';
 	let passwordModalVisible = false;
 	let isProtected: any;
 
@@ -55,12 +55,12 @@
 					ban.userId === $user?.id &&
 					(ban.expiresAt == null || new Date(ban.expiresAt) > new Date())
 			);
-			
+
 			isUserBanned = !!ban;
 			if (isUserBanned) {
 				banExpiresAt = ban.expiresAt ? new Date(ban.expiresAt) : null;
 				chatIdLocal = null;
-				return ;
+				return;
 			}
 
 			const mute = currentChat.mutes.find(
@@ -70,8 +70,7 @@
 			);
 
 			isUserMuted = !!mute;
-			if (isUserMuted)
-				muteExpiresAt = mute.expiresAt ? new Date(mute.expiresAt) : null;
+			if (isUserMuted) muteExpiresAt = mute.expiresAt ? new Date(mute.expiresAt) : null;
 			$socket.emit('joinRoom', { chatId: chatIdLocal });
 		}
 	});
@@ -90,8 +89,7 @@
 	}
 
 	async function toggleAccess() {
-		if (!isProtected && !currentChat.password && !password)
-			openPasswordModal();
+		if (!isProtected && !currentChat.password && !password) openPasswordModal();
 		else {
 			$socket.emit('setAccess', { chatId: chatIdLocal, isProtected, password });
 			password = undefined;
@@ -107,7 +105,7 @@
 		}
 	}
 
-	function updatePassword(event : any) {
+	function updatePassword(event: any) {
 		password = event.target.value;
 	}
 
@@ -133,7 +131,7 @@
 	}
 
 	function changeRole(userId: number, newRoleId: number) {
-  		$socket.emit('changeRole', { chatId: chatIdLocal, userId, newRoleId });
+		$socket.emit('changeRole', { chatId: chatIdLocal, userId, newRoleId });
 	}
 
 	function banUser(userId: number, duration: number | null) {
@@ -170,9 +168,8 @@
 	$socket.on('chatUserAdded', (data: any) => {
 		if (data.chatId === chatIdLocal) {
 			currentChat.chatUsers = [...currentChat.chatUsers, data.chatUser];
-    }
-
-});
+		}
+	});
 </script>
 
 <div id="box">
@@ -216,7 +213,6 @@
 			</form>
 		{/if}
 	</div>
-
 
 	<div id="user-list">
 		{#if roleId <= 1}
@@ -279,7 +275,7 @@
 										placeholder="Mute duration in seconds"
 										min="0"
 									/>
-								</div>						  
+								</div>
 							{/if}
 						{/if}
 					</li>
