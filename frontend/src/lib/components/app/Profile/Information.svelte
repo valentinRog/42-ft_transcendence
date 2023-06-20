@@ -6,27 +6,28 @@
 	const openEditProfile = Context.openEditProfile();
 
 	export let username: string | null | undefined = null;
-	let login: string | null | undefined = null;
+
 	let currentUser: any = {};
 	let imgUrl: string | '';
+	let showEdit = false;
 
 	if (username === null) {
-		username = $user!.username;
-		login = $user!.login;
 		currentUser = $user;
+		fetchAvatar();
+		showEdit = true;
 	} else {
-		fetchWithToken(`users/info/${username}`)
+		fetchWithToken(`users/info/name/${username}`)
 			.then((res) => res.json())
 			.then((data) => {
 				currentUser = data;
-				login = currentUser.login;
+				fetchAvatar();
 			});
 	}
 
 	const friends = Context.contacts();
 
-	if (login) {
-		fetchWithToken(`users/avatar/${login}`)
+	async function fetchAvatar() {
+		fetchWithToken(`users/avatar/${currentUser.id}`)
 			.then((res) => {
 				if (res.status === 200 || res.status === 201) {
 					return res.blob();
@@ -39,6 +40,8 @@
 				imgUrl = '/avatar.png';
 			});
 	}
+
+
 </script>
 
 <div id="box">
@@ -52,7 +55,8 @@
 				<img src={imgUrl} />
 			</li>
 		</div>
-		<button type="button" on:click={() => ($openEditProfile = true)}>Edit Profile</button>
+		<button type="button"
+		on:click={() => ($openEditProfile = true)}>Edit Profile</button>
 		{#if username === $user?.username}
 			<li class="box friends">
 				<p>My friends</p>
