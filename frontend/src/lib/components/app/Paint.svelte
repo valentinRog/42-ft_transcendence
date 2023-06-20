@@ -14,6 +14,7 @@
 		readonly lineJoin: CanvasLineJoin;
 		startX: number;
 		startY: number;
+		png: string;
 		readonly drawOption: (event: MouseEvent) => void;
 		readonly action: (event: MouseEvent) => void;
 	}
@@ -30,6 +31,7 @@
 			drawOption: draw,
 			startX: 0,
 			startY: 0,
+			png: 'pencill.png',
 			action: () => {
 				console.log('Fonction de mon PEN !');
 			}
@@ -43,6 +45,7 @@
 			drawOption: draw,
 			startX: 0,
 			startY: 0,
+			png: 'brush.png',
 			action: () => {
 				console.log('Fonction de ma BRUSH !');
 			}
@@ -56,6 +59,7 @@
 			drawOption: drawRectangle,
 			startX: 0,
 			startY: 0,
+			png: 'rectanglee.png',
 			action: () => {
 				console.log('Fonction de ma Rectangle !');
 			}
@@ -69,6 +73,7 @@
 			drawOption: draw,
 			startX: 0,
 			startY: 0,
+			png: 'spectator.png',
 			action: () => {
 				console.log('Fonction de mon PLOP !');
 			}
@@ -97,7 +102,7 @@
 	});
 
 	type Line = {
-		type: "line";
+		type: 'line';
 		startX: number;
 		startY: number;
 		endX: number;
@@ -107,7 +112,7 @@
 	};
 
 	type Rectangle = {
-		type: "rectangle";
+		type: 'rectangle';
 		startX: number;
 		startY: number;
 		width: number;
@@ -129,21 +134,19 @@
 	}
 
 	function drawOldStuff() {
-		shapes.forEach(
-			(shape) => {
-				ctx.lineWidth = shape.lineWidth;
-				ctx.strokeStyle = shape.color;
-				if (shape.type === "rectangle") {
-					if (shape.startX !== 0 && shape.startY !== 0) {
-						ctx.strokeRect(shape.startX, shape.startY, shape.width, shape.height);
-					}
+		shapes.forEach((shape) => {
+			ctx.lineWidth = shape.lineWidth;
+			ctx.strokeStyle = shape.color;
+			if (shape.type === 'rectangle') {
+				if (shape.startX !== 0 && shape.startY !== 0) {
+					ctx.strokeRect(shape.startX, shape.startY, shape.width, shape.height);
 				}
-				else if (shape.type === "line") {
-					ctx.beginPath();
-					ctx.moveTo(shape.startX, shape.startY);
-					ctx.lineTo(shape.endX, shape.endY);
-					ctx.stroke();
-				}
+			} else if (shape.type === 'line') {
+				ctx.beginPath();
+				ctx.moveTo(shape.startX, shape.startY);
+				ctx.lineTo(shape.endX, shape.endY);
+				ctx.stroke();
+			}
 		});
 	}
 
@@ -169,7 +172,7 @@
 		ctx.strokeStyle = color;
 		ctx.stroke();
 		shapes.push({
-			type: "line",
+			type: 'line',
 			startX: toolSelected.startX,
 			startY: toolSelected.startY,
 			endX: offsetX,
@@ -186,7 +189,7 @@
 		const width = event.offsetX - toolSelected.startX;
 		const height = event.offsetY - toolSelected.startY;
 		shapes.push({
-			type: "rectangle",
+			type: 'rectangle',
 			startX: toolSelected.startX,
 			startY: toolSelected.startY,
 			width,
@@ -217,34 +220,38 @@
 		<div class="tools-and-props">
 			<div class="tool-box">
 				<div class="tools">
-					<img
-						class="tool-logo {toolSelected === tools.Pen ? 'selected' : ''}"
+					<div
+						class="each-tool {toolSelected === tools.Pen ? 'selected' : ''}"
 						on:click={() => {
 							toolSelected = tools.Pen;
 						}}
-						src="/pencil.png"
-					/>
-					<img
-						class="tool-logo {toolSelected === tools.Brush ? 'selected' : ''}"
+					>
+						<img class="tool-logo" src="/pencil.png" />
+					</div>
+					<div
+						class="each-tool {toolSelected === tools.Brush ? 'selected' : ''}"
 						on:click={() => {
 							toolSelected = tools.Brush;
 						}}
-						src="/brush.png"
-					/>
-					<img
-						class="tool-logo {toolSelected === tools.Rectangle ? 'selected' : ''}"
+					>
+						<img class="tool-logo" src="/brush.png" />
+					</div>
+					<div
+						class="each-tool {toolSelected === tools.Rectangle ? 'selected' : ''}"
 						on:click={() => {
 							toolSelected = tools.Rectangle;
 						}}
-						src="/rectangle.png"
-					/>
-					<img
-						class="tool-logo {toolSelected === tools.Plop ? 'selected' : ''}"
+					>
+						<img class="tool-logo" src="/rectangle.png" />
+					</div>
+					<div
+						class="each-tool {toolSelected === tools.Plop ? 'selected' : ''}"
 						on:click={() => {
 							toolSelected = tools.Plop;
 						}}
-						src="/spectator.png"
-					/>
+					>
+						<img class="tool-logo" src="/spectator.png" />
+					</div>
 				</div>
 			</div>
 		</div>
@@ -254,11 +261,16 @@
 			on:mousemove={toolSelected.drawOption}
 			on:mouseup={stopDrawing}
 			on:mouseleave={stopDrawing}
+			style="{`cursor: url(${toolSelected.png}) 0 15, auto;`}"
 		/>
 	</div>
 	<div class="color-pick">
 		{#each colors as c}
-			<div class="color" style:background={c} on:click={() => (color = c)} />
+			<div
+				class="color {color === c ? 'selected' : ''}"
+				style:background={c}
+				on:click={() => (color = c)}
+			/>
 		{/each}
 	</div>
 </div>
@@ -284,17 +296,27 @@
 
 		.tools-and-props {
 			@include tab-border($light-grey, $dark-grey);
-			width: 4rem;
+			width: 4.5rem;
 			margin: 0.2rem;
 			.tool-box {
 				@include tab-border($light-grey, $dark-grey);
 				margin: 0.2rem;
-				padding: 0.2rem;
 				.tools {
-					.tool-logo {
+					display: flex;
+					flex-direction: row;
+					flex-wrap: wrap;
+					.each-tool {
+						margin: 0.15rem;
 						padding: 0.1rem;
-						height: 1.25rem;
+						height: 1.5rem;
+						width: 1.5rem;
 						@include tab-border($dark-grey, $light-grey);
+						.tool-logo {
+							display: block;
+							max-width: 1.15rem;
+							height: 1rem;
+							margin: 0 auto;
+						}
 					}
 					.selected {
 						@include tab-border(white, black);
@@ -304,24 +326,26 @@
 		}
 
 		canvas {
-			// height: 25rem;
 			margin: 0.2rem;
 			background: white;
+			// background: $dark-grey;
 			@include tab-border($light-grey, $dark-grey);
 		}
 	}
 
 	div.color-pick {
 		display: flex;
-
+		margin: 0.2rem;
+		@include tab-border($light-grey, $dark-grey);
+		height: fit-content;
+		width: fit-content;
 		div.color {
 			width: 1.2rem;
 			height: 1.2rem;
 			margin: 0.15rem;
-			border: 0.1rem solid transparent;
+			@include tab-border(transparent, black);
 
 			&.selected {
-				border-color: black;
 			}
 		}
 	}
