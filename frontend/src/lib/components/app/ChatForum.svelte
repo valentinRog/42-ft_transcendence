@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { writable } from 'svelte/store';
 	import { Context } from '$lib/components/Context.svelte';
 	import { user } from '$lib/stores';
 
@@ -15,6 +16,8 @@
 	let disabled = false;
 
 	//BAN AND MUTE
+	let updateState = true;
+
 	let isUserBanned = false;
 	let isUserMuted = false;
 
@@ -26,7 +29,6 @@
 
 	//PASSWORD
 	let password: any = undefined;
-	let newPassword: string = '';
 	let passwordModalVisible = false;
 	let isProtected: any;
 
@@ -42,7 +44,6 @@
 					(ban.expiresAt == null || new Date(ban.expiresAt) > new Date())
 			);
 			isUserBanned = !!ban;
-			if (isUserBanned) chatIdLocal = null;
 		}
 
 		disabled = isUserBanned || isUserMuted;
@@ -127,10 +128,7 @@
 	}
 
 	function selectUser(user: any) {
-		if (selectedUser === user)
-			selectedUser = null;
-		else
-			selectedUser = user;
+		selectedUser = user;
 	}
 
 	function changeRole(userId: number, newRoleId: number) {
@@ -156,8 +154,8 @@
 	$socket.on('userBan', (data: any) => {
 		if (data.chatId === chatIdLocal) {
 			isUserBanned = true;
+			chatIdLocal = null; //WHY
 			banExpiresAt = data.expiresAt ? new Date(data.expiresAt) : null;
-			chatIdLocal = null;
 		}
 	});
 
@@ -165,6 +163,18 @@
 		if (data.chatId === chatIdLocal) {
 			isUserMuted = true;
 			muteExpiresAt = data.expiresAt ? new Date(data.expiresAt) : null;
+		}
+	});
+
+	$socket.on('userUnBan', (data: any) => {
+		if (data.chatId === chatIdLocal) {
+			isUserBanned = false;
+		}
+	});
+
+	$socket.on('userUnMute', (data: any) => {
+		if (data.chatId === chatIdLocal) {
+			isUserMuted = false;
 		}
 	});
 
@@ -178,7 +188,7 @@
 <div id="box">
 	<div class="chat-container">
 		<div id="chat-window">
-			{#if isUserBanned && chatIdLocal === null}
+			{#if isUserBanned}
 				<p>
 					You are banned from this Topics {banExpiresAt
 						? `until ${banExpiresAt.toLocaleString()}`
@@ -327,10 +337,6 @@
 	.send-btn {
 		margin-left: auto;
 		order: 2;
-	}
-
-	.leave-group {
-		float: right;
 	}
 
 	h5 {

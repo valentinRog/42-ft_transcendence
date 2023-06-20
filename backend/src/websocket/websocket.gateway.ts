@@ -220,10 +220,8 @@ export abstract class SocketGateway
   ) {
     const { chatId, userId, duration } = payload;
     const expiresAt = await this.chatService.banUser(chatId, userId, duration);
-
     const user = await this.userService.getUserById(userId);
     const socket = await this.webSocketService.getSocket(user.username);
-
     if (socket) socket.emit('userBan', { chatId, expiresAt });
 
     return;
@@ -235,7 +233,11 @@ export abstract class SocketGateway
     payload: { chatId: number; userId: number },
   ) {
     const { chatId, userId } = payload;
+    const user = await this.userService.getUserById(userId);
+    const socket = await this.webSocketService.getSocket(user.username);
+
     await this.chatService.unBanUser(chatId, userId);
+    if (socket) socket.emit('userUnBan', { chatId });
     return;
   }
 
@@ -261,7 +263,11 @@ export abstract class SocketGateway
     payload: { chatId: number; userId: number },
   ) {
     const { chatId, userId } = payload;
+    const user = await this.userService.getUserById(userId);
+    const socket = await this.webSocketService.getSocket(user.username);
+
     await this.chatService.unMuteUser(chatId, userId);
+    socket.emit('userUnMute', { chatId } );
     return;
   }
 
