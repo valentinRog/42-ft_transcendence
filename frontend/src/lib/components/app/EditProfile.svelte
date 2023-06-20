@@ -125,7 +125,7 @@
 	}
 
 	if (login) {
-		fetchWithToken(`users/avatar/${login}`)
+		fetchWithToken(`users/avatar/${$user?.id}`)
 			.then((res) => {
 				if (res.status === 200 || res.status === 201) {
 					return res.blob();

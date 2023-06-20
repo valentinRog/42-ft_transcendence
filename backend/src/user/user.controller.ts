@@ -53,17 +53,19 @@ export class UserController {
     return this.prisma.user.findUnique({ where: { id: parseId } });
   }
 
-  @Get('avatar/:login')
+  @Get('info/name/:username')
+  getInfoByName(@Param('username') username: string) {
+    return this.prisma.user.findUnique({ where: { username: username } });
+  }
+
+  @Get('avatar/:id')
   @UseInterceptors()
-  async getUserPhoto(@Param('login') login: string) {
-    const user = await this.userService.getUser(login);
-    const path = join(process.cwd(), '/upload', `${user.login}.png`);
+  async getUserPhoto(@Param('id') id: string) {
+    const path = join(process.cwd(), '/upload', `${id}.png`);
     if (!fs.existsSync(path)) {
       throw new NotFoundException('Avatar not found');
     }
-    const file = createReadStream(
-      join(process.cwd(), '/upload', `${user.login}.png`),
-    );
+    const file = createReadStream(join(process.cwd(), '/upload', `${id}.png`));
     return new StreamableFile(file);
   }
 
