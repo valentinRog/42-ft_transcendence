@@ -70,6 +70,12 @@
 	async function leaveGroup() {
 		$socket.emit('leaveGroup', { chatId: chatIdLocal });
 	}
+
+	const formatter = new Intl.DateTimeFormat('en', {
+		hour12: false,
+		hour: 'numeric',
+		minute: '2-digit'
+	});
 </script>
 
 <div id="box">
@@ -89,6 +95,7 @@
 							{/if}
 						</div>
 						<div class="message-content">{message.content}</div>
+						<h6 class="clock">{formatter.format(new Date(message.createdAt))}</h6>
 					</li>
 				{/each}
 			{/if}
@@ -108,12 +115,8 @@
 
 <style lang="scss">
 	#box {
-		background: #c0c0c0;
-		color: #000;
-		font-family: 'MS Sans Serif', sans-serif;
-		box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, 0.5);
-		width: 15rem;
-		height: 17rem;
+		width: 20rem;
+		height: 25rem;
 	}
 
 	#chat-window {
@@ -121,7 +124,8 @@
 		overflow-y: auto;
 		overflow-x: hidden;
 		padding: 0.5rem;
-		border-bottom: 1px solid #000;
+		margin: 0.25rem;
+		@include tab-border($light-grey, $dark-grey);
 	}
 
 	#sendMessage-window {
@@ -144,12 +148,12 @@
 	h5 {
 		margin: 0;
 		text-align: center;
-		color: rgba(51, 51, 51, 0.814);
+		color: $dark-grey;
 	}
 
 	input[type='text'].message-input {
 		@include tab-border(white, black);
-		background-color: $light-grey;
+		background-color: white;
 		width: 100%;
 		box-sizing: border-box;
 		margin-right: 0.5rem;
@@ -164,7 +168,7 @@
 	}
 
 	li {
-		margin-bottom: 0.5rem;
+		margin-bottom: 0.25rem;
 		word-break: break-word;
 		display: flex;
 		flex-direction: column;
@@ -176,10 +180,11 @@
 
 	li.self .message-header,
 	li.self .message-content {
+		margin-top: 0.1rem;
 		align-self: flex-end;
 		display: flex;
 		justify-content: flex-end;
-		width: 9.5rem;
+		width: 80%;
 	}
 
 	li.other .message-header {
@@ -188,10 +193,11 @@
 
 	li.other .message-header,
 	li.other .message-content {
+		margin-top: 0.1rem;
 		align-self: flex-start;
 		display: flex;
 		justify-content: flex-start;
-		width: 9.5rem;
+		width: 80%;
 	}
 
 	.message-header {
@@ -202,14 +208,10 @@
 
 	.message-content {
 		margin-top: 0.2rem;
-		padding-left: 0.5rem;
-		padding-right: 0.5rem;
-		padding-top: 0.3rem;
-		padding-bottom: 0.3rem;
+		padding: 0.3rem 0.5rem;
 		font-size: 0.9em;
 		@include tab-border(white, black);
-		// border-radius: 0.8rem;
-		background-color: rgb(229, 229, 229);
+		background-color: $light-grey;
 	}
 
 	.send-message-form {
