@@ -171,7 +171,7 @@
 	import Notepad from '$lib/components/app/Notepad.svelte';
 	import FriendRequest from '$lib/components/app/FriendRequest.svelte';
 	import EditProfile from './app/EditProfile.svelte';
-	import { token, user } from '$lib/stores';
+	import { token, user, loading } from '$lib/stores';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import type { Socket } from 'socket.io-client';
 	import ioClient from 'socket.io-client';
@@ -341,8 +341,10 @@
 	}
 
 	async function fetchFriends() {
+		$loading = true;
 		const res = await fetchWithToken('users/me/friends');
 		const data = await res.json();
+		$loading = false;
 		$contacts = data;
 		return data;
 	}
