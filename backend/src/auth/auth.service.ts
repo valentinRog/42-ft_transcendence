@@ -47,6 +47,7 @@ export class AuthService {
           },
         },
       });
+      console.log(user.id.toString());
       await this.userService.saveImageFromUrl(dto.avatar, user.id.toString());
       return user;
     } catch (error) {
