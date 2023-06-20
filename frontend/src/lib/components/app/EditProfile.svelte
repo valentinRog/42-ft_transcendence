@@ -6,7 +6,6 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { user } from '$lib/stores';
-	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
 
 	const fetchWithToken = Context.fetchWithToken();
@@ -28,7 +27,6 @@
 
 	let inputLogin = $user?.login;
 	let inputUsername = $user?.username;
-
 	let checkboxValue = $user?.twoFactorEnabled;
 
 	async function handleSubmit(event: Event) {
@@ -59,6 +57,7 @@
 			disable2fa();
 		else if (!$user?.twoFactorEnabled && checkboxValue)
 			enable2fa();
+		changes = false;
 	}
 
 	async function enable2fa() {
@@ -89,11 +88,72 @@
 		changes = inputLogin !== $user?.login || inputUsername !== $user?.username || checkboxValue !== $user?.twoFactorEnabled;
 	}
 
+	let fileinput: HTMLInputElement;
+	let imgUrl: string | '';
+
+	const onFileSelected = (e: any) => {
+		let image = e.target.files[0];
+		const formData = new FormData();
+		formData.append('file', image);
+
+		fetchWithToken('users/upload', {
+			method: 'POST',
+			body: formData
+		})
+			.then((res) => res.json())
+			.then((data) => {
+				imgUrl = URL.createObjectURL(image);
+			});
+		changes = true;
+	};
+
+	export let username: string | null | undefined = null;
+	let login: string | null | undefined = null;
+	let currentUser: any = {};
+
+	if (username === null) {
+		username = $user!.username;
+		login = $user!.login;
+		currentUser = $user;
+	} else {
+		fetchWithToken(`users/info/${username}`)
+			.then((res) => res.json())
+			.then((data) => {
+				currentUser = data;
+				login = currentUser.login;
+			});
+	}
+
+	if (login) {
+		fetchWithToken(`users/avatar/${login}`)
+			.then((res) => {
+				if (res.status === 200 || res.status === 201) {
+					return res.blob();
+				} else {
+					throw new Error('Avatar fetch failed');
+				}
+			})
+			.then((blob) => (imgUrl = URL.createObjectURL(blob)))
+			.catch(() => {
+				imgUrl = '/avatar.png';
+			});
+	}
+
 </script>
 
 <div class="window-body">
 	<ErrorDialog {showModal} {errorMessage} on:close={() => (showModal = false)} />
 		<div id="formular">
+			<li class="pic">
+				<input
+					type="file"
+					id="file-upload"
+					accept=".jpg, .jpeg, .png"
+					on:change={(e) => onFileSelected(e)}
+					bind:this={fileinput}
+				/>
+				<img src={imgUrl} />
+			</li>
 		<div class="content">
 			<form
 				on:submit|preventDefault={handleSubmit}
@@ -160,6 +220,32 @@
 			font-size: 1rem;
 			align-self: center;
 		}
+
+		.pic {
+				display: inline-block;
+				position: relative;
+				cursor: pointer;
+				@include tab-contour-hollow;
+				margin-left: 28%;
+				background-color: white;
+				height: 5rem;
+				width: 7.5rem;
+				img {
+					display: block;
+					margin: 0 auto;
+					height: 4.5rem;
+				}
+
+				input[type='file'] {
+					position: absolute;
+					top: 0;
+					left: 0;
+					opacity: 0;
+					cursor: pointer;
+					width: 100%;
+					height: 100%;
+				}
+			}
 	}
 
 </style>

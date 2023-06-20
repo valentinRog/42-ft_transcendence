@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { token, user } from '$lib/stores';
+	import { user } from '$lib/stores';
 	import { Context } from '$lib/components/Context.svelte';
 
 	const fetchWithToken = Context.fetchWithToken();
@@ -40,26 +40,6 @@
 			});
 	}
 
-	let fileinput: HTMLInputElement;
-
-	const onFileSelected = (e: any) => {
-		let image = e.target.files[0];
-		const formData = new FormData();
-		formData.append('file', image);
-
-		fetchWithToken('users/upload', {
-			method: 'POST',
-			body: formData
-		})
-			.then((res) => res.json())
-			.then((data) => {
-				imgUrl = URL.createObjectURL(image);
-			});
-	};
-
-	function updateActionUrl() {
-		//
-	}
 
 </script>
 
@@ -71,13 +51,6 @@
 				<li class="box">Login: {currentUser.login || ''}</li>
 			</div>
 			<li class="pic">
-				<input
-					type="file"
-					id="file-upload"
-					accept=".jpg, .jpeg, .png"
-					on:change={(e) => onFileSelected(e)}
-					bind:this={fileinput}
-				/>
 				<img src={imgUrl} />
 			</li>
 		</div>
@@ -122,7 +95,6 @@
 			.pic {
 				display: inline-block;
 				position: relative;
-				cursor: pointer;
 
 				@include tab-contour-hollow;
 				padding: 0.15rem;
@@ -136,16 +108,6 @@
 					margin: 0 auto;
 					height: 4.5rem;
 					width: auto;
-				}
-
-				input[type='file'] {
-					position: absolute;
-					top: 0;
-					left: 0;
-					opacity: 0;
-					cursor: pointer;
-					width: 100%;
-					height: 100%;
 				}
 			}
 		}
