@@ -2,7 +2,6 @@
 	import { onDestroy } from 'svelte';
 	import { user } from '$lib/stores';
 	import { Context } from '$lib/components/Context.svelte';
-	import { each } from 'svelte/internal';
 
 	const chats = Context.chats();
 	const chatId = Context.chatId();
@@ -69,7 +68,7 @@
 								<h5>
 									{#each chat.chatUsers as chatUser, i}
 										{#if chatUser.user.username != $user?.username}
-											{chatUser.user.username + (chat.chatUsers.length - i > 1 ? ', ' : '')}
+											{chatUser.user.username + (chat.chatUsers.length - 1 - i > 1 ? ', ' : '')}
 										{/if}
 									{/each}
 								</h5>
@@ -83,7 +82,12 @@
 					<div class="chat-content">
 						{#if chat.messages.length > 0}
 							<div class="message-details">
-								<p>{getLastMessageSender(chat)}: {chat.messages[chat.messages.length - 1].content}</p>
+								<p>
+									{getLastMessageSender(chat) === $user?.username
+										? 'you'
+										: getLastMessageSender(chat)}
+									: {chat.messages[chat.messages.length - 1].content}
+								</p>
 								<span class="timestamp"
 									>{timeDifference(
 										now,
@@ -108,51 +112,36 @@
 </div>
 
 <style lang="scss">
-	@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
-	body {
-		font-family: 'Press Start 2P', cursive;
-		background: #008080;
-		color: black;
-	}
-
 	#box {
-		width: 15rem;
-		background: #c0c0c0;
-		border-right-color: #fff;
-		border-bottom-color: #fff;
+		width: 20rem;
 	}
 
 	#chat-window {
 		height: 22rem;
 		overflow-y: auto;
 		overflow-x: hidden;
-		border-right-color: #fff;
-		border-bottom-color: #fff;
-		margin-bottom: 1rem;
-		padding: 1rem;
+		margin: 0.2rem;
+		padding: 0.3rem;
 	}
 
 	.chat {
-		border: 2px solid #000;
-		border-right-color: #fff;
-		border-bottom-color: #fff;
-		padding: 1rem;
-		margin-bottom: 1rem;
+		@include tab-border($light-grey, $dark-grey);
+		padding: 0.5rem;
+		margin-bottom: 0.2rem;
 	}
 
 	h4 {
-		color: #000080;
-		margin-bottom: 0.5rem;
-
+		color: $blue;
+		margin-bottom: 0.2rem;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		max-width: 9.5rem;
-	}
-
-	p {
-		color: #000;
+		max-width: 12rem;
+		h5 {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			max-width: 15rem;
+		}
 	}
 
 	.chat-content {
@@ -166,6 +155,7 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		max-width: 8.6rem;
+		margin-bottom: 0.2rem;
 	}
 
 	.chat-content {
@@ -192,6 +182,6 @@
 
 	.timestamp {
 		font-size: 0.8rem;
-		color: rgb(58, 58, 58);
+		color: $dark-grey;
 	}
 </style>

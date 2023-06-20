@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { UpdateStatDto } from './dto';
+import { NotFoundException } from '@nestjs/common';
 import Elo from '@studimax/elo';
 
 @Injectable()
@@ -44,20 +45,20 @@ export class StatService {
       },
     });
 
-    const winnerId = dto.result === 1 ? userId : playerB.id;
-    const loserId = dto.result === 1 ? playerB.id : userId;
+    const winnerName = dto.result === 1 ? playerA.username : playerB.username;
+    const loserName = dto.result === 1 ? playerB.username : playerA.username;
     const match = await this.prisma.match.create({
       data: {
-        winnerId: winnerId,
-        loserId: loserId,
+        winnerName: winnerName,
+        loserName: loserName,
       },
     });
     await this.prisma.user.update({
-      where: { id: winnerId },
+      where: { username: winnerName },
       data: { matchesAsWinner: { connect: { id: match.id } } },
     });
     await this.prisma.user.update({
-      where: { id: loserId },
+      where: { username: loserName },
       data: { matchesAsLoser: { connect: { id: match.id } } },
     });
     return match;
@@ -80,7 +81,7 @@ export class StatService {
       );
       return sortedMatches;
     } catch (error) {
-      throw new Error('Error retrieving matches');
+      throw new NotFoundException('Error retrieving matches');
     }
   }
 
@@ -92,8 +93,7 @@ export class StatService {
       });
       return user.stat;
     } catch (error) {
-      console.error('Error retrieving stats:', error);
-      throw error;
+      throw new NotFoundException('Error retrieving stats');
     }
   }
 }

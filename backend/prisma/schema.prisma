@@ -15,19 +15,29 @@ model User {
   logFrom42        Boolean  @default(false)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
-  avatar           String?
-  status           String   @default("online")
   twoFactorEnabled Boolean  @default(false)
   twoFactorAuthSecret  String?
   friends          Int[]    @default([])
   stat             Stat     @relation(fields: [statId], references: [id])
   statId           Int      @unique
+  settings         Settings     @relation(fields: [settingsId], references: [id])
+  settingsId       Int      @unique
   notifications    Notification[]
   matchesAsWinner  Match[]  @relation("Winner")
   matchesAsLoser   Match[]  @relation("Loser")
   messages         Message[]
   chats            ChatUser[]
   bans             Ban[]
+  mutes            Mute[]
+}
+
+model Match {
+  id         Int       @id @default(autoincrement())
+  createdAt  DateTime  @default(now())
+  winner     User      @relation("Winner", fields: [winnerName], references: [username])
+  loser      User      @relation("Loser", fields: [loserName], references: [username])
+  winnerName String
+  loserName  String
 }
 
 model Notification {
@@ -40,21 +50,20 @@ model Notification {
   @@unique([userId, sender, type])
 }
 
-model Match {
-  id         Int       @id @default(autoincrement())
-  createdAt  DateTime  @default(now())
-  winner     User      @relation("Winner", fields: [winnerId], references: [id])
-  loser      User      @relation("Loser", fields: [loserId], references: [id])
-  winnerId   Int
-  loserId    Int
-}
-
 model Stat {
   id     Int  @id @default(autoincrement())
   wins   Int  @default(0)
   losses Int  @default(0)
   elo    Int  @default(1000)
   ladder String @default("bronze")
+
+  user   User?
+}
+
+model Settings {
+  id     Int  @id @default(autoincrement())
+  up String @default("ArrowUp")
+  down String @default("ArrowDown")
 
   user   User?
 }
@@ -78,11 +87,18 @@ model Chat {
   name           String
   isGroupChat    Boolean   @default(false)
   accessibility  String    @default("public")
-  password       String? 
+  password       String?
 
   messages       Message[]
   chatUsers      ChatUser[]
-  bans           Ban[] 
+  bans           Ban[]
+  mutes          Mute[]
+}
+
+model Role {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  chatUsers ChatUser[]
 }
 
 model ChatUser {
@@ -91,10 +107,11 @@ model ChatUser {
   chatId           Int
   createdAt        DateTime @default(now())
   lastReadMessageId Int?
-  isAdmin          Boolean  @default(false)
+  roleId           Int      @default(2)
 
   user             User     @relation(fields: [userId], references: [id])
   chat             Chat     @relation(fields: [chatId], references: [id])
+  role             Role     @relation(fields: [roleId], references: [id])
 
   @@unique([userId, chatId])
 }
@@ -103,10 +120,22 @@ model Ban {
   chatId         Int
   userId         Int
   createdAt      DateTime  @default(now())
-  expiresAt      DateTime? 
+  expiresAt      DateTime?
 
   chat           Chat  @relation(fields: [chatId], references: [id])
   user           User  @relation(fields: [userId], references: [id])
 
-  @@id([chatId, userId]) 
+  @@id([chatId, userId])
+}
+
+model Mute {
+  chatId         Int
+  userId         Int
+  createdAt      DateTime  @default(now())
+  expiresAt      DateTime?
+
+  chat           Chat  @relation(fields: [chatId], references: [id])
+  user           User  @relation(fields: [userId], references: [id])
+
+  @@id([chatId, userId])
 }

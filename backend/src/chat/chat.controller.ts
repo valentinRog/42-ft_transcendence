@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Post, Get, Query, Param, Body } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { JwtGuard } from '../auth/guard';
 import { UseGuards } from '@nestjs/common';
@@ -15,15 +15,45 @@ export class ChatController {
     return chats;
   }
 
-  // @UseGuards(JwtGuard)
-  // @Post('create-chat')
-  // async createChat(
-  //   @Body('groupName') groupName: string,
-  //   @Body('memberUsernames') memberUsernames: string[],
-  //   @Body('isGroupChat') isGroupChat: boolean
-  // ) {
-  //   const newGroupChat = await this.chatService.createChat(groupName, memberUsernames, isGroupChat);
-  //   return newGroupChat;
-  // }
+  @UseGuards(JwtGuard)
+  @Get('publicChats')
+  async getPublicChats(@Query('start') start: string, @Query('limit') limit: string) {
+    const chats = this.chatService.getChatsPublic(Number(start), Number(limit));
+    return chats;
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(':chatId')
+  async findChatById(@Param('chatId') chatId: string) {
+    const chat = await this.chatService.findChatById(Number(chatId));
+    return chat;
+  }
+
+  @Post('verifyPassword')
+  async verifyPassword(@Body() body: { chatId: string, password: string }) {
+    const chat = await this.chatService.findChatById(Number(body.chatId));
+    if (chat.accessibility === "public" || chat.accessibility === "private")
+      return true;
+    if (chat.accessibility === "protected" && chat.password && chat.password === body.password)
+      return true;
+    else
+      return false;
+  }
+
+  @UseGuards(JwtGuard)
+  @Post('create-chat')
+  async createChat(
+    @Body('memberUsernames') memberUsernames: string[],
+    @Body('isGroupChat') isGroupChat: boolean,
+    @Body('accessibility') accessibility: string,
+    @Body('password') password?: string,
+  ) {
+
+    const groupName = memberUsernames.join('-');
+    console.log(accessibility);
+    const newGroupChat = await this.chatService.createChat(groupName, memberUsernames, isGroupChat, accessibility, password);
+    return newGroupChat;
+  }
+
 
 }

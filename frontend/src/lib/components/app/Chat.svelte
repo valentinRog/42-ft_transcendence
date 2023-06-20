@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount, afterUpdate } from 'svelte';
-	import type { Socket } from 'socket.io-client';
 	import { Context } from '$lib/components/Context.svelte';
 	import { user } from '$lib/stores';
 
@@ -10,6 +9,7 @@
 	const chatId = Context.chatId();
 	const friendInfoId = Context.friendInfoId();
 	const contacts = Context.contacts();
+	const fetchCreateChat = Context.fetchCreateChat();
 
 	let chatIdLocal: number | null = $chatId;
 	let currentChat: any = null;
@@ -51,6 +51,17 @@
 
 	async function sendMessage() {
 		if (messageContent.trim() === '') return;
+		if (!chatIdLocal) {
+			const memberUsernames = [$user?.username, friendUsername];
+			const chat = await fetchCreateChat(memberUsernames, false, 'private');
+			const chatExists = $chats.some(existingChat => existingChat.id === chat.id);
+			
+			if (!chatExists) {
+			 	$chats.push(chat);
+				chatIdLocal = chat.id;
+				$socket.emit('otherAddChat', { chat: chat, userId: friendId });
+			}
+		}
 		$socket.emit('sendMessage', {
 			chatId: chatIdLocal,
 			content: messageContent,
@@ -120,7 +131,8 @@
 	}
 
 	#chat-window {
-		height: 85%;
+		height: 91%;
+		margin-right: 0.2rem;
 		overflow-y: auto;
 		overflow-x: hidden;
 		padding: 0.5rem;
@@ -129,7 +141,7 @@
 	}
 
 	#sendMessage-window {
-		padding: 0.5rem;
+		padding: 0.4rem 0.2rem 0.2rem 0.2rem;
 	}
 
 	.btn {
@@ -141,12 +153,8 @@
 		order: 2;
 	}
 
-	.leave-group {
-		float: right;
-	}
-
 	h5 {
-		margin: 0;
+		margin: 0.2rem 0 0 0;
 		text-align: center;
 		color: $dark-grey;
 	}
@@ -158,11 +166,11 @@
 		box-sizing: border-box;
 		margin-right: 0.5rem;
 		order: 1;
+		outline: none;
 	}
 
 	ul {
 		list-style: none;
-		padding: 0;
 		display: flex;
 		flex-direction: column;
 	}

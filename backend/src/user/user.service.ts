@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EditUserDto } from './dto';
+import { WebSocketService } from '../websocket/websocket.service';
 import { createWriteStream } from 'fs';
 import { HttpService } from '@nestjs/axios';
 import UPLOAD_PATH from '../../config/upload-path';
@@ -16,10 +17,15 @@ export class UserService {
   constructor(
     private prisma: PrismaService,
     private httpService: HttpService,
+    private socketService: WebSocketService,
   ) {}
 
   async getUser(username: string) {
     return this.prisma.user.findUnique({ where: { username: username } });
+  }
+
+  async getUserById(userId: number) {
+    return this.prisma.user.findUnique({ where: { id: userId } });
   }
 
   async editUser(userId: number, dto: EditUserDto) {
@@ -59,10 +65,13 @@ export class UserService {
         where: { username: userName },
         data: { friends: { push: friendId } },
       });
-      await this.prisma.user.update({
+      const friend = await this.prisma.user.update({
         where: { id: friendId },
         data: { friends: { push: user.id } },
       });
+      if ((await this.getUserStatus(friend.username)) != 'offline') {
+        this.socketService.sendToUser(friend.username, userName, 'friend');
+      }
       delete user.hash;
       return user;
     } catch (error) {
@@ -74,9 +83,8 @@ export class UserService {
     try {
       const user = await this.prisma.user.findUnique({
         where: { username: username },
-        select: { status: true },
       });
-      return user.status;
+      return this.socketService.getStatus(user.username);
     } catch (error) {
       throw new NotFoundException(
         `User with username '${username}' not found.`,
@@ -86,7 +94,7 @@ export class UserService {
 
   async removeFriend(userName: string, friendId: number) {
     if (!(await this.findFriend(userName, friendId))) {
-      throw new ForbiddenException('User not in friends list');
+      throw new NotFoundException('User not in friends list');
     }
     try {
       const user = await this.prisma.user.update({
@@ -102,8 +110,7 @@ export class UserService {
           },
         },
       });
-      // Remove the user from the friend's friend list
-      await this.prisma.user.update({
+      const friend = await this.prisma.user.update({
         where: { id: friendId },
         data: {
           friends: {
@@ -116,6 +123,9 @@ export class UserService {
           },
         },
       });
+      if ((await this.getUserStatus(friend.username)) != 'offline') {
+        this.socketService.sendToUser(friend.username, userName, 'friend');
+      }
       delete user.hash;
       return user;
     } catch (error) {
@@ -162,36 +172,20 @@ export class UserService {
   }
 
   async getQueueUsers() {
+    const inqueue = [...this.socketService.getAllStatus().entries()]
+      .filter(([_, status]) => status === 'queue')
+      .map(([username, _]) => username);
     const users = await this.prisma.user.findMany({
       where: {
-        status: 'queue',
+        username: {
+          in: inqueue,
+        },
       },
     });
     return users;
   }
 
-  async updateUserStatus(username: string, status: string) {
-    try {
-      const user = await this.prisma.user.update({
-        where: {
-          username: username,
-        },
-        data: {
-          status: status,
-        },
-      });
-
-      if (!user) {
-        throw new NotFoundException(
-          `User with username '${username}' not found.`,
-        );
-      }
-      delete user.hash;
-      return user;
-    } catch (error) {
-      throw new NotFoundException(
-        `User with username '${username}' not found.`,
-      );
-    }
+  getStatus(username: string) {
+    return this.socketService.getStatus(username);
   }
 }

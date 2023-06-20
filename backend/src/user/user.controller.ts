@@ -10,10 +10,10 @@ import {
   FileTypeValidator,
   MaxFileSizeValidator,
   ForbiddenException,
+  NotFoundException,
   Get,
   Param,
-  Res,
-  StreamableFile
+  StreamableFile,
 } from '@nestjs/common';
 import { GetUser } from '../auth/decorator';
 import { JwtGuard } from '../auth/guard';
@@ -23,11 +23,12 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { PrismaClient } from '@prisma/client';
 import { createReadStream } from 'fs';
 import { join } from 'path';
+import * as fs from 'fs';
 
 @UseGuards(JwtGuard)
 @Controller('users')
 export class UserController {
-  constructor(private userService: UserService, private prisma: PrismaClient) { }
+  constructor(private userService: UserService, private prisma: PrismaClient) {}
 
   @Get('me')
   getMe(@GetUser() user) {
@@ -36,7 +37,13 @@ export class UserController {
 
   @Get('avatar/me')
   getMyPhoto(@GetUser() user) {
-    const file = createReadStream(join(process.cwd(), '/upload', `${user.login}.png`));
+    const path = join(process.cwd(), '/upload', `${user.login}.png`);
+    if (!fs.existsSync(path)) {
+      throw new NotFoundException('Avatar not found');
+    }
+    const file = createReadStream(
+      join(process.cwd(), '/upload', `${user.login}.png`),
+    );
     return new StreamableFile(file);
   }
 
@@ -47,17 +54,27 @@ export class UserController {
   }
 
   @Get('avatar/:login')
+  @UseInterceptors()
   async getUserPhoto(@Param('login') login: string) {
     const user = await this.userService.getUser(login);
-    const file = createReadStream(join(process.cwd(), '/upload', `${user.login}.png`));
+    const path = join(process.cwd(), '/upload', `${user.login}.png`);
+    if (!fs.existsSync(path)) {
+      throw new NotFoundException('Avatar not found');
+    }
+    const file = createReadStream(
+      join(process.cwd(), '/upload', `${user.login}.png`),
+    );
     return new StreamableFile(file);
   }
 
   @UseGuards(JwtGuard)
   @Get('me/friends')
   async getUserFriends(@GetUser() user) {
-    const friends = await this.prisma.user.findMany({
+    const friends = (await this.prisma.user.findMany({
       where: { id: { in: user.friends } },
+    })) as any;
+    friends.forEach((friend) => {
+      friend.status = this.userService.getStatus(friend.username);
     });
     return friends;
   }
@@ -91,19 +108,7 @@ export class UserController {
     const prisma_friend = await this.prisma.user.findUnique({
       where: { username: dto.friend },
     });
-    if (!prisma_friend) throw new ForbiddenException('User not found');
-
+    if (!prisma_friend) throw new NotFoundException('User not found');
     return await this.userService.removeFriend(username, prisma_friend.id);
-  }
-
-  @Post('add-friend')
-  async addFriend(@GetUser('username') username, @Body() dto: FriendDto) {
-    if (username == dto.friend)
-      throw new ForbiddenException('You cannot add yourself as a friend');
-    const prisma_friend = await this.prisma.user.findUnique({
-      where: { username: dto.friend },
-    });
-    if (!prisma_friend) throw new ForbiddenException('User not found');
-    return await this.userService.addFriend(username, prisma_friend.id);
   }
 }

@@ -13,7 +13,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
 import { ChatService } from 'src/chat/chat.service';
 import { StatService } from 'src/stat/stat.service';
-import { Chat, ChatUser, Message, User } from '../chat/model/chat.model';
+import { NotificationService } from 'src/notification/notification.service';
 
 @WebSocketGateway({
   cors: {
@@ -32,6 +32,7 @@ export abstract class SocketGateway
     protected readonly userService: UserService,
     protected readonly chatService: ChatService,
     protected readonly statService: StatService,
+    protected readonly notificationService: NotificationService,
   ) {}
 
   async handleConnection(client: Socket) {
@@ -47,18 +48,47 @@ export abstract class SocketGateway
     }
     console.log(`${user.username} connected`);
     this.webSocketService.addSocket(user.username, client);
-    this.userService.updateUserStatus(user.username, 'online');
+    this.webSocketService.setStatus(user.username, 'online');
+    this.webSocketService.setStatus(user.username, 'online');
+    const userToNotify = await this.notificationService.removeNotification(
+      user.username,
+      'game',
+    );
+    for (const id of userToNotify) {
+      const user = await this.userService.getUserById(id);
+      this.webSocketService
+        .getSocket(user.username)
+        .emit('game', user.username);
+    }
   }
 
   handleDisconnect(client: Socket) {
     const username = this.webSocketService.getClientName(client);
-    if (username) this.userService.updateUserStatus(username, 'offline');
+    if (username) this.webSocketService.setStatus(username, 'offline');
     console.log(`${username} disconnected`);
   }
 
   @SubscribeMessage('joinRoom')
   handleJoinRoom(client: Socket, payload: { chatId: number }) {
     client.join(`chat-${payload.chatId}`);
+  }
+
+  @SubscribeMessage('leaveRoom')
+  handleLeaveChatRoom(client: Socket, payload: { chatId: number }) {
+    client.leave(`chat-${payload.chatId}`);
+  }
+
+  @SubscribeMessage('joinChat')
+  async handleJoinChat(client: any, payload: any) {
+    const chatId = payload.chatId;
+    const username = this.webSocketService.getClientName(client);
+    const user = await this.userService.getUser(username);
+
+    await this.chatService.addUserToChat(chatId, user.id)
+    const chat = await this.chatService.findChatById(chatId);
+
+    client.join(`chat-${payload.chatId}`);
+    client.emit('addChat', chat);
   }
 
   @SubscribeMessage('createGroupChat')
@@ -72,13 +102,12 @@ export abstract class SocketGateway
       password?: string;
     },
   ) {
-    const user = this.webSocketService.getClientName(client);
     const newGroupChat = await this.chatService.createChat(
       payload.groupName,
       payload.memberUsernames,
       payload.isGroupChat,
       payload.accessibility,
-      payload.password
+      payload.password,
     );
 
     for (const member of newGroupChat.chatUsers) {
@@ -91,19 +120,31 @@ export abstract class SocketGateway
     client.emit('createChat', newGroupChat.id);
   }
 
+  @SubscribeMessage('otherAddChat')
+  async handleFriendAddChat(
+    client: Socket,
+    payload: { chat: any, userId: number}
+  ) {
+    const { chat, userId} = payload;
+
+    const user = await this.userService.getUserById(userId);
+    const socket = await this.webSocketService.getSocket(user.username);
+
+    socket.emit('addChat', chat);
+    socket.emit('updateChat', chat.id);
+  }
+
   @SubscribeMessage('sendMessage')
   async handleMessage(
     client: Socket,
-    payload: { chatId: number; content: string; friendUsername: string },
+    payload: { chatId: number; content: string; friendUsername?: string },
   ) {
     const chat = await this.chatService.findChatById(payload.chatId);
     const username = this.webSocketService.getClientName(client);
     const user = await this.userService.getUser(username);
 
     const otherChatUser = chat
-      ? chat.chatUsers.find(
-          (chatUser) => (chatUser as any).user.username !== username,
-        )
+      ? chat.chatUsers.find((c) => (c as any).user.username !== username)
       : null;
     const socket = this.webSocketService.getSocket(
       otherChatUser
@@ -128,26 +169,15 @@ export abstract class SocketGateway
       }
     };
 
-    if (!chat) {
-      const newchat = await this.chatService.createChat(
-        `${username}-${payload.friendUsername}`,
-        [username, payload.friendUsername],
-        false,
-        "private"
-      );
-      const newMessage = await this.chatService.addMessageToDatabase(
-        newchat.id,
-        payload.content,
-        user.id,
-      );
-      newchat.messages.push(newMessage);
-      if (socket) {
-        socket.emit('addChat', newchat);
-        socket.emit('updateChat', newchat.id);
-      }
+    if (!chat.chatUsers.find((c) => (c as any).user.id === user.id)) {
+      const chatUser = await this.chatService.addUserToChat(chat.id, user.id);
+      const newchat = await this.chatService.findChatById(chat.id);
+      client.join(`chat-${chat.id}`);
+      this.server.to(`chat-${chat.id}`).emit('chatUserAdded', { chatId: chat.id, chatUser})
       client.emit('addChat', newchat);
-      client.emit('updateChat', newchat.id);
-    } else await sendMessage();
+    }
+    await sendMessage();
+    
   }
 
   @SubscribeMessage('leaveGroup')
@@ -181,13 +211,91 @@ export abstract class SocketGateway
     }
   }
 
+  //BAN//
 
-  @SubscribeMessage('accept-friend')
+  @SubscribeMessage('banUser')
+  async handleBanUser(
+    client: Socket,
+    payload: { chatId: number; userId: number; duration: number | null },
+  ) {
+    const { chatId, userId, duration } = payload;
+    const expiresAt = await this.chatService.banUser(chatId, userId, duration);
+
+    const user = await this.userService.getUserById(userId);
+    const socket = await this.webSocketService.getSocket(user.username);
+
+    if (socket) socket.emit('userBan', { chatId, expiresAt });
+
+    return;
+  }
+
+  @SubscribeMessage('unBanUser')
+  async handleUnbanUser(
+    client: Socket,
+    payload: { chatId: number; userId: number },
+  ) {
+    const { chatId, userId } = payload;
+    await this.chatService.unBanUser(chatId, userId);
+    return;
+  }
+
+  //MUTE//
+
+  @SubscribeMessage('muteUser')
+  async handleMuteUser(
+    client: Socket,
+    payload: { chatId: number; userId: number; duration: number | null },
+  ) {
+    const { chatId, userId, duration } = payload;
+    const expiresAt = await this.chatService.muteUser(chatId, userId, duration);
+    const user = await this.userService.getUserById(userId);
+    const socket = await this.webSocketService.getSocket(user.username);
+    if (socket) socket.emit('userMute', { chatId, expiresAt });
+
+    return;
+  }
+
+  @SubscribeMessage('unMuteUser')
+  async handleUnMuteUser(
+    client: Socket,
+    payload: { chatId: number; userId: number },
+  ) {
+    const { chatId, userId } = payload;
+    await this.chatService.unMuteUser(chatId, userId);
+    return;
+  }
+
+  @SubscribeMessage('changeRole')
+  async handleChangeRole(
+    client: Socket,
+    payload: { chatId: number; userId: number; newRoleId: number },
+  ) {
+    const { chatId, userId, newRoleId } = payload;
+    await this.chatService.changeRole(chatId, userId, newRoleId);
+    return;
+  }
+
+  @SubscribeMessage('setAccess')
+  async handleSetAccess(
+    client: Socket,
+    payload: { chatId: number, isProtected: boolean, password?: string },
+  ) {
+    const { chatId, isProtected, password } = payload;
+    await this.chatService.setAccess(chatId, isProtected, password);
+    return;
+  }
+
+  @SubscribeMessage('setPassword')
+  async setPassword(client: any, payload: { chatId: number, password: string }): Promise<void> {
+    const { chatId, password } = payload;
+    await this.chatService.setPassword(chatId, password);
+  }
+
+  @SubscribeMessage('response-friend')
   async handleAcceptFriend(
     @MessageBody() data: { response: boolean; friend: string },
     @ConnectedSocket() client: Socket,
   ) {
-    console.log('accept-friend');
     const username = this.webSocketService.getClientName(client);
     const user = await this.userService.getUser(data.friend);
     if (!user) return { error: 'User not found' };
@@ -197,15 +305,12 @@ export abstract class SocketGateway
     client.emit('friend-accepted', data.friend);
   }
 
-  @SubscribeMessage('accept-game')
+  @SubscribeMessage('response-game')
   async handleMatch(
     @MessageBody() data: { response: boolean; friend: string },
     @ConnectedSocket() client: Socket,
   ) {
     const username = this.webSocketService.getClientName(client);
-    const user = await this.userService.getUser(username);
-    if (!user) return { error: 'User not found' };
-    if (user.status !== 'online') return { error: 'User is not ready' };
     if (data.response) {
       this.webSocketService.createRoom(username, data.friend);
     }

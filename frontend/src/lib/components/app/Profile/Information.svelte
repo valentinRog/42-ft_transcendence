@@ -3,6 +3,7 @@
 	import { Context } from '$lib/components/Context.svelte';
 
 	const fetchWithToken = Context.fetchWithToken();
+	const openEditProfile = Context.openEditProfile();
 
 	export let username: string | null | undefined = null;
 	let login: string | null | undefined = null;
@@ -24,10 +25,22 @@
 
 	const friends = Context.contacts();
 
-	$: if (login)
+	if (login) {
 		fetchWithToken(`users/avatar/${login}`)
-			.then((res) => res.blob())
-			.then((blob) => (imgUrl = URL.createObjectURL(blob)));
+			.then((res) => {
+				if (res.status === 200 || res.status === 201) {
+					return res.blob();
+				} else {
+					throw new Error('Avatar fetch failed');
+				}
+			})
+			.then((blob) => (imgUrl = URL.createObjectURL(blob)))
+			.catch(() => {
+				imgUrl = '/avatar.png';
+			});
+	}
+
+
 </script>
 
 <div id="box">
@@ -38,9 +51,11 @@
 				<li class="box">Login: {currentUser.login || ''}</li>
 			</div>
 			<li class="pic">
-				<img class="profile-pic" src={imgUrl} alt="profile picture" />
+				<img src={imgUrl} />
 			</li>
 		</div>
+		<button type="button"
+		on:click={() => ($openEditProfile = true)}>Edit Profile</button>
 		{#if username === $user?.username}
 			<li class="box friends">
 				<p>My friends</p>
@@ -78,6 +93,9 @@
 			display: flex;
 			align-items: center;
 			.pic {
+				display: inline-block;
+				position: relative;
+
 				@include tab-contour-hollow;
 				padding: 0.15rem;
 				margin-right: 0.25rem;
@@ -105,6 +123,7 @@
 			@include tab-contour-hollow;
 			background-color: white;
 			div {
+				margin-bottom: 0.2rem;
 				display: flex;
 				align-items: center;
 				.status {
@@ -118,6 +137,13 @@
 		.img-status {
 			height: 0.8rem;
 			width: auto;
+		}
+		button.two-factor {
+			margin: 0.25rem;
+			padding: 0.25rem;
+			@include tab-contour;
+			@include tab-contour-active;
+			background-color: $grey;
 		}
 	}
 </style>

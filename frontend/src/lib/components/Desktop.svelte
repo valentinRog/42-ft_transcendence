@@ -4,18 +4,18 @@
 	import Start from '$lib/components/Start.svelte';
 	import { Context } from '$lib/components/Context.svelte';
 	import Clock from './Clock.svelte';
+	import NotificationBadge from './NotificationBadge.svelte';
 
 	const chats = Context.chats();
-	const chatId = Context.chatId();
 	const openChatWindow = Context.openChatWindow();
+	const openChatForumWindow = Context.openChatForumWindow();
 	const friendInfoId = Context.friendInfoId();
-
+	const openPongWindow = Context.openPongWindow();
 	const openFriendRequest = Context.openFriendRequest();
-
+	const openEditProfile = Context.openEditProfile();
 	const appInstances = Context.appInstances();
 	const zstack = Context.zstack();
 	const selected = Context.selected();
-
 	const addInstance = Context.addInstance();
 	const removeInstance = Context.removeInstance();
 
@@ -31,59 +31,29 @@
 			$selected = null;
 			openChatWindow.set(false);
 		}
+		if ($openChatForumWindow) {
+			addInstance('ChatForum');
+			$selected = null;
+			openChatForumWindow.set(false);
+		}
 		if ($openFriendRequest) {
 			addInstance('FriendRequest');
 			$selected = null;
 			openFriendRequest.set(false);
 		}
-	}
-
-	interface Props {
-		readonly name: string;
-		readonly icon: string;
-	}
-
-	interface AppProps {
-		readonly TabProps: Props;
-		readonly DesktopProps: Props;
-	}
-
-	const apps: Record<Context.App, AppProps> = {
-		Profile: {
-			TabProps: { name: 'Profile', icon: '/computer.png' },
-			DesktopProps: { name: 'Profile', icon: '/computer.png' }
-		},
-		Conversation: {
-			TabProps: { name: 'Conversation', icon: '/mail3.png' },
-			DesktopProps: { name: 'Conversation', icon: '/big-mail.png' }
-		},
-		Chat: {
-			TabProps: { name: 'Chat', icon: '/mail3.png' },
-			DesktopProps: { name: 'Chat', icon: '/big-mail.png' }
-		},
-		Contact: {
-			TabProps: { name: 'Contact', icon: '/phone.png' },
-			DesktopProps: { name: 'Contact', icon: '/phone.png' }
-		},
-		Pong: {
-			TabProps: { name: 'Pong', icon: '/pong.png' },
-			DesktopProps: { name: 'Pong', icon: '/big-pong.png' }
-		},
-		FriendRequest: {
-			TabProps: { name: 'FriendRequest', icon: '/computer.png' },
-			DesktopProps: { name: 'FriendRequest', icon: '/computer.png' }
-		},
-		Forum: {
-			TabProps: { name: 'Forum', icon: '/computer.png' },
-			DesktopProps: { name: 'Forum', icon: '/computer.png' }
-		},
-		Paint: {
-			TabProps: { name: 'Paint', icon: '/paint.png' },
-			DesktopProps: { name: 'Paint', icon: '/paint.png' }
+		if ($openEditProfile) {
+			addInstance('EditProfile');
+			$selected = null;
+			openEditProfile.set(false);
 		}
-	};
+		if ($openPongWindow) {
+			addInstance('Pong');
+			$selected = null;
+			openPongWindow.set(false);
+		}
+	}
 
-	Object.freeze(apps);
+	const apps = Context.apps();
 
 	let width: number;
 	let height: number;
@@ -91,10 +61,17 @@
 	const fetchMe = Context.fetchMe();
 	const fetchFriends = Context.fetchFriends();
 	const fetchChats = Context.fetchChats();
+	const fetchFriendRequest = Context.fetchFriendRequest();
+	const fetchGameRequest = Context.fetchGameRequest();
+
+	const friendRequest = Context.friendRequest();
+	const gameRequest = Context.gameRequest();
 
 	(async () => {
 		await fetchMe();
 		await fetchFriends();
+		await fetchFriendRequest();
+		await fetchGameRequest();
 
 		fetchChats().then(() => {
 			$chats.forEach((chat) => {
@@ -102,6 +79,8 @@
 			});
 		});
 	})();
+
+	const notVisible = ['FriendRequest', 'Chat', 'ChatForum', 'EditProfile'];
 </script>
 
 <div
@@ -111,26 +90,37 @@
 	on:mousedown={() => ($selected = null)}
 >
 	<div class="icons">
-		{#each Object.entries(apps) as [k, v]}
-			{#if k !== 'FriendRequest' && k !== 'Chat'}
-				<div
-					class="icon"
-					on:dblclick={() => {
-						addInstance(k);
-						$selected = null;
-					}}
-				>
-					<img src={v.DesktopProps.icon} alt={v.DesktopProps.name} draggable="false" />
-					<div class="icon-text">
-						<span>{v.DesktopProps.name}</span>
-					</div>
+		{#each Object.entries($apps).filter(([k, _]) => !notVisible.includes(k) ) as [k, v]}
+			<div
+				class="icon"
+				on:dblclick={() => {
+					addInstance(k);
+					$selected = null;
+				}}
+			>
+				<img src={v.DesktopProps.icon} alt={v.DesktopProps.name} draggable="false" />
+				{#if k === 'Conversation'}
+					<span class="notification-badge">
+						<NotificationBadge count={0} />
+					</span>
+				{:else if k === 'Contact'}
+					<span class="notification-badge">
+						<NotificationBadge count={$friendRequest.length} />
+					</span>
+				{:else if k === 'Pong'}
+					<span class="notification-badge">
+						<NotificationBadge count={$gameRequest.length} />
+					</span>
+				{/if}
+				<div class="icon-text">
+					<span>{v.DesktopProps.name}</span>
 				</div>
-			{/if}
+			</div>
 		{/each}
 	</div>
 	{#each [...$appInstances.entries()] as [id, { componentType, component, visible, propsWin, props }] (id)}
 		<Window
-			{...apps[componentType].TabProps}
+			{...$apps[componentType].TabProps}
 			props={propsWin}
 			parentWidth={width}
 			parentHeight={height}
@@ -159,7 +149,7 @@
 	<div class="navbar-tabs">
 		{#each [...$appInstances.entries()] as [id, { componentType, visible, propsWin }]}
 			<Tab
-				{...apps[componentType].TabProps}
+				{...$apps[componentType].TabProps}
 				props={propsWin}
 				active={$selected === id}
 				on:click={() => {
@@ -182,10 +172,7 @@
 
 <style lang="scss">
 	.icons {
-		// put the icons to the left of the screen
-		position: absolute;
-		left: 0;
-		top: 0;
+		position: relative;
 		width: 7rem;
 		height: 100%;
 		display: flex;
@@ -211,10 +198,6 @@
 
 	div.desktop {
 		height: calc(100vh - $navbar-height);
-		position: relative;
-	}
-
-	.icon-container {
 		position: relative;
 	}
 

@@ -2,6 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
 
+	const fetchHistory = Context.fetchHistory();
 	const fetchWithToken = Context.fetchWithToken();
 	const socket = Context.socket();
 
@@ -269,6 +270,7 @@
 
 	$socket.on('game-over', (winner: number) => {
 		stopLoop();
+		fetchHistory().then(() => {});
 		//if (winner === 0) {
 		//	alert('Player 1 wins!');
 		//} else {

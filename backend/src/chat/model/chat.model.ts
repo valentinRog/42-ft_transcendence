@@ -5,12 +5,14 @@ export type Chat = {
     id: number;
     isGroupChat: boolean;
     name: string;
+    accessibility: string;
+    password: string;
     updatedAt: Date;
 };
 
 export type ChatUser = {
     id: number;
-    createdAt: Date;  // Change this from string to Date
+    createdAt: Date;
     userId: number;
     chatId: number;
     lastReadMessageId: number | null;

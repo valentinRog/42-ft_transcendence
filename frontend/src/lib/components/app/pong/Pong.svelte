@@ -8,6 +8,7 @@
 
 	const socket = Context.socket();
 	const fetchWithToken = Context.fetchWithToken();
+	const gameRequest = Context.gameRequest();
 
 	let index = 0;
 	let room = '';
@@ -19,7 +20,9 @@
 		scale = parseInt(scaleString) / 100;
 	}
 
+	let matchmaking = false;
 	function matchmake() {
+		matchmaking = true;
 		fetchWithToken('matchmaking/queue', {
 			method: 'POST'
 		});
@@ -40,12 +43,33 @@
 		$socket.off('enter-room');
 		$socket.off('index');
 	});
+
+	function responseGame(sender: string, accept: boolean) {
+		$gameRequest = $gameRequest.filter((x) => x.sender !== sender);
+		$socket.emit('response-game', { response: accept, friend: sender });
+	}
 </script>
 
 <div class="container">
 	<div class="menu">
-		<DropDown name="game">
-			<button on:click={matchmake}>matchmaking</button>
+		<DropDown name="game" notif={$gameRequest.length}>
+			{#if matchmaking === false}
+				<button on:click={matchmake}>matchmaking</button>
+			{:else}
+				<button class="unavailable">matchmake</button>
+			{/if}
+			{#if $gameRequest.length > 0}
+				<RightDrop name="invitations" notif={$gameRequest.length}>
+					{#each $gameRequest as r (r.id)}
+						<RightDrop name={r.sender}>
+							<button on:click={() => responseGame(r.sender, true)}>accept</button>
+							<button on:click={() => responseGame(r.sender, false)}>decline</button>
+						</RightDrop>
+					{/each}
+				</RightDrop>
+			{:else}
+				<button class="unavailable"> invitations </button>
+			{/if}
 		</DropDown>
 		<DropDown name="settings">
 			<RightDrop name="scale">
@@ -59,6 +83,15 @@
 	</div>
 	{#if room !== ''}
 		<PongGame {scale} {index} {room} />
+	{:else}
+		<div class="empty-background">
+			<div>
+				<div class="smiley">
+					<img src="offline.png" />
+				</div>
+				<p>Sorry, no game at the moment.</p>
+			</div>
+		</div>
 	{/if}
 </div>
 
@@ -67,10 +100,47 @@
 		padding: 0.2rem;
 
 		div.menu {
+			height: 1.5rem;
+			@include tab-border(white, $dark-grey);
 			display: flex;
-
-			button {
+			button:not(.unavailable) {
 				@include dropdown-button;
+			}
+
+			button.unavailable {
+				@include dropdown-button(false);
+			}
+		}
+		.empty-background {
+			margin: 0.2rem 0;
+			width: 30rem;
+			height: 20rem;
+			@include tab-border(white, $dark-grey);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			div {
+				@include tab-border(white, $dark-grey);
+				width: 15rem;
+				height: 8rem;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-direction: column;
+				.smiley {
+					height: fit-content;
+					width: fit-content;
+					@include tab-border;
+					img {
+						height: 2rem;
+						width: 2rem;
+						padding: 0.3rem;
+						@include tab-border($dark-grey, $light-grey);
+					}
+				}
+				p {
+					margin: 0.5rem;
+				}
 			}
 		}
 	}

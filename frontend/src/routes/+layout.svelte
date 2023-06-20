@@ -20,11 +20,6 @@
 	}
 
 	@font-face {
-		font-family: 'bit5x3';
-		src: url('/fonts/bit5x3.ttf') format('truetype');
-	}
-
-	@font-face {
 		font-family: 'pong-score';
 		src: url('/fonts/pong-score.ttf') format('truetype');
 	}
@@ -44,7 +39,69 @@
 		font-size: 0.8rem;
 	}
 
+	button:disabled,
+	input[type="submit"]:disabled,
+	input[type="reset"]:disabled,
+	:disabled + label {
+		text-shadow: 1px 1px 0 var(--button-highlight);
+		pointer-events: none;
+		color: var(--button-shadow);
+
+	}
+
 	a:hover {
 		cursor: url($click), auto;
 	}
+
+	::-webkit-scrollbar {
+		width: 1rem;
+	}
+	::-webkit-scrollbar-track {
+		background-image: url('/scroll-back.png');
+		background-repeat: repeat;
+	}
+	::-webkit-scrollbar-thumb {
+		margin: 0 0.2rem;
+		background-color: $grey;
+		@include tab-border;
+	}
+	::-webkit-scrollbar-button {
+		background-image: url('/arrow-down.png');
+		background-size: 0.5rem;
+		background-repeat: no-repeat;
+		background-position: center;
+		background-color: $grey;
+		@include tab-border;
+	}
+
+	::-webkit-scrollbar-button:vertical:decrement {
+		background-image: url('/arrow-up.png');
+	}
+
+	::-webkit-scrollbar-button:horizontal:decrement {
+		background-image: url('/arrow-left.png');
+		background-size: 25% auto;
+	}
+
+	::-webkit-scrollbar-button:horizontal:increment {
+		background-image: url('/arrow-right.png');
+		background-size: 25% auto;
+	}
+
+	// a vérifier !!!
+	scrollbar {
+		width: 1rem;
+	}
+
+	scrollbartrack {
+		background-image: url('/scroll-back.png');
+		background-repeat: repeat;
+	}
+
+	scrollbarthumb {
+		margin: 0 0.2rem;
+		background-color: $grey;
+		@include tab-border;
+	}
+
 </style>

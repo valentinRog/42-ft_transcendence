@@ -49,6 +49,7 @@
 		actionUrl = signup ? `${PUBLIC_BACKEND_URL}/auth/signup` : `${PUBLIC_BACKEND_URL}/auth/signin`;
 	}
 	let showModal = false;
+
 </script>
 
 <div id="login">
@@ -56,8 +57,12 @@
 	<div id="formular">
 		<div class="top-bar">
 			<div class="buttons">
-				<button>&nbsp?&nbsp</button>
-				<button>&nbspX&nbsp</button>
+				<button>
+					<div class="border-inside">?</div>
+				</button>
+				<button>
+					<div class="border-inside">X</div>
+				</button>
 			</div>
 		</div>
 		<div class="content">
@@ -91,6 +96,9 @@
 					</div>
 				{/if}
 				<div class="button-container">
+					<button type="submit"
+						>{#if signup}Sign Up{:else}Sign In{/if}</button
+					>
 					<button
 						type="button"
 						on:click={() => {
@@ -98,33 +106,40 @@
 							updateActionUrl();
 						}}>{signup ? 'I have an account' : 'Create an account'}</button
 					>
-					<button type="submit"
-						>{#if signup}Sign Up{:else}Sign In{/if}</button
-					>
+					<a href="{PUBLIC_BACKEND_URL}/auth/42login">
+						<div>
+							<p>Login with</p>
+							<img src="/42.png" />
+						</div>
+					</a>
 				</div>
 			</form>
-			<a href="{PUBLIC_BACKEND_URL}/auth/42login">login with 42</a>
 		</div>
 	</div>
 </div>
 
 <style lang="scss">
 	div#formular {
+		@include form-95;
+		@include tab-border($dark-grey, $light-grey);
+		padding: 0.2rem;
+		background-color: $grey;
 		form {
+			@include tab-border($light-grey, $dark-grey);
 			display: flex;
 			flex-direction: column;
 			gap: 0.8rem;
 			padding: 1rem;
 			width: 25rem;
-			margin-top: 1rem;
+			margin-top: 0.2rem;
 
 			.row-icon img {
 				margin-right: 10px;
 				width: 25px;
 				height: 25px;
 			}
-
 			label {
+				color: black;
 				width: 7rem;
 			}
 		}
@@ -132,11 +147,6 @@
 		.form-group {
 			display: flex;
 			align-items: center;
-		}
-
-		input {
-			@include form-95;
-			margin-left: 10px;
 		}
 	}
 
@@ -152,8 +162,16 @@
 			height: 1.5rem;
 			display: flex;
 			align-items: center;
-
+			@include window-95;
 			.buttons {
+				button {
+					@include tab-contour;
+					@include tab-contour-active;
+					background-color: $grey;
+					div {
+						padding: 0.1rem 0.25rem;
+					}
+				}
 				margin-left: auto;
 				margin-right: 0.2rem;
 			}
@@ -162,22 +180,50 @@
 		.button-container {
 			display: flex;
 			justify-content: center;
+			flex-direction: column;
 			align-items: center;
 			gap: 0.5rem;
 			margin-top: 1rem;
+			align-items: center;
+			a {
+				@include tab-border;
+				color: black;
+				background-color: $light-grey;
+				text-decoration: none;
+				height: 1.8rem;
+				width: 10rem;
+				display: flex;
+				align-items: center;
+				flex-direction: row;
+				&:active {
+					@include tab-border(white, black);
+				}
+				div {
+					display: flex;
+					padding: 0.3rem;
+					align-content: center;
+					justify-content: center;
+					img {
+						margin-left: 0.3rem;
+						height: 1.2rem;
+						width: auto;
+					}
+				}
+			}
 		}
 
 		.button-container button {
+			background-color: $light-grey;
 			font-size: inherit;
 			padding: 0.3rem 1rem;
 			width: 10rem;
 		}
 
 		div.content {
-			padding: 1rem;
 			a {
 				display: block;
 				text-align: center;
+				height: 1.7rem;
 			}
 		}
 	}
