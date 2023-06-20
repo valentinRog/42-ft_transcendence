@@ -8,3 +8,4 @@ export const user = writable<{
 	twoFactorEnabled: boolean;
 	logFrom42: boolean;
 } | null>(null);
+export const loading = writable<boolean>(false);
