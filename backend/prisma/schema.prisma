@@ -15,12 +15,13 @@ model User {
   logFrom42        Boolean  @default(false)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
-  avatar           String?
   twoFactorEnabled Boolean  @default(false)
   twoFactorAuthSecret  String?
   friends          Int[]    @default([])
   stat             Stat     @relation(fields: [statId], references: [id])
   statId           Int      @unique
+  settings         Settings     @relation(fields: [settingsId], references: [id])
+  settingsId       Int      @unique
   notifications    Notification[]
   matchesAsWinner  Match[]  @relation("Winner")
   matchesAsLoser   Match[]  @relation("Loser")
@@ -55,6 +56,14 @@ model Stat {
   losses Int  @default(0)
   elo    Int  @default(1000)
   ladder String @default("bronze")
+
+  user   User?
+}
+
+model Settings {
+  id     Int  @id @default(autoincrement())
+  up String @default("ArrowUp")
+  down String @default("ArrowDown")
 
   user   User?
 }

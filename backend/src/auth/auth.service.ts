@@ -34,21 +34,21 @@ export class AuthService {
 
   async signup42(dto: AuthDto) {
     try {
-      const avatar_path = await this.userService.saveImageFromUrl(
-        dto.avatar,
-        dto.login,
-      );
-      return await this.prisma.user.create({
+      const user = await this.prisma.user.create({
         data: {
           login: dto.login,
           username: dto.username,
-          avatar: avatar_path,
           logFrom42: true,
           stat: {
             create: {},
           },
+          settings: {
+            create: {},
+          },
         },
       });
+      await this.userService.saveImageFromUrl(dto.avatar, user.id.toString());
+      return user;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code == 'P2002') {
@@ -68,6 +68,9 @@ export class AuthService {
           username: dto.username,
           hash: hash,
           stat: {
+            create: {},
+          },
+          settings: {
             create: {},
           },
         },
