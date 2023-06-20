@@ -49,6 +49,7 @@
 		actionUrl = signup ? `${PUBLIC_BACKEND_URL}/auth/signup` : `${PUBLIC_BACKEND_URL}/auth/signin`;
 	}
 	let showModal = false;
+
 </script>
 
 <div id="login">

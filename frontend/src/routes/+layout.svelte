@@ -39,6 +39,16 @@
 		font-size: 0.8rem;
 	}
 
+	button:disabled,
+	input[type="submit"]:disabled,
+	input[type="reset"]:disabled,
+	:disabled + label {
+		text-shadow: 1px 1px 0 var(--button-highlight);
+		pointer-events: none;
+		color: var(--button-shadow);
+
+	}
+
 	a:hover {
 		cursor: url($click), auto;
 	}
@@ -93,4 +103,5 @@
 		background-color: $grey;
 		@include tab-border;
 	}
+
 </style>

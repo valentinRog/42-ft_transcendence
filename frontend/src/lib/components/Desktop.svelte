@@ -12,6 +12,7 @@
 	const friendInfoId = Context.friendInfoId();
 	const openPongWindow = Context.openPongWindow();
 	const openFriendRequest = Context.openFriendRequest();
+	const openEditProfile = Context.openEditProfile();
 	const appInstances = Context.appInstances();
 	const zstack = Context.zstack();
 	const selected = Context.selected();
@@ -39,6 +40,11 @@
 			addInstance('FriendRequest');
 			$selected = null;
 			openFriendRequest.set(false);
+		}
+		if ($openEditProfile) {
+			addInstance('EditProfile');
+			$selected = null;
+			openEditProfile.set(false);
 		}
 		if ($openPongWindow) {
 			addInstance('Pong');

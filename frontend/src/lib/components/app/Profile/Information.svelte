@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { token, user } from '$lib/stores';
+	import { user } from '$lib/stores';
 	import { Context } from '$lib/components/Context.svelte';
 
 	const fetchWithToken = Context.fetchWithToken();
-	const addInstance = Context.addInstance();
-	const fetchMe = Context.fetchMe();
+	const openEditProfile = Context.openEditProfile();
 
 	export let username: string | null | undefined = null;
 	let login: string | null | undefined = null;
@@ -41,46 +40,7 @@
 			});
 	}
 
-	let fileinput: HTMLInputElement;
 
-	const onFileSelected = (e: any) => {
-		let image = e.target.files[0];
-		const formData = new FormData();
-		formData.append('file', image);
-
-		fetchWithToken('users/upload', {
-			method: 'POST',
-			body: formData
-		})
-			.then((res) => res.json())
-			.then((data) => {
-				imgUrl = URL.createObjectURL(image);
-			});
-	};
-
-	async function enable2fa() {
-		const res = await fetchWithToken('2fa/enable', {
-			method: 'POST'
-		});
-		const data = await res.json();
-		addInstance('Internet', {}, { url: data.qrcode });
-		$token = data.token;
-		sessionStorage.setItem('token', data.token);
-		fetchMe();
-	}
-
-	async function disable2fa() {
-		await fetchWithToken('users/edit', {
-			method: 'PATCH',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				twoFactorEnabled: false
-			})
-		});
-		fetchMe();
-	}
 </script>
 
 <div id="box">
@@ -91,23 +51,11 @@
 				<li class="box">Login: {currentUser.login || ''}</li>
 			</div>
 			<li class="pic">
-				<input
-					type="file"
-					id="file-upload"
-					accept=".jpg, .jpeg, .png"
-					on:change={(e) => onFileSelected(e)}
-					bind:this={fileinput}
-				/>
 				<img src={imgUrl} />
 			</li>
 		</div>
-		{#if !$user?.logFrom42}
-			{#if $user?.twoFactorEnabled}
-				<button class="two-factor" on:click={disable2fa}>disable 2fa</button>
-			{:else}
-				<button class="two-factor" on:click={enable2fa}>enable 2fa</button>
-			{/if}
-		{/if}
+		<button type="button"
+		on:click={() => ($openEditProfile = true)}>Edit Profile</button>
 		{#if username === $user?.username}
 			<li class="box friends">
 				<p>My friends</p>
@@ -147,7 +95,6 @@
 			.pic {
 				display: inline-block;
 				position: relative;
-				cursor: pointer;
 
 				@include tab-contour-hollow;
 				padding: 0.15rem;
@@ -161,16 +108,6 @@
 					margin: 0 auto;
 					height: 4.5rem;
 					width: auto;
-				}
-
-				input[type='file'] {
-					position: absolute;
-					top: 0;
-					left: 0;
-					opacity: 0;
-					cursor: pointer;
-					width: 100%;
-					height: 100%;
 				}
 			}
 		}

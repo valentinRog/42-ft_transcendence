@@ -65,6 +65,7 @@
 		export const gameRequest = (): Writable<NotifRequest[]> => getContext('gameRequest');
 		export const history = (): Writable<Match[]> => getContext('history');
 		export const openFriendRequest = (): Writable<boolean> => getContext('openFriendRequest');
+		export const openEditProfile = (): Writable<boolean> => getContext('openEditProfile');
 		export const openPongWindow = (): Writable<boolean> => getContext('openPongWindow');
 		export const friendInfoId = (): Writable<number | null> => getContext('friendInfoId');
 		export const chats = (): Writable<Chat[]> => getContext('chats');
@@ -84,7 +85,8 @@
 			| 'Forum'
 			| 'FriendRequest'
 			| 'Internet'
-			| 'Notepad';
+			| 'Notepad'
+			| 'EditProfile';
 
 		export interface AppInstance {
 			readonly componentType: App;
@@ -159,6 +161,7 @@
 	import Internet from '$lib/components/app/Internet.svelte';
 	import Notepad from '$lib/components/app/Notepad.svelte';
 	import FriendRequest from '$lib/components/app/FriendRequest.svelte';
+	import EditProfile from './app/EditProfile.svelte';
 	import { token, user } from '$lib/stores';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import type { Socket } from 'socket.io-client';
@@ -183,6 +186,7 @@
 	const gameRequest = writable<Context.NotifRequest[]>([]);
 	const history = writable<Context.Match[]>([]);
 	const openFriendRequest = writable(false);
+	const openEditProfile = writable(false);
 	const openPongWindow = writable(false);
 	const friendInfoId = writable<Context.User | null>(null);
 	const chats = writable<Context.Chat[]>([]);
@@ -196,6 +200,7 @@
 	setContext('gameRequest', gameRequest);
 	setContext('history', history);
 	setContext('openFriendRequest', openFriendRequest);
+	setContext('openEditProfile', openEditProfile);
 	setContext('openPongWindow', openPongWindow);
 	setContext('friendInfoId', friendInfoId);
 	setContext('chats', chats);
@@ -215,7 +220,8 @@
 		Conversation: Conversation,
 		Forum: Forum,
 		Internet: Internet,
-		Notepad: Notepad
+		Notepad: Notepad,
+		EditProfile: EditProfile
 	});
 
 	const appInstances = writable(new Map<string, Context.AppInstance>());
@@ -296,6 +302,10 @@
 		Notepad: {
 			TabProps: { name: 'Notepad', icon: '/notepad.png' },
 			DesktopProps: { name: 'Notepad', icon: '/notepad.png' }
+		},
+		EditProfile: {
+			TabProps: { name: 'EditProfile', icon: '/computer.png' },
+			DesktopProps: { name: 'EditProfile', icon: '/computer.png' }
 		}
 	});
 
