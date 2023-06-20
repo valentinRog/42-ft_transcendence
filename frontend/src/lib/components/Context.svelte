@@ -360,7 +360,6 @@
 		const res = await fetchWithToken('notification/get?type=game');
 		const data = await res.json();
 		$gameRequest = data;
-		console.log($gameRequest);
 		return data;
 	}
 
@@ -375,7 +374,6 @@
 			};
 		});
 		$history = data;
-		console.log(data);
 		return new Promise((resolve, reject) => {
 			resolve(data);
 		});

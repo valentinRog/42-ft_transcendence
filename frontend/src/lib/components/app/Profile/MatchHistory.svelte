@@ -12,6 +12,11 @@
 </script>
 
 <div class="sunken-panel" style="height: 15rem; width: 18rem;">
+	{#if $history.length === 0}
+			<tr>
+				<td colspan="3">You have not participated in any matches</td>
+			</tr>
+	{:else}
 	<table class="interactive">
 		<thead>
 			<tr>
@@ -31,8 +36,10 @@
 					{/each}
 				</tr>
 			{/each}
+
 		</tbody>
 	</table>
+	{/if}
 </div>
 
 <style lang="scss">

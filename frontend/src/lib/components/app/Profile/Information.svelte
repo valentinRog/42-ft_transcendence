@@ -41,7 +41,6 @@
 			});
 	}
 
-
 </script>
 
 <div id="box">
@@ -55,8 +54,10 @@
 				<img src={imgUrl} />
 			</li>
 		</div>
+		{#if showEdit}
 		<button type="button"
 		on:click={() => ($openEditProfile = true)}>Edit Profile</button>
+		{/if}
 		{#if username === $user?.username}
 			<li class="box friends">
 				<p>My friends</p>

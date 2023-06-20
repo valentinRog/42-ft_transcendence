@@ -89,7 +89,7 @@ export class UserController {
   @UseInterceptors(FileInterceptor('file'))
   @Post('upload')
   uploadFileAndPassValidation(
-    @GetUser('login') login,
+    @GetUser('id') id,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
@@ -100,7 +100,7 @@ export class UserController {
     )
     file: Express.Multer.File,
   ) {
-    return this.userService.saveImageFromBuffer(file, login + '.png');
+    return this.userService.saveImageFromBuffer(file, `${id}.png`);
   }
 
   @Patch('remove-friend')
