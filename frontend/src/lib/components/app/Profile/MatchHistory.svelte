@@ -22,8 +22,10 @@
 		</thead>
 		<tbody>
 			{#each Object.values($history) as row}
-				<tr class="{current === row ? 'highlighted' : ''}"
-				on:click={() => current === row ? (current = null ) : (current = row) }>
+				<tr
+					class={current === row ? 'highlighted' : ''}
+					on:click={() => (current === row ? (current = null) : (current = row))}
+				>
 					{#each Object.values(row) as cell}
 						<td>{cell}</td>
 					{/each}
@@ -34,7 +36,5 @@
 </div>
 
 <style lang="scss">
-
 	@include table-95;
-
 </style>

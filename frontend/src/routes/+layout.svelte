@@ -40,13 +40,12 @@
 	}
 
 	button:disabled,
-	input[type="submit"]:disabled,
-	input[type="reset"]:disabled,
+	input[type='submit']:disabled,
+	input[type='reset']:disabled,
 	:disabled + label {
 		text-shadow: 1px 1px 0 var(--button-highlight);
 		pointer-events: none;
 		color: var(--button-shadow);
-
 	}
 
 	a:hover {
@@ -103,5 +102,4 @@
 		background-color: $grey;
 		@include tab-border;
 	}
-
 </style>

@@ -36,7 +36,7 @@
 		for (const pair of data) {
 			body.append(pair[0], pair[1] as string);
 		}
-		const res = await fetchWithToken( 'users/edit', {
+		const res = await fetchWithToken('users/edit', {
 			method: 'PATCH',
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded'
@@ -53,10 +53,8 @@
 			if (browser) sessionStorage.setItem('token', json.access_token);
 			goto('/');
 		}
-		if ($user?.twoFactorEnabled && !checkboxValue)
-			disable2fa();
-		else if (!$user?.twoFactorEnabled && checkboxValue)
-			enable2fa();
+		if ($user?.twoFactorEnabled && !checkboxValue) disable2fa();
+		else if (!$user?.twoFactorEnabled && checkboxValue) enable2fa();
 		changes = false;
 	}
 
@@ -85,7 +83,10 @@
 	}
 
 	function handleChange() {
-		changes = inputLogin !== $user?.login || inputUsername !== $user?.username || checkboxValue !== $user?.twoFactorEnabled;
+		changes =
+			inputLogin !== $user?.login ||
+			inputUsername !== $user?.username ||
+			checkboxValue !== $user?.twoFactorEnabled;
 	}
 
 	let fileinput: HTMLInputElement;
@@ -138,22 +139,21 @@
 				imgUrl = '/avatar.png';
 			});
 	}
-
 </script>
 
 <div class="window-body">
 	<ErrorDialog {showModal} {errorMessage} on:close={() => (showModal = false)} />
-		<div id="formular">
-			<li class="pic">
-				<input
-					type="file"
-					id="file-upload"
-					accept=".jpg, .jpeg, .png"
-					on:change={(e) => onFileSelected(e)}
-					bind:this={fileinput}
-				/>
-				<img src={imgUrl} />
-			</li>
+	<div id="formular">
+		<li class="pic">
+			<input
+				type="file"
+				id="file-upload"
+				accept=".jpg, .jpeg, .png"
+				on:change={(e) => onFileSelected(e)}
+				bind:this={fileinput}
+			/>
+			<img src={imgUrl} />
+		</li>
 		<div class="content">
 			<form
 				on:submit|preventDefault={handleSubmit}
@@ -161,30 +161,40 @@
 				enctype="application/x-www-form-urlencoded"
 			>
 				<div class="form-group">
-						<label for="username">Username:</label>
-						<input type="text" id="username" name="username" bind:value="{inputUsername}" on:input="{handleChange}" />
+					<label for="username">Username:</label>
+					<input
+						type="text"
+						id="username"
+						name="username"
+						bind:value={inputUsername}
+						on:input={handleChange}
+					/>
 				</div>
 				{#if !$user?.logFrom42}
 					<div class="form-group">
 						<label for="login">Login:</label>
-						<input type="text" id="login" name="login" bind:value="{inputLogin}" on:input="{handleChange}"/>
+						<input
+							type="text"
+							id="login"
+							name="login"
+							bind:value={inputLogin}
+							on:input={handleChange}
+						/>
 					</div>
-					<input type="checkbox" id="2fa" bind:checked="{checkboxValue}" on:change="{handleChange}">
+					<input type="checkbox" id="2fa" bind:checked={checkboxValue} on:change={handleChange} />
 					<label for="2fa">2fa</label>
 				{/if}
 				{#if changes}
-				<button type="submit">Save</button>
+					<button type="submit">Save</button>
 				{:else}
-				<button disabled type="submit">Save</button>
+					<button disabled type="submit">Save</button>
 				{/if}
 			</form>
 		</div>
 	</div>
 </div>
 
-
 <style lang="scss">
-
 	div#formular {
 		@include checkbox;
 		@include form-95;
@@ -222,30 +232,29 @@
 		}
 
 		.pic {
-				display: inline-block;
-				position: relative;
-				cursor: pointer;
-				@include tab-contour-hollow;
-				margin-left: 28%;
-				background-color: white;
-				height: 5rem;
-				width: 7.5rem;
-				img {
-					display: block;
-					margin: 0 auto;
-					height: 4.5rem;
-				}
-
-				input[type='file'] {
-					position: absolute;
-					top: 0;
-					left: 0;
-					opacity: 0;
-					cursor: pointer;
-					width: 100%;
-					height: 100%;
-				}
+			display: inline-block;
+			position: relative;
+			cursor: pointer;
+			@include tab-contour-hollow;
+			margin-left: 28%;
+			background-color: white;
+			height: 5rem;
+			width: 7.5rem;
+			img {
+				display: block;
+				margin: 0 auto;
+				height: 4.5rem;
 			}
-	}
 
+			input[type='file'] {
+				position: absolute;
+				top: 0;
+				left: 0;
+				opacity: 0;
+				cursor: pointer;
+				width: 100%;
+				height: 100%;
+			}
+		}
+	}
 </style>
