@@ -24,8 +24,9 @@ export class AuthService {
   ) {}
 
   async findOrCreate(user: any) {
-    const prisma_user = await this.userService.findUser(user.login);
-
+    const prisma_user = await this.prisma.user.findUnique({
+      where: { login: user.login },
+    });
     if (!prisma_user) {
       return this.signup42(user);
     }
@@ -89,7 +90,10 @@ export class AuthService {
   }
 
   async signin(dto: LogDto) {
-    const prisma_user = await this.userService.findUser(dto.login);
+    const prisma_user = await this.prisma.user.findUnique({
+      where: { login: dto.login },
+    });
+
     if (!prisma_user) throw new NotFoundException('Please signup first');
     if (prisma_user.logFrom42)
       throw new ForbiddenException('Please login with 42');
@@ -146,5 +150,36 @@ export class AuthService {
     } catch (error) {
       return null;
     }
+  }
+
+  async enableTwoFactorAuth(userId: number, userLogin: string) {
+    const secret = speakeasy.generateSecret();
+
+    const otpauthUrl = speakeasy.otpauthURL({
+      secret: secret.base32,
+      label: 'transcendence',
+      encoding: 'base32',
+    });
+    const qrCodeUrl = `https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl=${encodeURIComponent(
+      otpauthUrl,
+    )}`;
+
+    await this.prisma.user.update({
+      where: { login: userLogin },
+      data: { twoFactorEnabled: true, twoFactorAuthSecret: secret.base32 },
+    });
+    const token = await this.jwt.signAsync(
+      {
+        sub: userId,
+        login: userLogin,
+        twoFactor: true,
+        isTwoFactorAuthenticated: true,
+      },
+      {
+        expiresIn: '1d',
+        secret: this.config.get('JWT_SECRET'),
+      },
+    );
+    return { qrcode: qrCodeUrl, token };
   }
 }

@@ -30,10 +30,6 @@
 	let checkboxValue = $user?.twoFactorEnabled;
 
 	async function handleSubmit(event: Event) {
-
-		if ($user?.twoFactorEnabled && !checkboxValue) disable2fa();
-		else if (!$user?.twoFactorEnabled && checkboxValue) enable2fa();
-
 		const form = event.target as HTMLFormElement;
 		const data = new FormData(form);
 		const body = new URLSearchParams();
@@ -52,13 +48,17 @@
 		if (res.status !== 200 && res.status !== 201) {
 			errorMessage = json.message;
 			showModal = true;
-		} else if (json.access_token) {
-			$token = json.access_token;
-			if (browser) sessionStorage.setItem('token', json.access_token);
-			goto('/');
 		}
-		changes = false;
-		$user = json;
+		//else if (json.access_token) {
+		else {
+			//$token = json.access_token;
+			//if (browser) sessionStorage.setItem('token', json.access_token);
+			//goto('/');
+			//	$user = json;
+			changes = false;
+			if (!$user?.twoFactorEnabled && checkboxValue) enable2fa();
+			fetchMe();
+		}
 	}
 
 	async function enable2fa() {
@@ -69,20 +69,6 @@
 		addInstance('Internet', {}, { url: data.qrcode });
 		$token = data.token;
 		sessionStorage.setItem('token', data.token);
-		fetchMe();
-	}
-
-	async function disable2fa() {
-		await fetchWithToken('users/edit', {
-			method: 'PATCH',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				twoFactorEnabled: false
-			})
-		});
-		fetchMe();
 	}
 
 	function handleChange() {
@@ -186,8 +172,8 @@
 							on:input={handleChange}
 						/>
 					</div>
-					<input type="checkbox" id="2fa" bind:checked={checkboxValue} on:change={handleChange} />
-					<label for="2fa">2fa</label>
+					<input type="checkbox" id="twoFactorEnabled" bind:checked={checkboxValue} on:change={handleChange} />
+					<label for="twoFactorEnabled">2fa</label>
 				{/if}
 				{#if changes}
 					<button type="submit">Save</button>

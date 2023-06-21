@@ -47,10 +47,4 @@ export class TwoFactorController {
     );
     return { qrcode: qrCodeUrl, token };
   }
-
-  @Post('test')
-  @UseGuards(JwtGuard)
-  async test(@GetUser() user: User) {
-    return user;
-  }
 }

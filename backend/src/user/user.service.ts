@@ -41,12 +41,8 @@ export class UserService {
       delete user.hash;
       return user;
     } catch (error) {
-      throw new NotFoundException(`User with id '${userId}' not found.`);
+      throw new ForbiddenException('Credentials taken');
     }
-  }
-
-  async findUser(login: string) {
-    return this.prisma.user.findUnique({ where: { login: login } });
   }
 
   async findFriend(username: string, friendId: number): Promise<boolean> {
