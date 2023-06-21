@@ -177,6 +177,7 @@
 	import ioClient from 'socket.io-client';
 	import { onDestroy } from 'svelte';
 	import { v4 as uuidv4 } from 'uuid';
+	import { logout } from '$lib/utils/connect';
 
 	function fetchWithToken(route: string, options: RequestInit = {}): Promise<Response> {
 		$loading = true;
@@ -187,7 +188,10 @@
 				Authorization: `Bearer ${$token}`
 			}
 		});
-		res.then(() => ($loading = false));
+		res.then((resp) => {
+			$loading = false;
+			if (resp.status === 401) logout();
+		});
 		return res;
 	}
 
