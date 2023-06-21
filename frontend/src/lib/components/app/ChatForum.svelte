@@ -247,18 +247,18 @@
 	</div>
 	{#if !isUserMuted && !isUserBanned}
 		<div id="user-list">
-			<input type="text" bind:value={searchQuery} placeholder="Enter username" />
-			<select bind:value={selectedAction}>
-				<option value="">Select action</option>
-				<option value="Moderator">Moderator</option>
-				<option value="User">User</option>
-				<option value="ban">Ban</option>
-				<option value="unban">unBan</option>
-				<option value="mute">Mute</option>
-				<option value="unmute">unMute</option>
-			</select>
-			<button on:click={performAction}>Submit</button>
 			{#if roleId <= 1}
+				<input type="text" bind:value={searchQuery} placeholder="Enter username" />
+				<select bind:value={selectedAction}>
+					<option value="">Select action</option>
+					<option value="Moderator">Moderator</option>
+					<option value="User">User</option>
+					<option value="ban">Ban</option>
+					<option value="unban">unBan</option>
+					<option value="mute">Mute</option>
+					<option value="unmute">unMute</option>
+				</select>
+				<button on:click={performAction}>Submit</button>
 				<div id="access-control">
 					{#if isProtected}
 						<button on:click={toggleAccess}>Switch to Public</button>
