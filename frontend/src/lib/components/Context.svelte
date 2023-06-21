@@ -81,6 +81,8 @@
 
 		export const settings = (): Writable<Settings> => getContext('settings');
 
+		export const fetchSettings = (): (() => Promise<any>) => getContext('fetchSettings');
+
 		export type App =
 			| 'Pong'
 			| 'Paint'
@@ -93,7 +95,8 @@
 			| 'FriendRequest'
 			| 'Internet'
 			| 'Notepad'
-			| 'EditProfile';
+			| 'EditProfile'
+			| 'PongKeybinds';
 
 		export interface AppInstance {
 			readonly componentType: App;
@@ -171,6 +174,7 @@
 	import Notepad from '$lib/components/app/Notepad.svelte';
 	import FriendRequest from '$lib/components/app/FriendRequest.svelte';
 	import EditProfile from './app/EditProfile.svelte';
+	import PongKeybinds from '$lib/components/app/pong/PongKeybinds.svelte';
 	import { token, user, loading } from '$lib/stores';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import type { Socket } from 'socket.io-client';
@@ -232,6 +236,16 @@
 
 	setContext('settings', settings);
 
+	async function fetchSettings() {
+		const res = await fetchWithToken('settings/get-settings');
+		const data = await res.json();
+		$settings.up = data.up;
+		$settings.down = data.down;
+		return data;
+	}
+
+	setContext('fetchSettings', fetchSettings);
+
 	const components = readable({
 		Pong: Pong,
 		Paint: Paint,
@@ -244,7 +258,8 @@
 		Forum: Forum,
 		Internet: Internet,
 		Notepad: Notepad,
-		EditProfile: EditProfile
+		EditProfile: EditProfile,
+		PongKeybinds: PongKeybinds
 	});
 
 	const appInstances = writable(new Map<string, Context.AppInstance>());
@@ -329,6 +344,10 @@
 		EditProfile: {
 			TabProps: { name: 'EditProfile', icon: '/computer.png' },
 			DesktopProps: { name: 'EditProfile', icon: '/computer.png' }
+		},
+		PongKeybinds: {
+			TabProps: { name: 'Keybinds', icon: '/computer.png' },
+			DesktopProps: { name: 'Keybinds', icon: '/computer.png' }
 		}
 	});
 

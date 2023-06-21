@@ -9,6 +9,10 @@
 	const socket = Context.socket();
 	const fetchWithToken = Context.fetchWithToken();
 	const gameRequest = Context.gameRequest();
+	const fetchSettings = Context.fetchSettings();
+	const addInstance = Context.addInstance();
+
+	fetchSettings();
 
 	let index = 0;
 	let room = '';
@@ -79,6 +83,7 @@
 					bind:selected={scaleString}
 				/>
 			</RightDrop>
+			<button on:click={() => addInstance('PongKeybinds')}>keybinds</button>
 		</DropDown>
 	</div>
 	{#if room !== ''}
