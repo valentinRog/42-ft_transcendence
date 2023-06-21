@@ -31,33 +31,32 @@
 
 	async function handleSubmit(event: Event) {
 		const form = event.target as HTMLFormElement;
-		const data = new FormData(form);
-		const body = new URLSearchParams();
-		for (const pair of data) {
-			body.append(pair[0], pair[1] as string);
+		const data: Record<string, any> = {};
+		const checkboxElement = form.elements.namedItem('twoFactorEnabled') as HTMLInputElement;
+		const checkboxValue = checkboxElement.checked;
+		data['twoFactorEnabled'] = checkboxValue;
+		for (const element of form.elements) {
+			if (element instanceof HTMLInputElement && element.name && element.type !== 'checkbox') {
+				data[element.name] = element.value;
+			}
 		}
+
 		const res = await fetchWithToken('users/edit', {
 			method: 'PATCH',
 			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded'
+				'Content-Type': 'application/json'
 			},
-			body
+			body: JSON.stringify(data),
 		});
 		const json = await res.json();
-		console.log(json);
 		if (res.status !== 200 && res.status !== 201) {
 			errorMessage = json.message;
 			showModal = true;
 		}
-		//else if (json.access_token) {
 		else {
-			//$token = json.access_token;
-			//if (browser) sessionStorage.setItem('token', json.access_token);
-			//goto('/');
-			//	$user = json;
 			changes = false;
 			if (!$user?.twoFactorEnabled && checkboxValue) enable2fa();
-			fetchMe();
+			await fetchMe();
 		}
 	}
 
