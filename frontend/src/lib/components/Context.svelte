@@ -178,14 +178,17 @@
 	import { onDestroy } from 'svelte';
 	import { v4 as uuidv4 } from 'uuid';
 
-	function fetchWithToken(route: string, options: RequestInit = {}) {
-		return fetch(`${PUBLIC_BACKEND_URL}/${route}`, {
+	function fetchWithToken(route: string, options: RequestInit = {}): Promise<Response> {
+		$loading = true;
+		const res = fetch(`${PUBLIC_BACKEND_URL}/${route}`, {
 			...options,
 			headers: {
 				...options.headers,
 				Authorization: `Bearer ${$token}`
 			}
 		});
+		res.then(() => ($loading = false));
+		return res;
 	}
 
 	setContext('fetchWithToken', fetchWithToken);
@@ -341,10 +344,8 @@
 	}
 
 	async function fetchFriends() {
-		$loading = true;
 		const res = await fetchWithToken('users/me/friends');
 		const data = await res.json();
-		$loading = false;
 		$contacts = data;
 		return data;
 	}
