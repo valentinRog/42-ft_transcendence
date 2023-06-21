@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { writable } from 'svelte/store';
 	import { Context } from '$lib/components/Context.svelte';
 	import { user } from '$lib/stores';
 
 	const socket = Context.socket();
 	const chats = Context.chats();
 	const chatId = Context.chatId();
+	const selected = Context.selected();
+	const fetchUserByUsername = Context.fetchUserByUsername();
+	const addInstance = Context.addInstance();
 
 	let currentChat: any = null;
 	let selectedUser: any = null;
@@ -15,9 +17,10 @@
 	let roleId: number;
 	let disabled = false;
 
-	//BAN AND MUTE
-	let updateState = true;
+	let searchQuery = '';
+	let selectedAction : string = '';
 
+	//BAN AND MUTE
 	let isUserBanned = false;
 	let isUserMuted = false;
 
@@ -36,16 +39,6 @@
 		currentChat = $chats.find((chat) => chat.id === chatIdLocal);
 		roleId = currentChat?.chatUsers.find((cu: any) => cu.userId === $user?.id)?.roleId;
 		isProtected = currentChat ? currentChat.accessibility === 'protected' : false;
-
-		if (currentChat && currentChat.bans) {
-			const ban = currentChat.bans.find(
-				(ban: any) =>
-					ban.userId === $user?.id &&
-					(ban.expiresAt == null || new Date(ban.expiresAt) > new Date())
-			);
-			isUserBanned = !!ban;
-		}
-
 		disabled = isUserBanned || isUserMuted;
 	}
 
@@ -60,7 +53,6 @@
 			isUserBanned = !!ban;
 			if (isUserBanned) {
 				banExpiresAt = ban.expiresAt ? new Date(ban.expiresAt) : null;
-				chatIdLocal = null;
 				return;
 			}
 
@@ -79,6 +71,29 @@
 	onDestroy(() => {
 		$socket.emit('leaveRoom', { chatId: chatIdLocal });
 	});
+
+	const actions = {
+        Moderator: (userId: number) => { changeRole(userId, 2) },
+        User: (userId: number) => { changeRole(userId, 3) },
+        ban: (userId: number) => { banUser(userId, banDuration) },
+        unban: (userId: number) => { unBanUser(userId) },
+        mute: (userId: number) => { muteUser(userId, muteDuration) },
+        unmute: (userId: number) => { unMuteUser(userId) }
+    };
+
+	const performAction = async() => {
+		const user = await fetchUserByUsername(searchQuery)
+		const userId = user.id;
+
+        if (userId && actions[selectedAction as keyof typeof actions]) {
+            actions[selectedAction as keyof typeof actions](userId);
+        }
+    };
+
+	function openProfile(username: string) {
+		addInstance('Profile', { }, { username: username });
+		$selected = null;
+	}
 
 	function openPasswordModal() {
 		passwordModalVisible = true;
@@ -154,7 +169,6 @@
 	$socket.on('userBan', (data: any) => {
 		if (data.chatId === chatIdLocal) {
 			isUserBanned = true;
-			chatIdLocal = null; //WHY
 			banExpiresAt = data.expiresAt ? new Date(data.expiresAt) : null;
 		}
 	});
@@ -167,8 +181,11 @@
 	});
 
 	$socket.on('userUnBan', (data: any) => {
+		console.log(data.chatId);
+		console.log(chatIdLocal);
 		if (data.chatId === chatIdLocal) {
 			isUserBanned = false;
+			console.log("la bas");
 		}
 	});
 
@@ -230,6 +247,17 @@
 	</div>
 	{#if !isUserMuted && !isUserBanned}
 		<div id="user-list">
+			<input type="text" bind:value={searchQuery} placeholder="Enter username" />
+			<select bind:value={selectedAction}>
+				<option value="">Select action</option>
+				<option value="Moderator">Moderator</option>
+				<option value="User">User</option>
+				<option value="ban">Ban</option>
+				<option value="unban">unBan</option>
+				<option value="mute">Mute</option>
+				<option value="unmute">unMute</option>
+			</select>
+			<button on:click={performAction}>Submit</button>
 			{#if roleId <= 1}
 				<div id="access-control">
 					{#if isProtected}
@@ -239,7 +267,7 @@
 								Enter new password:
 								<input type="password" bind:value={password} on:input={updatePassword} />
 							</label>
-							<button on:click={changePassword}>Submite</button>
+							<button on:click={changePassword}>Submit</button>
 						</div>
 					{:else}
 						<button on:click={toggleAccess}>Switch to Protected</button>
@@ -267,7 +295,7 @@
 						<li on:click={() => selectUser(chatUser)}>
 							({chatUser.role?.name}) {chatUser.user?.username}
 							{#if selectedUser === chatUser}
-								<button>Check Profile</button>
+								<button on:click={() => openProfile(chatUser.user?.username)}>Check Profile</button>
 								{#if roleId <= 1 && roleId < chatUser.roleId}
 									<button on:click={() => changeRole(chatUser.userId, 2)}>Made Moderator</button>
 									<button on:click={() => changeRole(chatUser.userId, 3)}>Make User</button>

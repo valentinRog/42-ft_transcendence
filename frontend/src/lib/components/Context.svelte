@@ -132,6 +132,8 @@
 
 		export const fetchHistory = (): (() => Promise<any>) => getContext('fetchHistory');
 		export const fetchMe = (): (() => Promise<any>) => getContext('fetchMe');
+		export const fetchUserByUsername = (): ((username : string) => Promise<any>) => 
+			getContext('fetchUserByUsername');
 		export const fetchFriends = (): (() => Promise<any>) => getContext('fetchFriends');
 		export const fetchFriendRequest = (): (() => Promise<any>) => getContext('fetchFriendRequest');
 		export const fetchGameRequest = (): (() => Promise<any>) => getContext('fetchGameRequest');
@@ -347,6 +349,12 @@
 		return data;
 	}
 
+	async function fetchUserByUsername(username : string) {
+		const res = await fetchWithToken(`users/info/name/${username}`);
+		const data = await res.json();
+		return data;
+	}
+
 	async function fetchFriends() {
 		const res = await fetchWithToken('users/me/friends');
 		const data = await res.json();
@@ -453,6 +461,7 @@
 	setContext('fetchGameRequest', fetchGameRequest);
 	setContext('fetchHistory', fetchHistory);
 	setContext('fetchMe', fetchMe);
+	setContext('fetchUserByUsername', fetchUserByUsername);
 	setContext('fetchFriends', fetchFriends);
 	setContext('fetchFriendRequest', fetchFriendRequest);
 	setContext('fetchChatById', fetchChatById);
