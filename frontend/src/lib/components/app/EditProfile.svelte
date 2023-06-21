@@ -30,6 +30,10 @@
 	let checkboxValue = $user?.twoFactorEnabled;
 
 	async function handleSubmit(event: Event) {
+
+		if ($user?.twoFactorEnabled && !checkboxValue) disable2fa();
+		else if (!$user?.twoFactorEnabled && checkboxValue) enable2fa();
+
 		const form = event.target as HTMLFormElement;
 		const data = new FormData(form);
 		const body = new URLSearchParams();
@@ -53,9 +57,8 @@
 			if (browser) sessionStorage.setItem('token', json.access_token);
 			goto('/');
 		}
-		if ($user?.twoFactorEnabled && !checkboxValue) disable2fa();
-		else if (!$user?.twoFactorEnabled && checkboxValue) enable2fa();
 		changes = false;
+		$user = json;
 	}
 
 	async function enable2fa() {
@@ -144,16 +147,18 @@
 <div class="window-body">
 	<ErrorDialog {showModal} {errorMessage} on:close={() => (showModal = false)} />
 	<div id="formular">
-		<li class="pic">
-			<input
-				type="file"
-				id="file-upload"
-				accept=".jpg, .jpeg, .png"
-				on:change={(e) => onFileSelected(e)}
-				bind:this={fileinput}
-			/>
-			<img src={imgUrl} />
-		</li>
+		<div class="pic-username-login">
+			<li class="pic">
+				<input
+					type="file"
+					id="file-upload"
+					accept=".jpg, .jpeg, .png"
+					on:change={(e) => onFileSelected(e)}
+					bind:this={fileinput}
+				/>
+				<img src={imgUrl} />
+			</li>
+		</div>
 		<div class="content">
 			<form
 				on:submit|preventDefault={handleSubmit}
@@ -243,7 +248,7 @@
 			img {
 				display: block;
 				margin: 0 auto;
-				height: 4.5rem;
+				height: 4.8rem;
 			}
 
 			input[type='file'] {

@@ -272,6 +272,7 @@
 	$socket.on('game-over', (winner: number) => {
 		stopLoop();
 		fetchHistory().then(() => {});
+		console.log('fetchHistory');
 		//if (winner === 0) {
 		//	alert('Player 1 wins!');
 		//} else {

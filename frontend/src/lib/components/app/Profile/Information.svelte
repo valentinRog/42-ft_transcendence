@@ -108,8 +108,6 @@
 				display: flex;
 				img {
 					margin: 0 auto;
-					height: 4.5rem;
-					width: auto;
 				}
 			}
 		}
@@ -139,13 +137,6 @@
 		.img-status {
 			height: 0.8rem;
 			width: auto;
-		}
-		button.two-factor {
-			margin: 0.25rem;
-			padding: 0.25rem;
-			@include tab-contour;
-			@include tab-contour-active;
-			background-color: $grey;
 		}
 	}
 </style>

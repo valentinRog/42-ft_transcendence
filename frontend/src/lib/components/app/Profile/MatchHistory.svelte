@@ -9,6 +9,7 @@
 	(async () => {
 		await fetchHistory();
 	})();
+
 </script>
 
 <div class="sunken-panel" style="height: 15rem; width: 18rem;">

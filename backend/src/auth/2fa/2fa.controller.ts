@@ -45,7 +45,6 @@ export class TwoFactorController {
         secret: this.config.get('JWT_SECRET'),
       },
     );
-    console.log('yo ', token);
     return { qrcode: qrCodeUrl, token };
   }
 
