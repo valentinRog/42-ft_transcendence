@@ -8,146 +8,137 @@ datasource db {
 }
 
 model User {
-  id               Int      @id @default(autoincrement())
-  login            String   @unique
-  username         String   @unique
-  hash             String?
-  logFrom42        Boolean  @default(false)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  twoFactorEnabled Boolean  @default(false)
-  twoFactorAuthSecret  String?
-  friends          Int[]    @default([])
-  stat             Stat     @relation(fields: [statId], references: [id])
-  statId           Int      @unique
-  settings         Settings     @relation(fields: [settingsId], references: [id])
-  settingsId       Int      @unique
-  notifications    Notification[]
-  matchesAsWinner  Match[]  @relation("Winner")
-  matchesAsLoser   Match[]  @relation("Loser")
-  messages         Message[]
-  chats            ChatUser[]
-  bans             Ban[]
-  mutes            Mute[]
-  blocks           Block[]  @relation("blockerToBlocks")
+  id                  Int            @id @default(autoincrement())
+  login               String         @unique
+  username            String         @unique
+  hash                String?
+  logFrom42           Boolean        @default(false)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  twoFactorEnabled    Boolean        @default(false)
+  twoFactorAuthSecret String?
+  friends             Int[]          @default([])
+  statId              Int            @unique
+  settingsId          Int            @unique
+  bans                Ban[]
+  blocks              Block[]        @relation("blockerToBlocks")
+  chats               ChatUser[]
+  matchesAsLoser      Match[]        @relation("Loser")
+  matchesAsWinner     Match[]        @relation("Winner")
+  messages            Message[]
+  mutes               Mute[]
+  notifications       Notification[]
+  settings            Settings       @relation(fields: [settingsId], references: [id])
+  stat                Stat           @relation(fields: [statId], references: [id])
 }
 
 model Match {
-  id         Int       @id @default(autoincrement())
-  createdAt  DateTime  @default(now())
-  winner     User      @relation("Winner", fields: [winnerName], references: [username])
-  loser      User      @relation("Loser", fields: [loserName], references: [username])
-  winnerName String
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
   loserName  String
+  winnerName String
+  loser      User     @relation("Loser", fields: [loserName], references: [username])
+  winner     User     @relation("Winner", fields: [winnerName], references: [username])
 }
 
 model Notification {
-  id        Int       @id @default(autoincrement())
-  createdAt DateTime  @default(now())
-  type	    String
-  user      User      @relation(fields: [userId], references: [id])
-  sender    String    @default("system")
-  userId   	Int
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  sender    String   @default("system")
+  userId    Int
+  type      String
+  user      User     @relation(fields: [userId], references: [id])
+
   @@unique([userId, sender, type])
 }
 
 model Stat {
-  id     Int  @id @default(autoincrement())
-  wins   Int  @default(0)
-  losses Int  @default(0)
-  elo    Int  @default(1000)
+  id     Int    @id @default(autoincrement())
+  wins   Int    @default(0)
+  losses Int    @default(0)
+  elo    Int    @default(1000)
   ladder String @default("bronze")
-
   user   User?
 }
 
 model Settings {
-  id     Int  @id @default(autoincrement())
-  up String @default("ArrowUp")
+  id   Int    @id @default(autoincrement())
+  up   String @default("ArrowUp")
   down String @default("ArrowDown")
-
-  user   User?
+  user User?
 }
 
 model Message {
-  id          Int      @id @default(autoincrement())
-  content     String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  userId      Int
-  chatId      Int
-
-  user        User     @relation(fields: [userId], references: [id])
-  chat        Chat     @relation(fields: [chatId], references: [id])
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    Int
+  chatId    Int
+  chat      Chat     @relation(fields: [chatId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Chat {
-  id             Int       @id @default(autoincrement())
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  name           String
-  isGroupChat    Boolean   @default(false)
-  accessibility  String    @default("public")
-  password       String?
-
-  messages       Message[]
-  chatUsers      ChatUser[]
-  bans           Ban[]
-  mutes          Mute[]
+  id            Int        @id @default(autoincrement())
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  name          String
+  isGroupChat   Boolean    @default(false)
+  accessibility String     @default("public")
+  password      String?
+  bans          Ban[]
+  chatUsers     ChatUser[]
+  messages      Message[]
+  mutes         Mute[]
 }
 
 model Role {
-  id        Int       @id @default(autoincrement())
-  name      String    @unique
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
   chatUsers ChatUser[]
 }
 
 model ChatUser {
-  id               Int      @id @default(autoincrement())
-  userId           Int
-  chatId           Int
-  createdAt        DateTime @default(now())
+  id                Int      @id @default(autoincrement())
+  userId            Int
+  chatId            Int
+  createdAt         DateTime @default(now())
   lastReadMessageId Int?
-  roleId           Int      @default(2)
-
-  user             User     @relation(fields: [userId], references: [id])
-  chat             Chat     @relation(fields: [chatId], references: [id])
-  role             Role     @relation(fields: [roleId], references: [id])
+  roleId            Int      @default(2)
+  chat              Chat     @relation(fields: [chatId], references: [id])
+  role              Role     @relation(fields: [roleId], references: [id])
+  user              User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, chatId])
 }
 
 model Ban {
-  chatId         Int
-  userId         Int
-  createdAt      DateTime  @default(now())
-  expiresAt      DateTime?
-
-  chat           Chat  @relation(fields: [chatId], references: [id])
-  user           User  @relation(fields: [userId], references: [id])
+  chatId    Int
+  userId    Int
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
+  chat      Chat      @relation(fields: [chatId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
 
   @@id([chatId, userId])
 }
 
 model Mute {
-  chatId         Int
-  userId         Int
-  createdAt      DateTime  @default(now())
-  expiresAt      DateTime?
-
-  chat           Chat  @relation(fields: [chatId], references: [id])
-  user           User  @relation(fields: [userId], references: [id])
+  chatId    Int
+  userId    Int
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
+  chat      Chat      @relation(fields: [chatId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
 
   @@id([chatId, userId])
 }
 
 model Block {
-  id         Int       @id @default(autoincrement())
-  createdAt  DateTime  @default(now())
-  blocker    User      @relation("blockerToBlocks", fields: [blockerId], references: [id])
-  blockerId  Int
-  blockedId  Int
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  blockerId Int
+  blockedId Int
+  blocker   User     @relation("blockerToBlocks", fields: [blockerId], references: [id])
 }
-
-
-

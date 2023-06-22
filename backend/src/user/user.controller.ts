@@ -113,4 +113,10 @@ export class UserController {
     if (!prisma_friend) throw new NotFoundException('User not found');
     return await this.userService.removeFriend(username, prisma_friend.id);
   }
+
+  @UseGuards(JwtGuard)
+  @Post('block')
+  blockUser(@Body('userId') userId: number, @Body('blockedId') blockedId: number) {
+    return this.userService.blockUser(userId, blockedId);
+  }
 }
