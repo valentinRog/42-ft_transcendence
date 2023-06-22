@@ -1,6 +1,27 @@
 <script lang="ts">
-	export let showDialog: boolean;
+	import { Context } from '$lib/components/Context.svelte';
+	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
+	import { token } from '$lib/stores';
+	import { browser } from '$app/environment';
+	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
+
+	onMount(() => {
+		if ($page.url.searchParams.get('token')) {
+			$token = $page.url.searchParams.get('token');
+			if (browser) sessionStorage.setItem('token', $token!);
+			goto('/', { replaceState: true });
+		}
+	});
+
 	let dialog: HTMLDialogElement;
+
+	export let showDialog : boolean;
+	let showModal = false;
+	let errorMessage: string | null = null;
+
+	const fetchWithToken = Context.fetchWithToken();
 
 	$: if (dialog && showDialog) dialog.showModal();
 
@@ -30,9 +51,39 @@
 		}
 	}
 
+	async function enable2fa(code : string) {
+		console.log(code);
+		const res = await fetchWithToken(`2fa/validate/${code}`, {
+			method: 'POST'
+		});
+		const json = await res.json();
+		if (res.status !== 200 && res.status !== 201) {
+			errorMessage = json.message;
+			showModal = true;
+			console.log(errorMessage);
+		}
+		else {
+			dialog.close();
+			const res = await fetchWithToken('2fa/enable', {
+				method: 'POST',
+			});
+			const data = await res.json();
+			$token = data.token;
+			sessionStorage.setItem('token', data.token);
+		}
+	}
+
+	function handleOK () {
+		if (numbers.length === 6) {
+			const code = numbers.join("");
+			enable2fa(code);
+		}
+	}
+
 </script>
 
 <dialog bind:this={dialog} on:close>
+	<ErrorDialog {showModal} {errorMessage} on:close={() => (showModal = false)} />
 	<div class="top-bar">
 		<div class="topbutton">
 			<button on:click={() => dialog.close()}>
@@ -53,7 +104,7 @@
 
 	</div>
 	<div class="buttons" on:click|stopPropagation>
-		<button on:click={() => dialog.close()}>OK</button>
+		<button on:click={handleOK}>OK</button>
 		<button on:click={() => dialog.close()}>Cancel</button>
 	</div>
 </dialog>
@@ -67,6 +118,7 @@
 		}
 
 		input {
+			font-size: 1.1rem;
 			width: 2rem;
 			height: 2rem;
 			text-align: center;

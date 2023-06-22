@@ -1,10 +1,5 @@
 <script lang="ts">
 	import { Context } from '$lib/components/Context.svelte';
-	import { token } from '$lib/stores';
-	import { browser } from '$app/environment';
-	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
-	import { page } from '$app/stores';
 	import { user } from '$lib/stores';
 	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
 	import TwoFactorDialog from '$lib/components/TwoFactorDialog.svelte';
@@ -13,13 +8,6 @@
 	const addInstance = Context.addInstance();
 	const fetchMe = Context.fetchMe();
 
-	onMount(() => {
-		if ($page.url.searchParams.get('token')) {
-			$token = $page.url.searchParams.get('token');
-			if (browser) sessionStorage.setItem('token', $token!);
-			goto('/', { replaceState: true });
-		}
-	});
 
 	let showModal = false;
 	let showDialog = false;
@@ -67,8 +55,6 @@
 		const data = await res.json();
 		addInstance('Internet', {}, { url: data.qrcode });
 		showDialog = true;
-		//$token = data.token;
-		//sessionStorage.setItem('token', data.token);
 	}
 
 	function handleChange() {

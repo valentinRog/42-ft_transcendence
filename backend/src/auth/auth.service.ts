@@ -124,9 +124,9 @@ export class AuthService {
     return { access_token: token };
   }
 
-  async is2faCodeValid(user: User, code: string) {
+  async is2faCodeValid(user: User, code: string, secret?: string) {
     const isCodeValid = speakeasy.totp.verify({
-      secret: user.twoFactorAuthSecret,
+      secret: user.twoFactorAuthSecret ? user.twoFactorAuthSecret : secret,
       encoding: 'base32',
       token: code, // the user's 2FA code entered in the frontend
       window: 1, // optional: number of 30-second windows to check before/after the current time
