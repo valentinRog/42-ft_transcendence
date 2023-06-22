@@ -208,6 +208,16 @@
 			currentChat.chatUsers = [...currentChat.chatUsers, data.chatUser];
 		}
 	});
+
+	$socket.on('updateRole', (data: any) => {
+	if (data.chatId === chatIdLocal) {
+		if ($user?.id === data.userId)
+			roleId = data.newRoleId;
+	}
+});
+
+$: console.log(roleId);
+
 </script>
 
 <div id="box">
