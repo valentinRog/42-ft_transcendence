@@ -60,6 +60,7 @@
 
 	const fetchMe = Context.fetchMe();
 	const fetchFriends = Context.fetchFriends();
+	const fetchGetUserBlocks = Context.fetchGetUserBlocks();
 	const fetchChats = Context.fetchChats();
 	const fetchFriendRequest = Context.fetchFriendRequest();
 	const fetchGameRequest = Context.fetchGameRequest();
@@ -70,6 +71,7 @@
 	(async () => {
 		await fetchMe();
 		await fetchFriends();
+		await fetchGetUserBlocks();
 		await fetchFriendRequest();
 		await fetchGameRequest();
 

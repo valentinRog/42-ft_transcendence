@@ -6,17 +6,19 @@
 	const fetchBlockUser = Context.fetchBlockUser();
 	const fetchUnblockUser = Context.fetchUnblockUser();
 	const openEditProfile = Context.openEditProfile();
+	
+	const blocks = Context.blocks();
 
 	export let username: string | null | undefined = null;
 
 	let currentUser: any = {};
 	let imgUrl: string | '';
-	let showEdit = false;
+	let isUser = false;
 
 	if (username === null) {
 		currentUser = $user;
 		fetchAvatar();
-		showEdit = true;
+		isUser = true;
 	} else {
 		fetchWithToken(`users/info/name/${username}`)
 			.then((res) => res.json())
@@ -55,9 +57,14 @@
 				<img src={imgUrl} />
 			</li>
 		</div>
-		{#if showEdit}
-		<button type="button"
-		on:click={() => ($openEditProfile = true)}>Edit Profile</button>
+		{#if isUser}
+			<button type="button" on:click={() => ($openEditProfile = true)}>Edit Profile</button>
+		{:else}
+			{#if $blocks.some(block => block.blockedId === currentUser.id)}
+				<button type="button" on:click={() => fetchUnblockUser(currentUser.id)}>UnBlock</button>
+			{:else}
+				<button type="button" on:click={() => fetchBlockUser(currentUser.id)}>Block</button>
+			{/if}
 		{/if}
 		{#if username === $user?.username}
 			<li class="box friends">
@@ -84,9 +91,6 @@
 					{/each}
 				</ul>
 			</li>
-		{:else}
-			<button type="button" on:click={() => fetchBlockUser(currentUser.id)}>Block</button>
-			<button type="button" on:click={() => fetchUnblockUser(currentUser.id)}>UnBlock</button>
 		{/if}
 	</ul>
 </div>

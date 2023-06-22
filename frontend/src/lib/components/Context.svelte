@@ -16,6 +16,11 @@
 			username: string;
 			status: string;
 		}
+		export interface Block {
+			id: number;
+			blockerId: number;
+			blockedId: number;
+		}
 
 		export type NotifRequest = {
 			id: number;
@@ -61,6 +66,7 @@
 		}
 
 		export const contacts = (): Writable<Contact[]> => getContext('contacts');
+		export const blocks = (): Writable<Block[]> => getContext('blocks');
 		export const friendRequest = (): Writable<NotifRequest[]> => getContext('friendRequest');
 		export const gameRequest = (): Writable<NotifRequest[]> => getContext('gameRequest');
 		export const history = (): Writable<Match[]> => getContext('history');
@@ -141,6 +147,7 @@
 		export const fetchBlockUser = (): ((userId: number) => Promise<any>) => getContext('fetchBlockUser');
 		export const fetchUnblockUser = (): ((userId: number) => Promise<any>) => getContext('fetchUnblockUser');
 		export const fetchFriends = (): (() => Promise<any>) => getContext('fetchFriends');
+		export const fetchGetUserBlocks = (): (() => Promise<any>) => getContext('fetchGetUserBlocks');
 		export const fetchFriendRequest = (): (() => Promise<any>) => getContext('fetchFriendRequest');
 		export const fetchGameRequest = (): (() => Promise<any>) => getContext('fetchGameRequest');
 		export const fetchChats = (): (() => Promise<any>) => getContext('fetchChats');
@@ -207,6 +214,7 @@
 	setContext('fetchWithToken', fetchWithToken);
 
 	const contacts = writable<Context.Contact[]>([]);
+	const blocks = writable<Context.Block[]>([]);
 	const friendRequest = writable<Context.NotifRequest[]>([]);
 	const gameRequest = writable<Context.NotifRequest[]>([]);
 	const history = writable<Context.Match[]>([]);
@@ -221,6 +229,7 @@
 	const openChatForumWindow = writable(false);
 
 	setContext('contacts', contacts);
+	setContext('blocks', blocks);
 	setContext('friendRequest', friendRequest);
 	setContext('gameRequest', gameRequest);
 	setContext('history', history);
@@ -370,6 +379,7 @@
 			twoFactorEnabled: data.twoFactorEnabled,
 			logFrom42: data.logFrom42
 		};
+		console.log(data);
 		return data;
 	}
 
@@ -386,6 +396,13 @@
 		return data;
 	}
 
+	async function fetchGetUserBlocks() {
+		const res = await fetchWithToken('users/me/blocks');
+		const data = await res.json();
+		$blocks = data;
+		return data;
+	}
+
 	async function fetchBlockUser(userId: number) {
 		const res = await fetchWithToken('users/block', {
         	method: 'POST',
@@ -395,6 +412,7 @@
 		if (!res)
 			return ;
 		const data = await res.json();
+		$blocks = [...$blocks, data];
 		return data;
 	}
 
@@ -407,6 +425,7 @@
 		if (!res)
 			return ;
 		const data = await res.json();
+		$blocks = $blocks.filter(block => block.blockedId !== userId);
 		return data;
 	}
 
@@ -482,7 +501,6 @@
 		const response = await fetchWithToken(`chat/publicChats?start=${start}&limit=${limit}`);
 		const data = await response.json();
 		$chatsPublic = data;
-		console.log(data);
 		return data;
 	}
 
@@ -510,6 +528,7 @@
 	setContext('fetchBlockUser', fetchBlockUser);
 	setContext('fetchUnblockUser', fetchUnblockUser);
 	setContext('fetchFriends', fetchFriends);
+	setContext('fetchGetUserBlocks', fetchGetUserBlocks);
 	setContext('fetchFriendRequest', fetchFriendRequest);
 	setContext('fetchChatById', fetchChatById);
 	setContext('fetchChats', fetchChats);
@@ -539,7 +558,6 @@
 
 	$socket.on('addChat', (chat) => {
 		chats.update((chatsValue) => [...chatsValue, chat]);
-		console.log($chats);
 	});
 
 	$socket.on('leaveChat', (chatId) => {

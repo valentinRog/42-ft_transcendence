@@ -114,6 +114,12 @@ export class UserController {
     return await this.userService.removeFriend(username, prisma_friend.id);
   }
 
+  @Get('me/blocks')
+  getMyBlocks(@GetUser() user) {
+    const blocks = this.userService.getUserBlocks(user.username);
+    return blocks;
+  }
+
   @UseGuards(JwtGuard)
   @Post('block')
   async blockUser(@Body('userId') userId: number, @Body('blockedId') blockedId: number) {
