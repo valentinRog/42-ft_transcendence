@@ -84,7 +84,7 @@ export abstract class SocketGateway
     const username = this.webSocketService.getClientName(client);
     const user = await this.userService.getUser(username);
 
-    await this.chatService.addUserToChat(chatId, user.id)
+    await this.chatService.addUserToChat(chatId, user.id);
     const chat = await this.chatService.findChatById(chatId);
 
     client.join(`chat-${payload.chatId}`);
@@ -123,9 +123,9 @@ export abstract class SocketGateway
   @SubscribeMessage('otherAddChat')
   async handleFriendAddChat(
     client: Socket,
-    payload: { chat: any, userId: number}
+    payload: { chat: any; userId: number },
   ) {
-    const { chat, userId} = payload;
+    const { chat, userId } = payload;
 
     const user = await this.userService.getUserById(userId);
     const socket = await this.webSocketService.getSocket(user.username);
@@ -173,11 +173,12 @@ export abstract class SocketGateway
       const chatUser = await this.chatService.addUserToChat(chat.id, user.id);
       const newchat = await this.chatService.findChatById(chat.id);
       client.join(`chat-${chat.id}`);
-      this.server.to(`chat-${chat.id}`).emit('chatUserAdded', { chatId: chat.id, chatUser})
+      this.server
+        .to(`chat-${chat.id}`)
+        .emit('chatUserAdded', { chatId: chat.id, chatUser });
       client.emit('addChat', newchat);
     }
     await sendMessage();
-    
   }
 
   @SubscribeMessage('leaveGroup')
@@ -267,7 +268,7 @@ export abstract class SocketGateway
     const socket = await this.webSocketService.getSocket(user.username);
 
     await this.chatService.unMuteUser(chatId, userId);
-    socket.emit('userUnMute', { chatId } );
+    socket.emit('userUnMute', { chatId });
     return;
   }
 
@@ -284,7 +285,7 @@ export abstract class SocketGateway
   @SubscribeMessage('setAccess')
   async handleSetAccess(
     client: Socket,
-    payload: { chatId: number, isProtected: boolean, password?: string },
+    payload: { chatId: number; isProtected: boolean; password?: string },
   ) {
     const { chatId, isProtected, password } = payload;
     await this.chatService.setAccess(chatId, isProtected, password);
@@ -292,7 +293,10 @@ export abstract class SocketGateway
   }
 
   @SubscribeMessage('setPassword')
-  async setPassword(client: any, payload: { chatId: number, password: string }): Promise<void> {
+  async setPassword(
+    client: any,
+    payload: { chatId: number; password: string },
+  ): Promise<void> {
     const { chatId, password } = payload;
     await this.chatService.setPassword(chatId, password);
   }
@@ -303,10 +307,11 @@ export abstract class SocketGateway
     @ConnectedSocket() client: Socket,
   ) {
     const username = this.webSocketService.getClientName(client);
-    const user = await this.userService.getUser(data.friend);
-    if (!user) return { error: 'User not found' };
+    const user = await this.userService.getUser(username);
+    const friend = await this.userService.getUser(data.friend);
+    if (!friend) return { error: 'User not found' };
     if (data.response) {
-      this.userService.addFriend(username, user.id);
+      this.userService.addFriend(user.id, friend.id);
     }
     client.emit('friend-accepted', data.friend);
   }

@@ -45,20 +45,20 @@ export class UserService {
     }
   }
 
-  async findFriend(username: string, friendId: number): Promise<boolean> {
+  async findFriend(id: number, friendId: number): Promise<boolean> {
     const user = await this.prisma.user.findUnique({
-      where: { username: username },
+      where: { id: id },
     });
     return user.friends.includes(friendId);
   }
 
-  async addFriend(userName: string, friendId: number) {
-    if (await this.findFriend(userName, friendId)) {
+  async addFriend(userId: number, friendId: number) {
+    if (await this.findFriend(userId, friendId)) {
       throw new ForbiddenException('User already in friends list');
     }
     try {
       const user = await this.prisma.user.update({
-        where: { username: userName },
+        where: { id: userId },
         data: { friends: { push: friendId } },
       });
       const friend = await this.prisma.user.update({
@@ -66,7 +66,7 @@ export class UserService {
         data: { friends: { push: user.id } },
       });
       if ((await this.getUserStatus(friend.username)) != 'offline') {
-        this.socketService.sendToUser(friend.username, userName, 'friend');
+        this.socketService.sendToUser(friend.username, user.username, 'friend');
       }
       delete user.hash;
       return user;
@@ -88,18 +88,18 @@ export class UserService {
     }
   }
 
-  async removeFriend(userName: string, friendId: number) {
-    if (!(await this.findFriend(userName, friendId))) {
+  async removeFriend(userId: number, friendId: number) {
+    if (!(await this.findFriend(userId, friendId))) {
       throw new NotFoundException('User not in friends list');
     }
     try {
       const user = await this.prisma.user.update({
-        where: { username: userName },
+        where: { id: userId },
         data: {
           friends: {
             set: (
               await this.prisma.user.findUnique({
-                where: { username: userName },
+                where: { id: userId },
                 select: { friends: true },
               })
             ).friends.filter((id) => id !== friendId),
@@ -120,7 +120,7 @@ export class UserService {
         },
       });
       if ((await this.getUserStatus(friend.username)) != 'offline') {
-        this.socketService.sendToUser(friend.username, userName, 'friend');
+        this.socketService.sendToUser(friend.username, user.username, 'friend');
       }
       delete user.hash;
       return user;
@@ -192,10 +192,10 @@ export class UserService {
         blockedId: blockedId,
       },
     });
-  
+
     if (existingBlock)
       return false;
-  
+
     return this.prisma.block.create({
       data: {
         blockerId: userId,
@@ -214,10 +214,10 @@ export class UserService {
 
     if (!existingBlock)
       return false;
-  
+
     return this.prisma.block.delete({
        where: { id: existingBlock.id,}
     });
   }
-  
+
 }

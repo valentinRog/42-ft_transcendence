@@ -104,14 +104,14 @@ export class UserController {
   }
 
   @Patch('remove-friend')
-  async removeFriend(@GetUser('username') username, @Body() dto: FriendDto) {
-    if (username == dto.friend)
+  async removeFriend(@GetUser('id') id, @Body() dto: FriendDto) {
+    if (id == dto.friendId)
       throw new ForbiddenException('You cannot remove yourself as a friend');
     const prisma_friend = await this.prisma.user.findUnique({
-      where: { username: dto.friend },
+      where: { id: dto.friendId },
     });
     if (!prisma_friend) throw new NotFoundException('User not found');
-    return await this.userService.removeFriend(username, prisma_friend.id);
+    return await this.userService.removeFriend(id, prisma_friend.id);
   }
 
   @UseGuards(JwtGuard)
