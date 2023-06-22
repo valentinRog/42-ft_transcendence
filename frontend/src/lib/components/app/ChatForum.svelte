@@ -30,6 +30,8 @@
 	let banDuration: number | null = null;
 	let muteDuration: number | null = null;
 
+	let actionDuration: number | null = null;
+
 	//PASSWORD
 	let password: any = undefined;
 	let passwordModalVisible = false;
@@ -75,13 +77,16 @@
 	const actions = {
         Moderator: (userId: number) => { changeRole(userId, 2) },
         User: (userId: number) => { changeRole(userId, 3) },
-        ban: (userId: number) => { banUser(userId, banDuration) },
+        ban: (userId: number) => { banUser(userId, actionDuration) },
         unban: (userId: number) => { unBanUser(userId) },
-        mute: (userId: number) => { muteUser(userId, muteDuration) },
+        mute: (userId: number) => { muteUser(userId, actionDuration) },
         unmute: (userId: number) => { unMuteUser(userId) }
     };
 
 	const performAction = async() => {
+		if (searchQuery.trim() === "")
+			return ;
+			
 		const user = await fetchUserByUsername(searchQuery)
 		const userId = user.id;
 
@@ -185,7 +190,6 @@
 		console.log(chatIdLocal);
 		if (data.chatId === chatIdLocal) {
 			isUserBanned = false;
-			console.log("la bas");
 		}
 	});
 
@@ -258,6 +262,9 @@
 					<option value="mute">Mute</option>
 					<option value="unmute">unMute</option>
 				</select>
+				{#if selectedAction === 'ban' || selectedAction === 'mute'}
+           			<input type="number" bind:value={actionDuration} placeholder="Enter duration in seconds" min="0" />
+        		{/if}
 				<button on:click={performAction}>Submit</button>
 				<div id="access-control">
 					{#if isProtected}

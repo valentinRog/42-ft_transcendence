@@ -19,6 +19,7 @@
 	let isFriend = true;
 	let chatWindow: HTMLDivElement;
 	let autoScroll = true;
+	let isCreatingChat = false;
 
 	$: {
 		friendUsername = $contacts.find((contact) => contact.id === friendId)?.username;
@@ -51,7 +52,10 @@
 
 	async function sendMessage() {
 		if (messageContent.trim() === '') return;
+		if (isCreatingChat) return;
 		if (!chatIdLocal) {
+			isCreatingChat = true;
+
 			const memberUsernames = [$user?.username, friendUsername];
 			const chat = await fetchCreateChat(memberUsernames, false, 'private');
 			const chatExists = $chats.some((existingChat) => existingChat.id === chat.id);
@@ -61,6 +65,7 @@
 				chatIdLocal = chat.id;
 				$socket.emit('otherAddChat', { chat: chat, userId: friendId });
 			}
+			isCreatingChat = false;
 		}
 		$socket.emit('sendMessage', {
 			chatId: chatIdLocal,
@@ -76,10 +81,6 @@
 			return chatUser ? chatUser.user.username : 'Unknown';
 		}
 		return 'Unknown';
-	}
-
-	async function leaveGroup() {
-		$socket.emit('leaveGroup', { chatId: chatIdLocal });
 	}
 
 	const formatter = new Intl.DateTimeFormat('en', {
@@ -116,7 +117,7 @@
 		{#if isFriend}
 			<form on:submit|preventDefault={sendMessage} class="send-message-form">
 				<input type="text" bind:value={messageContent} class="message-input" />
-				<button type="submit" class="btn send-btn">Send</button>
+				<button type="submit" class="btn send-btn" disabled={isCreatingChat}>Send</button>
 			</form>
 		{:else}
 			<p>You are no longer friends with this user.</p>
