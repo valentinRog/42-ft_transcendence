@@ -185,6 +185,14 @@ export class UserService {
     return this.socketService.getStatus(username);
   }
 
+  async getUserBlocks(username: string) {
+    const user = await this.prisma.user.findUnique({ 
+      where: { username: username },
+      include: { blocks: true },
+    });
+    return user.blocks;
+  }
+
   async blockUser(userId: number, blockedId: number) {
     const existingBlock = await this.prisma.block.findFirst({
       where: {

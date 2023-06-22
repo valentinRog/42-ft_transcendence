@@ -6,6 +6,7 @@
 	const socket = Context.socket();
 
 	const chats = Context.chats();
+	const blocks = Context.blocks();
 	const chatId = Context.chatId();
 	const friendInfoId = Context.friendInfoId();
 	const contacts = Context.contacts();
@@ -22,8 +23,10 @@
 	let chatWindow: HTMLDivElement;
 	let autoScroll = true;
 	let isCreatingChat = false;
+	let blockedIds: number[];
 
 	$: {
+		blockedIds = $blocks.map(block => block.blockedId);
 		friendUsername = $contacts.find((contact) => contact.id === friendId)?.username;
 		if (friendUsername === undefined) isFriend = false;
 		else isFriend = true;
@@ -99,18 +102,20 @@
 		<ul>
 			{#if currentChat}
 				{#each currentChat?.messages || [] as message, i (i)}
-					<li class={message.user?.username === $user?.username ? 'self' : 'other'}>
-						<div class="message-header">
-							{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
-								<strong on:click={() => openProfile(message.user?.username)}>{message.user?.username}</strong>
-							{/if}
-						</div>
-						<div class="message-content">{message.content}</div>
-						<h6 class="clock">{formatter.format(new Date(message.createdAt))}</h6>
-					</li>
+					{#if !blockedIds.includes(message.userId)}
+						<li class={message.user?.username === $user?.username ? 'self' : 'other'}>
+							<div class="message-header">
+								{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
+									<strong on:click={() => openProfile(message.user?.username)}>{message.user?.username}</strong>
+								{/if}
+							</div>
+							<div class="message-content">{message.content}</div>
+							<h6 class="clock">{formatter.format(new Date(message.createdAt))}</h6>
+						</li>
+					{/if}
 				{/each}
 			{/if}
-		</ul>
+		</ul>		
 	</div>
 	<div id="sendMessage-window">
 		{#if isFriend}

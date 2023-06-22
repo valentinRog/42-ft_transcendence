@@ -55,7 +55,6 @@ export class ChatController {
     @Body('password') password?: string,
   ) {
     const groupName = memberUsernames.join('-');
-    console.log(accessibility);
     const newGroupChat = await this.chatService.createChat(
       groupName,
       memberUsernames,
