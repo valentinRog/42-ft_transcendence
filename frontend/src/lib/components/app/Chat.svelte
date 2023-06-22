@@ -9,6 +9,8 @@
 	const chatId = Context.chatId();
 	const friendInfoId = Context.friendInfoId();
 	const contacts = Context.contacts();
+	const selected = Context.selected();
+	const addInstance = Context.addInstance();
 	const fetchCreateChat = Context.fetchCreateChat();
 
 	let chatIdLocal: number | null = $chatId;
@@ -41,6 +43,11 @@
 	afterUpdate(() => {
 		if (autoScroll) chatWindow.scrollTop = chatWindow.scrollHeight;
 	});
+
+	function openProfile(username: string) {
+		addInstance('Profile', { }, { username: username });
+		$selected = null;
+	}
 
 	function handleScroll() {
 		if (chatWindow.scrollTop + chatWindow.clientHeight + 1 >= chatWindow.scrollHeight) {
@@ -75,14 +82,6 @@
 		messageContent = '';
 	}
 
-	function findUser(userId: number, chatId: number | null) {
-		if (currentChat) {
-			let chatUser = currentChat.chatUsers.find((cu: any) => cu.userId === userId);
-			return chatUser ? chatUser.user.username : 'Unknown';
-		}
-		return 'Unknown';
-	}
-
 	const formatter = new Intl.DateTimeFormat('en', {
 		hour12: false,
 		hour: 'numeric',
@@ -100,10 +99,10 @@
 		<ul>
 			{#if currentChat}
 				{#each currentChat?.messages || [] as message, i (i)}
-					<li class={findUser(message.userId, chatIdLocal) === $user?.username ? 'self' : 'other'}>
+					<li class={message.user?.username === $user?.username ? 'self' : 'other'}>
 						<div class="message-header">
 							{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
-								<strong>{findUser(message.userId, chatIdLocal)}</strong>
+								<strong on:click={() => openProfile(message.user?.username)}>{message.user?.username}</strong>
 							{/if}
 						</div>
 						<div class="message-content">{message.content}</div>

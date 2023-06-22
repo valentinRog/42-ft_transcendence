@@ -138,6 +138,7 @@
 		export const fetchMe = (): (() => Promise<any>) => getContext('fetchMe');
 		export const fetchUserByUsername = (): ((username: string) => Promise<any>) =>
 			getContext('fetchUserByUsername');
+		export const fetchBlockUser = (): ((userId: number) => Promise<any>) => getContext('fetchBlockUser');
 		export const fetchFriends = (): (() => Promise<any>) => getContext('fetchFriends');
 		export const fetchFriendRequest = (): (() => Promise<any>) => getContext('fetchFriendRequest');
 		export const fetchGameRequest = (): (() => Promise<any>) => getContext('fetchGameRequest');
@@ -384,6 +385,16 @@
 		return data;
 	}
 
+	async function fetchBlockUser(userId: number) {
+		const res = await fetch('/api/block', {
+        	method: 'POST',
+        	headers: { 'Content-Type': 'application/json' },
+        	body: JSON.stringify({ userId: $user?.id, blockedId: userId }),
+      	});
+		const data = await res.json();
+		return data;
+	}
+
 	async function fetchFriendRequest() {
 		const res = await fetchWithToken('notification/get?type=friend');
 		const data = await res.json();
@@ -429,7 +440,6 @@
 		accessibility: string,
 		password?: string
 	) {
-		console.log(accessibility);
 		const response = await fetchWithToken('chat/create-chat', {
 			method: 'POST',
 			headers: {
@@ -484,6 +494,7 @@
 	setContext('fetchHistory', fetchHistory);
 	setContext('fetchMe', fetchMe);
 	setContext('fetchUserByUsername', fetchUserByUsername);
+	setContext('fetchBlockUser', fetchBlockUser);
 	setContext('fetchFriends', fetchFriends);
 	setContext('fetchFriendRequest', fetchFriendRequest);
 	setContext('fetchChatById', fetchChatById);

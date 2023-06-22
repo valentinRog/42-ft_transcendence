@@ -95,6 +95,11 @@
 		}
 	};
 
+	const performAction = async() => {
+		if (searchQuery.trim() === "")
+			return ;
+
+		const user = await fetchUserByUsername(searchQuery)
 	const performAction = async () => {
 		if (searchQuery.trim() === '') return;
 
@@ -148,14 +153,6 @@
 			content: messageContent
 		});
 		messageContent = '';
-	}
-
-	function findUser(userId: number, chatId: number | null) {
-		if (currentChat) {
-			let chatUser = currentChat.chatUsers.find((cu: any) => cu.userId === userId);
-			return chatUser ? chatUser.user.username : 'Unknown';
-		}
-		return 'Unknown';
 	}
 
 	function selectUser(user: any) {
@@ -231,11 +228,11 @@
 					{#if currentChat}
 						{#each currentChat?.messages || [] as message, i (i)}
 							<li
-								class={findUser(message.userId, chatIdLocal) === $user?.username ? 'self' : 'other'}
+								class={message.user?.username === $user?.username ? 'self' : 'other'}
 							>
 								<div class="message-header">
 									{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
-										<strong>{findUser(message.userId, chatIdLocal)}</strong>
+										<strong on:click={() => openProfile(message.user?.username)}>{message.user?.username}</strong>
 									{/if}
 								</div>
 								<div class="message-content">{message.content}</div>
