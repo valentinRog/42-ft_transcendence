@@ -186,17 +186,19 @@
 		gap: 0.5rem;
 	}
 
-	h3, h4 {
+	h3,
+	h4 {
 		color: $blue;
 		margin-bottom: 0.5rem;
-		text-align: center
+		text-align: center;
 	}
 
 	h3 {
-		margin-top: 1rem
+		margin-top: 1rem;
 	}
 
-	.create-Chat, button {
+	.create-Chat,
+	button {
 		@include tab-border($light-grey, $dark-grey);
 		padding: 0.5rem;
 		margin-bottom: 0.2rem;
@@ -225,4 +227,3 @@
 		margin-bottom: 0.2rem;
 	}
 </style>
-

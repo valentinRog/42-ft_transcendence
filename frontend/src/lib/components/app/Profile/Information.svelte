@@ -40,8 +40,6 @@
 				imgUrl = '/avatar.png';
 			});
 	}
-
-
 </script>
 
 <div id="box">
@@ -55,8 +53,7 @@
 				<img src={imgUrl} />
 			</li>
 		</div>
-		<button type="button"
-		on:click={() => ($openEditProfile = true)}>Edit Profile</button>
+		<button type="button" on:click={() => ($openEditProfile = true)}>Edit Profile</button>
 		{#if username === $user?.username}
 			<li class="box friends">
 				<p>My friends</p>

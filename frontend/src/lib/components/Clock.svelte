@@ -1,5 +1,8 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
+	import { Context } from '$lib/components/Context.svelte';
+
+	const soundOn = Context.soundOn();
 
 	let time = new Date();
 
@@ -11,17 +14,15 @@
 		minute: '2-digit'
 	});
 
-	let soundOn: boolean = true;
-
 	onDestroy(() => clearInterval(interval));
 </script>
 
 <div class="navbar-clock">
 	<p>
 		<img
-			on:mousedown={() => (soundOn = !soundOn)}
-			src={soundOn ? 'sound-on.png' : 'sound-off.png'}
-			alt={soundOn ? 'sound on' : 'sound off'}
+			on:mousedown={() => ($soundOn = !$soundOn)}
+			src={$soundOn ? 'sound-on.png' : 'sound-off.png'}
+			alt={$soundOn ? 'sound on' : 'sound off'}
 			draggable="false"
 		/>
 		{formatter.format(time)}

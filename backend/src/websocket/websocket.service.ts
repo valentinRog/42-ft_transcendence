@@ -53,10 +53,10 @@ export class WebSocketService {
     }
     socketPlayer1.join(room);
     socketPlayer2.join(room);
-    socketPlayer1.emit('enter-room', { room: room, index: 0 });
-    socketPlayer2.emit('enter-room', { room: room, index: 1 });
+    socketPlayer1.emit('enter-room', { room, index: 0, opponent: player2 });
+    socketPlayer2.emit('enter-room', { room, index: 1, opponent: player1 });
 
-    return { player1: player1, player2: player2, room: room };
+    return { player1: player1, player2: player2, room };
   }
 
   joinRoom(player: string, room: string) {

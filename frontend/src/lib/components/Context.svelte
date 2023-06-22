@@ -80,6 +80,7 @@
 		}
 
 		export const settings = (): Writable<Settings> => getContext('settings');
+		export const soundOn = (): Writable<boolean> => getContext('soundOn');
 
 		export const fetchSettings = (): (() => Promise<any>) => getContext('fetchSettings');
 
@@ -135,7 +136,7 @@
 
 		export const fetchHistory = (): (() => Promise<any>) => getContext('fetchHistory');
 		export const fetchMe = (): (() => Promise<any>) => getContext('fetchMe');
-		export const fetchUserByUsername = (): ((username : string) => Promise<any>) => 
+		export const fetchUserByUsername = (): ((username: string) => Promise<any>) =>
 			getContext('fetchUserByUsername');
 		export const fetchFriends = (): (() => Promise<any>) => getContext('fetchFriends');
 		export const fetchFriendRequest = (): (() => Promise<any>) => getContext('fetchFriendRequest');
@@ -235,8 +236,10 @@
 		up: 'ArrowUp',
 		down: 'ArrowDown'
 	});
+	const soundOn = writable(true);
 
 	setContext('settings', settings);
+	setContext('soundOn', soundOn);
 
 	async function fetchSettings() {
 		const res = await fetchWithToken('settings/get-settings');
@@ -368,7 +371,7 @@
 		return data;
 	}
 
-	async function fetchUserByUsername(username : string) {
+	async function fetchUserByUsername(username: string) {
 		const res = await fetchWithToken(`users/info/name/${username}`);
 		const data = await res.json();
 		return data;
@@ -497,6 +500,8 @@
 	);
 
 	// ------- EVENTS --------
+
+	$socket.on('disconnect', logout);
 
 	$socket.on('friend', (data: { message: string }) => {
 		fetchFriendRequest();

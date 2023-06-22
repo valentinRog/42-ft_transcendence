@@ -80,7 +80,7 @@
 		});
 	})();
 
-	const notVisible = new Set(['FriendRequest', 'Chat', 'ChatForum', 'EditProfile', "PongKeybinds"]);
+	const notVisible = new Set(['FriendRequest', 'Chat', 'ChatForum', 'EditProfile', 'PongKeybinds']);
 </script>
 
 <div
