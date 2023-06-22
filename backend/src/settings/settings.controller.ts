@@ -16,7 +16,6 @@ export class SettingsController {
 
   @Patch('edit')
   editSettings(@GetUser('id') userId: number, @Body() dto: EditSettingsDto) {
-    console.log(dto);
     return this.settingsService.editSettings(userId, dto);
   }
 }

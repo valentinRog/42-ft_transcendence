@@ -1,26 +1,16 @@
 <script lang="ts">
 	import { Context } from '$lib/components/Context.svelte';
-	import { token } from '$lib/stores';
-	import { browser } from '$app/environment';
-	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
-	import { page } from '$app/stores';
 	import { user } from '$lib/stores';
 	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
+	import TwoFactorDialog from '$lib/components/TwoFactorDialog.svelte';
 
 	const fetchWithToken = Context.fetchWithToken();
 	const addInstance = Context.addInstance();
 	const fetchMe = Context.fetchMe();
 
-	onMount(() => {
-		if ($page.url.searchParams.get('token')) {
-			$token = $page.url.searchParams.get('token');
-			if (browser) sessionStorage.setItem('token', $token!);
-			goto('/', { replaceState: true });
-		}
-	});
 
 	let showModal = false;
+	let showDialog = false;
 	let errorMessage: string | null = null;
 
 	let changes = false;
@@ -31,55 +21,40 @@
 
 	async function handleSubmit(event: Event) {
 		const form = event.target as HTMLFormElement;
-		const data = new FormData(form);
-		const body = new URLSearchParams();
-		for (const pair of data) {
-			body.append(pair[0], pair[1] as string);
+		const data: Record<string, any> = {};
+		if (!checkboxValue)
+			data['twoFactorEnabled'] = checkboxValue;
+		for (const element of form.elements) {
+			if (element instanceof HTMLInputElement && element.name && element.type !== 'checkbox') {
+				data[element.name] = element.value;
+			}
 		}
 		const res = await fetchWithToken('users/edit', {
 			method: 'PATCH',
 			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded'
+				'Content-Type': 'application/json'
 			},
-			body
+			body: JSON.stringify(data),
 		});
 		const json = await res.json();
-		console.log(json);
 		if (res.status !== 200 && res.status !== 201) {
 			errorMessage = json.message;
 			showModal = true;
-		} else if (json.access_token) {
-			$token = json.access_token;
-			if (browser) sessionStorage.setItem('token', json.access_token);
-			goto('/');
 		}
-		if ($user?.twoFactorEnabled && !checkboxValue) disable2fa();
-		else if (!$user?.twoFactorEnabled && checkboxValue) enable2fa();
-		changes = false;
+		else {
+			changes = false;
+			if (!$user?.twoFactorEnabled && checkboxValue) generate2fa();
+			await fetchMe();
+		}
 	}
 
-	async function enable2fa() {
-		const res = await fetchWithToken('2fa/enable', {
+	async function generate2fa() {
+		const res = await fetchWithToken('2fa/generate', {
 			method: 'POST'
 		});
 		const data = await res.json();
 		addInstance('Internet', {}, { url: data.qrcode });
-		$token = data.token;
-		sessionStorage.setItem('token', data.token);
-		fetchMe();
-	}
-
-	async function disable2fa() {
-		await fetchWithToken('users/edit', {
-			method: 'PATCH',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				twoFactorEnabled: false
-			})
-		});
-		fetchMe();
+		showDialog = true;
 	}
 
 	function handleChange() {
@@ -142,18 +117,21 @@
 </script>
 
 <div class="window-body">
+	<TwoFactorDialog {showDialog} on:close={() => (showDialog = false)} />
 	<ErrorDialog {showModal} {errorMessage} on:close={() => (showModal = false)} />
 	<div id="formular">
-		<li class="pic">
-			<input
-				type="file"
-				id="file-upload"
-				accept=".jpg, .jpeg, .png"
-				on:change={(e) => onFileSelected(e)}
-				bind:this={fileinput}
-			/>
-			<img src={imgUrl} />
-		</li>
+		<div class="pic-username-login">
+			<li class="pic">
+				<input
+					type="file"
+					id="file-upload"
+					accept=".jpg, .jpeg, .png"
+					on:change={(e) => onFileSelected(e)}
+					bind:this={fileinput}
+				/>
+				<img src={imgUrl} />
+			</li>
+		</div>
 		<div class="content">
 			<form
 				on:submit|preventDefault={handleSubmit}
@@ -181,8 +159,8 @@
 							on:input={handleChange}
 						/>
 					</div>
-					<input type="checkbox" id="2fa" bind:checked={checkboxValue} on:change={handleChange} />
-					<label for="2fa">2fa</label>
+					<input type="checkbox" id="twoFactorEnabled" bind:checked={checkboxValue} on:change={handleChange} />
+					<label for="twoFactorEnabled">2fa</label>
 				{/if}
 				{#if changes}
 					<button type="submit">Save</button>
@@ -217,6 +195,10 @@
 			}
 		}
 
+		input {
+			width: 100%;
+		}
+
 		.form-group {
 			display: flex;
 			align-items: center;
@@ -243,7 +225,7 @@
 			img {
 				display: block;
 				margin: 0 auto;
-				height: 4.5rem;
+				height: 4.8rem;
 			}
 
 			input[type='file'] {

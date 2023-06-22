@@ -42,8 +42,6 @@
 				imgUrl = '/avatar.png';
 			});
 	}
-
-
 </script>
 
 <div id="box">
@@ -57,8 +55,10 @@
 				<img src={imgUrl} />
 			</li>
 		</div>
+		{#if showEdit}
 		<button type="button"
 		on:click={() => ($openEditProfile = true)}>Edit Profile</button>
+		{/if}
 		{#if username === $user?.username}
 			<li class="box friends">
 				<p>My friends</p>
@@ -112,8 +112,6 @@
 				display: flex;
 				img {
 					margin: 0 auto;
-					height: 4.5rem;
-					width: auto;
 				}
 			}
 		}
@@ -143,13 +141,6 @@
 		.img-status {
 			height: 0.8rem;
 			width: auto;
-		}
-		button.two-factor {
-			margin: 0.25rem;
-			padding: 0.25rem;
-			@include tab-contour;
-			@include tab-contour-active;
-			background-color: $grey;
 		}
 	}
 </style>

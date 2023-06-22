@@ -44,7 +44,7 @@
 		margin-right: 0.2rem;
 		textarea {
 			min-height: 80px;
-  			min-width: 150px;
+			min-width: 150px;
 			padding-top: 0.2rem;
 			padding-left: 0.2rem;
 			font-size: 1.1rem;

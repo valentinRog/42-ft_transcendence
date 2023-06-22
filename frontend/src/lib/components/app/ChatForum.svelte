@@ -18,7 +18,7 @@
 	let disabled = false;
 
 	let searchQuery = '';
-	let selectedAction : string = '';
+	let selectedAction: string = '';
 
 	//BAN AND MUTE
 	let isUserBanned = false;
@@ -75,28 +75,39 @@
 	});
 
 	const actions = {
-        Moderator: (userId: number) => { changeRole(userId, 2) },
-        User: (userId: number) => { changeRole(userId, 3) },
-        ban: (userId: number) => { banUser(userId, actionDuration) },
-        unban: (userId: number) => { unBanUser(userId) },
-        mute: (userId: number) => { muteUser(userId, actionDuration) },
-        unmute: (userId: number) => { unMuteUser(userId) }
-    };
+		Moderator: (userId: number) => {
+			changeRole(userId, 2);
+		},
+		User: (userId: number) => {
+			changeRole(userId, 3);
+		},
+		ban: (userId: number) => {
+			banUser(userId, actionDuration);
+		},
+		unban: (userId: number) => {
+			unBanUser(userId);
+		},
+		mute: (userId: number) => {
+			muteUser(userId, actionDuration);
+		},
+		unmute: (userId: number) => {
+			unMuteUser(userId);
+		}
+	};
 
-	const performAction = async() => {
-		if (searchQuery.trim() === "")
-			return ;
+	const performAction = async () => {
+		if (searchQuery.trim() === '') return;
 
-		const user = await fetchUserByUsername(searchQuery)
+		const user = await fetchUserByUsername(searchQuery);
 		const userId = user.id;
 
-        if (userId && actions[selectedAction as keyof typeof actions]) {
-            actions[selectedAction as keyof typeof actions](userId);
-        }
-    };
+		if (userId && actions[selectedAction as keyof typeof actions]) {
+			actions[selectedAction as keyof typeof actions](userId);
+		}
+	};
 
 	function openProfile(username: string) {
-		addInstance('Profile', { }, { username: username });
+		addInstance('Profile', {}, { username: username });
 		$selected = null;
 	}
 
@@ -211,12 +222,12 @@
 				<ul>
 					{#if currentChat}
 						{#each currentChat?.messages || [] as message, i (i)}
-							<li
-								class={message.user?.username === $user?.username ? 'self' : 'other'}
-							>
+							<li class={message.user?.username === $user?.username ? 'self' : 'other'}>
 								<div class="message-header">
 									{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
-										<strong on:click={() => openProfile(message.user?.username)}>{message.user?.username}</strong>
+										<strong on:click={() => openProfile(message.user?.username)}
+											>{message.user?.username}</strong
+										>
 									{/if}
 								</div>
 								<div class="message-content">{message.content}</div>
@@ -255,8 +266,13 @@
 					<option value="unmute">unMute</option>
 				</select>
 				{#if selectedAction === 'ban' || selectedAction === 'mute'}
-           			<input type="number" bind:value={actionDuration} placeholder="Enter duration in seconds" min="0" />
-        		{/if}
+					<input
+						type="number"
+						bind:value={actionDuration}
+						placeholder="Enter duration in seconds"
+						min="0"
+					/>
+				{/if}
 				<button on:click={performAction}>Submit</button>
 				<div id="access-control">
 					{#if isProtected}
@@ -446,5 +462,4 @@
 		text-align: center;
 		font-size: 0.9rem;
 	}
-
 </style>

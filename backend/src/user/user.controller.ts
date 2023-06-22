@@ -82,14 +82,14 @@ export class UserController {
   }
 
   @Patch('edit')
-  asynceditUser(@GetUser('id') userId: number, @Body() dto: EditUserDto) {
+  async editUser(@GetUser('id') userId: number, @Body() dto: EditUserDto) {
     return this.userService.editUser(userId, dto);
   }
 
   @UseInterceptors(FileInterceptor('file'))
   @Post('upload')
   uploadFileAndPassValidation(
-    @GetUser('login') login,
+    @GetUser('id') id,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
@@ -100,7 +100,7 @@ export class UserController {
     )
     file: Express.Multer.File,
   ) {
-    return this.userService.saveImageFromBuffer(file, login + '.png');
+    return this.userService.saveImageFromBuffer(file, `${id}.png`);
   }
 
   @Patch('remove-friend')

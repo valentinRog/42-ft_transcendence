@@ -17,7 +17,10 @@ export class ChatController {
 
   @UseGuards(JwtGuard)
   @Get('publicChats')
-  async getPublicChats(@Query('start') start: string, @Query('limit') limit: string) {
+  async getPublicChats(
+    @Query('start') start: string,
+    @Query('limit') limit: string,
+  ) {
     const chats = this.chatService.getChatsPublic(Number(start), Number(limit));
     return chats;
   }
@@ -30,14 +33,17 @@ export class ChatController {
   }
 
   @Post('verifyPassword')
-  async verifyPassword(@Body() body: { chatId: string, password: string }) {
+  async verifyPassword(@Body() body: { chatId: string; password: string }) {
     const chat = await this.chatService.findChatById(Number(body.chatId));
-    if (chat.accessibility === "public" || chat.accessibility === "private")
+    if (chat.accessibility === 'public' || chat.accessibility === 'private')
       return true;
-    if (chat.accessibility === "protected" && chat.password && chat.password === body.password)
+    if (
+      chat.accessibility === 'protected' &&
+      chat.password &&
+      chat.password === body.password
+    )
       return true;
-    else
-      return false;
+    else return false;
   }
 
   @UseGuards(JwtGuard)
@@ -48,12 +54,15 @@ export class ChatController {
     @Body('accessibility') accessibility: string,
     @Body('password') password?: string,
   ) {
-
     const groupName = memberUsernames.join('-');
     console.log(accessibility);
-    const newGroupChat = await this.chatService.createChat(groupName, memberUsernames, isGroupChat, accessibility, password);
+    const newGroupChat = await this.chatService.createChat(
+      groupName,
+      memberUsernames,
+      isGroupChat,
+      accessibility,
+      password,
+    );
     return newGroupChat;
   }
-
-
 }
