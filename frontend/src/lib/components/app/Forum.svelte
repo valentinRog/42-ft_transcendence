@@ -95,66 +95,135 @@
 </script>
 
 <div id="box">
-	<h3>add new Topic</h3>
-	<form on:submit|preventDefault={createChat}>
-		<label>
-			Topic Name :
-			<input type="text" bind:value={groupName} required />
-		</label>
-		<label>
-			Access :
-			<select bind:value={accessibility}>
-				<option value="public">Public</option>
-				<option value="protected">Protected by password</option>
-			</select>
-		</label>
-		{#if accessibility === 'protected'}
+	<div class="create-Chat">
+		<h4>Add New Topic</h4>
+		<form on:submit|preventDefault={createChat}>
 			<label>
-				Password :
-				<input type="password" bind:value={password} required />
+				Topic Name :
+				<input type="text" bind:value={groupName} required />
 			</label>
-		{/if}
-		<button type="submit">Créer un chat</button>
-	</form>
-	<button on:click={() => switchView('public')}>Public Topics</button>
-	<button on:click={() => switchView('my')}>My Topics</button>
+			<label>
+				Access :
+				<select bind:value={accessibility}>
+					<option value="public">Public</option>
+					<option value="protected">Protected</option>
+				</select>
+			</label>
+			{#if accessibility === 'protected'}
+				<label>
+					Password :
+					<input type="password" bind:value={password} required />
+				</label>
+			{/if}
+			<button type="submit">Create Chat</button>
+		</form>
+	</div>
+	<div class="change-page">
+		<button on:click={() => switchView('public')}>Public Topics</button>
+		<button on:click={() => switchView('my')}>My Topics</button>
+	</div>
 	{#if currentView === 'public'}
 		<h3>Public Topics</h3>
-		<ul>
-			{#each $chatsPublic as chat (chat.id)}
-				<li>
-					<span on:click={() => startChat(chat)}>{chat.name}</span>
-				</li>
-			{/each}
-		</ul>
-		{#if start >= limit}
-			<button on:click={previousChats}>Previous</button>
-		{/if}
-		{#if chatsCount === limit}
-			<button on:click={nextChats}>Next</button>
-		{/if}
+		<div class="chat-windows">
+			<ul>
+				{#each $chatsPublic as chat (chat.id)}
+					<li class="chat" on:click={() => startChat(chat)}>{chat.name}</li>
+				{/each}
+			</ul>
+			<div class="change-page">
+				{#if start >= limit}
+					<button on:click={previousChats}>Previous</button>
+				{/if}
+				{#if chatsCount === limit}
+					<button on:click={nextChats}>Next</button>
+				{/if}
+			</div>
+			{#if selectedChat !== null}
+				<label>
+					Enter Password for {selectedChat.name} :
+					<input type="password" bind:value={chatPassword} required />
+					<button on:click={enterChat}>Enter</button>
+				</label>
+			{/if}
+		</div>
 	{:else if currentView === 'my'}
 		<h3>My Topics</h3>
-		<ul>
-			{#each $chats as chat (chat.id)}
-				{#if chat.accessibility !== 'private'}
-					<li on:click={() => startChat(chat)}>{chat.name}</li>
-				{/if}
-			{/each}
-		</ul>
-	{/if}
-	{#if selectedChat !== null}
-		<label>
-			Enter Password for {selectedChat.name} :
-			<input type="password" bind:value={chatPassword} required />
-			<button on:click={enterChat}>Enter</button>
-		</label>
+		<div class="chat-windows">
+			<ul>
+				{#each $chats as chat (chat.id)}
+					{#if chat.accessibility !== 'private'}
+						<li class="chat" on:click={() => startChat(chat)}>{chat.name}</li>
+					{/if}
+				{/each}
+			</ul>
+		</div>
 	{/if}
 </div>
 
 <style lang="scss">
 	#box {
-		width: 30rem;
-		height: 17rem;
+		width: 25rem;
+		height: 32rem;
+	}
+
+	.chat-window {
+		overflow-x: hidden;
+		margin: 0.2rem;
+		padding: 0.3rem;
+	}
+
+	.chat {
+		@include tab-border($light-grey, $dark-grey);
+		padding: 0.5rem;
+		height: 3rem;
+		font-size: 1.3rem;
+		margin-bottom: 0.3rem;
+	}
+
+	.change-page {
+		display: flex;
+		justify-content: center;
+		gap: 0.5rem;
+	}
+
+	h3,
+	h4 {
+		color: $blue;
+		margin-bottom: 0.5rem;
+		text-align: center;
+	}
+
+	h3 {
+		margin-top: 1rem;
+	}
+
+	.create-Chat,
+	button {
+		@include tab-border($light-grey, $dark-grey);
+		padding: 0.5rem;
+		margin-bottom: 0.2rem;
+	}
+
+	ul {
+		min-height: 18rem;
+		max-height: 20rem;
+		overflow-y: auto;
+		overflow-x: hidden;
+		margin: 0.2rem;
+		padding: 0.3rem;
+	}
+
+	li {
+		position: relative;
+		display: flex;
+		justify-content: space-between;
+	}
+
+	li span {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 8.6rem;
+		margin-bottom: 0.2rem;
 	}
 </style>

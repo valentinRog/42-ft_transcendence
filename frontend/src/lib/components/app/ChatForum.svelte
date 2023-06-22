@@ -6,6 +6,9 @@
 	const socket = Context.socket();
 	const chats = Context.chats();
 	const chatId = Context.chatId();
+	const selected = Context.selected();
+	const fetchUserByUsername = Context.fetchUserByUsername();
+	const addInstance = Context.addInstance();
 
 	let currentChat: any = null;
 	let selectedUser: any = null;
@@ -13,6 +16,9 @@
 	let messageContent = '';
 	let roleId: number;
 	let disabled = false;
+
+	let searchQuery = '';
+	let selectedAction: string = '';
 
 	//BAN AND MUTE
 	let isUserBanned = false;
@@ -24,9 +30,10 @@
 	let banDuration: number | null = null;
 	let muteDuration: number | null = null;
 
+	let actionDuration: number | null = null;
+
 	//PASSWORD
 	let password: any = undefined;
-	let newPassword: string = '';
 	let passwordModalVisible = false;
 	let isProtected: any;
 
@@ -34,17 +41,6 @@
 		currentChat = $chats.find((chat) => chat.id === chatIdLocal);
 		roleId = currentChat?.chatUsers.find((cu: any) => cu.userId === $user?.id)?.roleId;
 		isProtected = currentChat ? currentChat.accessibility === 'protected' : false;
-
-		if (currentChat && currentChat.bans) {
-			const ban = currentChat.bans.find(
-				(ban: any) =>
-					ban.userId === $user?.id &&
-					(ban.expiresAt == null || new Date(ban.expiresAt) > new Date())
-			);
-			isUserBanned = !!ban;
-			if (isUserBanned) chatIdLocal = null;
-		}
-
 		disabled = isUserBanned || isUserMuted;
 	}
 
@@ -59,7 +55,6 @@
 			isUserBanned = !!ban;
 			if (isUserBanned) {
 				banExpiresAt = ban.expiresAt ? new Date(ban.expiresAt) : null;
-				chatIdLocal = null;
 				return;
 			}
 
@@ -78,6 +73,43 @@
 	onDestroy(() => {
 		$socket.emit('leaveRoom', { chatId: chatIdLocal });
 	});
+
+	const actions = {
+		Moderator: (userId: number) => {
+			changeRole(userId, 2);
+		},
+		User: (userId: number) => {
+			changeRole(userId, 3);
+		},
+		ban: (userId: number) => {
+			banUser(userId, actionDuration);
+		},
+		unban: (userId: number) => {
+			unBanUser(userId);
+		},
+		mute: (userId: number) => {
+			muteUser(userId, actionDuration);
+		},
+		unmute: (userId: number) => {
+			unMuteUser(userId);
+		}
+	};
+
+	const performAction = async () => {
+		if (searchQuery.trim() === '') return;
+
+		const user = await fetchUserByUsername(searchQuery);
+		const userId = user.id;
+
+		if (userId && actions[selectedAction as keyof typeof actions]) {
+			actions[selectedAction as keyof typeof actions](userId);
+		}
+	};
+
+	function openProfile(username: string) {
+		addInstance('Profile', {}, { username: username });
+		$selected = null;
+	}
 
 	function openPasswordModal() {
 		passwordModalVisible = true;
@@ -118,14 +150,6 @@
 		messageContent = '';
 	}
 
-	function findUser(userId: number, chatId: number | null) {
-		if (currentChat) {
-			let chatUser = currentChat.chatUsers.find((cu: any) => cu.userId === userId);
-			return chatUser ? chatUser.user.username : 'Unknown';
-		}
-		return 'Unknown';
-	}
-
 	function selectUser(user: any) {
 		selectedUser = user;
 	}
@@ -154,7 +178,6 @@
 		if (data.chatId === chatIdLocal) {
 			isUserBanned = true;
 			banExpiresAt = data.expiresAt ? new Date(data.expiresAt) : null;
-			chatIdLocal = null;
 		}
 	});
 
@@ -162,6 +185,20 @@
 		if (data.chatId === chatIdLocal) {
 			isUserMuted = true;
 			muteExpiresAt = data.expiresAt ? new Date(data.expiresAt) : null;
+		}
+	});
+
+	$socket.on('userUnBan', (data: any) => {
+		console.log(data.chatId);
+		console.log(chatIdLocal);
+		if (data.chatId === chatIdLocal) {
+			isUserBanned = false;
+		}
+	});
+
+	$socket.on('userUnMute', (data: any) => {
+		if (data.chatId === chatIdLocal) {
+			isUserMuted = false;
 		}
 	});
 
@@ -173,122 +210,150 @@
 </script>
 
 <div id="box">
-	<div id="chat-window">
-		{#if isUserBanned && chatIdLocal === null}
-			<p>
-				You are banned from this Topics {banExpiresAt
-					? `until ${banExpiresAt.toLocaleString()}`
-					: 'indefinitely'}.
-			</p>
-		{:else}
-			<ul>
-				{#if currentChat}
-					{#each currentChat?.messages || [] as message, i (i)}
-						<li
-							class={findUser(message.userId, chatIdLocal) === $user?.username ? 'self' : 'other'}
-						>
-							<div class="message-header">
-								{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
-									<strong>{findUser(message.userId, chatIdLocal)}</strong>
+	<div class="chat-container">
+		<div id="chat-window">
+			{#if isUserBanned}
+				<p>
+					You are banned from this Topics {banExpiresAt
+						? `until ${banExpiresAt.toLocaleString()}`
+						: 'indefinitely'}.
+				</p>
+			{:else}
+				<ul>
+					{#if currentChat}
+						{#each currentChat?.messages || [] as message, i (i)}
+							<li class={message.user?.username === $user?.username ? 'self' : 'other'}>
+								<div class="message-header">
+									{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
+										<strong on:click={() => openProfile(message.user?.username)}
+											>{message.user?.username}</strong
+										>
+									{/if}
+								</div>
+								<div class="message-content">{message.content}</div>
+							</li>
+						{/each}
+					{/if}
+				</ul>
+			{/if}
+		</div>
+		<div id="sendMessage-window">
+			{#if isUserMuted}
+				<p>
+					You are muted in this Topics {muteExpiresAt
+						? `until ${muteExpiresAt.toLocaleString()}`
+						: 'indefinitely'}.
+				</p>
+			{:else}
+				<form on:submit|preventDefault={sendMessage} class="send-message-form">
+					<input type="text" bind:value={messageContent} class="message-input" {disabled} />
+					<button type="submit" class="btn send-btn" {disabled}>Send</button>
+				</form>
+			{/if}
+		</div>
+	</div>
+	{#if !isUserMuted && !isUserBanned}
+		<div id="user-list">
+			{#if roleId <= 1}
+				<input type="text" bind:value={searchQuery} placeholder="Enter username" />
+				<select bind:value={selectedAction}>
+					<option value="">Select action</option>
+					<option value="Moderator">Moderator</option>
+					<option value="User">User</option>
+					<option value="ban">Ban</option>
+					<option value="unban">unBan</option>
+					<option value="mute">Mute</option>
+					<option value="unmute">unMute</option>
+				</select>
+				{#if selectedAction === 'ban' || selectedAction === 'mute'}
+					<input
+						type="number"
+						bind:value={actionDuration}
+						placeholder="Enter duration in seconds"
+						min="0"
+					/>
+				{/if}
+				<button on:click={performAction}>Submit</button>
+				<div id="access-control">
+					{#if isProtected}
+						<button on:click={toggleAccess}>Switch to Public</button>
+						<div id="password-change-form">
+							<label>
+								Enter new password:
+								<input type="password" bind:value={password} on:input={updatePassword} />
+							</label>
+							<button on:click={changePassword}>Submit</button>
+						</div>
+					{:else}
+						<button on:click={toggleAccess}>Switch to Protected</button>
+					{/if}
+					{#if passwordModalVisible}
+						<div id="password-modal">
+							<label>
+								{#if isProtected}
+									Enter new password:
+								{:else}
+									Enter password to switch to Protected:
 								{/if}
-							</div>
-							<div class="message-content">{message.content}</div>
+								<input type="password" on:input={updatePassword} />
+							</label>
+							<button on:click={toggleAccess}>Submit</button>
+							<button on:click={closePasswordModal}>Cancel</button>
+						</div>
+					{/if}
+				</div>
+			{/if}
+			{#if currentChat}
+				<h5>Users in this chat:</h5>
+				<ul>
+					{#each currentChat.chatUsers as chatUser (chatUser.userId)}
+						<li on:click={() => selectUser(chatUser)}>
+							({chatUser.role?.name}) {chatUser.user?.username}
+							{#if selectedUser === chatUser}
+								<button on:click={() => openProfile(chatUser.user?.username)}>Check Profile</button>
+								{#if roleId <= 1 && roleId < chatUser.roleId}
+									<button on:click={() => changeRole(chatUser.userId, 2)}>Made Moderator</button>
+									<button on:click={() => changeRole(chatUser.userId, 3)}>Make User</button>
+								{/if}
+								{#if roleId <= 2 && roleId < chatUser.roleId}
+									<div>
+										<button on:click={() => muteUser(chatUser.userId, null)}>Mute</button>
+										<button on:click={() => banUser(chatUser.userId, null)}>Ban</button>
+										<button on:click={() => unMuteUser(chatUser.userId)}>Unmute</button>
+										<button on:click={() => unBanUser(chatUser.userId)}>Unban</button>
+										<input
+											type="number"
+											bind:value={banDuration}
+											placeholder="Ban duration in seconds"
+											min="0"
+										/>
+										<input
+											type="number"
+											bind:value={muteDuration}
+											placeholder="Mute duration in seconds"
+											min="0"
+										/>
+									</div>
+								{/if}
+							{/if}
 						</li>
 					{/each}
-				{/if}
-			</ul>
-		{/if}
-	</div>
-	<div id="sendMessage-window">
-		{#if isUserMuted}
-			<p>
-				You are muted in this Topics {muteExpiresAt
-					? `until ${muteExpiresAt.toLocaleString()}`
-					: 'indefinitely'}.
-			</p>
-		{:else}
-			<form on:submit|preventDefault={sendMessage} class="send-message-form">
-				<input type="text" bind:value={messageContent} class="message-input" {disabled} />
-				<button type="submit" class="btn send-btn" {disabled}>Send</button>
-			</form>
-		{/if}
-	</div>
-
-	<div id="user-list">
-		{#if roleId <= 1}
-			<div id="access-control">
-				{#if isProtected}
-					<button on:click={toggleAccess}>Switch to Public</button>
-					<div id="password-change-form">
-						<label>
-							Enter new password:
-							<input type="password" bind:value={password} on:input={updatePassword} />
-						</label>
-						<button on:click={changePassword}>Submite</button>
-					</div>
-				{:else}
-					<button on:click={toggleAccess}>Switch to Protected</button>
-				{/if}
-				{#if passwordModalVisible}
-					<div id="password-modal">
-						<label>
-							{#if isProtected}
-								Enter new password:
-							{:else}
-								Enter password to switch to Protected:
-							{/if}
-							<input type="password" on:input={updatePassword} />
-						</label>
-						<button on:click={toggleAccess}>Submit</button>
-						<button on:click={closePasswordModal}>Cancel</button>
-					</div>
-				{/if}
-			</div>
-		{/if}
-		{#if currentChat}
-			<h5>Users in this chat:</h5>
-			<ul>
-				{#each currentChat.chatUsers as chatUser (chatUser.userId)}
-					<li on:click={() => selectUser(chatUser)}>
-						({chatUser.role?.name}) {chatUser.user?.username}
-						{#if selectedUser === chatUser}
-							<button>Check Profile</button>
-							{#if roleId <= 1 && roleId < chatUser.roleId}
-								<button on:click={() => changeRole(chatUser.userId, 2)}>Made Moderator</button>
-								<button on:click={() => changeRole(chatUser.userId, 3)}>Make User</button>
-							{/if}
-							{#if roleId <= 2 && roleId < chatUser.roleId}
-								<div>
-									<button on:click={() => muteUser(chatUser.userId, null)}>Mute</button>
-									<button on:click={() => banUser(chatUser.userId, null)}>Ban</button>
-									<button on:click={() => unMuteUser(chatUser.userId)}>Unmute</button>
-									<button on:click={() => unBanUser(chatUser.userId)}>Unban</button>
-									<input
-										type="number"
-										bind:value={banDuration}
-										placeholder="Ban duration in seconds"
-										min="0"
-									/>
-									<input
-										type="number"
-										bind:value={muteDuration}
-										placeholder="Mute duration in seconds"
-										min="0"
-									/>
-								</div>
-							{/if}
-						{/if}
-					</li>
-				{/each}
-			</ul>
-		{/if}
-	</div>
+				</ul>
+			{/if}
+		</div>
+	{/if}
 </div>
 
 <style lang="scss">
 	#box {
-		width: 15rem;
+		width: 30rem;
 		height: 17rem;
+	}
+
+	.chat-container {
+		float: left;
+		height: 17rem;
+		width: 20rem;
 	}
 
 	#chat-window {
@@ -303,6 +368,11 @@
 		padding: 0.5rem;
 	}
 
+	#user-list {
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+
 	.btn {
 		padding: 0.1rem 0.4rem;
 	}
@@ -310,10 +380,6 @@
 	.send-btn {
 		margin-left: auto;
 		order: 2;
-	}
-
-	.leave-group {
-		float: right;
 	}
 
 	h5 {
@@ -395,19 +461,5 @@
 		font-weight: bold;
 		text-align: center;
 		font-size: 0.9rem;
-	}
-
-	#user-list {
-		padding: 0.5rem;
-		ul {
-			list-style: none;
-			padding: 0;
-			display: flex;
-			flex-direction: column;
-		}
-		li {
-			margin-bottom: 0.2rem;
-			font-size: 0.9em;
-		}
 	}
 </style>

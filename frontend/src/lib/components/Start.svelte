@@ -11,12 +11,6 @@
 	let active = false;
 
 	const fetchWithToken = Context.fetchWithToken();
-
-	function enable2fa() {
-		fetchWithToken('2fa/enable', {
-			method: 'POST'
-		});
-	}
 </script>
 
 <svelte:body on:click={() => (active = false)} />

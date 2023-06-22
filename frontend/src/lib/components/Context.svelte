@@ -80,6 +80,9 @@
 		}
 
 		export const settings = (): Writable<Settings> => getContext('settings');
+		export const soundOn = (): Writable<boolean> => getContext('soundOn');
+
+		export const fetchSettings = (): (() => Promise<any>) => getContext('fetchSettings');
 
 		export type App =
 			| 'Pong'
@@ -93,7 +96,8 @@
 			| 'FriendRequest'
 			| 'Internet'
 			| 'Notepad'
-			| 'EditProfile';
+			| 'EditProfile'
+			| 'PongKeybinds';
 
 		export interface AppInstance {
 			readonly componentType: App;
@@ -132,6 +136,9 @@
 
 		export const fetchHistory = (): (() => Promise<any>) => getContext('fetchHistory');
 		export const fetchMe = (): (() => Promise<any>) => getContext('fetchMe');
+		export const fetchUserByUsername = (): ((username: string) => Promise<any>) =>
+			getContext('fetchUserByUsername');
+		export const fetchBlockUser = (): ((userId: number) => Promise<any>) => getContext('fetchBlockUser');
 		export const fetchFriends = (): (() => Promise<any>) => getContext('fetchFriends');
 		export const fetchFriendRequest = (): (() => Promise<any>) => getContext('fetchFriendRequest');
 		export const fetchGameRequest = (): (() => Promise<any>) => getContext('fetchGameRequest');
@@ -171,21 +178,29 @@
 	import Notepad from '$lib/components/app/Notepad.svelte';
 	import FriendRequest from '$lib/components/app/FriendRequest.svelte';
 	import EditProfile from './app/EditProfile.svelte';
+	import PongKeybinds from '$lib/components/app/pong/PongKeybinds.svelte';
 	import { token, user, loading } from '$lib/stores';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import type { Socket } from 'socket.io-client';
 	import ioClient from 'socket.io-client';
 	import { onDestroy } from 'svelte';
 	import { v4 as uuidv4 } from 'uuid';
+	import { logout } from '$lib/utils/connect';
 
-	function fetchWithToken(route: string, options: RequestInit = {}) {
-		return fetch(`${PUBLIC_BACKEND_URL}/${route}`, {
+	function fetchWithToken(route: string, options: RequestInit = {}): Promise<Response> {
+		$loading = true;
+		const res = fetch(`${PUBLIC_BACKEND_URL}/${route}`, {
 			...options,
 			headers: {
 				...options.headers,
 				Authorization: `Bearer ${$token}`
 			}
 		});
+		res.then((resp) => {
+			$loading = false;
+			if (resp.status === 401) logout();
+		});
+		return res;
 	}
 
 	setContext('fetchWithToken', fetchWithToken);
@@ -222,8 +237,20 @@
 		up: 'ArrowUp',
 		down: 'ArrowDown'
 	});
+	const soundOn = writable(true);
 
 	setContext('settings', settings);
+	setContext('soundOn', soundOn);
+
+	async function fetchSettings() {
+		const res = await fetchWithToken('settings/get-settings');
+		const data = await res.json();
+		$settings.up = data.up;
+		$settings.down = data.down;
+		return data;
+	}
+
+	setContext('fetchSettings', fetchSettings);
 
 	const components = readable({
 		Pong: Pong,
@@ -237,7 +264,8 @@
 		Forum: Forum,
 		Internet: Internet,
 		Notepad: Notepad,
-		EditProfile: EditProfile
+		EditProfile: EditProfile,
+		PongKeybinds: PongKeybinds
 	});
 
 	const appInstances = writable(new Map<string, Context.AppInstance>());
@@ -322,6 +350,10 @@
 		EditProfile: {
 			TabProps: { name: 'EditProfile', icon: '/computer.png' },
 			DesktopProps: { name: 'EditProfile', icon: '/computer.png' }
+		},
+		PongKeybinds: {
+			TabProps: { name: 'Keybinds', icon: '/computer.png' },
+			DesktopProps: { name: 'Keybinds', icon: '/computer.png' }
 		}
 	});
 
@@ -340,12 +372,26 @@
 		return data;
 	}
 
+	async function fetchUserByUsername(username: string) {
+		const res = await fetchWithToken(`users/info/name/${username}`);
+		const data = await res.json();
+		return data;
+	}
+
 	async function fetchFriends() {
-		$loading = true;
 		const res = await fetchWithToken('users/me/friends');
 		const data = await res.json();
-		$loading = false;
 		$contacts = data;
+		return data;
+	}
+
+	async function fetchBlockUser(userId: number) {
+		const res = await fetch('/api/block', {
+        	method: 'POST',
+        	headers: { 'Content-Type': 'application/json' },
+        	body: JSON.stringify({ userId: $user?.id, blockedId: userId }),
+      	});
+		const data = await res.json();
 		return data;
 	}
 
@@ -392,7 +438,6 @@
 		accessibility: string,
 		password?: string
 	) {
-		console.log(accessibility);
 		const response = await fetchWithToken('chat/create-chat', {
 			method: 'POST',
 			headers: {
@@ -446,6 +491,8 @@
 	setContext('fetchGameRequest', fetchGameRequest);
 	setContext('fetchHistory', fetchHistory);
 	setContext('fetchMe', fetchMe);
+	setContext('fetchUserByUsername', fetchUserByUsername);
+	setContext('fetchBlockUser', fetchBlockUser);
 	setContext('fetchFriends', fetchFriends);
 	setContext('fetchFriendRequest', fetchFriendRequest);
 	setContext('fetchChatById', fetchChatById);
@@ -462,6 +509,8 @@
 	);
 
 	// ------- EVENTS --------
+
+	$socket.on('disconnect', logout);
 
 	$socket.on('friend', (data: { message: string }) => {
 		fetchFriendRequest();

@@ -9,9 +9,14 @@
 	const socket = Context.socket();
 	const fetchWithToken = Context.fetchWithToken();
 	const gameRequest = Context.gameRequest();
+	const fetchSettings = Context.fetchSettings();
+	const addInstance = Context.addInstance();
+
+	fetchSettings();
 
 	let index = 0;
 	let room = '';
+	let opponent = '';
 
 	let scale = 1;
 
@@ -28,11 +33,11 @@
 		});
 	}
 
-	$socket.on('enter-room', (data: { room: string; index: number }) => {
+	$socket.on('enter-room', (data: { room: string; index: number; opponent: string }) => {
 		room = data.room;
 		index = data.index;
+		opponent = data.opponent;
 		$socket.emit('enter-room', data);
-		console.log('enter-room');
 	});
 
 	$socket.on('index', (i: number) => {
@@ -79,10 +84,11 @@
 					bind:selected={scaleString}
 				/>
 			</RightDrop>
+			<button on:click={() => addInstance('PongKeybinds')}>keybinds</button>
 		</DropDown>
 	</div>
 	{#if room !== ''}
-		<PongGame {scale} {index} {room} />
+		<PongGame {scale} {index} {room} {opponent} />
 	{:else}
 		<div class="empty-background">
 			<div>

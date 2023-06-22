@@ -6,6 +6,13 @@
 	const fetchWithToken = Context.fetchWithToken();
 	const socket = Context.socket();
 	const settings = Context.settings();
+	const soundOn = Context.soundOn();
+
+	const sounds = {
+		paddle: new Audio('/paddle.mp3'),
+		wall: new Audio('/wall.mp3'),
+		score: new Audio('/score.mp3')
+	};
 
 	interface Dimensions {
 		readonly width: number;
@@ -78,6 +85,7 @@
 				ball.y + dimensions.ballWidth >= s.paddles[0].y &&
 				ball.y <= s.paddles[0].y + dimensions.paddleHeight
 			) {
+				if ($soundOn) sounds.paddle.play();
 				const dyMax = 0.9;
 				const distToCenter =
 					ball.y + dimensions.ballWidth / 2 - s.paddles[0].y - dimensions.paddleHeight / 2;
@@ -86,6 +94,7 @@
 				ball.dy = dy;
 				ball.x = wallLeft + (wallLeft - ball.x);
 			} else if (ball.x + dimensions.ballWidth < 0) {
+				if ($soundOn) sounds.score.play();
 				ball.x = dimensions.width / 2 - dimensions.ballWidth / 2;
 				ball.y = dimensions.height / 2 - dimensions.ballWidth / 2;
 				ball.dx = 1;
@@ -101,6 +110,7 @@
 				ball.y + dimensions.ballWidth >= s.paddles[1].y &&
 				ball.y <= s.paddles[1].y + dimensions.paddleHeight
 			) {
+				if ($soundOn) sounds.paddle.play();
 				const dyMax = 0.9;
 				const distToCenter =
 					ball.y + dimensions.ballWidth / 2 - s.paddles[1].y - dimensions.paddleHeight / 2;
@@ -109,6 +119,7 @@
 				ball.dy = dy;
 				ball.x = wallRight - dimensions.ballWidth - (ball.x + dimensions.ballWidth - wallRight);
 			} else if (ball.x > dimensions.width) {
+				if ($soundOn) sounds.score.play();
 				ball.x = dimensions.width / 2 - dimensions.ballWidth / 2;
 				ball.y = dimensions.height / 2 - dimensions.ballWidth / 2;
 				ball.dx = -1;
@@ -121,9 +132,11 @@
 		}
 
 		if (ball.y <= 0 && ball.dy < 0) {
+			if ($soundOn) sounds.wall.play();
 			ball.y = -ball.y;
 			ball.dy *= -1;
 		} else if (ball.y >= dimensions.height - dimensions.ballWidth && ball.dy > 0) {
+			if ($soundOn) sounds.wall.play();
 			ball.y =
 				dimensions.height -
 				dimensions.ballWidth -
@@ -159,6 +172,7 @@
 	export let room: string;
 	let pingTimer: number | null = null;
 	let gameTimer: number | null = null;
+	export let opponent: string;
 
 	let state: GameState = {
 		ball: {
@@ -271,8 +285,8 @@
 
 	$socket.on('game-over', (winner: number) => {
 		stopLoop();
-		fetchHistory().then(() => {});
-		console.log('fetchHistory');
+		fetchHistory();
+		room = '';
 		//if (winner === 0) {
 		//	alert('Player 1 wins!');
 		//} else {
@@ -321,6 +335,11 @@
 		$socket.off('ping');
 		$socket.off('state');
 		$socket.off('input');
+
+		Object.values(sounds).forEach((sound) => {
+			sound.pause();
+			sound.currentTime = 0;
+		});
 	});
 
 	function handleKeyDown(e: KeyboardEvent) {
@@ -344,6 +363,7 @@
 
 <div class="container">
 	<canvas bind:this={canvas} />
+	<p>{opponent}</p>
 </div>
 
 <style lang="scss">

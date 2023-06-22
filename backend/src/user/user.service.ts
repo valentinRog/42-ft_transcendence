@@ -184,4 +184,13 @@ export class UserService {
   getStatus(username: string) {
     return this.socketService.getStatus(username);
   }
+
+  async blockUser(userId: number, blockedId: number) {
+  //   return this.prisma.block.create({
+  //     data: {
+  //       blockerId: userId,
+  //       blockedId: blockedId,
+  //     },
+  //   });
+  }
 }

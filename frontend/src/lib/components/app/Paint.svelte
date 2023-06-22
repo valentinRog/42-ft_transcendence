@@ -16,10 +16,9 @@
 		startY: number;
 		png: string;
 		readonly drawOption: (event: MouseEvent) => void;
-		readonly action: (event: MouseEvent) => void;
 	}
 
-	type Tool = 'Pen' | 'Brush' | 'Rectangle' | 'Plop';
+	type Tool = 'Pen' | 'Brush' | 'Rectangle' | 'Eraser';
 
 	let tools: Record<Tool, toolProps> = {
 		Pen: {
@@ -31,10 +30,7 @@
 			drawOption: draw,
 			startX: 0,
 			startY: 0,
-			png: 'pencill.png',
-			action: () => {
-				console.log('Fonction de mon PEN !');
-			}
+			png: 'pencill.png'
 		},
 		Brush: {
 			name: 'brush',
@@ -45,10 +41,7 @@
 			drawOption: draw,
 			startX: 0,
 			startY: 0,
-			png: 'brush.png',
-			action: () => {
-				console.log('Fonction de ma BRUSH !');
-			}
+			png: 'brushh.png'
 		},
 		Rectangle: {
 			name: 'rectangle',
@@ -59,13 +52,10 @@
 			drawOption: drawRectangle,
 			startX: 0,
 			startY: 0,
-			png: 'rectanglee.png',
-			action: () => {
-				console.log('Fonction de ma Rectangle !');
-			}
+			png: 'rectanglee.png'
 		},
-		Plop: {
-			name: 'plop',
+		Eraser: {
+			name: 'eraser',
 			lineWidth: 15,
 			color: 'blue',
 			lineCap: 'butt',
@@ -73,10 +63,7 @@
 			drawOption: draw,
 			startX: 0,
 			startY: 0,
-			png: 'spectator.png',
-			action: () => {
-				console.log('Fonction de mon PLOP !');
-			}
+			png: 'eraserr.png'
 		}
 	};
 
@@ -90,10 +77,18 @@
 		'#00FFFF',
 		'#FF00FF',
 		'#000000',
+		'#00FFaa',
+		'#00ccaa',
+		'#0000aa',
+		'#FFFFaa',
+		'#FddFaa',
+		'#FF00aa',
 		'#FFFFFF'
 	];
 
 	let color: string = colors[0];
+	let eraser: string = colors[13];
+	let topColor: boolean = false;
 
 	onMount(() => {
 		canvas.width = 800;
@@ -136,6 +131,7 @@
 	function drawOldStuff() {
 		shapes.forEach((shape) => {
 			ctx.lineWidth = shape.lineWidth;
+			ctx.lineCap = toolSelected.lineCap;
 			ctx.strokeStyle = shape.color;
 			if (shape.type === 'rectangle') {
 				if (shape.startX !== 0 && shape.startY !== 0) {
@@ -169,7 +165,8 @@
 		ctx.lineCap = toolSelected.lineCap;
 		ctx.lineJoin = toolSelected.lineJoin;
 		ctx.lineTo(offsetX, offsetY);
-		ctx.strokeStyle = color;
+		const c = toolSelected.name === 'eraser' ? eraser : color;
+		ctx.strokeStyle = c;
 		ctx.stroke();
 		shapes.push({
 			type: 'line',
@@ -178,7 +175,7 @@
 			endX: offsetX,
 			endY: offsetY,
 			lineWidth: toolSelected.lineWidth,
-			color: color
+			color: c
 		});
 		toolSelected.startX = offsetX;
 		toolSelected.startY = offsetY;
@@ -213,7 +210,16 @@
 			<button on:click={clear}>New</button>
 		</DropDown>
 		<DropDown name="Edit">
-			<button class="unavailable">Undo</button>
+			<button
+				on:click={() => {
+					console.log(shapes.length);
+					ctx.clearRect(0, 0, canvas.width, canvas.height);
+					shapes.pop();
+					drawOldStuff();
+				}}
+			>
+				Undo
+			</button>
 		</DropDown>
 	</div>
 	<div class="around-canvas">
@@ -245,12 +251,12 @@
 						<img class="tool-logo" src="/rectangle.png" />
 					</div>
 					<div
-						class="each-tool {toolSelected === tools.Plop ? 'selected' : ''}"
+						class="each-tool {toolSelected === tools.Eraser ? 'selected' : ''}"
 						on:click={() => {
-							toolSelected = tools.Plop;
+							toolSelected = tools.Eraser;
 						}}
 					>
-						<img class="tool-logo" src="/spectator.png" />
+						<img class="tool-logo" src="/eraser.png" />
 					</div>
 				</div>
 			</div>
@@ -261,17 +267,53 @@
 			on:mousemove={toolSelected.drawOption}
 			on:mouseup={stopDrawing}
 			on:mouseleave={stopDrawing}
-			style="{`cursor: url(${toolSelected.png}) 0 15, auto;`}"
+			style={`cursor: url(${toolSelected.png}) 0 15, auto;`}
 		/>
 	</div>
-	<div class="color-pick">
-		{#each colors as c}
-			<div
-				class="color {color === c ? 'selected' : ''}"
-				style:background={c}
-				on:click={() => (color = c)}
-			/>
-		{/each}
+	<div class="color-box">
+		<div class="current-color-box">
+			{#each colors as c}
+				{#if color === c}
+					<div class="border-color">
+						<div
+							class="current-color"
+							style:background={c}
+							on:click={() => {
+								const tmp = color;
+								color = eraser;
+								eraser = tmp;
+							}}
+						/>
+					</div>
+				{/if}
+			{/each}
+			{#each colors as c}
+				{#if eraser === c}
+					<div class="border-color">
+						<div
+							class="current-color behind"
+							style:background={c}
+							on:click={() => {
+								const tmp = color;
+								color = eraser;
+								eraser = tmp;
+							}}
+						/>
+					</div>
+				{/if}
+			{/each}
+		</div>
+		<div class="color-pick">
+			{#each colors as c}
+				<div class="border-color">
+					<div
+						class="color {color === c ? 'selected' : ''}"
+						style:background={c}
+						on:click={() => (color = c)}
+					/>
+				</div>
+			{/each}
+		</div>
 	</div>
 </div>
 
@@ -315,7 +357,7 @@
 							display: block;
 							max-width: 1.15rem;
 							height: 1rem;
-							margin: 0 auto;
+							margin: auto auto;
 						}
 					}
 					.selected {
@@ -333,19 +375,48 @@
 		}
 	}
 
-	div.color-pick {
+	.color-box {
 		display: flex;
-		margin: 0.2rem;
-		@include tab-border($light-grey, $dark-grey);
+		background-color: $light-grey;
 		height: fit-content;
 		width: fit-content;
-		div.color {
-			width: 1.2rem;
-			height: 1.2rem;
-			margin: 0.15rem;
-			@include tab-border(transparent, black);
+		max-width: 15rem;
+		margin: 0.2rem;
 
-			&.selected {
+		.current-color-box {
+			display: flex;
+			margin: 0.2rem;
+			@include tab-border($light-grey, $dark-grey);
+			height: max-content;
+			width: fit-content;
+
+			.border-color {
+				margin: 0.05rem;
+				@include tab-border($grey, $dark-grey);
+				div.current-color {
+					width: 1.2rem;
+					height: 1.2rem;
+					margin: 0.15rem;
+					@include tab-border(transparent, black);
+				}
+			}
+		}
+
+		.color-pick {
+			display: flex;
+			margin: 0.2rem;
+			height: fit-content;
+			width: fit-content;
+			flex-wrap: wrap;
+
+			.border-color {
+				margin: 0.05rem;
+				@include tab-border($grey, $dark-grey);
+				.color {
+					width: 1.2rem;
+					height: 1.2rem;
+					@include tab-border(transparent, black);
+				}
 			}
 		}
 	}

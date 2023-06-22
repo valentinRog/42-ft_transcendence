@@ -3,6 +3,7 @@
 	import { Context } from '$lib/components/Context.svelte';
 
 	const fetchWithToken = Context.fetchWithToken();
+	const fetchBlockUser = Context.fetchBlockUser();
 	const openEditProfile = Context.openEditProfile();
 
 	export let username: string | null | undefined = null;
@@ -40,7 +41,6 @@
 				imgUrl = '/avatar.png';
 			});
 	}
-
 </script>
 
 <div id="box">
@@ -83,6 +83,8 @@
 					{/each}
 				</ul>
 			</li>
+		{:else}
+			<button type="button" on:click={() => fetchBlockUser(currentUser.id)}>Block</button>
 		{/if}
 	</ul>
 </div>

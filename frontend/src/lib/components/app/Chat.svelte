@@ -9,6 +9,8 @@
 	const chatId = Context.chatId();
 	const friendInfoId = Context.friendInfoId();
 	const contacts = Context.contacts();
+	const selected = Context.selected();
+	const addInstance = Context.addInstance();
 	const fetchCreateChat = Context.fetchCreateChat();
 
 	let chatIdLocal: number | null = $chatId;
@@ -19,6 +21,7 @@
 	let isFriend = true;
 	let chatWindow: HTMLDivElement;
 	let autoScroll = true;
+	let isCreatingChat = false;
 
 	$: {
 		friendUsername = $contacts.find((contact) => contact.id === friendId)?.username;
@@ -41,6 +44,11 @@
 		if (autoScroll) chatWindow.scrollTop = chatWindow.scrollHeight;
 	});
 
+	function openProfile(username: string) {
+		addInstance('Profile', { }, { username: username });
+		$selected = null;
+	}
+
 	function handleScroll() {
 		if (chatWindow.scrollTop + chatWindow.clientHeight + 1 >= chatWindow.scrollHeight) {
 			autoScroll = true;
@@ -51,7 +59,10 @@
 
 	async function sendMessage() {
 		if (messageContent.trim() === '') return;
+		if (isCreatingChat) return;
 		if (!chatIdLocal) {
+			isCreatingChat = true;
+
 			const memberUsernames = [$user?.username, friendUsername];
 			const chat = await fetchCreateChat(memberUsernames, false, 'private');
 			const chatExists = $chats.some((existingChat) => existingChat.id === chat.id);
@@ -61,6 +72,7 @@
 				chatIdLocal = chat.id;
 				$socket.emit('otherAddChat', { chat: chat, userId: friendId });
 			}
+			isCreatingChat = false;
 		}
 		$socket.emit('sendMessage', {
 			chatId: chatIdLocal,
@@ -68,18 +80,6 @@
 			friendUsername: friendUsername
 		});
 		messageContent = '';
-	}
-
-	function findUser(userId: number, chatId: number | null) {
-		if (currentChat) {
-			let chatUser = currentChat.chatUsers.find((cu: any) => cu.userId === userId);
-			return chatUser ? chatUser.user.username : 'Unknown';
-		}
-		return 'Unknown';
-	}
-
-	async function leaveGroup() {
-		$socket.emit('leaveGroup', { chatId: chatIdLocal });
 	}
 
 	const formatter = new Intl.DateTimeFormat('en', {
@@ -99,10 +99,10 @@
 		<ul>
 			{#if currentChat}
 				{#each currentChat?.messages || [] as message, i (i)}
-					<li class={findUser(message.userId, chatIdLocal) === $user?.username ? 'self' : 'other'}>
+					<li class={message.user?.username === $user?.username ? 'self' : 'other'}>
 						<div class="message-header">
 							{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
-								<strong>{findUser(message.userId, chatIdLocal)}</strong>
+								<strong on:click={() => openProfile(message.user?.username)}>{message.user?.username}</strong>
 							{/if}
 						</div>
 						<div class="message-content">{message.content}</div>
@@ -116,7 +116,7 @@
 		{#if isFriend}
 			<form on:submit|preventDefault={sendMessage} class="send-message-form">
 				<input type="text" bind:value={messageContent} class="message-input" />
-				<button type="submit" class="btn send-btn">Send</button>
+				<button type="submit" class="btn send-btn" disabled={isCreatingChat}>Send</button>
 			</form>
 		{:else}
 			<p>You are no longer friends with this user.</p>
