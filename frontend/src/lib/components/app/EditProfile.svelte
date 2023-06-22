@@ -34,9 +34,8 @@
 	async function handleSubmit(event: Event) {
 		const form = event.target as HTMLFormElement;
 		const data: Record<string, any> = {};
-		const checkboxElement = form.elements.namedItem('twoFactorEnabled') as HTMLInputElement;
-		const checkboxValue = checkboxElement.checked;
-		data['twoFactorEnabled'] = checkboxValue;
+		if (!checkboxValue)
+			data['twoFactorEnabled'] = checkboxValue;
 		for (const element of form.elements) {
 			if (element instanceof HTMLInputElement && element.name && element.type !== 'checkbox') {
 				data[element.name] = element.value;
@@ -56,12 +55,12 @@
 		}
 		else {
 			changes = false;
-			if (!$user?.twoFactorEnabled && checkboxValue) enable2fa();
+			if (!$user?.twoFactorEnabled && checkboxValue) generate2fa();
 			await fetchMe();
 		}
 	}
 
-	async function enable2fa() {
+	async function generate2fa() {
 		const res = await fetchWithToken('2fa/generate', {
 			method: 'POST'
 		});

@@ -51,6 +51,9 @@ export class TwoFactorController {
   @Post('enable')
   @UseGuards(JwtGuard)
   async enableTwoFactor(@GetUser() user: User) {
-
+    //await this.prisma.user.update({
+    //  where: { login: user.login },
+    //  data: { twoFactorEnabled: true, twoFactorAuthSecret: secret.base32 },
+    //});
   }
 }
