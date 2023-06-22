@@ -151,35 +151,4 @@ export class AuthService {
       return null;
     }
   }
-
-  async enableTwoFactorAuth(userId: number, userLogin: string) {
-    const secret = speakeasy.generateSecret();
-
-    const otpauthUrl = speakeasy.otpauthURL({
-      secret: secret.base32,
-      label: 'transcendence',
-      encoding: 'base32',
-    });
-    const qrCodeUrl = `https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl=${encodeURIComponent(
-      otpauthUrl,
-    )}`;
-
-    await this.prisma.user.update({
-      where: { login: userLogin },
-      data: { twoFactorEnabled: true, twoFactorAuthSecret: secret.base32 },
-    });
-    const token = await this.jwt.signAsync(
-      {
-        sub: userId,
-        login: userLogin,
-        twoFactor: true,
-        isTwoFactorAuthenticated: true,
-      },
-      {
-        expiresIn: '1d',
-        secret: this.config.get('JWT_SECRET'),
-      },
-    );
-    return { qrcode: qrCodeUrl, token };
-  }
 }

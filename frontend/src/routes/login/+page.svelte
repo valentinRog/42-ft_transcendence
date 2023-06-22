@@ -120,6 +120,12 @@
 <style lang="scss">
 	div#formular {
 		@include form-95;
+
+		input {
+			width: 100%;
+			margin-left: 10px;
+		}
+
 		@include tab-border($dark-grey, $light-grey);
 		padding: 0.2rem;
 		background-color: $grey;

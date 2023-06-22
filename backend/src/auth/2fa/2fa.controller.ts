@@ -15,9 +15,9 @@ export class TwoFactorController {
     private jwt: JwtService,
   ) {}
 
-  @Post('enable')
+  @Post('generate')
   @UseGuards(JwtGuard)
-  async enableTwoFactorAuth(@GetUser() user: User) {
+  async generateTwoFactorUrl() {
     const secret = speakeasy.generateSecret();
 
     const otpauthUrl = speakeasy.otpauthURL({
@@ -29,22 +29,28 @@ export class TwoFactorController {
       otpauthUrl,
     )}`;
 
-    await this.prisma.user.update({
-      where: { login: user.login },
-      data: { twoFactorEnabled: true, twoFactorAuthSecret: secret.base32 },
-    });
-    const token = await this.jwt.signAsync(
-      {
-        sub: user.id,
-        login: user.login,
-        twoFactor: true,
-        isTwoFactorAuthenticated: true,
-      },
-      {
-        expiresIn: '1d',
-        secret: this.config.get('JWT_SECRET'),
-      },
-    );
-    return { qrcode: qrCodeUrl, token };
+    //await this.prisma.user.update({
+    //  where: { login: user.login },
+    //  data: { twoFactorEnabled: true, twoFactorAuthSecret: secret.base32 },
+    //});
+    //const token = await this.jwt.signAsync(
+    //  {
+    //    sub: user.id,
+    //    login: user.login,
+    //    twoFactor: true,
+    //    isTwoFactorAuthenticated: true,
+    //  },
+    //  {
+    //    expiresIn: '1d',
+    //    secret: this.config.get('JWT_SECRET'),
+    //  },
+    //);
+    return { qrcode: qrCodeUrl };
+  }
+
+  @Post('enable')
+  @UseGuards(JwtGuard)
+  async enableTwoFactor(@GetUser() user: User) {
+
   }
 }

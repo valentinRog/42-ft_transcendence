@@ -26,11 +26,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       include: { stat: true },
     });
     if (user) {
-      if (!user.twoFactorEnabled) {
-        delete user.hash;
-        return user;
-      }
-      if (payload.isTwoFactorAuthenticated) {
+      if (!user.twoFactorEnabled || payload.isTwoFactorAuthenticated) {
         delete user.hash;
         return user;
       }

@@ -7,6 +7,7 @@
 	import { page } from '$app/stores';
 	import { user } from '$lib/stores';
 	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
+	import TwoFactorDialog from '$lib/components/TwoFactorDialog.svelte';
 
 	const fetchWithToken = Context.fetchWithToken();
 	const addInstance = Context.addInstance();
@@ -21,6 +22,7 @@
 	});
 
 	let showModal = false;
+	let showDialog = false;
 	let errorMessage: string | null = null;
 
 	let changes = false;
@@ -40,7 +42,6 @@
 				data[element.name] = element.value;
 			}
 		}
-
 		const res = await fetchWithToken('users/edit', {
 			method: 'PATCH',
 			headers: {
@@ -61,13 +62,14 @@
 	}
 
 	async function enable2fa() {
-		const res = await fetchWithToken('2fa/enable', {
+		const res = await fetchWithToken('2fa/generate', {
 			method: 'POST'
 		});
 		const data = await res.json();
 		addInstance('Internet', {}, { url: data.qrcode });
-		$token = data.token;
-		sessionStorage.setItem('token', data.token);
+		showDialog = true;
+		//$token = data.token;
+		//sessionStorage.setItem('token', data.token);
 	}
 
 	function handleChange() {
@@ -130,6 +132,7 @@
 </script>
 
 <div class="window-body">
+	<TwoFactorDialog {showDialog} on:close={() => (showDialog = false)} />
 	<ErrorDialog {showModal} {errorMessage} on:close={() => (showModal = false)} />
 	<div id="formular">
 		<div class="pic-username-login">
@@ -205,6 +208,10 @@
 				color: black;
 				width: 7rem;
 			}
+		}
+
+		input {
+			width: 100%;
 		}
 
 		.form-group {

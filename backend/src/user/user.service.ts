@@ -29,7 +29,6 @@ export class UserService {
   }
 
   async editUser(userId: number, dto: EditUserDto) {
-	console.log(dto);
     try {
       const user = await this.prisma.user.update({
         where: {
