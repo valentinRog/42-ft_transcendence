@@ -29,6 +29,7 @@ model User {
   chats            ChatUser[]
   bans             Ban[]
   mutes            Mute[]
+  blocks           Block[]  @relation("blockerToBlocks")
 }
 
 model Match {
@@ -139,3 +140,14 @@ model Mute {
 
   @@id([chatId, userId])
 }
+
+model Block {
+  id         Int       @id @default(autoincrement())
+  createdAt  DateTime  @default(now())
+  blocker    User      @relation("blockerToBlocks", fields: [blockerId], references: [id])
+  blockerId  Int
+  blockedId  Int
+}
+
+
+

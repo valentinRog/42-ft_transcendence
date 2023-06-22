@@ -18,7 +18,11 @@ export class ChatService {
         },
       },
       include: {
-        messages: true,
+        messages: {
+          include: {
+            user: true,
+          },
+        },
         chatUsers: {
           include: {
             user: true,
@@ -79,7 +83,11 @@ export class ChatService {
               role: true,
             },
           },
-          messages: true,
+          messages: {
+            include: {
+              user: true,
+            },
+          },
           bans: true,
           mutes: true,
         },
