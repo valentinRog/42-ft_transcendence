@@ -4,6 +4,7 @@
 
 	const fetchWithToken = Context.fetchWithToken();
 	const fetchBlockUser = Context.fetchBlockUser();
+	const fetchUnblockUser = Context.fetchUnblockUser();
 	const openEditProfile = Context.openEditProfile();
 
 	export let username: string | null | undefined = null;
@@ -85,6 +86,7 @@
 			</li>
 		{:else}
 			<button type="button" on:click={() => fetchBlockUser(currentUser.id)}>Block</button>
+			<button type="button" on:click={() => fetchUnblockUser(currentUser.id)}>UnBlock</button>
 		{/if}
 	</ul>
 </div>

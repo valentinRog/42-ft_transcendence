@@ -190,11 +190,38 @@ export class UserService {
   }
 
   async blockUser(userId: number, blockedId: number) {
-  //   return this.prisma.block.create({
-  //     data: {
-  //       blockerId: userId,
-  //       blockedId: blockedId,
-  //     },
-  //   });
+    const existingBlock = await this.prisma.block.findFirst({
+      where: {
+        blockerId: userId,
+        blockedId: blockedId,
+      },
+    });
+  
+    if (existingBlock)
+      return false;
+  
+    return this.prisma.block.create({
+      data: {
+        blockerId: userId,
+        blockedId: blockedId,
+      },
+    });
   }
+
+  async unblockUser(userId: number, blockedId: number) {
+    const existingBlock = await this.prisma.block.findFirst({
+      where: {
+        blockerId: userId,
+        blockedId: blockedId,
+      },
+    });
+
+    if (!existingBlock)
+      return false;
+  
+    return this.prisma.block.delete({
+       where: { id: existingBlock.id,}
+    });
+  }
+  
 }

@@ -138,6 +138,7 @@
 		export const fetchUserByUsername = (): ((username : string) => Promise<any>) => 
 			getContext('fetchUserByUsername');
 		export const fetchBlockUser = (): ((userId: number) => Promise<any>) => getContext('fetchBlockUser');
+		export const fetchUnblockUser = (): ((userId: number) => Promise<any>) => getContext('fetchUnblockUser');
 		export const fetchFriends = (): (() => Promise<any>) => getContext('fetchFriends');
 		export const fetchFriendRequest = (): (() => Promise<any>) => getContext('fetchFriendRequest');
 		export const fetchGameRequest = (): (() => Promise<any>) => getContext('fetchGameRequest');
@@ -383,11 +384,25 @@
 	}
 
 	async function fetchBlockUser(userId: number) {
-		const res = await fetch('/api/block', {
+		const res = await fetchWithToken('users/block', {
         	method: 'POST',
         	headers: { 'Content-Type': 'application/json' },
         	body: JSON.stringify({ userId: $user?.id, blockedId: userId }),
       	});
+		if (!res)
+			return ;
+		const data = await res.json();
+		return data;
+	}
+
+	async function fetchUnblockUser(userId: number) {
+		const res = await fetchWithToken('users/unblock', {
+        	method: 'POST',
+        	headers: { 'Content-Type': 'application/json' },
+        	body: JSON.stringify({ userId: $user?.id, blockedId: userId }),
+      	});
+		if (!res)
+			return ;
 		const data = await res.json();
 		return data;
 	}
@@ -492,6 +507,7 @@
 	setContext('fetchMe', fetchMe);
 	setContext('fetchUserByUsername', fetchUserByUsername);
 	setContext('fetchBlockUser', fetchBlockUser);
+	setContext('fetchUnblockUser', fetchUnblockUser);
 	setContext('fetchFriends', fetchFriends);
 	setContext('fetchFriendRequest', fetchFriendRequest);
 	setContext('fetchChatById', fetchChatById);
