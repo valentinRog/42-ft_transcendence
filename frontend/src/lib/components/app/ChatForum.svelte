@@ -95,11 +95,6 @@
 		}
 	};
 
-	const performAction = async() => {
-		if (searchQuery.trim() === "")
-			return ;
-
-		const user = await fetchUserByUsername(searchQuery)
 	const performAction = async () => {
 		if (searchQuery.trim() === '') return;
 
@@ -227,12 +222,12 @@
 				<ul>
 					{#if currentChat}
 						{#each currentChat?.messages || [] as message, i (i)}
-							<li
-								class={message.user?.username === $user?.username ? 'self' : 'other'}
-							>
+							<li class={message.user?.username === $user?.username ? 'self' : 'other'}>
 								<div class="message-header">
 									{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
-										<strong on:click={() => openProfile(message.user?.username)}>{message.user?.username}</strong>
+										<strong on:click={() => openProfile(message.user?.username)}
+											>{message.user?.username}</strong
+										>
 									{/if}
 								</div>
 								<div class="message-content">{message.content}</div>
