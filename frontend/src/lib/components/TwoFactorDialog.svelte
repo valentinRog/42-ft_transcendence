@@ -4,68 +4,31 @@
 
 	$: if (dialog && showDialog) dialog.showModal();
 
-	let numbers: number[] = [];
+	let numbers: string[] = [];
 	let activeInput: HTMLInputElement;
 
 	function addNumber(event: any) {
 		activeInput = event.target;
 		let inputValue = activeInput.value;
 		const code = parseInt(inputValue);
-		console.log(code);
 		if (code >= 0 && code <= 9) {
-			numbers.push(code);
+			numbers.push(inputValue);
 			activeInput = activeInput?.nextElementSibling as HTMLInputElement;;
 			if (activeInput) activeInput.focus();
 		}
 		else
-		{
-			inputValue = "";
-			activeInput.value = inputValue;
-		}
+			activeInput.value = "";
 		numbers = numbers;
-
-		//if ( event.key === "Backspace" ) {
-		//	activeInput?.previousElementSibling as HTMLInputElement;
-		//	if (activeInput) activeInput.focus();
-		//}
 	}
 
-	function addListener(event: any) {
-		const input = event.target.value;
-		console.log(input);
-		const code = parseInt(input);
-		if (code >= 0 && code <= 9) {
-			const n = input.nextElementSibling;
-		if (n) n.focus();
-		} else {
-			input.value = "";
-		}
-
-		const key = event.key;
-		if (key === "Backspace" || key === "Delete") {
-			console.log("backspace");
-			const prev = input.previousElementSibling;
-			if (prev) prev.focus();
+	function keydown(event: any) {
+		if ( event.key === "Backspace" ) {
+			numbers.pop();
+			activeInput = activeInput?.previousElementSibling as HTMLInputElement;
+			if (activeInput) activeInput.focus();
+			return ;
 		}
 	}
-
-	//function onKeyDown(e : KeyboardEvent) {
-	//	console.log(e.key);
-	//	if ( e.key === "Backspace" ) {
-	//		activeInput?.previousElementSibling as HTMLInputElement;
-	//		if (activeInput) activeInput.focus();
-	//	}
-	//	e.stopPropagation();
-    //  	return;
-	//}
-
-	//(async () => {
-	//	window.addEventListener("keydown", handleKeyDown);
-
-	//	return () => {
-	//	window.removeEventListener("keydown", handleKeyDown);
-	//	};
-	//});
 
 </script>
 
@@ -80,12 +43,12 @@
 	<div class="form-group">
 			<label for="twoFactor">Provide your two factor code : </label>
 			<div id='inputs'>
-				  <input id='input1' type='text' maxLength="1" on:input={addNumber}/>
-				  <input id='input2' type='text' maxLength="1" on:input={addNumber}/>
-				  <input id='input3' type='text' maxLength="1" on:input={addNumber}/>
-				  <input id='input4' type='text' maxLength="1" on:input={addNumber}/>
-				  <input id='input5' type='text' maxLength="1" on:input={addNumber}/>
-				  <input id='input6' type='text' maxLength="1" on:input={addNumber}/>
+				  <input id='input1' type='text' maxLength="1" on:input={addNumber} on:keydown={keydown}/>
+				  <input id='input2' type='text' maxLength="1" on:input={addNumber} on:keydown={keydown}/>
+				  <input id='input3' type='text' maxLength="1" on:input={addNumber} on:keydown={keydown}/>
+				  <input id='input4' type='text' maxLength="1" on:input={addNumber} on:keydown={keydown}/>
+				  <input id='input5' type='text' maxLength="1" on:input={addNumber} on:keydown={keydown}/>
+				  <input id='input6' type='text' maxLength="1" on:input={addNumber} on:keydown={keydown}/>
 			</div>
 
 	</div>
@@ -94,8 +57,6 @@
 		<button on:click={() => dialog.close()}>Cancel</button>
 	</div>
 </dialog>
-
-<!--<svelte:window on:keydown|preventDefault={onKeyDown} />-->
 
 <style lang="scss">
 	.form-group {
