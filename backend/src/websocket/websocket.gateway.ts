@@ -50,14 +50,6 @@ export abstract class SocketGateway
     this.webSocketService.addSocket(user.id, client);
     this.webSocketService.setStatus(user.id, 'online');
     this.webSocketService.setStatus(user.id, 'online');
-    const userToNotify = await this.notificationService.removeNotification(
-      user.id,
-      'game',
-    );
-    for (const id of userToNotify) {
-      const user = await this.userService.getUserById(id);
-      this.webSocketService.getSocket(user.id).emit('game', user.username);
-    }
   }
 
   handleDisconnect(client: Socket) {
@@ -182,8 +174,7 @@ export abstract class SocketGateway
     @MessageBody() data: { chatId: number },
     @ConnectedSocket() client: Socket,
   ) {
-    const user = this.webSocketService.getClientId(client);
-    const userId = (await this.userService.getUserById(user)).id;
+    const userId = this.webSocketService.getClientId(client);
     const isSuccessful = await this.chatService.leaveGroup(data.chatId, userId);
 
     if (isSuccessful) {
@@ -217,8 +208,7 @@ export abstract class SocketGateway
   ) {
     const { chatId, userId, duration } = payload;
     const expiresAt = await this.chatService.banUser(chatId, userId, duration);
-    const user = await this.userService.getUserById(userId);
-    const socket = await this.webSocketService.getSocket(user.id);
+    const socket = await this.webSocketService.getSocket(userId);
     if (socket) socket.emit('userBan', { chatId, expiresAt });
 
     return;
@@ -230,8 +220,7 @@ export abstract class SocketGateway
     payload: { chatId: number; userId: number },
   ) {
     const { chatId, userId } = payload;
-    const user = await this.userService.getUserById(userId);
-    const socket = await this.webSocketService.getSocket(user.id);
+    const socket = await this.webSocketService.getSocket(userId);
 
     await this.chatService.unBanUser(chatId, userId);
     if (socket) socket.emit('userUnBan', { chatId });
@@ -247,8 +236,7 @@ export abstract class SocketGateway
   ) {
     const { chatId, userId, duration } = payload;
     const expiresAt = await this.chatService.muteUser(chatId, userId, duration);
-    const user = await this.userService.getUserById(userId);
-    const socket = await this.webSocketService.getSocket(user.id);
+    const socket = await this.webSocketService.getSocket(userId);
     if (socket) socket.emit('userMute', { chatId, expiresAt });
 
     return;
@@ -260,8 +248,7 @@ export abstract class SocketGateway
     payload: { chatId: number; userId: number },
   ) {
     const { chatId, userId } = payload;
-    const user = await this.userService.getUserById(userId);
-    const socket = await this.webSocketService.getSocket(user.id);
+    const socket = await this.webSocketService.getSocket(userId);
 
     await this.chatService.unMuteUser(chatId, userId);
     socket.emit('userUnMute', { chatId });

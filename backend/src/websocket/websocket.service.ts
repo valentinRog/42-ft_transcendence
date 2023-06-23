@@ -22,8 +22,8 @@ export class WebSocketService {
     }
   }
 
-  getSocket(clientId: number): Socket | undefined {
-    return this.websockets.get(clientId);
+  getSocket(userId: number): Socket | undefined {
+    return this.websockets.get(userId);
   }
 
   getClientId(socket: Socket): number | undefined {
@@ -41,25 +41,25 @@ export class WebSocketService {
     return this.websockets.size;
   }
 
-  createRoom(player1: number, player2: number) {
+  createRoom(player1Id: number, player2Id: number) {
     const room = uuidv4();
     console.log('createRoom', room);
 
-    const socketPlayer1 = this.getSocket(player1);
-    const socketPlayer2 = this.getSocket(player2);
+    const socketPlayer1 = this.getSocket(player1Id);
+    const socketPlayer2 = this.getSocket(player2Id);
     if (!socketPlayer1 || !socketPlayer2) {
       throw new NotFoundException('user socket not connected');
     }
     socketPlayer1.join(room);
     socketPlayer2.join(room);
-    socketPlayer1.emit('enter-room', { room, index: 0, opponentId: player2 });
-    socketPlayer2.emit('enter-room', { room, index: 1, opponentId: player1 });
+    socketPlayer1.emit('enter-room', { room, index: 0, opponentId: player2Id });
+    socketPlayer2.emit('enter-room', { room, index: 1, opponentId: player1Id });
 
-    return { player1: player1, player2: player2, room };
+    return { player1: player1Id, player2: player2Id, room };
   }
 
-  joinRoom(player: number, room: string) {
-    const socketPlayer = this.getSocket(player);
+  joinRoom(playerId: number, room: string) {
+    const socketPlayer = this.getSocket(playerId);
 
     if (!socketPlayer) {
       throw new NotFoundException('user socket not connected');
@@ -68,12 +68,11 @@ export class WebSocketService {
     socketPlayer.join(room);
     socketPlayer.emit('enter-room', room);
 
-    return { spectator: player, room: room };
+    return { spectator: playerId, room: room };
   }
 
   sendToUser(userToNotify: number, message: string, event: string) {
-    //const socket = this.getSocket(userToNotify);
-    const socket = null;
+    const socket = this.getSocket(userToNotify);
     socket?.emit(event, { message: message });
   }
 

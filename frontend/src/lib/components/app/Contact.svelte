@@ -120,8 +120,8 @@
 	const selected = Context.selected();
 	let visible: number = 0;
 
-	function spectateGame(friend: string) {
-		$socket.emit('spectate', { friend: friend });
+	function spectateGame(friendId: number) {
+		$socket.emit('spectate', { friendId: friendId });
 		$openPongWindow = true;
 	}
 </script>
@@ -197,7 +197,7 @@
 					{:else if friend.username === 'vrogiste' && friend.status === 'in-game'}
 						<img src="/in-game-val.png" alt="in-game" />
 					{:else if friend.status === 'in-game'}
-						<a href="#" on:click={() => spectateGame(friend.username)}>
+						<a href="#" on:click={() => spectateGame(friend.id)}>
 							<img src="/in-game.png" alt="in-game" />
 						</a>
 					{:else if friend.status === 'spectator'}

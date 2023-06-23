@@ -54,18 +54,22 @@ export class NotificationService {
   }
 
   async removeNotification(friendId: number, message: string) {
-    const userToNotify = await this.prisma.notification.findMany({
-      where: {
-        senderId: friendId,
-        type: message,
-      },
-    });
-    await this.prisma.notification.deleteMany({
-      where: {
-        senderId: friendId,
-        type: message,
-      },
-    });
-    return userToNotify.map((item) => item.userId);
+    try {
+      const userToNotify = await this.prisma.notification.findMany({
+        where: {
+          senderId: friendId,
+          type: message,
+        },
+      });
+      await this.prisma.notification.deleteMany({
+        where: {
+          senderId: friendId,
+          type: message,
+        },
+      });
+      return userToNotify.map((item) => item.userId);
+    } catch (error) {
+      console.log('No notifications found');
+    }
   }
 }
