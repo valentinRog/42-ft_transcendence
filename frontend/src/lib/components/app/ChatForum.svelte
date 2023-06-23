@@ -21,6 +21,7 @@
 
 	let searchQuery = '';
 	let selectedAction: string = '';
+	let RoleName: string[] = ["Admin", "Moderator", "User"];
 
 	//BAN AND MUTE
 	let isUserBanned = false;
@@ -210,13 +211,19 @@
 	});
 
 	$socket.on('updateRole', (data: any) => {
-	if (data.chatId === chatIdLocal) {
-		if ($user?.id === data.userId)
-			roleId = data.newRoleId;
-	}
-});
+		if (data.chatId === chatIdLocal) {
+			if ($user?.id === data.userId)
+				roleId = data.newRoleId;
+			currentChat.chatUsers.forEach((chatUser: any) => {
+				if (chatUser.userId === data.userId) {
+					chatUser.roleId = data.newRoleId;
+				}
+			});
+			currentChat.chatUsers = [...currentChat.chatUsers];
+			console.log(currentChat.chatUsers);
+		}
+	});
 
-$: console.log(roleId);
 
 </script>
 
@@ -321,9 +328,9 @@ $: console.log(roleId);
 			{#if currentChat}
 				<h5>Users in this chat:</h5>
 				<ul>
-					{#each currentChat.chatUsers as chatUser (chatUser.userId)}
+					{#each currentChat.chatUsers as chatUser, index (index)}
 						<li on:click={() => selectUser(chatUser)}>
-							({chatUser.role?.name}) {chatUser.user?.username}
+							({RoleName[chatUser.roleId - 1]}) {chatUser.user?.username}
 							{#if selectedUser === chatUser}
 								<button on:click={() => openProfile(chatUser.user?.username)}>Check Profile</button>
 								{#if roleId <= 1 && roleId < chatUser.roleId}
