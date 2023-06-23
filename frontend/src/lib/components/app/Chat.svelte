@@ -77,7 +77,7 @@
 		$socket.emit('sendMessage', {
 			chatId: chatIdLocal,
 			content: messageContent,
-			friendUsername: friendUsername
+			friendId: friendId
 		});
 		messageContent = '';
 	}

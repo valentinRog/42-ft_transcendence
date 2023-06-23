@@ -20,10 +20,6 @@ export class UserService {
     private socketService: WebSocketService,
   ) {}
 
-  async getUser(username: string) {
-    return this.prisma.user.findUnique({ where: { username: username } });
-  }
-
   async getUserById(userId: number) {
     return this.prisma.user.findUnique({ where: { id: userId } });
   }
@@ -181,8 +177,8 @@ export class UserService {
     return users;
   }
 
-  getStatus(username: string) {
-    return this.socketService.getStatus(username);
+  getStatus(userId: number) {
+    return this.socketService.getStatus(userId);
   }
 
   async blockUser(userId: number, blockedId: number) {

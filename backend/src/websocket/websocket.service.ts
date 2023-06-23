@@ -5,35 +5,35 @@ import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class WebSocketService {
-  private websockets: Map<string, Socket> = new Map();
-  private reverseMap: Map<string, string> = new Map();
-  private userStatus: Map<string, string> = new Map();
+  private websockets: Map<number, Socket> = new Map();
+  private reverseMap: Map<string, number> = new Map();
+  private userStatus: Map<number, string> = new Map();
 
-  addSocket(clientName: string, socket: Socket): void {
-    this.websockets.set(clientName, socket);
-    this.reverseMap.set(socket.id, clientName);
+  addSocket(clientId: number, socket: Socket): void {
+    this.websockets.set(clientId, socket);
+    this.reverseMap.set(socket.id, clientId);
   }
 
-  removeSocket(clientName: string): void {
-    const socket = this.websockets.get(clientName);
+  removeSocket(clientId: number): void {
+    const socket = this.websockets.get(clientId);
     if (socket) {
-      this.websockets.delete(clientName);
+      this.websockets.delete(clientId);
       this.reverseMap.delete(socket.id);
     }
   }
 
-  getSocket(clientName: string): Socket | undefined {
-    return this.websockets.get(clientName);
+  getSocket(clientId: number): Socket | undefined {
+    return this.websockets.get(clientId);
   }
 
-  getClientName(socket: Socket): string | undefined {
+  getClientId(socket: Socket): number | undefined {
     if (socket) return this.reverseMap.get(socket?.id);
     else {
       console.log('socket is undefined');
     }
   }
 
-  getAllSockets(): Map<string, Socket> {
+  getAllSockets(): Map<number, Socket> {
     return this.websockets;
   }
 
@@ -41,7 +41,7 @@ export class WebSocketService {
     return this.websockets.size;
   }
 
-  createRoom(player1: string, player2: string) {
+  createRoom(player1: number, player2: number) {
     const room = uuidv4();
     console.log('createRoom', room);
 
@@ -59,7 +59,7 @@ export class WebSocketService {
     return { player1: player1, player2: player2, room };
   }
 
-  joinRoom(player: string, room: string) {
+  joinRoom(player: number, room: string) {
     const socketPlayer = this.getSocket(player);
 
     if (!socketPlayer) {
@@ -78,19 +78,19 @@ export class WebSocketService {
     socket?.emit(event, { message: message });
   }
 
-  setStatus(username: string, status: string) {
+  setStatus(userId: number, status: string) {
     if (status === 'offline') {
-      this.userStatus.delete(username);
+      this.userStatus.delete(userId);
     } else {
-      this.userStatus.set(username, status);
+      this.userStatus.set(userId, status);
     }
   }
 
-  getStatus(username: string): string {
-    return this.userStatus.get(username) || 'offline';
+  getStatus(userId: number): string {
+    return this.userStatus.get(userId) || 'offline';
   }
 
-  getAllStatus(): Map<string, string> {
+  getAllStatus(): Map<number, string> {
     return this.userStatus;
   }
 }
