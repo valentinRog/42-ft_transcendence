@@ -48,7 +48,6 @@ export class WebSocketService {
     const socketPlayer1 = this.getSocket(player1);
     const socketPlayer2 = this.getSocket(player2);
     if (!socketPlayer1 || !socketPlayer2) {
-      console.log('user socket not connected');
       throw new NotFoundException('user socket not connected');
     }
     socketPlayer1.join(room);

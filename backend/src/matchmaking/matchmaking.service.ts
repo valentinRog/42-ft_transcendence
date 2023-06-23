@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PlayerDto } from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { WebSocketService } from 'src/websocket/websocket.service';
@@ -57,7 +57,7 @@ export class MatchmakingService {
     this.socketService.setStatus(player.playerId, 'queue');
 
     if (this.queue.isPlayerInQueue(player)) {
-      throw new ForbiddenException('Player already in queue');
+      console.log('Player already in queue');
     }
     this.queue.enqueue(player);
     console.log(this.queue);
@@ -87,7 +87,7 @@ export class MatchmakingService {
       where: { id: userId },
     });
     if (this.socketService.getStatus(user.id) !== 'online') {
-      throw new ForbiddenException('User is not ready');
+      console.log('User is not ready');
     }
     this.socketService.setStatus(user.id, 'spectate');
 
@@ -99,15 +99,16 @@ export class MatchmakingService {
       where: { id: userId },
     });
     if (this.socketService.getStatus(user.id) !== 'online') {
-      throw new ForbiddenException('User is not ready');
+      console.log('User is not ready');
     }
     const friend = await this.prisma.user.findUnique({
       where: { id: opponentId },
     });
     if (this.socketService.getStatus(friend.id) !== 'online') {
-      throw new ForbiddenException('Friend is not ready');
+      console.log('Friend is not ready');
     }
 
+    console.log('createMatch', userId, opponentId);
     return this.socketService.createRoom(userId, opponentId);
   }
 }

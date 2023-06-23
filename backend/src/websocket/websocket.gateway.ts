@@ -317,6 +317,7 @@ export abstract class SocketGateway
     @MessageBody() data: { response: boolean; friendId: number },
     @ConnectedSocket() client: Socket,
   ) {
+	console.log(data.friendId);
     const userId = this.webSocketService.getClientId(client);
     if (data.response) {
       this.webSocketService.createRoom(userId, data.friendId);

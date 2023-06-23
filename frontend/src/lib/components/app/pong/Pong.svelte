@@ -51,7 +51,7 @@
 
 	function responseGame(senderId: number, accept: boolean) {
 		$gameRequest = $gameRequest.filter((x) => x.senderId !== senderId);
-		$socket.emit('response-game', { response: accept, friend: senderId });
+		$socket.emit('response-game', { response: accept, friendId: senderId });
 	}
 </script>
 
