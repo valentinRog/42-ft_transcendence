@@ -11,7 +11,7 @@ class MatchmakingQueue {
   }
 
   public dequeue_player(player: PlayerDto): PlayerDto | undefined {
-    const index = this.queue.findIndex((p) => p.username === player.username);
+    const index = this.queue.findIndex((p) => p.playerId === player.playerId);
     if (index !== -1) {
       return this.queue.splice(index, 1)[0];
     }
@@ -31,7 +31,7 @@ class MatchmakingQueue {
   }
 
   public isPlayerInQueue(player: PlayerDto): boolean {
-    const index = this.queue.findIndex((p) => p.username === player.username);
+    const index = this.queue.findIndex((p) => p.playerId === player.playerId);
     return index !== -1;
   }
 }
@@ -49,12 +49,12 @@ export class MatchmakingService {
 
   async handlePlayerJoinedQueue(player: PlayerDto) {
     const user = await this.prisma.user.findUnique({
-      where: { username: player.username },
+      where: { id: player.playerId },
     });
-    if (this.socketService.getStatus(user.username) !== 'online') {
+    if (this.socketService.getStatus(user.id) !== 'online') {
       return 'User is not ready';
     }
-    this.socketService.setStatus(player.username, 'queue');
+    this.socketService.setStatus(player.playerId, 'queue');
 
     if (this.queue.isPlayerInQueue(player)) {
       throw new ForbiddenException('Player already in queue');
@@ -77,37 +77,37 @@ export class MatchmakingService {
 
   handleMatchFound(players: PlayerDto[]) {
     return this.socketService.createRoom(
-      players[0].username,
-      players[1].username,
+      players[0].playerId,
+      players[1].playerId,
     );
   }
 
-  async joinSpectate(userName: string, room: string) {
+  async joinSpectate(userId: number, room: string) {
     const user = await this.prisma.user.findUnique({
-      where: { username: userName },
+      where: { id: userId },
     });
-    if (this.socketService.getStatus(user.username) !== 'online') {
+    if (this.socketService.getStatus(user.id) !== 'online') {
       throw new ForbiddenException('User is not ready');
     }
-    this.socketService.setStatus(user.username, 'spectate');
+    this.socketService.setStatus(user.id, 'spectate');
 
-    return this.socketService.joinRoom(userName, room);
+    return this.socketService.joinRoom(userId, room);
   }
 
-  async createMatch(userName: string, opponent: string) {
+  async createMatch(userId: number, opponentId: number) {
     const user = await this.prisma.user.findUnique({
-      where: { username: userName },
+      where: { id: userId },
     });
-    if (this.socketService.getStatus(user.username) !== 'online') {
+    if (this.socketService.getStatus(user.id) !== 'online') {
       throw new ForbiddenException('User is not ready');
     }
     const friend = await this.prisma.user.findUnique({
-      where: { username: opponent },
+      where: { id: opponentId },
     });
-    if (this.socketService.getStatus(friend.username) !== 'online') {
+    if (this.socketService.getStatus(friend.id) !== 'online') {
       throw new ForbiddenException('Friend is not ready');
     }
 
-    return this.socketService.createRoom(userName, opponent);
+    return this.socketService.createRoom(userId, opponentId);
   }
 }

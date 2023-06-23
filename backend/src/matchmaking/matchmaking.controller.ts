@@ -11,7 +11,7 @@ export class MatchmakingController {
   @Post('queue')
   async queue(@GetUser() user) {
     const player = {
-      username: user.username,
+      playerId: user.id,
       elo: user.stat.elo,
     };
     return await this.matchmakingService.handlePlayerJoinedQueue(player);
@@ -20,7 +20,7 @@ export class MatchmakingController {
   @Post('unqueue')
   async unqueue(@GetUser() user) {
     const player = {
-      username: user.username,
+      playerId: user.id,
       elo: user.stat.elo,
     };
 
@@ -28,7 +28,7 @@ export class MatchmakingController {
   }
 
   @Post('spectate')
-  async spectate(@GetUser() user, room: string) {
-    return await this.matchmakingService.joinSpectate(user.username, room);
+  async spectate(@GetUser('id') userId: number, room: string) {
+    return await this.matchmakingService.joinSpectate(userId, room);
   }
 }

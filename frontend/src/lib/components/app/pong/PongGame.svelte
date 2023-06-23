@@ -172,7 +172,7 @@
 	export let room: string;
 	let pingTimer: number | null = null;
 	let gameTimer: number | null = null;
-	export let opponent: string;
+	export let opponentId: number;
 
 	let state: GameState = {
 		ball: {
@@ -363,7 +363,7 @@
 
 <div class="container">
 	<canvas bind:this={canvas} />
-	<p>{opponent}</p>
+	<p>{opponentId}</p>
 </div>
 
 <style lang="scss">

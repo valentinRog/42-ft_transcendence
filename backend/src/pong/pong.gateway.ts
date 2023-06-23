@@ -43,22 +43,22 @@ export class PongGateway extends SocketGateway {
     if (data.index === 0) {
       this.rooms.set(client.id, data.room);
       this.games.get(data.room).setPlayer1(client);
-      const p1 = this.webSocketService.getClientName(client);
+      const p1 = this.webSocketService.getClientId(client);
       this.webSocketService.setStatus(p1, 'in-game');
       client.emit('index', 0);
     } else if (data.index === 1) {
       this.rooms.set(client.id, data.room);
       this.games.get(data.room).setPlayer2(client);
-      const p2 = this.webSocketService.getClientName(client);
+      const p2 = this.webSocketService.getClientId(client);
       this.webSocketService.setStatus(p2, 'in-game');
       client.emit('index', 1);
     }
   }
 
   @SubscribeMessage('spectate')
-  handleSpecate(client: Socket, data: { friend: string }) {
+  handleSpecate(client: Socket, data: { friendId: number }) {
     console.log('spectate', data);
-    const friend = this.webSocketService.getSocket(data.friend);
+    const friend = this.webSocketService.getSocket(data.friendId);
     client.emit('enter-room', { room: this.rooms.get(friend.id), index: 2 });
   }
 
@@ -73,8 +73,8 @@ export class PongGateway extends SocketGateway {
   }
 
   gameEnd(game: PongGame) {
-    const p1 = this.webSocketService.getClientName(game.getPlayer1());
-    const p2 = this.webSocketService.getClientName(game.getPlayer2());
+    const p1 = this.webSocketService.getClientId(game.getPlayer1());
+    const p2 = this.webSocketService.getClientId(game.getPlayer2());
     if (p1 && p2) {
       this.webSocketService.setStatus(p1, 'online');
       this.webSocketService.setStatus(p2, 'online');
@@ -89,12 +89,12 @@ export class PongGateway extends SocketGateway {
     data: { room: string; index: number },
     result: number,
   ) {
-    const winner = await this.userService.getUser(
-      this.webSocketService.getClientName(client),
+    const winner = await this.userService.getUserById(
+      this.webSocketService.getClientId(client),
     );
     const opponent = data.index === 0 ? game.getPlayer2() : game.getPlayer1();
-    const loser = await this.userService.getUser(
-      this.webSocketService.getClientName(opponent),
+    const loser = await this.userService.getUserById(
+      this.webSocketService.getClientId(opponent),
     );
     await this.statService.updateStat(winner.id, {
       result: result,

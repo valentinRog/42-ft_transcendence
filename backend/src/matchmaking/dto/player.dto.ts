@@ -2,7 +2,7 @@ import { IsNumber, IsString } from 'class-validator';
 
 export class PlayerDto {
   @IsString()
-  username: string;
+  playerId: number;
 
   @IsNumber()
   elo: number;

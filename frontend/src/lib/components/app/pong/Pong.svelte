@@ -16,7 +16,7 @@
 
 	let index = 0;
 	let room = '';
-	let opponent = '';
+	let opponentId = 0;
 
 	let scale = 1;
 
@@ -33,10 +33,10 @@
 		});
 	}
 
-	$socket.on('enter-room', (data: { room: string; index: number; opponent: string }) => {
+	$socket.on('enter-room', (data: { room: string; index: number; opponentId: number }) => {
 		room = data.room;
 		index = data.index;
-		opponent = data.opponent;
+		opponentId = data.opponentId;
 		$socket.emit('enter-room', data);
 	});
 
@@ -88,7 +88,7 @@
 		</DropDown>
 	</div>
 	{#if room !== ''}
-		<PongGame {scale} {index} {room} {opponent} />
+		<PongGame {scale} {index} {room} {opponentId} />
 	{:else}
 		<div class="empty-background">
 			<div>
