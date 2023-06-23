@@ -13,44 +13,46 @@ export class NotificationService {
   ) {}
 
   async notifyEvent(prisma_friend: User, user: User, message: string) {
-    //try {
-    const firstNotif = await this.prisma.notification.findFirst({
-      where: {
-        senderId: user.id,
-        type: message,
-        userId: prisma_friend.id,
-      },
-    });
-    if (firstNotif) {
-      await this.prisma.notification.delete({
-        where: { id: firstNotif.id },
-      });
-    }
-    const notif = await this.prisma.notification.create({
-      data: {
-        user: {
-          connect: {
-            id: prisma_friend.id,
-          },
+    try {
+      const firstNotif = await this.prisma.notification.findFirst({
+        where: {
+          senderId: user.id,
+          type: message,
+          userId: prisma_friend.id,
         },
-        senderId: user.id,
-        senderName: user.username,
-        type: message,
-      },
-    });
-    await this.prisma.user.update({
-      where: { username: prisma_friend.username },
-      data: {
-        notifications: { connect: { id: notif.id } },
-      },
-    });
-    if ((await this.userService.getUserStatus(prisma_friend.id)) != 'offline') {
-      this.socketService.sendToUser(prisma_friend.id, user.username, message);
+      });
+      if (firstNotif) {
+        await this.prisma.notification.delete({
+          where: { id: firstNotif.id },
+        });
+      }
+      const notif = await this.prisma.notification.create({
+        data: {
+          user: {
+            connect: {
+              id: prisma_friend.id,
+            },
+          },
+          senderId: user.id,
+          senderName: user.username,
+          type: message,
+        },
+      });
+      await this.prisma.user.update({
+        where: { username: prisma_friend.username },
+        data: {
+          notifications: { connect: { id: notif.id } },
+        },
+      });
+      if (
+        (await this.userService.getUserStatus(prisma_friend.id)) != 'offline'
+      ) {
+        this.socketService.sendToUser(prisma_friend.id, user.username, message);
+      }
+      return notif;
+    } catch (error) {
+      throw new NotFoundException('Error in NotificationService');
     }
-    return notif;
-    //} catch (error) {
-    //  throw new NotFoundException('User not found');
-    //}
   }
 
   async removeNotification(friendId: number, message: string) {
