@@ -19,7 +19,6 @@ export class NotificationController {
 
   @Post('add-friend')
   async addFriend(@GetUser() user, @Body() dto: FriendDto) {
-    console.log('addFriend', dto.friend);
     const prisma_friend = await this.prisma.user.findUnique({
       where: { username: dto.friend },
     });
@@ -46,14 +45,14 @@ export class NotificationController {
   }
 
   @Post('ask-game')
-  async match(@GetUser('id') id, @Body() dto: FriendDto) {
-    if (id == dto.friendId)
+  async match(@GetUser() user, @Body() dto: FriendDto) {
+    if (user.id == dto.friendId)
       throw new ForbiddenException('You cannot match yourself');
     const prisma_friend = await this.prisma.user.findUnique({
       where: { id: dto.friendId },
     });
     if (!prisma_friend) throw new NotFoundException('User not found');
-    return await this.notifService.notifyEvent(prisma_friend, id, 'game');
+    return await this.notifService.notifyEvent(prisma_friend, user, 'game');
   }
 
   @Get('get')
