@@ -1,9 +1,9 @@
-import { IsNotEmpty, IsNumber, IsBoolean } from 'class-validator';
+import { IsNotEmpty, IsString, IsBoolean } from 'class-validator';
 
 export class ResponseDto {
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  friendId: string;
+  friend: string;
 
   @IsBoolean()
   @IsNotEmpty()

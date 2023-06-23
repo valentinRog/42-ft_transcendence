@@ -12,11 +12,11 @@ export class NotificationService {
     private userService: UserService,
   ) {}
 
-  async notifyEvent(prisma_friend: User, username: string, message: string) {
+  async notifyEvent(prisma_friend: User, user: User, message: string) {
     try {
       const firstNotif = await this.prisma.notification.findFirst({
         where: {
-          sender: username,
+          senderId: user.id,
           type: message,
           userId: prisma_friend.id,
         },
@@ -33,7 +33,8 @@ export class NotificationService {
               id: prisma_friend.id,
             },
           },
-          sender: username,
+          senderId: user.id,
+		  senderName: user.username,
           type: message,
         },
       });
@@ -47,11 +48,7 @@ export class NotificationService {
         (await this.userService.getUserStatus(prisma_friend.username)) !=
         'offline'
       ) {
-        this.socketService.sendToUser(
-          prisma_friend.username,
-          username,
-          message,
-        );
+        this.socketService.sendToUser(prisma_friend.id, user.username, message);
       }
       return notif;
     } catch (error) {
@@ -59,16 +56,16 @@ export class NotificationService {
     }
   }
 
-  async removeNotification(friend: string, message: string) {
+  async removeNotification(friendId: number, message: string) {
     const userToNotify = await this.prisma.notification.findMany({
       where: {
-        sender: friend,
+        senderId: friendId,
         type: message,
       },
     });
     await this.prisma.notification.deleteMany({
       where: {
-        sender: friend,
+        senderId: friendId,
         type: message,
       },
     });

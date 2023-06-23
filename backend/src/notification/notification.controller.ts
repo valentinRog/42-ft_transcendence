@@ -18,28 +18,27 @@ export class NotificationController {
   ) {}
 
   @Post('add-friend')
-  async addFriend(@GetUser('id') id, @Body() dto: FriendDto) {
-    if (id == dto.friendId)
-      throw new ForbiddenException('You cannot add yourself as a friend');
+  async addFriend(@GetUser() user, @Body() dto: FriendDto) {
+    console.log('addFriend', dto.friend);
     const prisma_friend = await this.prisma.user.findUnique({
-      where: { id: dto.friendId },
+      where: { username: dto.friend },
     });
     if (!prisma_friend) throw new NotFoundException('User not found');
-    if (await this.userService.findFriend(id, prisma_friend.id)) {
+    else if (user.id == prisma_friend.id)
+      throw new ForbiddenException('You cannot add yourself as a friend');
+    else if (await this.userService.findFriend(user.id, prisma_friend.id)) {
       throw new ForbiddenException('You are already friends');
     }
-    return await this.notifService.notifyEvent(prisma_friend, id, 'friend');
+    return await this.notifService.notifyEvent(prisma_friend, user, 'friend');
   }
 
   @Post('friend-response')
   async responseFriend(@GetUser('id') id, @Body() dto: ResponseDto) {
-    await this.notifService.removeNotification(dto.friendId, 'friend');
+    const prisma_friend = await this.prisma.user.findUnique({
+      where: { username: dto.friend },
+    });
+    await this.notifService.removeNotification(prisma_friend.id, 'friend');
     if (dto.response) {
-      if (id == dto.friendId)
-        throw new ForbiddenException('You cannot add yourself as a friend');
-      const prisma_friend = await this.prisma.user.findUnique({
-        where: { username: dto.friendId },
-      });
       if (!prisma_friend) throw new NotFoundException('User not found');
       return await this.userService.addFriend(id, prisma_friend.id);
     }

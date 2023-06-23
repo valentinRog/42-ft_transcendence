@@ -49,9 +49,9 @@
 		$socket.off('index');
 	});
 
-	function responseGame(sender: string, accept: boolean) {
-		$gameRequest = $gameRequest.filter((x) => x.sender !== sender);
-		$socket.emit('response-game', { response: accept, friend: sender });
+	function responseGame(senderName: string, accept: boolean) {
+		$gameRequest = $gameRequest.filter((x) => x.senderName !== senderName);
+		$socket.emit('response-game', { response: accept, friend: senderName });
 	}
 </script>
 
@@ -66,9 +66,9 @@
 			{#if $gameRequest.length > 0}
 				<RightDrop name="invitations" notif={$gameRequest.length}>
 					{#each $gameRequest as r (r.id)}
-						<RightDrop name={r.sender}>
-							<button on:click={() => responseGame(r.sender, true)}>accept</button>
-							<button on:click={() => responseGame(r.sender, false)}>decline</button>
+						<RightDrop name={r.senderName}>
+							<button on:click={() => responseGame(r.senderName, true)}>accept</button>
+							<button on:click={() => responseGame(r.senderName, false)}>decline</button>
 						</RightDrop>
 					{/each}
 				</RightDrop>

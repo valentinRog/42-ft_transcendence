@@ -1,7 +1,11 @@
-import { IsNumber, IsNotEmpty } from 'class-validator';
+import { IsString, IsNumber, IsOptional } from 'class-validator';
 
 export class FriendDto {
   @IsNumber()
-  @IsNotEmpty()
-  friendId: number;
+  @IsOptional()
+  friendId?: number;
+
+  @IsString()
+  @IsOptional()
+  friend?: string;
 }

@@ -72,8 +72,9 @@ export class WebSocketService {
     return { spectator: player, room: room };
   }
 
-  sendToUser(userToNotify: string, message: string, event: string) {
-    const socket = this.getSocket(userToNotify);
+  sendToUser(userToNotify: number, message: string, event: string) {
+    //const socket = this.getSocket(userToNotify);
+    const socket = null;
     socket?.emit(event, { message: message });
   }
 

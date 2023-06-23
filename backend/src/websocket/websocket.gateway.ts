@@ -51,7 +51,7 @@ export abstract class SocketGateway
     this.webSocketService.setStatus(user.username, 'online');
     this.webSocketService.setStatus(user.username, 'online');
     const userToNotify = await this.notificationService.removeNotification(
-      user.username,
+      user.id,
       'game',
     );
     for (const id of userToNotify) {

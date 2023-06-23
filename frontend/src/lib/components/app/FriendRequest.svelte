@@ -17,6 +17,7 @@
 		fetchFriendRequest();
 		fetchFriends();
 	}
+
 	const friendRequest = Context.friendRequest();
 	fetchFriendRequest();
 </script>
@@ -25,9 +26,9 @@
 	<div id="friend-list">
 		{#each $friendRequest as request (request.id)}
 			<div class="friend">
-				<p>{request.sender}</p>
-				<button on:click={() => answerFriendRequest(request.sender, true)}>Accept</button>
-				<button on:click={() => answerFriendRequest(request.sender, false)}>Refuse</button>
+				<p>{request.senderName}</p>
+				<button on:click={() => answerFriendRequest(request.senderName, true)}>Accept</button>
+				<button on:click={() => answerFriendRequest(request.senderName, false)}>Refuse</button>
 			</div>
 		{/each}
 	</div>

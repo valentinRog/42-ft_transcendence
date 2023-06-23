@@ -116,16 +116,21 @@ export class UserController {
 
   @UseGuards(JwtGuard)
   @Post('block')
-  async blockUser(@Body('userId') userId: number, @Body('blockedId') blockedId: number) {
+  async blockUser(
+    @Body('userId') userId: number,
+    @Body('blockedId') blockedId: number,
+  ) {
     const block = this.userService.blockUser(userId, blockedId);
     return block;
   }
 
   @UseGuards(JwtGuard)
   @Post('unblock')
-  async unblockUser(@Body('userId') userId: number, @Body('blockedId') blockedId: number) {
+  async unblockUser(
+    @Body('userId') userId: number,
+    @Body('blockedId') blockedId: number,
+  ) {
     const block = this.userService.unblockUser(userId, blockedId);
-    return block
+    return block;
   }
-
 }

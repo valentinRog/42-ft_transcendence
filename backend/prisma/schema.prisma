@@ -44,12 +44,13 @@ model Match {
 model Notification {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
-  sender    String   @default("system")
+  senderId  	Int
+  senderName	String
   userId    Int
   type      String
   user      User     @relation(fields: [userId], references: [id])
 
-  @@unique([userId, sender, type])
+  @@unique([userId, senderId, type])
 }
 
 model Stat {

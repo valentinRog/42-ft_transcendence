@@ -66,7 +66,7 @@ export class UserService {
         data: { friends: { push: user.id } },
       });
       if ((await this.getUserStatus(friend.username)) != 'offline') {
-        this.socketService.sendToUser(friend.username, user.username, 'friend');
+        this.socketService.sendToUser(friendId, user.username, 'friend');
       }
       delete user.hash;
       return user;
@@ -120,7 +120,7 @@ export class UserService {
         },
       });
       if ((await this.getUserStatus(friend.username)) != 'offline') {
-        this.socketService.sendToUser(friend.username, user.username, 'friend');
+        this.socketService.sendToUser(friendId, user.username, 'friend');
       }
       delete user.hash;
       return user;

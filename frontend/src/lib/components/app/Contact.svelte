@@ -44,25 +44,25 @@
 		friendInput = '';
 	}
 
-	async function removeFriend(friendUsername: string) {
+	async function removeFriend(friendId: number) {
 		const res = await fetchWithToken('users/remove-friend', {
 			method: 'PATCH',
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({ friend: friendUsername })
+			body: JSON.stringify({ friendId: friendId })
 		});
 		await res.json();
 		fetchFriends();
 	}
 
-	function askGame(friendUsername: string) {
+	function askGame(friendId: number) {
 		fetchWithToken('notification/ask-game', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({ friend: friendUsername })
+			body: JSON.stringify({ friendId: friendId })
 		});
 	}
 
@@ -178,14 +178,14 @@
 								<img
 									class="option-icons"
 									src="/joystick.png"
-									on:click={() => askGame(friend.username)}
+									on:click={() => askGame(friend.id)}
 								/>
 							{/if}
 							<img class="option-icons" src="/write.png" on:click={() => startChat(friend)} />
 							<img
 								class="option-icons"
 								src="/no-friend.png"
-								on:click={() => removeFriend(friend.username)}
+								on:click={() => removeFriend(friend.id)}
 							/>
 						{/if}
 					</div>

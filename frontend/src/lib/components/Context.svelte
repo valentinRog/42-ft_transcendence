@@ -20,7 +20,8 @@
 		export type NotifRequest = {
 			id: number;
 			createdAt: string;
-			sender: string;
+			senderId: number;
+			senderName: string;
 			user: User;
 			userId: number;
 		};
