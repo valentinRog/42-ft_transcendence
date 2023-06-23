@@ -34,7 +34,7 @@ export class NotificationService {
             },
           },
           senderId: user.id,
-		  senderName: user.username,
+          senderName: user.username,
           type: message,
         },
       });
@@ -45,8 +45,7 @@ export class NotificationService {
         },
       });
       if (
-        (await this.userService.getUserStatus(prisma_friend.username)) !=
-        'offline'
+        (await this.userService.getUserStatus(prisma_friend.id)) != 'offline'
       ) {
         this.socketService.sendToUser(prisma_friend.id, user.username, message);
       }

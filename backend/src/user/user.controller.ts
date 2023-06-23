@@ -76,7 +76,7 @@ export class UserController {
       where: { id: { in: user.friends } },
     })) as any;
     friends.forEach((friend) => {
-      friend.status = this.userService.getStatus(friend.username);
+      friend.status = this.userService.getStatus(friend.id);
     });
     return friends;
   }

@@ -61,7 +61,7 @@ export class UserService {
         where: { id: friendId },
         data: { friends: { push: user.id } },
       });
-      if ((await this.getUserStatus(friend.username)) != 'offline') {
+      if ((await this.getUserStatus(friend.id)) != 'offline') {
         this.socketService.sendToUser(friendId, user.username, 'friend');
       }
       delete user.hash;
@@ -71,16 +71,14 @@ export class UserService {
     }
   }
 
-  async getUserStatus(username: string) {
+  async getUserStatus(userId: number) {
     try {
       const user = await this.prisma.user.findUnique({
-        where: { username: username },
+        where: { id: userId },
       });
       return this.socketService.getStatus(user.id);
     } catch (error) {
-      throw new NotFoundException(
-        `User with username '${username}' not found.`,
-      );
+      throw new NotFoundException(`User with login '${userId}' not found.`);
     }
   }
 
@@ -115,7 +113,7 @@ export class UserService {
           },
         },
       });
-      if ((await this.getUserStatus(friend.username)) != 'offline') {
+      if ((await this.getUserStatus(friend.id)) != 'offline') {
         this.socketService.sendToUser(friendId, user.username, 'friend');
       }
       delete user.hash;
@@ -163,19 +161,19 @@ export class UserService {
     };
   }
 
-//  async getQueueUsers() {
-//    const inqueue = [...this.socketService.getAllStatus().entries()]
-//      .filter(([_, status]) => status === 'queue')
-//      .map(([username, _]) => username);
-//    const users = await this.prisma.user.findMany({
-//      where: {
-//        username: {
-//          in: inqueue,
-//        },
-//      },
-//    });
-//    return users;
-//  }
+  //  async getQueueUsers() {
+  //    const inqueue = [...this.socketService.getAllStatus().entries()]
+  //      .filter(([_, status]) => status === 'queue')
+  //      .map(([username, _]) => username);
+  //    const users = await this.prisma.user.findMany({
+  //      where: {
+  //        username: {
+  //          in: inqueue,
+  //        },
+  //      },
+  //    });
+  //    return users;
+  //  }
 
   getStatus(userId: number) {
     return this.socketService.getStatus(userId);
@@ -189,8 +187,7 @@ export class UserService {
       },
     });
 
-    if (existingBlock)
-      return false;
+    if (existingBlock) return false;
 
     return this.prisma.block.create({
       data: {
@@ -208,12 +205,10 @@ export class UserService {
       },
     });
 
-    if (!existingBlock)
-      return false;
+    if (!existingBlock) return false;
 
     return this.prisma.block.delete({
-       where: { id: existingBlock.id,}
+      where: { id: existingBlock.id },
     });
   }
-
 }
