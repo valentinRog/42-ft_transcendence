@@ -16,6 +16,11 @@
 			username: string;
 			status: string;
 		}
+		export interface Block {
+			id: number;
+			blockerId: number;
+			blockedId: number;
+		}
 
 		export type NotifRequest = {
 			id: number;
@@ -62,6 +67,7 @@
 		}
 
 		export const contacts = (): Writable<Contact[]> => getContext('contacts');
+		export const blocks = (): Writable<Block[]> => getContext('blocks');
 		export const friendRequest = (): Writable<NotifRequest[]> => getContext('friendRequest');
 		export const gameRequest = (): Writable<NotifRequest[]> => getContext('gameRequest');
 		export const history = (): Writable<Match[]> => getContext('history');
@@ -139,9 +145,14 @@
 		export const fetchMe = (): (() => Promise<any>) => getContext('fetchMe');
 		export const fetchUserByUsername = (): ((username: string) => Promise<any>) =>
 			getContext('fetchUserByUsername');
-		export const fetchBlockUser = (): ((userId: number) => Promise<any>) => getContext('fetchBlockUser');
-		export const fetchUnblockUser = (): ((userId: number) => Promise<any>) => getContext('fetchUnblockUser');
+		export const fetchUpdateLastMessageRead = (): ((chatId: number, messageId: number, userId: number) 
+			=> Promise<any>) => getContext('fetchUpdateLastMessageRead');
+		export const fetchBlockUser = (): ((userId: number) => Promise<any>) =>
+			getContext('fetchBlockUser');
+		export const fetchUnblockUser = (): ((userId: number) => Promise<any>) =>
+			getContext('fetchUnblockUser');
 		export const fetchFriends = (): (() => Promise<any>) => getContext('fetchFriends');
+		export const fetchGetUserBlocks = (): (() => Promise<any>) => getContext('fetchGetUserBlocks');
 		export const fetchFriendRequest = (): (() => Promise<any>) => getContext('fetchFriendRequest');
 		export const fetchGameRequest = (): (() => Promise<any>) => getContext('fetchGameRequest');
 		export const fetchChats = (): (() => Promise<any>) => getContext('fetchChats');
@@ -162,6 +173,53 @@
 
 		export const getUnreadMessagesCount = (): ((chat: any, chatUser: any) => number) =>
 			getContext('getUnreadMessagesCount');
+
+		export const ping = (): Writable<number> => getContext('ping');
+		export const serverClockDelta = (): Writable<number> => getContext('serverClockDelta');
+
+		// -------- PONG ---------
+
+		interface Ball {
+			x: number;
+			y: number;
+			dx: number;
+			dy: number;
+			speed: number; //pixel per second
+		}
+
+		type Paddle = {
+			y: number;
+			up: boolean;
+			down: boolean;
+		};
+
+		export interface GameState {
+			ball: Ball;
+			paddles: [Paddle, Paddle];
+			time: number;
+			id: number;
+			inputed: boolean;
+			lastInputId: number;
+			missed: boolean;
+			player1Score: number;
+			player2Score: number;
+		}
+
+		export interface Room {
+			room: string;
+			index: number;
+			opponent: string;
+			state: GameState;
+		}
+
+		export interface Sound {
+			readonly paddle: HTMLAudioElement;
+			readonly wall: HTMLAudioElement;
+			readonly score: HTMLAudioElement;
+		}
+
+		export const room = (): Writable<Room | null> => getContext('room');
+		export const sounds = (): Readable<Sound> => getContext('sounds');
 	}
 </script>
 
@@ -208,6 +266,7 @@
 	setContext('fetchWithToken', fetchWithToken);
 
 	const contacts = writable<Context.Contact[]>([]);
+	const blocks = writable<Context.Block[]>([]);
 	const friendRequest = writable<Context.NotifRequest[]>([]);
 	const gameRequest = writable<Context.NotifRequest[]>([]);
 	const history = writable<Context.Match[]>([]);
@@ -222,6 +281,7 @@
 	const openChatForumWindow = writable(false);
 
 	setContext('contacts', contacts);
+	setContext('blocks', blocks);
 	setContext('friendRequest', friendRequest);
 	setContext('gameRequest', gameRequest);
 	setContext('history', history);
@@ -371,6 +431,7 @@
 			twoFactorEnabled: data.twoFactorEnabled,
 			logFrom42: data.logFrom42
 		};
+		console.log(data);
 		return data;
 	}
 
@@ -387,27 +448,34 @@
 		return data;
 	}
 
+	async function fetchGetUserBlocks() {
+		const res = await fetchWithToken('users/me/blocks');
+		const data = await res.json();
+		$blocks = data;
+		return data;
+	}
+
 	async function fetchBlockUser(userId: number) {
 		const res = await fetchWithToken('users/block', {
-        	method: 'POST',
-        	headers: { 'Content-Type': 'application/json' },
-        	body: JSON.stringify({ userId: $user?.id, blockedId: userId }),
-      	});
-		if (!res)
-			return ;
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ userId: $user?.id, blockedId: userId })
+		});
+		if (!res) return;
 		const data = await res.json();
+		$blocks = [...$blocks, data];
 		return data;
 	}
 
 	async function fetchUnblockUser(userId: number) {
 		const res = await fetchWithToken('users/unblock', {
-        	method: 'POST',
-        	headers: { 'Content-Type': 'application/json' },
-        	body: JSON.stringify({ userId: $user?.id, blockedId: userId }),
-      	});
-		if (!res)
-			return ;
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ userId: $user?.id, blockedId: userId })
+		});
+		if (!res) return;
 		const data = await res.json();
+		$blocks = $blocks.filter(block => block.blockedId !== userId);
 		return data;
 	}
 
@@ -483,9 +551,37 @@
 		const response = await fetchWithToken(`chat/publicChats?start=${start}&limit=${limit}`);
 		const data = await response.json();
 		$chatsPublic = data;
-		console.log(data);
 		return data;
 	}
+
+	async function fetchUpdateLastMessageRead(chatId: number, messageId: number, userId: number | undefined) {
+		const response = await fetchWithToken(`chat/updateLastMessageRead`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ chatId, messageId, userId })
+		});
+		const data = await response.json();
+		if (data) {
+			$chats = $chats.map(chat => {
+    			if (chat.id === chatId) {
+        			return { ...chat,
+           				chatUsers: chat.chatUsers.map(chatUser =>
+                		chatUser.userId === userId
+                    	? { ...chatUser, lastReadMessageId: messageId }
+                    	: chatUser
+            )};
+    } else {
+        return chat;
+    }
+});
+
+		}
+		return data;
+	}
+
+
 
 	async function fetchVerifyPassword(chatId: number, password: string) {
 		const response = await fetchWithToken('chat/verifyPassword', {
@@ -508,9 +604,11 @@
 	setContext('fetchHistory', fetchHistory);
 	setContext('fetchMe', fetchMe);
 	setContext('fetchUserByUsername', fetchUserByUsername);
+	setContext('fetchUpdateLastMessageRead', fetchUpdateLastMessageRead);
 	setContext('fetchBlockUser', fetchBlockUser);
 	setContext('fetchUnblockUser', fetchUnblockUser);
 	setContext('fetchFriends', fetchFriends);
+	setContext('fetchGetUserBlocks', fetchGetUserBlocks);
 	setContext('fetchFriendRequest', fetchFriendRequest);
 	setContext('fetchChatById', fetchChatById);
 	setContext('fetchChats', fetchChats);
@@ -525,22 +623,81 @@
 		})
 	);
 
+	const ping = writable(0);
+	const serverClockDelta = writable(0);
+
+	setContext('ping', ping);
+	setContext('serverClockDelta', serverClockDelta);
+
+	// -------- PONG ---------
+
+	const room = writable<Context.Room | null>(null);
+	const sounds = readable<Context.Sound>({
+		paddle: new Audio('/paddle.mp3'),
+		wall: new Audio('/wall.mp3'),
+		score: new Audio('/score.mp3')
+	});
+
+	setContext('room', room);
+	setContext('sounds', sounds);
+
 	// ------- EVENTS --------
 
 	$socket.on('disconnect', logout);
+
+	setInterval(() => $socket.emit('ping', Date.now()), 1000);
+
+	$socket.on('ping', (data: [number, number]) => {
+		$ping = Date.now() - data[0];
+		$serverClockDelta = data[1] - Date.now() + $ping / 2;
+	});
 
 	$socket.on('friend', (data: { message: string }) => {
 		fetchFriendRequest();
 		fetchFriends();
 	});
 
-	$socket.on('game', (data: { message: string }) => {
-		fetchGameRequest();
+	$socket.on('game', fetchGameRequest);
+
+	$socket.on('enter-room', (data: { room: string; index: number; opponent: string }) => {
+		$room = {
+			room: data.room,
+			index: data.index,
+			opponent: data.opponent,
+			state: {
+				ball: {
+					x: 0,
+					y: 0,
+					dx: 0,
+					dy: 0,
+					speed: 0
+				},
+				paddles: [
+					{
+						y: 0,
+						up: false,
+						down: false
+					},
+					{
+						y: 0,
+						up: false,
+						down: false
+					}
+				],
+				time: 0,
+				id: 0,
+				inputed: false,
+				lastInputId: 0,
+				missed: false,
+				player1Score: 0,
+				player2Score: 0
+			}
+		};
+		$socket.emit('enter-room', data);
 	});
 
 	$socket.on('addChat', (chat) => {
 		chats.update((chatsValue) => [...chatsValue, chat]);
-		console.log($chats);
 	});
 
 	$socket.on('leaveChat', (chatId) => {
@@ -559,15 +716,24 @@
 	});
 
 	$socket.on('message', ({ chatId, message }) => {
-		let targetChatIndex = $chats.findIndex((chat) => chat.id === chatId);
-		if (targetChatIndex !== -1) {
-			let chatscopy = [...$chats];
-			chatscopy[targetChatIndex].messages.push(message);
-			$chats = chatscopy;
-		} else {
-			console.error(`Received message for unknown chat with id: ${chatId}`);
-		}
-	});
+    let targetChatIndex = $chats.findIndex((chat) => chat.id === chatId);
+    if (targetChatIndex !== -1) {
+        let chatscopy = [...$chats];
+        chatscopy[targetChatIndex].messages.push(message);
+        if (message.userId === $user?.id) {
+            let targetChatUserIndex = chatscopy[targetChatIndex].chatUsers.findIndex((chatUser) => chatUser.userId === $user?.id);
+            if (targetChatUserIndex !== -1) {
+                chatscopy[targetChatIndex].chatUsers[targetChatUserIndex].lastReadMessageId = message.id;
+            }
+        }
+
+        $chats = chatscopy;
+    } else {
+        console.error(`Received message for unknown chat with id: ${chatId}`);
+    }
+});
+
+
 
 	// ------- END EVENTS --------
 

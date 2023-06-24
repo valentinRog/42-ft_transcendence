@@ -6,11 +6,13 @@
 	const socket = Context.socket();
 	const chats = Context.chats();
 	const chatId = Context.chatId();
+	const blocks = Context.blocks();
 	const selected = Context.selected();
 	const fetchUserByUsername = Context.fetchUserByUsername();
 	const addInstance = Context.addInstance();
 
 	let currentChat: any = null;
+	let blockedIds: number[];
 	let selectedUser: any = null;
 	let chatIdLocal: number | null = $chatId;
 	let messageContent = '';
@@ -19,6 +21,7 @@
 
 	let searchQuery = '';
 	let selectedAction: string = '';
+	let RoleName: string[] = ["Admin", "Moderator", "User"];
 
 	//BAN AND MUTE
 	let isUserBanned = false;
@@ -38,6 +41,7 @@
 	let isProtected: any;
 
 	$: {
+		blockedIds = $blocks.map(block => block.blockedId);
 		currentChat = $chats.find((chat) => chat.id === chatIdLocal);
 		roleId = currentChat?.chatUsers.find((cu: any) => cu.userId === $user?.id)?.roleId;
 		isProtected = currentChat ? currentChat.accessibility === 'protected' : false;
@@ -189,8 +193,6 @@
 	});
 
 	$socket.on('userUnBan', (data: any) => {
-		console.log(data.chatId);
-		console.log(chatIdLocal);
 		if (data.chatId === chatIdLocal) {
 			isUserBanned = false;
 		}
@@ -207,6 +209,22 @@
 			currentChat.chatUsers = [...currentChat.chatUsers, data.chatUser];
 		}
 	});
+
+	$socket.on('updateRole', (data: any) => {
+		if (data.chatId === chatIdLocal) {
+			if ($user?.id === data.userId)
+				roleId = data.newRoleId;
+			currentChat.chatUsers.forEach((chatUser: any) => {
+				if (chatUser.userId === data.userId) {
+					chatUser.roleId = data.newRoleId;
+				}
+			});
+			currentChat.chatUsers = [...currentChat.chatUsers];
+			console.log(currentChat.chatUsers);
+		}
+	});
+
+
 </script>
 
 <div id="box">
@@ -222,16 +240,18 @@
 				<ul>
 					{#if currentChat}
 						{#each currentChat?.messages || [] as message, i (i)}
-							<li class={message.user?.username === $user?.username ? 'self' : 'other'}>
-								<div class="message-header">
-									{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
-										<strong on:click={() => openProfile(message.user?.username)}
-											>{message.user?.username}</strong
-										>
-									{/if}
-								</div>
-								<div class="message-content">{message.content}</div>
-							</li>
+							{#if !blockedIds.includes(message.userId)}
+								<li class={message.user?.username === $user?.username ? 'self' : 'other'}>
+									<div class="message-header">
+										{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
+											<strong on:click={() => openProfile(message.user?.username)}
+												>{message.user?.username}</strong
+											>
+										{/if}
+									</div>
+									<div class="message-content">{message.content}</div>
+								</li>
+							{/if}
 						{/each}
 					{/if}
 				</ul>
@@ -254,12 +274,14 @@
 	</div>
 	{#if !isUserMuted && !isUserBanned}
 		<div id="user-list">
-			{#if roleId <= 1}
+			{#if roleId <= 2}
 				<input type="text" bind:value={searchQuery} placeholder="Enter username" />
 				<select bind:value={selectedAction}>
 					<option value="">Select action</option>
-					<option value="Moderator">Moderator</option>
-					<option value="User">User</option>
+					{#if roleId <= 1}
+						<option value="Moderator">Moderator</option>
+						<option value="User">User</option>
+					{/if}
 					<option value="ban">Ban</option>
 					<option value="unban">unBan</option>
 					<option value="mute">Mute</option>
@@ -306,9 +328,9 @@
 			{#if currentChat}
 				<h5>Users in this chat:</h5>
 				<ul>
-					{#each currentChat.chatUsers as chatUser (chatUser.userId)}
+					{#each currentChat.chatUsers as chatUser, index (index)}
 						<li on:click={() => selectUser(chatUser)}>
-							({chatUser.role?.name}) {chatUser.user?.username}
+							({RoleName[chatUser.roleId - 1]}) {chatUser.user?.username}
 							{#if selectedUser === chatUser}
 								<button on:click={() => openProfile(chatUser.user?.username)}>Check Profile</button>
 								{#if roleId <= 1 && roleId < chatUser.roleId}

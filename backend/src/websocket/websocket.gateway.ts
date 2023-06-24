@@ -146,6 +146,7 @@ export abstract class SocketGateway
         payload.content,
         user.id,
       );
+      this.chatService.updateLastMessageRead(chat.id, newMessage.id, user.id);
       if (chat.isGroupChat) {
         this.server
           .to(`chat-${payload.chatId}`)
@@ -262,6 +263,9 @@ export abstract class SocketGateway
   ) {
     const { chatId, userId, newRoleId } = payload;
     await this.chatService.changeRole(chatId, userId, newRoleId);
+    this.server
+      .to(`chat-${chatId}`)
+      .emit('updateRole', { chatId: chatId, userId: userId, newRoleId: newRoleId });
     return;
   }
 

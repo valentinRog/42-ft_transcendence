@@ -4,20 +4,23 @@
 	import RightDrop from '$lib/components/drop/RightDrop.svelte';
 	import DropRadios from '$lib/components/drop/DropRadios.svelte';
 	import PongGame from '$lib/components/app/pong/PongGame.svelte';
-	import { onDestroy } from 'svelte';
 
 	const socket = Context.socket();
 	const fetchWithToken = Context.fetchWithToken();
 	const gameRequest = Context.gameRequest();
 	const fetchSettings = Context.fetchSettings();
 	const addInstance = Context.addInstance();
+	const room = Context.room();
 
 	fetchSettings();
 
+<<<<<<< HEAD
 	let index = 0;
 	let room = '';
 	let opponentId = 0;
 
+=======
+>>>>>>> main
 	let scale = 1;
 
 	let scaleString: string;
@@ -33,6 +36,7 @@
 		});
 	}
 
+<<<<<<< HEAD
 	$socket.on('enter-room', (data: { room: string; index: number; opponentId: number }) => {
 		room = data.room;
 		index = data.index;
@@ -52,6 +56,11 @@
 	function responseGame(senderId: number, accept: boolean) {
 		$gameRequest = $gameRequest.filter((x) => x.senderId !== senderId);
 		$socket.emit('response-game', { response: accept, friendId: senderId });
+=======
+	function responseGame(sender: string, accept: boolean) {
+		$gameRequest = $gameRequest.filter((x) => x.sender !== sender);
+		$socket.emit('response-game', { response: accept, friend: sender });
+>>>>>>> main
 	}
 </script>
 
@@ -87,8 +96,13 @@
 			<button on:click={() => addInstance('PongKeybinds')}>keybinds</button>
 		</DropDown>
 	</div>
+<<<<<<< HEAD
 	{#if room !== ''}
 		<PongGame {scale} {index} {room} {opponentId} />
+=======
+	{#if $room !== null}
+		<PongGame {scale} />
+>>>>>>> main
 	{:else}
 		<div class="empty-background">
 			<div>

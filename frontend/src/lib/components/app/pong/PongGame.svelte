@@ -1,18 +1,15 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
+	import type { Writable } from 'svelte/store';
 
 	const fetchHistory = Context.fetchHistory();
-	const fetchWithToken = Context.fetchWithToken();
 	const socket = Context.socket();
 	const settings = Context.settings();
 	const soundOn = Context.soundOn();
-
-	const sounds = {
-		paddle: new Audio('/paddle.mp3'),
-		wall: new Audio('/wall.mp3'),
-		score: new Audio('/score.mp3')
-	};
+	const room = Context.room() as Writable<Context.Room>;
+	const sounds = Context.sounds();
+	const serverClockDelta = Context.serverClockDelta();
 
 	interface Dimensions {
 		readonly width: number;
@@ -34,32 +31,6 @@
 		paddleSpeed: 500
 	};
 
-	interface Ball {
-		x: number;
-		y: number;
-		dx: number;
-		dy: number;
-		speed: number; //pixel per second
-	}
-
-	type Paddle = {
-		y: number;
-		up: boolean;
-		down: boolean;
-	};
-
-	interface GameState {
-		ball: Ball;
-		paddles: [Paddle, Paddle];
-		time: number;
-		id: number;
-		inputed: boolean;
-		lastInputId: number;
-		missed: boolean;
-		player1Score: number;
-		player2Score: number;
-	}
-
 	type Input = {
 		room: string;
 		clientId: string;
@@ -70,8 +41,8 @@
 		down: boolean;
 	};
 
-	function update(state: GameState, delta: number): GameState {
-		const s = structuredClone(state) as GameState;
+	function update(state: Context.GameState, delta: number): Context.GameState {
+		const s = structuredClone(state) as Context.GameState;
 		const ball = s.ball;
 
 		ball.x += ball.dx * ball.speed * (delta / 1000);
@@ -85,7 +56,7 @@
 				ball.y + dimensions.ballWidth >= s.paddles[0].y &&
 				ball.y <= s.paddles[0].y + dimensions.paddleHeight
 			) {
-				if ($soundOn) sounds.paddle.play();
+				if ($soundOn) $sounds.paddle.play();
 				const dyMax = 0.9;
 				const distToCenter =
 					ball.y + dimensions.ballWidth / 2 - s.paddles[0].y - dimensions.paddleHeight / 2;
@@ -94,7 +65,7 @@
 				ball.dy = dy;
 				ball.x = wallLeft + (wallLeft - ball.x);
 			} else if (ball.x + dimensions.ballWidth < 0) {
-				if ($soundOn) sounds.score.play();
+				if ($soundOn) $sounds.score.play();
 				ball.x = dimensions.width / 2 - dimensions.ballWidth / 2;
 				ball.y = dimensions.height / 2 - dimensions.ballWidth / 2;
 				ball.dx = 1;
@@ -110,7 +81,7 @@
 				ball.y + dimensions.ballWidth >= s.paddles[1].y &&
 				ball.y <= s.paddles[1].y + dimensions.paddleHeight
 			) {
-				if ($soundOn) sounds.paddle.play();
+				if ($soundOn) $sounds.paddle.play();
 				const dyMax = 0.9;
 				const distToCenter =
 					ball.y + dimensions.ballWidth / 2 - s.paddles[1].y - dimensions.paddleHeight / 2;
@@ -119,7 +90,7 @@
 				ball.dy = dy;
 				ball.x = wallRight - dimensions.ballWidth - (ball.x + dimensions.ballWidth - wallRight);
 			} else if (ball.x > dimensions.width) {
-				if ($soundOn) sounds.score.play();
+				if ($soundOn) $sounds.score.play();
 				ball.x = dimensions.width / 2 - dimensions.ballWidth / 2;
 				ball.y = dimensions.height / 2 - dimensions.ballWidth / 2;
 				ball.dx = -1;
@@ -132,11 +103,11 @@
 		}
 
 		if (ball.y <= 0 && ball.dy < 0) {
-			if ($soundOn) sounds.wall.play();
+			if ($soundOn) $sounds.wall.play();
 			ball.y = -ball.y;
 			ball.dy *= -1;
 		} else if (ball.y >= dimensions.height - dimensions.ballWidth && ball.dy > 0) {
-			if ($soundOn) sounds.wall.play();
+			if ($soundOn) $sounds.wall.play();
 			ball.y =
 				dimensions.height -
 				dimensions.ballWidth -
@@ -161,11 +132,8 @@
 		return s;
 	}
 
-	let ping = 0;
-	let serverDelta = 0;
 	const tickRate = 30;
 	const delay = 20;
-	export let index: number;
 	let inputs = new Array<Input>();
 	let up = false;
 	let down = false;
@@ -206,7 +174,7 @@
 	export let scale = 1;
 
 	function draw(ctx: CanvasRenderingContext2D) {
-		const s = update(state, Date.now() - state.time);
+		const s = update($room.state, Date.now() - $room.state.time);
 		ctx.clearRect(0, 0, dimensions.width * scale, dimensions.height * scale);
 		ctx.fillStyle = 'white';
 		ctx.fillRect(
@@ -251,11 +219,11 @@
 
 	setInterval(() => {
 		const input: Input = {
-			room,
+			room: $room.room,
 			clientId: $socket.id,
-			stateId: state.id + delay,
+			stateId: $room.state.id + delay,
 			clientTime: Date.now() + delay,
-			serverTime: Date.now() + delay + serverDelta,
+			serverTime: Date.now() + delay + $serverClockDelta,
 			up,
 			down
 		};
@@ -280,13 +248,8 @@
 		canvas.height = dimensions.height * scale;
 	}
 
-	pingTimer = null;
-	gameTimer = null;
-
 	$socket.on('game-over', (winner: number) => {
-		stopLoop();
 		fetchHistory();
-		room = '';
 		//if (winner === 0) {
 		//	alert('Player 1 wins!');
 		//} else {
@@ -294,52 +257,26 @@
 		//}
 	});
 
-	$socket.on('ping', (data: [number, number]) => {
-		ping = Date.now() - data[0];
-		serverDelta = data[1] - Date.now() + ping / 2;
-	});
-
-	$socket.on('state', (s: GameState) => {
-		s.time -= serverDelta;
+	$socket.on('state', (s: Context.GameState) => {
+		s.time -= $serverClockDelta;
 		while (inputs.length && inputs[0].clientTime < s.time) {
 			inputs.shift();
 		}
 		for (let i = 1; i < inputs.length && inputs[i].clientTime <= Date.now(); i++) {
 			s = update(s, inputs[i].clientTime - inputs[i - 1].clientTime);
-			s.paddles[index].up = inputs[i].up;
-			s.paddles[index].down = inputs[i].down;
+			s.paddles[$room.index].up = inputs[i].up;
+			s.paddles[$room.index].down = inputs[i].down;
 			s.time = inputs[i].clientTime;
 			s.id = inputs[i].stateId;
 		}
-		state = s;
+		$room.state = s;
 	});
 
-	function stopLoop() {
-		if (pingTimer !== null && gameTimer !== null) {
-			clearTimeout(pingTimer);
-			pingTimer = null;
-			clearTimeout(gameTimer);
-			gameTimer = null;
-		}
-	}
-
 	onDestroy(() => {
-		stopLoop();
-		if (room !== '') {
-			$socket.emit('leave-room', { room: room, index: index });
-		} else {
-			fetchWithToken('matchmaking/unqueue', {
-				method: 'POST'
-			});
-		}
+		// $socket.emit('leave-room', { room: room, index: $room.index });
 		$socket.off('ping');
 		$socket.off('state');
 		$socket.off('input');
-
-		Object.values(sounds).forEach((sound) => {
-			sound.pause();
-			sound.currentTime = 0;
-		});
 	});
 
 	function handleKeyDown(e: KeyboardEvent) {
@@ -363,7 +300,11 @@
 
 <div class="container">
 	<canvas bind:this={canvas} />
+<<<<<<< HEAD
 	<p>{opponentId}</p>
+=======
+	<p>{$room.opponent}</p>
+>>>>>>> main
 </div>
 
 <style lang="scss">

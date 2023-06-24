@@ -55,7 +55,6 @@ export class ChatController {
     @Body('password') password?: string,
   ) {
     const groupName = memberUsernames.join('-');
-    console.log(accessibility);
     const newGroupChat = await this.chatService.createChat(
       groupName,
       memberUsernames,
@@ -64,5 +63,11 @@ export class ChatController {
       password,
     );
     return newGroupChat;
+  }
+  
+  @Post('updateLastMessageRead')
+  async updateLastMessageRead(@Body() body): Promise<any> {
+    const { chatId, messageId, userId } = body;
+    return await this.chatService.updateLastMessageRead(chatId, messageId, userId);
   }
 }

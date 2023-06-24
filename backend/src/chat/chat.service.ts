@@ -112,6 +112,9 @@ export class ChatService {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      include: {
+        user: true,
+      },
     });
     return newMessage;
   }
@@ -316,6 +319,17 @@ export class ChatService {
     await this.prisma.chat.update({
       where: { id: chatId },
       data: { password },
+    });
+  }
+
+  async updateLastMessageRead(chatId: number, messageId: number, userId: number): Promise<any> {
+    return await this.prisma.chatUser.update({
+      where: {
+        userId_chatId: { userId, chatId },
+      },
+      data: {
+        lastReadMessageId: messageId,
+      },
     });
   }
 }

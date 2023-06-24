@@ -6,13 +6,16 @@
 	const socket = Context.socket();
 
 	const chats = Context.chats();
+	const blocks = Context.blocks();
 	const chatId = Context.chatId();
 	const friendInfoId = Context.friendInfoId();
 	const contacts = Context.contacts();
 	const selected = Context.selected();
 	const addInstance = Context.addInstance();
 	const fetchCreateChat = Context.fetchCreateChat();
+	const fetchUpdateLastMessageRead = Context.fetchUpdateLastMessageRead();
 
+	let userId = $user?.id;
 	let chatIdLocal: number | null = $chatId;
 	let currentChat: any = null;
 	let friendUsername: string | null | undefined = '';
@@ -22,8 +25,10 @@
 	let chatWindow: HTMLDivElement;
 	let autoScroll = true;
 	let isCreatingChat = false;
+	let blockedIds: number[];
 
 	$: {
+		blockedIds = $blocks.map(block => block.blockedId);
 		friendUsername = $contacts.find((contact) => contact.id === friendId)?.username;
 		isFriend = (friendUsername != undefined);
 		if (chatIdLocal !== null && chatIdLocal !== undefined) {
@@ -37,6 +42,7 @@
 			if (chatIdLocal === null || chatIdLocal === undefined) chatIdLocal = chatId;
 		});
 		chatWindow.scrollTop = chatWindow.scrollHeight;
+		updateLastMessageRead();
 	});
 
 	afterUpdate(() => {
@@ -53,6 +59,23 @@
 			autoScroll = true;
 		} else {
 			autoScroll = false;
+		}
+	}
+
+	async function handleClick(event : any) {
+		if (event.button === 0)
+			updateLastMessageRead()
+	}
+
+	async function updateLastMessageRead() {
+		const lastMessage = currentChat?.messages[currentChat?.messages.length - 1];
+		if (lastMessage.userId !== $user?.id) {
+			const chatUser = currentChat.chatUsers.find((user : any) => user.userId === userId);
+			if(chatIdLocal && lastMessage.id !== chatUser.lastReadMessageId && $user?.id) {
+				await fetchUpdateLastMessageRead(chatIdLocal, lastMessage.id, $user?.id);
+				currentChat.chatUsers
+					.find((user : any) => user.userId === userId).lastReadMessageId = lastMessage.id;
+			}
 		}
 	}
 
@@ -88,7 +111,7 @@
 	});
 </script>
 
-<div id="box">
+<div id="box"  on:click={handleClick}>
 	<div id="chat-window" bind:this={chatWindow} on:scroll={handleScroll}>
 		{#if !currentChat}
 			<h5>Waiting for messages...</h5>
@@ -98,15 +121,17 @@
 		<ul>
 			{#if currentChat}
 				{#each currentChat?.messages || [] as message, i (i)}
-					<li class={message.user?.username === $user?.username ? 'self' : 'other'}>
-						<div class="message-header">
-							{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
-								<strong on:click={() => openProfile(message.user?.id)}>{message.user?.username}</strong>
-							{/if}
-						</div>
-						<div class="message-content">{message.content}</div>
-						<h6 class="clock">{formatter.format(new Date(message.createdAt))}</h6>
-					</li>
+					{#if !blockedIds.includes(message.userId)}
+						<li class={message.user?.username === $user?.username ? 'self' : 'other'}>
+							<div class="message-header">
+								{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
+									<strong on:click={() => openProfile(message.user?.username)}>{message.user?.username}</strong>
+								{/if}
+							</div>
+							<div class="message-content">{message.content}</div>
+							<h6 class="clock">{formatter.format(new Date(message.createdAt))}</h6>
+						</li>
+					{/if}
 				{/each}
 			{/if}
 		</ul>
