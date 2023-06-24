@@ -12,17 +12,19 @@
 	let imgUrl: string | '';
 	let showEdit = false;
 
-	if (username === null) {
-		currentUser = $user;
-		fetchAvatar();
-		showEdit = true;
-	} else {
-		fetchWithToken(`users/info/name/${username}`)
-			.then((res) => res.json())
-			.then((data) => {
-				currentUser = data;
-				fetchAvatar();
-			});
+	$: {
+		if (username === null) {
+			currentUser = $user;
+			fetchAvatar();
+			showEdit = true;
+		} else {
+			fetchWithToken(`users/info/name/${username}`)
+				.then((res) => res.json())
+				.then((data) => {
+					currentUser = data;
+					fetchAvatar();
+				});
+		}
 	}
 
 	const friends = Context.contacts();

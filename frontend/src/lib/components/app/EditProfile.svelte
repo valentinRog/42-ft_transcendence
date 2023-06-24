@@ -8,7 +8,6 @@
 	const addInstance = Context.addInstance();
 	const fetchMe = Context.fetchMe();
 
-
 	let showModal = false;
 	let showDialog = false;
 	let errorMessage: string | null = null;
