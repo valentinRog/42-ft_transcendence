@@ -561,7 +561,6 @@
 			},
 			body: JSON.stringify({ chatId, messageId, userId })
 		});
-
 		const data = await response.json();
 		if (data) {
 			$chats = $chats.map(chat => {

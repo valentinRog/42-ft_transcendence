@@ -69,15 +69,13 @@
 	}
 
 	async function updateLastMessageRead() {
-		let lastMessageRead;
-		const lastMessageReadId = currentChat?.messages[currentChat?.messages.length - 1].userId;
-
-		if (lastMessageReadId !== $user?.id) {
+		const lastMessage = currentChat?.messages[currentChat?.messages.length - 1];
+		if (lastMessage.userId !== $user?.id) {
 			const chatUser = currentChat.chatUsers.find((user : any) => user.userId === userId);
-			if(chatIdLocal && lastMessageRead && lastMessageReadId !== chatUser.lastReadMessageId && $user?.id) {
-				await fetchUpdateLastMessageRead(chatIdLocal, lastMessageReadId, $user?.id);
+			if(chatIdLocal && lastMessage.id !== chatUser.lastReadMessageId && $user?.id) {
+				await fetchUpdateLastMessageRead(chatIdLocal, lastMessage.id, $user?.id);
 				currentChat.chatUsers
-					.find((user : any) => user.userId === userId).lastReadMessageId = lastMessageReadId;
+					.find((user : any) => user.userId === userId).lastReadMessageId = lastMessage.id;
 			}
 		}
 	}
