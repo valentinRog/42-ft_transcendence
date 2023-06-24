@@ -82,7 +82,6 @@
 	async function createGroupChat() {
 		selectedFriends = [$user!.username, ...selectedFriends];
 		const groupName = selectedFriends.join(', ');
-		let chatid: Number;
 		$socket.emit('createGroupChat', {
 			groupName: groupName,
 			memberUsernames: selectedFriends,

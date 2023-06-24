@@ -69,6 +69,10 @@
 				<button type="button" on:click={() => fetchBlockUser(currentUser.id)}>Block</button>
 			{/if}
 		{/if}
+		{#if showEdit}
+			<button type="button"
+			on:click={() => ($openEditProfile = true)}>Edit Profile</button>
+		{/if}
 		{#if userId === $user?.id}
 			<li class="box friends">
 				<p>My friends</p>
