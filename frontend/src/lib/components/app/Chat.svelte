@@ -28,7 +28,6 @@
 		isFriend = (friendUsername != undefined);
 		if (chatIdLocal !== null && chatIdLocal !== undefined) {
 			currentChat = $chats.find((chat) => chat.id === chatIdLocal);
-			console.log(currentChat);
 			if (currentChat.isGroupChat) isFriend = true;
 		}
 	}
