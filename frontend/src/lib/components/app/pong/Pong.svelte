@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Context } from '$lib/components/Context.svelte';
+	import { Context } from '$lib/components/app/Profile/Context.svelte';
 	import DropDown from '$lib/components/drop/DropDown.svelte';
 	import RightDrop from '$lib/components/drop/RightDrop.svelte';
 	import DropRadios from '$lib/components/drop/DropRadios.svelte';

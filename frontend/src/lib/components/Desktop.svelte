@@ -2,7 +2,7 @@
 	import Window from '$lib/components/Window.svelte';
 	import Tab from '$lib/components/Tab.svelte';
 	import Start from '$lib/components/Start.svelte';
-	import { Context } from '$lib/components/Context.svelte';
+	import { Context } from '$lib/components/app/Profile/Context.svelte';
 	import Clock from './Clock.svelte';
 	import NotificationBadge from './NotificationBadge.svelte';
 

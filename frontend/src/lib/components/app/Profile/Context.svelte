@@ -61,6 +61,14 @@
 			userId: number;
 		}
 
+		export type Stat = {
+			id:		number;
+			wins:	number;
+			losses: number;
+			elo:    number;
+			ladder: string;
+		};
+
 		export interface User {
 			id: number;
 			username: string | null;
@@ -71,6 +79,7 @@
 		export const friendRequest = (): Writable<NotifRequest[]> => getContext('friendRequest');
 		export const gameRequest = (): Writable<NotifRequest[]> => getContext('gameRequest');
 		export const history = (): Writable<Match[]> => getContext('history');
+		export const statistics = (): Writable<Stat> => getContext('statistics');
 		export const openFriendRequest = (): Writable<boolean> => getContext('openFriendRequest');
 		export const openEditProfile = (): Writable<boolean> => getContext('openEditProfile');
 		export const openPongWindow = (): Writable<boolean> => getContext('openPongWindow');
@@ -80,6 +89,7 @@
 		export const chatId = (): Writable<number | null> => getContext('chatId');
 		export const openChatWindow = (): Writable<boolean> => getContext('openChatWindow');
 		export const openChatForumWindow = (): Writable<boolean> => getContext('openChatForumWindow');
+		export const fetchSettings = (): (() => Promise<any>) => getContext('fetchSettings');
 
 		export interface Settings {
 			up: string;
@@ -89,7 +99,6 @@
 		export const settings = (): Writable<Settings> => getContext('settings');
 		export const soundOn = (): Writable<boolean> => getContext('soundOn');
 
-		export const fetchSettings = (): (() => Promise<any>) => getContext('fetchSettings');
 
 		export type App =
 			| 'Pong'
@@ -145,7 +154,7 @@
 		export const fetchMe = (): (() => Promise<any>) => getContext('fetchMe');
 		export const fetchUserByUsername = (): ((username: string) => Promise<any>) =>
 			getContext('fetchUserByUsername');
-		export const fetchUpdateLastMessageRead = (): ((chatId: number, messageId: number, userId: number) 
+		export const fetchUpdateLastMessageRead = (): ((chatId: number, messageId: number, userId: number)
 			=> Promise<any>) => getContext('fetchUpdateLastMessageRead');
 		export const fetchBlockUser = (): ((userId: number) => Promise<any>) =>
 			getContext('fetchBlockUser');
@@ -169,6 +178,7 @@
 			password?: string
 		) => Promise<any>) => getContext('fetchCreateChat');
 
+		export const fetchStatistics = (): (() => Promise<Stat>) => getContext('fetchStatistics');
 		export const socket = (): Readable<Socket> => getContext('socket');
 
 		export const getUnreadMessagesCount = (): ((chat: any, chatUser: any) => number) =>
@@ -237,7 +247,7 @@
 	import Internet from '$lib/components/app/Internet.svelte';
 	import Notepad from '$lib/components/app/Notepad.svelte';
 	import FriendRequest from '$lib/components/app/FriendRequest.svelte';
-	import EditProfile from './app/EditProfile.svelte';
+	import EditProfile from '../EditProfile.svelte';
 	import PongKeybinds from '$lib/components/app/pong/PongKeybinds.svelte';
 	import { token, user, loading } from '$lib/stores';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
@@ -270,6 +280,7 @@
 	const friendRequest = writable<Context.NotifRequest[]>([]);
 	const gameRequest = writable<Context.NotifRequest[]>([]);
 	const history = writable<Context.Match[]>([]);
+	const statistics = writable<Context.Stat>();
 	const openFriendRequest = writable(false);
 	const openEditProfile = writable(false);
 	const openPongWindow = writable(false);
@@ -285,6 +296,7 @@
 	setContext('friendRequest', friendRequest);
 	setContext('gameRequest', gameRequest);
 	setContext('history', history);
+	setContext('statistics', statistics);
 	setContext('openFriendRequest', openFriendRequest);
 	setContext('openEditProfile', openEditProfile);
 	setContext('openPongWindow', openPongWindow);
@@ -509,6 +521,13 @@
 		});
 	}
 
+	async function fetchStatistics() {
+		const res = await fetchWithToken(`stat/get-stat/${$user?.id}`)
+		const data = await res.json();
+		$statistics = data;
+		return data;
+	}
+
 	async function fetchChats() {
 		const res = await fetchWithToken('chat/allUserChats');
 		const data = await res.json();
@@ -614,6 +633,7 @@
 	setContext('fetchChats', fetchChats);
 	setContext('fetchCreateChat', fetchCreateChat);
 	setContext('fetchVerifyPassword', fetchVerifyPassword);
+	setContext('fetchStatistics', fetchStatistics);
 
 	const socket = readable<Socket>(
 		ioClient(PUBLIC_BACKEND_URL, {

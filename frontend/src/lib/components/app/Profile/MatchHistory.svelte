@@ -1,5 +1,7 @@
 <script lang="ts">
-	import { Context } from '$lib/components/Context.svelte';
+	import { Context } from '$lib/components/app/Profile/Context.svelte';
+
+	export let userId: string | null | undefined = null;
 
 	const fetchHistory = Context.fetchHistory();
 	const history = Context.history();

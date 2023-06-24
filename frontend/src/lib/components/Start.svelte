@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { logout } from '$lib/utils/connect';
-	import { Context } from '$lib/components/Context.svelte';
-	import RightDrop from '$lib/components/drop/RightDrop.svelte';
+	import { Context } from '$lib/components/app/Profile/Context.svelte';
 
 	export let desktopHeight: number;
 
@@ -10,7 +9,6 @@
 
 	let active = false;
 
-	const fetchWithToken = Context.fetchWithToken();
 </script>
 
 <svelte:body on:click={() => (active = false)} />

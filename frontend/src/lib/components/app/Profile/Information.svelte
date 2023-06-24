@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { user } from '$lib/stores';
-	import { Context } from '$lib/components/Context.svelte';
+	import { Context } from '$lib/components/app/Profile/Context.svelte';
 
 	const fetchWithToken = Context.fetchWithToken();
 	const fetchBlockUser = Context.fetchBlockUser();
@@ -9,12 +9,11 @@
 
 	const blocks = Context.blocks();
 
-	export let userId: string | null | undefined = null;
+	export let userId: number | null | undefined = null;
 
 	let currentUser: any = {};
 	let imgUrl: string | '';
 	let isUser = false;
-	let showEdit = false;
 
 	$: {
 		if (userId === null) {

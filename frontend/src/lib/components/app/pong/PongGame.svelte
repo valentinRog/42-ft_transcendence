@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { Context } from '$lib/components/Context.svelte';
+	import { Context } from '$lib/components/app/Profile/Context.svelte';
 	import type { Writable } from 'svelte/store';
 
 	const fetchHistory = Context.fetchHistory();

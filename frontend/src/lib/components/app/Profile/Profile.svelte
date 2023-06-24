@@ -1,6 +1,7 @@
 <script lang="ts">
 	import MatchHistory from './MatchHistory.svelte';
 	import ProfileInfo from './Information.svelte';
+	import Statistics from './Statistics.svelte';
 
 	export let userId: string | null = null;
 
@@ -30,9 +31,9 @@
 					<ProfileInfo {userId} />
 				</div>
 			{:else if activeTabIndex === 1}
-				<p class="tab-content">{'stat'}</p>
+				<Statistics {userId}/>
 			{:else if activeTabIndex === 2}
-				<MatchHistory />
+				<MatchHistory {userId}/>
 			{/if}
 		</div>
 	</div>

@@ -85,7 +85,7 @@ export class StatService {
     }
   }
 
-  async getStats(playerId: number) {
+  async getStat(playerId: number) {
     try {
       const user = await this.prisma.user.findUnique({
         where: { id: playerId },

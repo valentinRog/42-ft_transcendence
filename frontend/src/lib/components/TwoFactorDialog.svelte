@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Context } from '$lib/components/Context.svelte';
+	import { Context } from '$lib/components/app/Profile/Context.svelte';
 	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
 	import { token } from '$lib/stores';
 	import { browser } from '$app/environment';
