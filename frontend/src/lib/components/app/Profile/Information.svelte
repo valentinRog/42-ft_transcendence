@@ -18,9 +18,9 @@
 
 	$: {
 		if (userId === null) {
+			isUser = true;
 			currentUser = $user;
 			fetchAvatar();
-			showEdit = true;
 		} else {
 			fetchWithToken(`users/info/${userId}`)
 				.then((res) => res.json())
@@ -68,10 +68,6 @@
 			{:else}
 				<button type="button" on:click={() => fetchBlockUser(currentUser.id)}>Block</button>
 			{/if}
-		{/if}
-		{#if showEdit}
-			<button type="button"
-			on:click={() => ($openEditProfile = true)}>Edit Profile</button>
 		{/if}
 		{#if userId === $user?.id}
 			<li class="box friends">
