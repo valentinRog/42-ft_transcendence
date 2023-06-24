@@ -114,8 +114,11 @@
 		if ($user) chat = findChat($user?.username, friend.username);
 		$chatId = chat?.id;
 		$friendInfoId = friend.id;
+		console.log('chat');
+		console.log($friendInfoId);
 		$openChatWindow = true;
 	}
+
 	const addInstance = Context.addInstance();
 	const selected = Context.selected();
 	let visible: number = 0;
@@ -170,7 +173,7 @@
 								class="option-icons"
 								src="/profile2.png"
 								on:click={() => {
-									addInstance('Profile', {}, { username: friend.username });
+									addInstance('Profile', {}, { userId: friend.id });
 									$selected = null;
 								}}
 							/>
@@ -224,8 +227,8 @@
 <style lang="scss">
 	.notification-badge {
 		position: relative;
-		top: 0.6rem;
-		left: 9.4rem;
+		top: 1.6rem;
+		left: 9.3rem;
 	}
 
 	.box {

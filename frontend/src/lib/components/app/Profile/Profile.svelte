@@ -2,9 +2,10 @@
 	import MatchHistory from './MatchHistory.svelte';
 	import ProfileInfo from './Information.svelte';
 
-	export let username: string | null = null;
+	export let userId: string | null = null;
 
-	console.log(username);
+	console.log(userId);
+
 	let activeTabIndex = 0;
 	const tabTitle = ['Informations', 'Statistics', 'Match history'];
 </script>
@@ -26,7 +27,7 @@
 		<div class="window-body">
 			{#if activeTabIndex === 0}
 				<div class="window-body">
-					<ProfileInfo {username} />
+					<ProfileInfo {userId} />
 				</div>
 			{:else if activeTabIndex === 1}
 				<p class="tab-content">{'stat'}</p>

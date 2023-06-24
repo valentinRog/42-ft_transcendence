@@ -91,7 +91,7 @@
 		login = $user!.login;
 		currentUser = $user;
 	} else {
-		fetchWithToken(`users/info/${username}`)
+		fetchWithToken(`users/info/${$user?.id}`)
 			.then((res) => res.json())
 			.then((data) => {
 				currentUser = data;

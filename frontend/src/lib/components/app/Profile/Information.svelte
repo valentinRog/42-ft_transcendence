@@ -6,19 +6,19 @@
 	const fetchBlockUser = Context.fetchBlockUser();
 	const openEditProfile = Context.openEditProfile();
 
-	export let username: string | null | undefined = null;
+	export let userId: string | null | undefined = null;
 
 	let currentUser: any = {};
 	let imgUrl: string | '';
 	let showEdit = false;
 
 	$: {
-		if (username === null) {
+		if (userId === null) {
 			currentUser = $user;
 			fetchAvatar();
 			showEdit = true;
 		} else {
-			fetchWithToken(`users/info/name/${username}`)
+			fetchWithToken(`users/info/${userId}`)
 				.then((res) => res.json())
 				.then((data) => {
 					currentUser = data;
@@ -60,7 +60,7 @@
 		<button type="button"
 		on:click={() => ($openEditProfile = true)}>Edit Profile</button>
 		{/if}
-		{#if username === $user?.username}
+		{#if userId === $user?.id}
 			<li class="box friends">
 				<p>My friends</p>
 				<ul id="friend-list">

@@ -25,10 +25,10 @@
 
 	$: {
 		friendUsername = $contacts.find((contact) => contact.id === friendId)?.username;
-		if (friendUsername === undefined) isFriend = false;
-		else isFriend = true;
+		isFriend = (friendUsername != undefined);
 		if (chatIdLocal !== null && chatIdLocal !== undefined) {
 			currentChat = $chats.find((chat) => chat.id === chatIdLocal);
+			console.log(currentChat);
 			if (currentChat.isGroupChat) isFriend = true;
 		}
 	}
@@ -44,8 +44,8 @@
 		if (autoScroll) chatWindow.scrollTop = chatWindow.scrollHeight;
 	});
 
-	function openProfile(username: string) {
-		addInstance('Profile', { }, { username: username });
+	function openProfile(userId: string) {
+		addInstance('Profile', { }, { userId: userId });
 		$selected = null;
 	}
 
@@ -102,7 +102,7 @@
 					<li class={message.user?.username === $user?.username ? 'self' : 'other'}>
 						<div class="message-header">
 							{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
-								<strong on:click={() => openProfile(message.user?.username)}>{message.user?.username}</strong>
+								<strong on:click={() => openProfile(message.user?.id)}>{message.user?.username}</strong>
 							{/if}
 						</div>
 						<div class="message-content">{message.content}</div>
