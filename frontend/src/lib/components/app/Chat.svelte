@@ -122,7 +122,7 @@
 			{#if currentChat}
 				{#each currentChat?.messages || [] as message, i (i)}
 					{#if !blockedIds.includes(message.userId)}
-						<li class={message.user?.username === $user?.username ? 'self' : 'other'}>
+						<li class={message.user?.id === $user?.id ? 'self' : 'other'}>
 							<div class="message-header">
 								{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
 									<strong on:click={() => openProfile(message.user?.username)}>{message.user?.username}</strong>

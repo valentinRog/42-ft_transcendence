@@ -6,7 +6,7 @@ import { Chat, Message } from '../chat/model/chat.model';
 export class ChatService {
   constructor(private prisma: PrismaService) {}
 
-  async getAllUserChats(username: string) : Promise<Chat[]>{
+  async getAllUserChats(username: string): Promise<Chat[]> {
     const chats = await this.prisma.chat.findMany({
       where: {
         chatUsers: {
@@ -71,28 +71,28 @@ export class ChatService {
   }
 
   async findChatById(id: number | null): Promise<Chat | null> {
-      if (id === undefined || id === null) return null;
-      const chat = await this.prisma.chat.findUnique({
-        where: {
-          id: id,
-        },
-        include: {
-          chatUsers: {
-            include: {
-              user: true,
-              role: true,
-            },
+    if (id === undefined || id === null) return null;
+    const chat = await this.prisma.chat.findUnique({
+      where: {
+        id: id,
+      },
+      include: {
+        chatUsers: {
+          include: {
+            user: true,
+            role: true,
           },
-          messages: {
-            include: {
-              user: true,
-            },
-          },
-          bans: true,
-          mutes: true,
         },
-      });
-      return chat;
+        messages: {
+          include: {
+            user: true,
+          },
+        },
+        bans: true,
+        mutes: true,
+      },
+    });
+    return chat;
   }
 
   async addMessageToDatabase(
@@ -141,17 +141,17 @@ export class ChatService {
     return result;
   }
 
-  async getChatsPublic(start: number, limit: number) : Promise<any>{
+  async getChatsPublic(start: number, limit: number): Promise<any> {
     const chats = await this.prisma.chat.findMany({
       where: {
         OR: [
           {
-            accessibility: 'public'
+            accessibility: 'public',
           },
           {
-            accessibility: 'protected'
-          }
-        ]
+            accessibility: 'protected',
+          },
+        ],
       },
       select: {
         id: true,
@@ -161,7 +161,7 @@ export class ChatService {
         chatUsers: true,
       },
       skip: start,
-      take: limit
+      take: limit,
     });
     return chats;
   }
@@ -191,8 +191,7 @@ export class ChatService {
       },
     });
 
-    if (!chatUser)
-      return ;
+    if (!chatUser) return;
 
     const updatedChatUser = await this.prisma.chatUser.update({
       where: { id: chatUser.id },
@@ -202,16 +201,15 @@ export class ChatService {
     return updatedChatUser;
   }
 
-
   //BAN//
 
   async banUser(chatId: number, userId: number, duration: number | null) {
     const expiresAt = duration ? new Date(Date.now() + duration * 1000) : null;
-  
+
     const existingBan = await this.prisma.ban.findUnique({
       where: { chatId_userId: { chatId: chatId, userId: userId } },
     });
-  
+
     if (existingBan) {
       await this.prisma.ban.update({
         where: { chatId_userId: { chatId: chatId, userId: userId } },
@@ -227,7 +225,7 @@ export class ChatService {
       });
     }
     return expiresAt;
-  } 
+  }
 
   async unBanUser(chatId: number, userId: number) {
     const ban = await this.prisma.ban.findUnique({
@@ -239,8 +237,7 @@ export class ChatService {
       },
     });
 
-    if (!ban)
-      return ;
+    if (!ban) return;
 
     await this.prisma.ban.delete({
       where: {
@@ -259,7 +256,7 @@ export class ChatService {
     const existingMute = await this.prisma.mute.findUnique({
       where: { chatId_userId: { chatId: chatId, userId: userId } },
     });
-  
+
     if (existingMute) {
       await this.prisma.mute.update({
         where: { chatId_userId: { chatId: chatId, userId: userId } },
@@ -275,7 +272,7 @@ export class ChatService {
       });
     }
     return expiresAt;
-  }  
+  }
 
   async unMuteUser(chatId: number, userId: number) {
     const mute = await this.prisma.mute.findUnique({
@@ -287,8 +284,7 @@ export class ChatService {
       },
     });
 
-    if (!mute)
-      return;
+    if (!mute) return;
 
     await this.prisma.mute.delete({
       where: {
@@ -300,14 +296,16 @@ export class ChatService {
     });
   }
 
+  async setAccess(
+    chatId: number,
+    isProtected: boolean,
+    password?: string,
+  ): Promise<void> {
+    const accessibility = isProtected ? 'public' : 'protected';
 
-  async setAccess(chatId: number, isProtected: boolean, password?: string): Promise<void> {
-    let accessibility = isProtected ? 'public' : 'protected';
-    
-    let updateData = { accessibility, };
+    const updateData = { accessibility };
 
-    if (password !== undefined)
-      updateData['password'] = password;
+    if (password !== undefined) updateData['password'] = password;
 
     await this.prisma.chat.update({
       where: { id: chatId },
@@ -315,14 +313,18 @@ export class ChatService {
     });
   }
 
-  async setPassword(chatId: number, password: string): Promise<void> {  
+  async setPassword(chatId: number, password: string): Promise<void> {
     await this.prisma.chat.update({
       where: { id: chatId },
       data: { password },
     });
   }
 
-  async updateLastMessageRead(chatId: number, messageId: number, userId: number): Promise<any> {
+  async updateLastMessageRead(
+    chatId: number,
+    messageId: number,
+    userId: number,
+  ): Promise<any> {
     return await this.prisma.chatUser.update({
       where: {
         userId_chatId: { userId, chatId },

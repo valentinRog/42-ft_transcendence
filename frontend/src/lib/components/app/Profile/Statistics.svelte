@@ -25,12 +25,37 @@
 
 </script>
 
-<body>
-	<pre>
-	  {currentStatistics.wins}
-	</pre>
-  </body>
+<div>
+	  <div class="container">
+		<div class="image">
+		  <img src="{currentStatistics.ladder}.png" alt="Ladder Image" width="100" height="100">
+		</div>
+		<div class="stats">
+		  <div>Win: {currentStatistics.wins}</div>
+		  <div>Loss: {currentStatistics.losses}</div>
+		  <div>Elo: {currentStatistics.elo}</div>
+		  <div class="ladder" id="ladder"></div>
+		</div>
+	  </div>
+</div>
 
 <style lang="scss">
-	@include table-95;
+
+	.container {
+		  display: flex;
+		  align-items: center;
+		}
+
+		.image {
+		  flex: 0 0 auto;
+		  margin-right: 10px;
+		}
+
+		.stats {
+		  flex: 1 1 auto;
+		}
+
+		.ladder {
+		  margin-top: 10px;
+		}
 </style>
