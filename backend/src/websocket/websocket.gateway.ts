@@ -158,6 +158,7 @@ export abstract class SocketGateway
         payload.content,
         user.id,
       );
+      this.chatService.updateLastMessageRead(chat.id, newMessage.id, user.id);
       if (chat.isGroupChat) {
         this.server
           .to(`chat-${payload.chatId}`)

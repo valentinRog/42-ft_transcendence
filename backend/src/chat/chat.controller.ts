@@ -64,4 +64,10 @@ export class ChatController {
     );
     return newGroupChat;
   }
+  
+  @Post('updateLastMessageRead')
+  async updateLastMessageRead(@Body() body): Promise<any> {
+    const { chatId, messageId, userId } = body;
+    return await this.chatService.updateLastMessageRead(chatId, messageId, userId);
+  }
 }

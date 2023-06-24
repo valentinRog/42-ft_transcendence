@@ -144,6 +144,8 @@
 		export const fetchMe = (): (() => Promise<any>) => getContext('fetchMe');
 		export const fetchUserByUsername = (): ((username: string) => Promise<any>) =>
 			getContext('fetchUserByUsername');
+		export const fetchUpdateLastMessageRead = (): ((chatId: number, messageId: number, userId: number) 
+			=> Promise<any>) => getContext('fetchUpdateLastMessageRead');
 		export const fetchBlockUser = (): ((userId: number) => Promise<any>) =>
 			getContext('fetchBlockUser');
 		export const fetchUnblockUser = (): ((userId: number) => Promise<any>) =>
@@ -551,6 +553,36 @@
 		return data;
 	}
 
+	async function fetchUpdateLastMessageRead(chatId: number, messageId: number, userId: number | undefined) {
+		const response = await fetchWithToken(`chat/updateLastMessageRead`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ chatId, messageId, userId })
+		});
+
+		const data = await response.json();
+		if (data) {
+			$chats = $chats.map(chat => {
+    			if (chat.id === chatId) {
+        			return { ...chat,
+           				chatUsers: chat.chatUsers.map(chatUser =>
+                		chatUser.userId === userId
+                    	? { ...chatUser, lastReadMessageId: messageId }
+                    	: chatUser
+            )};
+    } else {
+        return chat;
+    }
+});
+
+		}
+		return data;
+	}
+
+
+
 	async function fetchVerifyPassword(chatId: number, password: string) {
 		const response = await fetchWithToken('chat/verifyPassword', {
 			method: 'POST',
@@ -572,6 +604,7 @@
 	setContext('fetchHistory', fetchHistory);
 	setContext('fetchMe', fetchMe);
 	setContext('fetchUserByUsername', fetchUserByUsername);
+	setContext('fetchUpdateLastMessageRead', fetchUpdateLastMessageRead);
 	setContext('fetchBlockUser', fetchBlockUser);
 	setContext('fetchUnblockUser', fetchUnblockUser);
 	setContext('fetchFriends', fetchFriends);
@@ -683,15 +716,24 @@
 	});
 
 	$socket.on('message', ({ chatId, message }) => {
-		let targetChatIndex = $chats.findIndex((chat) => chat.id === chatId);
-		if (targetChatIndex !== -1) {
-			let chatscopy = [...$chats];
-			chatscopy[targetChatIndex].messages.push(message);
-			$chats = chatscopy;
-		} else {
-			console.error(`Received message for unknown chat with id: ${chatId}`);
-		}
-	});
+    let targetChatIndex = $chats.findIndex((chat) => chat.id === chatId);
+    if (targetChatIndex !== -1) {
+        let chatscopy = [...$chats];
+        chatscopy[targetChatIndex].messages.push(message);
+        if (message.userId === $user?.id) {
+            let targetChatUserIndex = chatscopy[targetChatIndex].chatUsers.findIndex((chatUser) => chatUser.userId === $user?.id);
+            if (targetChatUserIndex !== -1) {
+                chatscopy[targetChatIndex].chatUsers[targetChatUserIndex].lastReadMessageId = message.id;
+            }
+        }
+
+        $chats = chatscopy;
+    } else {
+        console.error(`Received message for unknown chat with id: ${chatId}`);
+    }
+});
+
+
 
 	// ------- END EVENTS --------
 

@@ -13,7 +13,9 @@
 	const selected = Context.selected();
 	const addInstance = Context.addInstance();
 	const fetchCreateChat = Context.fetchCreateChat();
+	const fetchUpdateLastMessageRead = Context.fetchUpdateLastMessageRead();
 
+	let userId = $user?.id;
 	let chatIdLocal: number | null = $chatId;
 	let currentChat: any = null;
 	let friendUsername: string | null | undefined = '';
@@ -41,6 +43,7 @@
 			if (chatIdLocal === null || chatIdLocal === undefined) chatIdLocal = chatId;
 		});
 		chatWindow.scrollTop = chatWindow.scrollHeight;
+		updateLastMessageRead();
 	});
 
 	afterUpdate(() => {
@@ -57,6 +60,25 @@
 			autoScroll = true;
 		} else {
 			autoScroll = false;
+		}
+	}
+
+	async function handleClick(event : any) {
+		if (event.button === 0)
+			updateLastMessageRead()
+	}
+
+	async function updateLastMessageRead() {
+		let lastMessageRead;
+		const lastMessageReadId = currentChat?.messages[currentChat?.messages.length - 1].userId;
+
+		if (lastMessageReadId !== $user?.id) {
+			const chatUser = currentChat.chatUsers.find((user : any) => user.userId === userId);
+			if(chatIdLocal && lastMessageRead && lastMessageReadId !== chatUser.lastReadMessageId && $user?.id) {
+				await fetchUpdateLastMessageRead(chatIdLocal, lastMessageReadId, $user?.id);
+				currentChat.chatUsers
+					.find((user : any) => user.userId === userId).lastReadMessageId = lastMessageReadId;
+			}
 		}
 	}
 
@@ -92,7 +114,7 @@
 	});
 </script>
 
-<div id="box">
+<div id="box"  on:click={handleClick}>
 	<div id="chat-window" bind:this={chatWindow} on:scroll={handleScroll}>
 		{#if !currentChat}
 			<h5>Waiting for messages...</h5>
