@@ -137,39 +137,6 @@
 	let inputs = new Array<Input>();
 	let up = false;
 	let down = false;
-	export let room: string;
-	let pingTimer: number | null = null;
-	let gameTimer: number | null = null;
-	export let opponentId: number;
-
-	let state: GameState = {
-		ball: {
-			x: 0,
-			y: 0,
-			dx: 0,
-			dy: 0,
-			speed: 0
-		},
-		paddles: [
-			{
-				y: 0,
-				up: false,
-				down: false
-			},
-			{
-				y: 0,
-				up: false,
-				down: false
-			}
-		],
-		time: 0,
-		id: 0,
-		inputed: false,
-		lastInputId: 0,
-		missed: false,
-		player1Score: 0,
-		player2Score: 0
-	};
 
 	export let scale = 1;
 
@@ -273,7 +240,6 @@
 	});
 
 	onDestroy(() => {
-		// $socket.emit('leave-room', { room: room, index: $room.index });
 		$socket.off('ping');
 		$socket.off('state');
 		$socket.off('input');
@@ -300,11 +266,7 @@
 
 <div class="container">
 	<canvas bind:this={canvas} />
-<<<<<<< HEAD
-	<p>{opponentId}</p>
-=======
 	<p>{$room.opponent}</p>
->>>>>>> main
 </div>
 
 <style lang="scss">

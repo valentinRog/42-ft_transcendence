@@ -14,13 +14,6 @@
 
 	fetchSettings();
 
-<<<<<<< HEAD
-	let index = 0;
-	let room = '';
-	let opponentId = 0;
-
-=======
->>>>>>> main
 	let scale = 1;
 
 	let scaleString: string;
@@ -36,32 +29,11 @@
 		});
 	}
 
-<<<<<<< HEAD
-	$socket.on('enter-room', (data: { room: string; index: number; opponentId: number }) => {
-		room = data.room;
-		index = data.index;
-		opponentId = data.opponentId;
-		$socket.emit('enter-room', data);
-	});
-
-	$socket.on('index', (i: number) => {
-		index = i;
-	});
-
-	onDestroy(() => {
-		$socket.off('enter-room');
-		$socket.off('index');
-	});
-
 	function responseGame(senderId: number, accept: boolean) {
 		$gameRequest = $gameRequest.filter((x) => x.senderId !== senderId);
 		$socket.emit('response-game', { response: accept, friendId: senderId });
-=======
-	function responseGame(sender: string, accept: boolean) {
-		$gameRequest = $gameRequest.filter((x) => x.sender !== sender);
-		$socket.emit('response-game', { response: accept, friend: sender });
->>>>>>> main
 	}
+
 </script>
 
 <div class="container">
@@ -96,13 +68,8 @@
 			<button on:click={() => addInstance('PongKeybinds')}>keybinds</button>
 		</DropDown>
 	</div>
-<<<<<<< HEAD
-	{#if room !== ''}
-		<PongGame {scale} {index} {room} {opponentId} />
-=======
 	{#if $room !== null}
 		<PongGame {scale} />
->>>>>>> main
 	{:else}
 		<div class="empty-background">
 			<div>
