@@ -95,6 +95,7 @@
 </script>
 
 <div id="box">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css">
 	<div class="create-Chat">
 		<h4>Add New Topic</h4>
 		<form on:submit|preventDefault={createChat}>
@@ -127,7 +128,16 @@
 		<div class="chat-windows">
 			<ul>
 				{#each $chatsPublic as chat (chat.id)}
-					<li class="chat" on:click={() => startChat(chat)}>{chat.name}</li>
+					<div class="chat">
+						<li on:click={() => startChat(chat)}>
+							<div class="chat-item">
+								{#if chat.accessibility === "protected" && !chat.chatUsers.find(c => c.userId === $user?.id)}
+									<h6>logo lock</h6>
+								{/if}
+								<span>{chat.name}</span>
+							</div>
+						</li>
+					</div>
 				{/each}
 			</ul>
 			<div class="change-page">
@@ -223,7 +233,13 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		max-width: 8.6rem;
+		max-width: 20rem;
 		margin-bottom: 0.2rem;
 	}
+
+	.chat-item {
+		display: flex;
+		align-items: center;
+	}
+
 </style>
