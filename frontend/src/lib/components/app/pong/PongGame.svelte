@@ -6,7 +6,6 @@
 
 	export let show: Map<string, boolean>;
 
-	const fetchHistory = Context.fetchHistory();
 	const fetchWithToken = Context.fetchWithToken();
 	const socket = Context.socket();
 	const settings = Context.settings();
@@ -286,13 +285,13 @@
 		clearInterval(i1);
 		clearInterval(i2);
 		if (animationFrame !== undefined) cancelAnimationFrame(animationFrame);
-		// if ($room.room !== '') {
-		// 	$socket.emit('leave-room', { room: $room.room, index: $room.index });
-		// } else {
-		// 	fetchWithToken('matchmaking/unqueue', {
-		// 		method: 'POST'
-		// 	});
-		// }
+		 if ($room.room !== '') {
+		 	$socket.emit('leave-room', { room: $room.room, index: $room.index });
+		 } else {
+		 	fetchWithToken('matchmaking/unqueue', {
+		 		method: 'POST'
+		 	});
+		 }
 		$socket.off('ping');
 		$socket.off('state');
 		$socket.off('input');

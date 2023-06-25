@@ -113,8 +113,6 @@
 		if ($user) chat = findChat($user?.username, friend.username);
 		$chatId = chat?.id;
 		$friendInfoId = friend.id;
-		console.log('chat');
-		console.log($friendInfoId);
 		$openChatWindow = true;
 	}
 

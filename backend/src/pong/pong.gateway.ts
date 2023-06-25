@@ -111,8 +111,8 @@ export class PongGateway extends SocketGateway {
         await this.gameEnd(game);
         this.games.delete(data.room);
         const result = data.index === 0 ? 1 : 0;
+        await this.updateStat(game, client, data, result);
         this.server.to(data.room).emit('game-over', result);
-        this.updateStat(game, client, data, result);
       }
     }
     client.leave(data.room);
