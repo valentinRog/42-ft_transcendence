@@ -62,10 +62,10 @@
 		}
 
 		export type Stat = {
-			id:		number;
-			wins:	number;
+			id: number;
+			wins: number;
 			losses: number;
-			elo:    number;
+			elo: number;
 			ladder: string;
 		};
 
@@ -92,13 +92,21 @@
 		export const fetchSettings = (): (() => Promise<any>) => getContext('fetchSettings');
 
 		export interface Settings {
-			up: string;
-			down: string;
+			pong: {
+				up: string;
+				down: string;
+				colors: {
+					background: string;
+					paddle: string;
+					ball: string;
+					score: string;
+					decorations: string;
+				};
+			};
 		}
 
 		export const settings = (): Writable<Settings> => getContext('settings');
 		export const soundOn = (): Writable<boolean> => getContext('soundOn');
-
 
 		export type App =
 			| 'Pong'
@@ -154,8 +162,11 @@
 		export const fetchMe = (): (() => Promise<any>) => getContext('fetchMe');
 		export const fetchUserByUsername = (): ((username: string) => Promise<any>) =>
 			getContext('fetchUserByUsername');
-		export const fetchUpdateLastMessageRead = (): ((chatId: number, messageId: number, userId: number)
-			=> Promise<any>) => getContext('fetchUpdateLastMessageRead');
+		export const fetchUpdateLastMessageRead = (): ((
+			chatId: number,
+			messageId: number,
+			userId: number
+		) => Promise<any>) => getContext('fetchUpdateLastMessageRead');
 		export const fetchBlockUser = (): ((userId: number) => Promise<any>) =>
 			getContext('fetchBlockUser');
 		export const fetchUnblockUser = (): ((userId: number) => Promise<any>) =>
@@ -247,7 +258,7 @@
 	import Internet from '$lib/components/app/Internet.svelte';
 	import Notepad from '$lib/components/app/Notepad.svelte';
 	import FriendRequest from '$lib/components/app/FriendRequest.svelte';
-	import EditProfile from '../EditProfile.svelte';
+	import EditProfile from '$lib/components/app/EditProfile.svelte';
 	import PongKeybinds from '$lib/components/app/pong/PongKeybinds.svelte';
 	import { token, user, loading } from '$lib/stores';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
@@ -308,8 +319,17 @@
 	setContext('openChatForumWindow', openChatForumWindow);
 
 	const settings = writable<Context.Settings>({
-		up: 'ArrowUp',
-		down: 'ArrowDown'
+		pong: {
+			up: 'ArrowUp',
+			down: 'ArrowDown',
+			colors: {
+				background: 'black',
+				paddle: 'white',
+				ball: 'white',
+				score: 'white',
+				decorations: 'white'
+			}
+		}
 	});
 	const soundOn = writable(true);
 
@@ -319,8 +339,8 @@
 	async function fetchSettings() {
 		const res = await fetchWithToken('settings/get-settings');
 		const data = await res.json();
-		$settings.up = data.up;
-		$settings.down = data.down;
+		$settings.pong.up = data.up;
+		$settings.pong.down = data.down;
 		return data;
 	}
 
@@ -487,7 +507,7 @@
 		});
 		if (!res) return;
 		const data = await res.json();
-		$blocks = $blocks.filter(block => block.blockedId !== userId);
+		$blocks = $blocks.filter((block) => block.blockedId !== userId);
 		return data;
 	}
 
@@ -522,7 +542,7 @@
 	}
 
 	async function fetchStatistics() {
-		const res = await fetchWithToken(`stat/get-stat/${$user?.id}`)
+		const res = await fetchWithToken(`stat/get-stat/${$user?.id}`);
 		const data = await res.json();
 		$statistics = data;
 		return data;
@@ -573,34 +593,35 @@
 		return data;
 	}
 
-	async function fetchUpdateLastMessageRead(chatId: number, messageId: number, userId: number | undefined) {
+	async function fetchUpdateLastMessageRead(
+		chatId: number,
+		messageId: number,
+		userId: number | undefined
+	) {
 		const response = await fetchWithToken(`chat/updateLastMessageRead`, {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'application/json',
+				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({ chatId, messageId, userId })
 		});
 		const data = await response.json();
 		if (data) {
-			$chats = $chats.map(chat => {
-    			if (chat.id === chatId) {
-        			return { ...chat,
-           				chatUsers: chat.chatUsers.map(chatUser =>
-                		chatUser.userId === userId
-                    	? { ...chatUser, lastReadMessageId: messageId }
-                    	: chatUser
-            )};
-    } else {
-        return chat;
-    }
-});
-
+			$chats = $chats.map((chat) => {
+				if (chat.id === chatId) {
+					return {
+						...chat,
+						chatUsers: chat.chatUsers.map((chatUser) =>
+							chatUser.userId === userId ? { ...chatUser, lastReadMessageId: messageId } : chatUser
+						)
+					};
+				} else {
+					return chat;
+				}
+			});
 		}
 		return data;
 	}
-
-
 
 	async function fetchVerifyPassword(chatId: number, password: string) {
 		const response = await fetchWithToken('chat/verifyPassword', {
@@ -736,24 +757,24 @@
 	});
 
 	$socket.on('message', ({ chatId, message }) => {
-    let targetChatIndex = $chats.findIndex((chat) => chat.id === chatId);
-    if (targetChatIndex !== -1) {
-        let chatscopy = [...$chats];
-        chatscopy[targetChatIndex].messages.push(message);
-        if (message.userId === $user?.id) {
-            let targetChatUserIndex = chatscopy[targetChatIndex].chatUsers.findIndex((chatUser) => chatUser.userId === $user?.id);
-            if (targetChatUserIndex !== -1) {
-                chatscopy[targetChatIndex].chatUsers[targetChatUserIndex].lastReadMessageId = message.id;
-            }
-        }
+		let targetChatIndex = $chats.findIndex((chat) => chat.id === chatId);
+		if (targetChatIndex !== -1) {
+			let chatscopy = [...$chats];
+			chatscopy[targetChatIndex].messages.push(message);
+			if (message.userId === $user?.id) {
+				let targetChatUserIndex = chatscopy[targetChatIndex].chatUsers.findIndex(
+					(chatUser) => chatUser.userId === $user?.id
+				);
+				if (targetChatUserIndex !== -1) {
+					chatscopy[targetChatIndex].chatUsers[targetChatUserIndex].lastReadMessageId = message.id;
+				}
+			}
 
-        $chats = chatscopy;
-    } else {
-        console.error(`Received message for unknown chat with id: ${chatId}`);
-    }
-});
-
-
+			$chats = chatscopy;
+		} else {
+			console.error(`Received message for unknown chat with id: ${chatId}`);
+		}
+	});
 
 	// ------- END EVENTS --------
 

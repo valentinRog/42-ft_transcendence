@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { logout } from '$lib/utils/connect';
-	import { Context } from '$lib/components/app/Profile/Context.svelte';
+	import { Context } from '$lib/components/Context.svelte';
 
 	export let desktopHeight: number;
 

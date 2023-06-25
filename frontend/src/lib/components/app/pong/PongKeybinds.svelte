@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Context } from '$lib/components/app/Profile/Context.svelte';
+	import { Context } from '$lib/components/Context.svelte';
 
 	const fetchWithToken = Context.fetchWithToken();
 	const fetchSettings = Context.fetchSettings();

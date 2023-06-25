@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { user } from '$lib/stores';
-	import { Context } from '$lib/components/app/Profile/Context.svelte';
+	import { Context } from '$lib/components/Context.svelte';
 
 	const fetchWithToken = Context.fetchWithToken();
 	const fetchBlockUser = Context.fetchBlockUser();

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { user } from '$lib/stores';
-	import { Context } from '$lib/components/app/Profile/Context.svelte';
+	import { Context } from '$lib/components/Context.svelte';
 	import NotificationBadge from '../NotificationBadge.svelte';
 	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
 

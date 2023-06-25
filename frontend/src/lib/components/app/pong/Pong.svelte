@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Context } from '$lib/components/app/Profile/Context.svelte';
+	import { Context } from '$lib/components/Context.svelte';
 	import DropDown from '$lib/components/drop/DropDown.svelte';
 	import RightDrop from '$lib/components/drop/RightDrop.svelte';
 	import DropRadios from '$lib/components/drop/DropRadios.svelte';
@@ -11,6 +11,7 @@
 	const fetchSettings = Context.fetchSettings();
 	const addInstance = Context.addInstance();
 	const room = Context.room();
+	const settings = Context.settings();
 
 	fetchSettings();
 
@@ -33,7 +34,6 @@
 		$gameRequest = $gameRequest.filter((x) => x.senderId !== senderId);
 		$socket.emit('response-game', { response: accept, friendId: senderId });
 	}
-
 </script>
 
 <div class="container">
@@ -64,6 +64,23 @@
 					def="100%"
 					bind:selected={scaleString}
 				/>
+			</RightDrop>
+			<RightDrop name="colors">
+				<div class="color">
+					background <input type="color" bind:value={$settings.pong.colors.background} />
+				</div>
+				<div class="color">
+					paddle <input type="color" bind:value={$settings.pong.colors.paddle} />
+				</div>
+				<div class="color">
+					ball <input type="color" bind:value={$settings.pong.colors.ball} />
+				</div>
+				<div class="color">
+					score <input type="color" bind:value={$settings.pong.colors.score} />
+				</div>
+				<div class="color">
+					decorations <input type="color" bind:value={$settings.pong.colors.decorations} />
+				</div>
 			</RightDrop>
 			<button on:click={() => addInstance('PongKeybinds')}>keybinds</button>
 		</DropDown>
@@ -128,6 +145,18 @@
 				p {
 					margin: 0.5rem;
 				}
+			}
+		}
+
+		div.color {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 1rem;
+			@include dropdown-button;
+
+			input[type='color'] {
+				height: 1.3rem;
 			}
 		}
 	}

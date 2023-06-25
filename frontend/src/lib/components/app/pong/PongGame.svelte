@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { Context } from '$lib/components/app/Profile/Context.svelte';
+	import { Context } from '$lib/components/Context.svelte';
 	import type { Writable } from 'svelte/store';
 
 	const fetchHistory = Context.fetchHistory();
@@ -144,13 +144,16 @@
 	function draw(ctx: CanvasRenderingContext2D) {
 		const s = update($room.state, Date.now() - $room.state.time);
 		ctx.clearRect(0, 0, dimensions.width * scale, dimensions.height * scale);
-		ctx.fillStyle = 'white';
+		ctx.fillStyle = $settings.pong.colors.background;
+		ctx.fillRect(0, 0, dimensions.width * scale, dimensions.height * scale);
+		ctx.fillStyle = $settings.pong.colors.ball;
 		ctx.fillRect(
 			s.ball.x * scale,
 			s.ball.y * scale,
 			dimensions.ballWidth * scale,
 			dimensions.ballWidth * scale
 		);
+		ctx.fillStyle = $settings.pong.colors.paddle;
 		ctx.fillRect(
 			dimensions.paddleOffset * scale,
 			s.paddles[0].y * scale,
@@ -165,14 +168,14 @@
 		);
 
 		ctx.setLineDash([5, 5]);
-		ctx.strokeStyle = 'white';
+		ctx.strokeStyle = $settings.pong.colors.decorations;
 		ctx.beginPath();
 		ctx.moveTo((dimensions.width / 2) * scale, 0);
 		ctx.lineTo((dimensions.width / 2) * scale, dimensions.height * scale);
 		ctx.stroke();
 
 		ctx.font = '40px pong-score';
-		ctx.fillStyle = 'white';
+		ctx.fillStyle = $settings.pong.colors.score;
 		const getPlayerScoreOffset = (score: number) => {
 			if (score <= 9) return 12;
 			return 17 * (Math.floor(Math.log10(score)) + 1);
@@ -255,17 +258,17 @@
 	});
 
 	function handleKeyDown(e: KeyboardEvent) {
-		if (e.key === $settings.up) {
+		if (e.key === $settings.pong.up) {
 			up = true;
-		} else if (e.key === $settings.down) {
+		} else if (e.key === $settings.pong.down) {
 			down = true;
 		}
 	}
 
 	function handleKeyUp(e: KeyboardEvent) {
-		if (e.key === $settings.up) {
+		if (e.key === $settings.pong.up) {
 			up = false;
-		} else if (e.key === $settings.down) {
+		} else if (e.key === $settings.pong.down) {
 			down = false;
 		}
 	}
