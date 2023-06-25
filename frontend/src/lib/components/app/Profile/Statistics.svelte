@@ -28,6 +28,7 @@
 </script>
 
 <div>
+	{#if $currentStatistics !== undefined && $currentStatistics !== null}
 	  <div class="container">
 		<div class="image">
 		  <img src="{$currentStatistics?.ladder}.png" alt="ladder image" width="100" height="100">
@@ -39,6 +40,7 @@
 		  <div class="ladder" id="ladder"></div>
 		</div>
 	  </div>
+	{/if}
 </div>
 
 <style lang="scss">
