@@ -9,8 +9,13 @@
 	const settings = Context.settings();
 	const soundOn = Context.soundOn();
 	const room = Context.room() as Writable<Context.Room>;
-	const sounds = Context.sounds();
 	const serverClockDelta = Context.serverClockDelta();
+
+	const sounds = {
+		paddle: new Audio('/paddle.mp3'),
+		wall: new Audio('/wall.mp3'),
+		score: new Audio('/score.mp3')
+	};
 
 	interface Dimensions {
 		readonly width: number;
@@ -57,7 +62,7 @@
 				ball.y + dimensions.ballWidth >= s.paddles[0].y &&
 				ball.y <= s.paddles[0].y + dimensions.paddleHeight
 			) {
-				if ($soundOn) $sounds.paddle.play();
+				if ($soundOn) sounds.paddle.play();
 				const dyMax = 0.9;
 				const distToCenter =
 					ball.y + dimensions.ballWidth / 2 - s.paddles[0].y - dimensions.paddleHeight / 2;
@@ -66,7 +71,7 @@
 				ball.dy = dy;
 				ball.x = wallLeft + (wallLeft - ball.x);
 			} else if (ball.x + dimensions.ballWidth < 0) {
-				if ($soundOn) $sounds.score.play();
+				if ($soundOn) sounds.score.play();
 				ball.x = dimensions.width / 2 - dimensions.ballWidth / 2;
 				ball.y = dimensions.height / 2 - dimensions.ballWidth / 2;
 				ball.dx = 1;
@@ -82,7 +87,7 @@
 				ball.y + dimensions.ballWidth >= s.paddles[1].y &&
 				ball.y <= s.paddles[1].y + dimensions.paddleHeight
 			) {
-				if ($soundOn) $sounds.paddle.play();
+				if ($soundOn) sounds.paddle.play();
 				const dyMax = 0.9;
 				const distToCenter =
 					ball.y + dimensions.ballWidth / 2 - s.paddles[1].y - dimensions.paddleHeight / 2;
@@ -91,7 +96,7 @@
 				ball.dy = dy;
 				ball.x = wallRight - dimensions.ballWidth - (ball.x + dimensions.ballWidth - wallRight);
 			} else if (ball.x > dimensions.width) {
-				if ($soundOn) $sounds.score.play();
+				if ($soundOn) sounds.score.play();
 				ball.x = dimensions.width / 2 - dimensions.ballWidth / 2;
 				ball.y = dimensions.height / 2 - dimensions.ballWidth / 2;
 				ball.dx = -1;
@@ -104,11 +109,11 @@
 		}
 
 		if (ball.y <= 0 && ball.dy < 0) {
-			if ($soundOn) $sounds.wall.play();
+			if ($soundOn) sounds.wall.play();
 			ball.y = -ball.y;
 			ball.dy *= -1;
 		} else if (ball.y >= dimensions.height - dimensions.ballWidth && ball.dy > 0) {
-			if ($soundOn) $sounds.wall.play();
+			if ($soundOn) sounds.wall.play();
 			ball.y =
 				dimensions.height -
 				dimensions.ballWidth -
@@ -141,6 +146,7 @@
 
 	export let scale = 1;
 
+	let animationFrame: number;
 	function draw(ctx: CanvasRenderingContext2D) {
 		const s = update($room.state, Date.now() - $room.state.time);
 		ctx.clearRect(0, 0, dimensions.width * scale, dimensions.height * scale);
@@ -185,10 +191,10 @@
 		ctx.fillText(s.player1Score.toString(), (dimensions.width * scale) / 4 - offset1, 60);
 		ctx.fillText(s.player2Score.toString(), (3 * dimensions.width * scale) / 4 - offset2, 60);
 
-		requestAnimationFrame(() => draw(ctx));
+		animationFrame = requestAnimationFrame(() => draw(ctx));
 	}
 
-	setInterval(() => {
+	const i1 = setInterval(() => {
 		const input: Input = {
 			room: $room.room,
 			clientId: $socket.id,
@@ -205,7 +211,7 @@
 		}
 	}, 1000 / tickRate);
 
-	setInterval(() => $socket.emit('ping', Date.now()), 1000);
+	const i2 = setInterval(() => $socket.emit('ping', Date.now()), 1000);
 
 	let canvas: HTMLCanvasElement;
 
@@ -245,6 +251,9 @@
 	});
 
 	onDestroy(() => {
+		clearInterval(i1);
+		clearInterval(i2);
+		if (animationFrame !== undefined) cancelAnimationFrame(animationFrame);
 		if ($room.room !== '') {
 			$socket.emit('leave-room', { room: $room.room, index: $room.index });
 		} else {

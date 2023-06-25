@@ -233,14 +233,7 @@
 			state: GameState;
 		}
 
-		export interface Sound {
-			readonly paddle: HTMLAudioElement;
-			readonly wall: HTMLAudioElement;
-			readonly score: HTMLAudioElement;
-		}
-
 		export const room = (): Writable<Room | null> => getContext('room');
-		export const sounds = (): Readable<Sound> => getContext('sounds');
 	}
 </script>
 
@@ -670,17 +663,9 @@
 	setContext('ping', ping);
 	setContext('serverClockDelta', serverClockDelta);
 
-	// -------- PONG ---------
 
 	const room = writable<Context.Room | null>(null);
-	const sounds = readable<Context.Sound>({
-		paddle: new Audio('/paddle.mp3'),
-		wall: new Audio('/wall.mp3'),
-		score: new Audio('/score.mp3')
-	});
-
 	setContext('room', room);
-	setContext('sounds', sounds);
 
 	// ------- EVENTS --------
 
