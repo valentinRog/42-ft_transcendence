@@ -9,19 +9,21 @@
 	const statistics = Context.statistics();
 	let currentStatistics = writable<Context.Stat>();
 
+	$: {
+		if (userId === null) {
+			currentStatistics.set($statistics);
+		}
+	}
+
 	(async () => {
 		if (userId === null) {
 			await fetchStatistics();
 		}
 		else {
 			const res = await fetchWithToken(`stat/get-stat/${userId}`);
-			currentStatistics = await res.json();
+			currentStatistics.set( await res.json());
 		}
 	})();
-
-	$: {
-		currentStatistics.set($statistics);
-	}
 
 </script>
 

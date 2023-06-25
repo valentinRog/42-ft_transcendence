@@ -12,6 +12,12 @@
 	let current: Context.Match | null = null;
 	let currentHistory = writable<Context.Match[]>();
 
+	$: {
+		if (userId === null) {
+			currentHistory.set($history);
+		}
+	}
+
 	(async () => {
 		if (userId === null) {
 			await fetchHistory();
@@ -26,18 +32,14 @@
 					createdAt: element.createdAt
 				};
 			});
-			currentHistory = data;
+			currentHistory.set(data);
 		}
 	})();
-
-	$: {
-		currentHistory.set($history);
-	}
 
 </script>
 
 <div class="sunken-panel" style="height: 15rem; width: 18rem;">
-	{#if $currentHistory.length === 0}
+	{#if $currentHistory?.length === 0}
 			<tr>
 				<td colspan="3">You have not participated in any matches</td>
 			</tr>
@@ -51,17 +53,18 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each Object.values($currentHistory) as row}
-				<tr
-					class={current === row ? 'highlighted' : ''}
-					on:click={() => (current === row ? (current = null) : (current = row))}
-				>
-					{#each Object.values(row) as cell}
-						<td>{cell}</td>
-					{/each}
-				</tr>
-			{/each}
-
+			{#if $currentHistory !== undefined && $currentHistory !== null}
+				{#each Object.values($currentHistory) as row}
+					<tr
+						class={current === row ? 'highlighted' : ''}
+						on:click={() => (current === row ? (current = null) : (current = row))}
+					>
+						{#each Object.values(row) as cell}
+							<td>{cell}</td>
+						{/each}
+					</tr>
+				{/each}
+			{/if}
 		</tbody>
 	</table>
 	{/if}
