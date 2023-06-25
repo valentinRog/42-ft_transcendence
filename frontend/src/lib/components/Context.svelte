@@ -162,6 +162,7 @@
 		export const fetchMe = (): (() => Promise<any>) => getContext('fetchMe');
 		export const fetchUserByUsername = (): ((username: string) => Promise<any>) =>
 			getContext('fetchUserByUsername');
+		export const fetchUserById = (): ((id: number) => Promise<any>) => getContext('fetchUserById');
 		export const fetchUpdateLastMessageRead = (): ((
 			chatId: number,
 			messageId: number,
@@ -229,10 +230,11 @@
 		export interface Room {
 			room: string;
 			index: number;
-			opponent: string;
+			opponentId: number;
 			state: GameState;
 		}
 
+		export const matchmaking = (): Writable<boolean> => getContext('matchmaking');
 		export const room = (): Writable<Room | null> => getContext('room');
 	}
 </script>
@@ -466,12 +468,20 @@
 		return data;
 	}
 
+	async function fetchUserById(id: number) {
+		const res = await fetchWithToken(`users/info/${id}`);
+		const data = await res.json();
+		return data;
+	}
+
 	async function fetchFriends() {
 		const res = await fetchWithToken('users/me/friends');
 		const data = await res.json();
 		$contacts = data;
 		return data;
 	}
+
+	setInterval(fetchFriends, 3000);
 
 	async function fetchGetUserBlocks() {
 		const res = await fetchWithToken('users/me/blocks');
@@ -637,6 +647,7 @@
 	setContext('fetchHistory', fetchHistory);
 	setContext('fetchMe', fetchMe);
 	setContext('fetchUserByUsername', fetchUserByUsername);
+	setContext('fetchUserById', fetchUserById);
 	setContext('fetchUpdateLastMessageRead', fetchUpdateLastMessageRead);
 	setContext('fetchBlockUser', fetchBlockUser);
 	setContext('fetchUnblockUser', fetchUnblockUser);
@@ -663,9 +674,11 @@
 	setContext('ping', ping);
 	setContext('serverClockDelta', serverClockDelta);
 
-
+	const matchmaking = writable(false);
 	const room = writable<Context.Room | null>(null);
+
 	setContext('room', room);
+	setContext('matchmaking', matchmaking);
 
 	// ------- EVENTS --------
 
@@ -685,11 +698,12 @@
 
 	$socket.on('game', fetchGameRequest);
 
-	$socket.on('enter-room', (data: { room: string; index: number; opponent: string }) => {
+	$socket.on('enter-room', (data: { room: string; index: number; opponentId: number }) => {
+		console.log(data);
 		$room = {
 			room: data.room,
 			index: data.index,
-			opponent: data.opponent,
+			opponentId: data.opponentId,
 			state: {
 				ball: {
 					x: 0,
@@ -720,6 +734,11 @@
 			}
 		};
 		$socket.emit('enter-room', data);
+	});
+
+	$socket.on('game-over', (data: { winnerId: number }) => {
+		$room = null;
+		console.log(data);
 	});
 
 	$socket.on('addChat', (chat) => {
@@ -782,6 +801,10 @@
 	}
 
 	setContext('getUnreadMessagesCount', getUnreadMessagesCount);
+
+	onDestroy(() => {
+		if ($room) $socket.emit('leave-room', { room: $room.room, index: $room.index });
+	});
 </script>
 
 <slot />

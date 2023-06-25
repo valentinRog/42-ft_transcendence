@@ -33,7 +33,6 @@
 			body
 		});
 		const json = await res.json();
-		console.log(json);
 		if (res.status !== 200 && res.status !== 201) {
 			errorMessage = json.message;
 			showModal = true;

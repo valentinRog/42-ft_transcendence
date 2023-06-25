@@ -3,13 +3,16 @@
 	import DropDown from '$lib/components/drop/DropDown.svelte';
 	import RightDrop from '$lib/components/drop/RightDrop.svelte';
 	import DropRadios from '$lib/components/drop/DropRadios.svelte';
+	import DropCheck from '$lib/components/drop/DropCheck.svelte';
 	import PongGame from '$lib/components/app/pong/PongGame.svelte';
+	import { writable } from 'svelte/store';
 
 	const socket = Context.socket();
 	const fetchWithToken = Context.fetchWithToken();
 	const gameRequest = Context.gameRequest();
 	const fetchSettings = Context.fetchSettings();
 	const addInstance = Context.addInstance();
+	const matchmaking = Context.matchmaking();
 	const room = Context.room();
 	const settings = Context.settings();
 
@@ -22,9 +25,9 @@
 		scale = parseInt(scaleString) / 100;
 	}
 
-	let matchmaking = false;
 	function matchmake() {
-		matchmaking = true;
+		if ($matchmaking) return;
+		$matchmaking = true;
 		fetchWithToken('matchmaking/queue', {
 			method: 'POST'
 		});
@@ -34,12 +37,22 @@
 		$gameRequest = $gameRequest.filter((x) => x.senderId !== senderId);
 		$socket.emit('response-game', { response: accept, friendId: senderId });
 	}
+
+	let selected = writable(
+		new Map<string, boolean>(
+			Object.entries({
+				names: true,
+				rating: true,
+				performances: true
+			})
+		)
+	);
 </script>
 
 <div class="container">
 	<div class="menu">
 		<DropDown name="game" notif={$gameRequest.length}>
-			{#if matchmaking === false}
+			{#if $matchmaking === false}
 				<button on:click={matchmake}>matchmaking</button>
 			{:else}
 				<button class="unavailable">matchmake</button>
@@ -65,6 +78,9 @@
 					bind:selected={scaleString}
 				/>
 			</RightDrop>
+			<RightDrop name="show">
+				<DropCheck fields={selected} />
+			</RightDrop>
 			<RightDrop name="colors">
 				<div class="color">
 					background <input type="color" bind:value={$settings.pong.colors.background} />
@@ -86,7 +102,7 @@
 		</DropDown>
 	</div>
 	{#if $room !== null}
-		<PongGame {scale} />
+		<PongGame {scale} show={$selected} />
 	{:else}
 		<div class="empty-background">
 			<div>
