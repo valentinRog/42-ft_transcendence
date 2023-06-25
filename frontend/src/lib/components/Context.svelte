@@ -263,6 +263,8 @@
 	import { v4 as uuidv4 } from 'uuid';
 	import { logout } from '$lib/utils/connect';
 
+	let intervals: number[] = [];
+
 	function fetchWithToken(route: string, options: RequestInit = {}): Promise<Response> {
 		$loading = true;
 		const res = fetch(`${PUBLIC_BACKEND_URL}/${route}`, {
@@ -480,7 +482,7 @@
 		return data;
 	}
 
-	setInterval(fetchFriends, 3000);
+	intervals.push(setInterval(fetchFriends, 3000));
 
 	async function fetchGetUserBlocks() {
 		const res = await fetchWithToken('users/me/blocks');
@@ -683,7 +685,7 @@
 
 	$socket.on('disconnect', logout);
 
-	setInterval(() => $socket.emit('ping', Date.now()), 1000);
+	intervals.push(setInterval(() => $socket.emit('ping', Date.now()), 1000));
 
 	$socket.on('ping', (data: [number, number]) => {
 		$ping = Date.now() - data[0];
@@ -739,6 +741,8 @@
 		$room = null;
 		fetchHistory();
 		fetchStatistics();
+		console.log(data);
+		$matchmaking = false;
 	});
 
 	$socket.on('addChat', (chat) => {
@@ -802,7 +806,7 @@
 	setContext('getUnreadMessagesCount', getUnreadMessagesCount);
 
 	onDestroy(() => {
-		if ($room) $socket.emit('leave-room', { room: $room.room, index: $room.index });
+		intervals.forEach(clearInterval);
 	});
 </script>
 
