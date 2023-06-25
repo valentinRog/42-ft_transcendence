@@ -8,7 +8,7 @@
 	const fetchWithToken = Context.fetchWithToken();
 	const statistics = Context.statistics();
 
-	let currentStatistics: any = {};
+	let currentStatistics: Context.Stat = { id : 0, wins: 0, losses: 0, elo: 0, ladder: '' };
 
 	$: {}
 

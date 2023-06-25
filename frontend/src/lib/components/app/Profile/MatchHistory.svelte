@@ -1,21 +1,41 @@
 <script lang="ts">
 	import { Context } from '$lib/components/app/Profile/Context.svelte';
+	import { user } from '$lib/stores';
 
-	export let userId: string | null | undefined = null;
+	export let userId: number | null | undefined = null;
 
+	const fetchWithToken = Context.fetchWithToken();
 	const fetchHistory = Context.fetchHistory();
 	const history = Context.history();
 
 	let current: Context.Match | null = null;
 
+	let currentHistory : Context.Match[] = [];
+
 	(async () => {
-		await fetchHistory();
+		if (userId === null) {
+			userId = $user?.id;
+		}
+
+		const res = await fetchWithToken(`stat/get-history/${userId}`);
+		let data = await res.json();
+		data.forEach(function (element: any, index: number) {
+			data[index] = {
+				result: $user?.username === element.winnerName ? 'Win' : 'Lose',
+				opponent: $user?.username === element.winnerName ? element.loserName : element.winnerName,
+				createdAt: element.createdAt
+			};
+		});
+		currentHistory = data;
+		console.log(currentHistory);
+
 	})();
+
 
 </script>
 
 <div class="sunken-panel" style="height: 15rem; width: 18rem;">
-	{#if $history.length === 0}
+	{#if currentHistory.length === 0}
 			<tr>
 				<td colspan="3">You have not participated in any matches</td>
 			</tr>
@@ -29,7 +49,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each Object.values($history) as row}
+			{#each Object.values(currentHistory) as row}
 				<tr
 					class={current === row ? 'highlighted' : ''}
 					on:click={() => (current === row ? (current = null) : (current = row))}

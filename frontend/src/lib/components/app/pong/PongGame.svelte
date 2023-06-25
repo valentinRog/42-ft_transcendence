@@ -4,6 +4,7 @@
 	import type { Writable } from 'svelte/store';
 
 	const fetchHistory = Context.fetchHistory();
+	const fetchWithToken = Context.fetchWithToken();
 	const socket = Context.socket();
 	const settings = Context.settings();
 	const soundOn = Context.soundOn();
@@ -216,6 +217,7 @@
 	}
 
 	$socket.on('game-over', (winner: number) => {
+		console.log('game over');
 		fetchHistory();
 		//if (winner === 0) {
 		//	alert('Player 1 wins!');
@@ -240,6 +242,13 @@
 	});
 
 	onDestroy(() => {
+		if ($room.room !== '') {
+			$socket.emit('leave-room', { room: $room.room, index: $room.index });
+		} else {
+			fetchWithToken('matchmaking/unqueue', {
+				method: 'POST'
+			});
+		}
 		$socket.off('ping');
 		$socket.off('state');
 		$socket.off('input');
