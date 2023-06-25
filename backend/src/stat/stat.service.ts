@@ -8,6 +8,20 @@ import Elo from '@studimax/elo';
 export class StatService {
   constructor(private prisma: PrismaClient) {}
 
+  updateLadder(playerElo: number): string {
+    if (playerElo < 1000) {
+      return 'bronze';
+    } else if (playerElo <= 1100) {
+      return 'silver';
+    } else if (playerElo <= 1200) {
+      return 'gold';
+    } else if (playerElo <= 1300) {
+      return 'platinum';
+    } else if (playerElo <= 1400) {
+      return 'diamond';
+    }
+  }
+
   async updateStat(userId: number, dto: UpdateStatDto) {
     const playerA = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -25,6 +39,9 @@ export class StatService {
     );
     playerA.stat.elo = Math.round(Ra);
     playerB.stat.elo = Math.round(Rb);
+    playerA.stat.ladder = this.updateLadder(playerA.stat.elo);
+    playerB.stat.ladder = this.updateLadder(playerB.stat.elo);
+
     if (dto.result === 1) {
       playerA.stat.wins += 1;
       playerB.stat.losses += 1;
