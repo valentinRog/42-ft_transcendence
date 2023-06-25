@@ -481,6 +481,8 @@
 		return data;
 	}
 
+	setInterval(fetchFriends, 3000);
+
 	async function fetchGetUserBlocks() {
 		const res = await fetchWithToken('users/me/blocks');
 		const data = await res.json();
@@ -734,6 +736,11 @@
 		$socket.emit('enter-room', data);
 	});
 
+	$socket.on('game-over', (data: { winnerId: number }) => {
+		$room = null;
+		console.log(data);
+	});
+
 	$socket.on('addChat', (chat) => {
 		chats.update((chatsValue) => [...chatsValue, chat]);
 	});
@@ -794,6 +801,10 @@
 	}
 
 	setContext('getUnreadMessagesCount', getUnreadMessagesCount);
+
+	onDestroy(() => {
+		if ($room) $socket.emit('leave-room', { room: $room.room, index: $room.index });
+	});
 </script>
 
 <slot />

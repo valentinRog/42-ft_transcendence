@@ -267,16 +267,6 @@
 		canvas.height = dimensions.height * scale;
 	}
 
-	$socket.on('game-over', (winner: number) => {
-		console.log('game over');
-		fetchHistory();
-		//if (winner === 0) {
-		//	alert('Player 1 wins!');
-		//} else {
-		//	alert('Player 2 wins!');
-		//}
-	});
-
 	$socket.on('state', (s: Context.GameState) => {
 		s.time -= $serverClockDelta;
 		while (inputs.length && inputs[0].clientTime < s.time) {
@@ -296,13 +286,13 @@
 		clearInterval(i1);
 		clearInterval(i2);
 		if (animationFrame !== undefined) cancelAnimationFrame(animationFrame);
-		if ($room.room !== '') {
-			$socket.emit('leave-room', { room: $room.room, index: $room.index });
-		} else {
-			fetchWithToken('matchmaking/unqueue', {
-				method: 'POST'
-			});
-		}
+		// if ($room.room !== '') {
+		// 	$socket.emit('leave-room', { room: $room.room, index: $room.index });
+		// } else {
+		// 	fetchWithToken('matchmaking/unqueue', {
+		// 		method: 'POST'
+		// 	});
+		// }
 		$socket.off('ping');
 		$socket.off('state');
 		$socket.off('input');
