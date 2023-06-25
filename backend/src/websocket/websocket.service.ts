@@ -9,7 +9,12 @@ export class WebSocketService {
   private reverseMap: Map<string, number> = new Map();
   private userStatus: Map<number, string> = new Map();
 
+  private rooms = new Map<string, { room: string; index: number }>();
+
   addSocket(clientId: number, socket: Socket): void {
+    if (this.websockets.has(clientId)) {
+      this.removeSocket(clientId);
+    }
     this.websockets.set(clientId, socket);
     this.reverseMap.set(socket.id, clientId);
   }
@@ -19,6 +24,7 @@ export class WebSocketService {
     if (socket) {
       this.websockets.delete(clientId);
       this.reverseMap.delete(socket.id);
+      socket.disconnect();
     }
   }
 
@@ -41,6 +47,14 @@ export class WebSocketService {
     return this.websockets.size;
   }
 
+  getClientRoom(clientId: string) {
+    return this.rooms.get(clientId);
+  }
+
+  removeClientRoom(clientId: string) {
+    this.rooms.delete(clientId);
+  }
+
   createRoom(player1Id: number, player2Id: number) {
     const room = uuidv4();
     console.log('createRoom', room);
@@ -50,6 +64,8 @@ export class WebSocketService {
     if (!socketPlayer1 || !socketPlayer2) {
       throw new NotFoundException('user socket not connected');
     }
+    this.rooms.set(socketPlayer1.id, { room: room, index: 0 });
+    this.rooms.set(socketPlayer2.id, { room: room, index: 1 });
     socketPlayer1.join(room);
     socketPlayer2.join(room);
     socketPlayer1.emit('enter-room', { room, index: 0, opponentId: player2Id });

@@ -735,7 +735,7 @@
 				player2Score: 0
 			}
 		};
-		$socket.emit('enter-room', data);
+		$socket.emit('enter-room');
 	});
 
 	$socket.on('game-over', (data: { winnerId: number }) => {
