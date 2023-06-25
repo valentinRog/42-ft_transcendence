@@ -460,7 +460,6 @@
 			twoFactorEnabled: data.twoFactorEnabled,
 			logFrom42: data.logFrom42
 		};
-		console.log(data);
 		return data;
 	}
 
@@ -531,7 +530,7 @@
 	}
 
 	async function fetchHistory() {
-		const res = await fetchWithToken('stat/get-history');
+		const res = await fetchWithToken(`stat/get-history/${$user?.id}`);
 		const data = await res.json();
 		data.forEach(function (element: any, index: number) {
 			data[index] = {
@@ -740,6 +739,8 @@
 
 	$socket.on('game-over', (data: { winnerId: number }) => {
 		$room = null;
+		fetchHistory();
+		fetchStatistics();
 		console.log(data);
 		$matchmaking = false;
 	});
@@ -776,7 +777,6 @@
 					chatscopy[targetChatIndex].chatUsers[targetChatUserIndex].lastReadMessageId = message.id;
 				}
 			}
-
 			$chats = chatscopy;
 		} else {
 			console.error(`Received message for unknown chat with id: ${chatId}`);

@@ -3,9 +3,7 @@
 	import ProfileInfo from './Information.svelte';
 	import Statistics from './Statistics.svelte';
 
-	export let userId: string | null = null;
-
-	console.log(userId);
+	export let userId: number | null = null;
 
 	let activeTabIndex = 0;
 	const tabTitle = ['Informations', 'Statistics', 'Match history'];

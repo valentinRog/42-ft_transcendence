@@ -1,39 +1,46 @@
 <script lang="ts">
 	import { Context } from '$lib/components/Context.svelte';
-	import { user } from '$lib/stores';
+	import { writable } from 'svelte/store';
 
 	export let userId: number | null | undefined = null;
 
 	const fetchStatistics = Context.fetchStatistics();
 	const fetchWithToken = Context.fetchWithToken();
 	const statistics = Context.statistics();
+	let currentStatistics = writable<Context.Stat>();
 
-	let currentStatistics: Context.Stat = { id : 0, wins: 0, losses: 0, elo: 0, ladder: '' };
-
-	$: {}
+	$: {
+		if (userId === null) {
+			currentStatistics.set($statistics);
+		}
+	}
 
 	(async () => {
 		if (userId === null) {
-			userId = $user?.id;
+			await fetchStatistics();
 		}
-		const res = await fetchWithToken(`stat/get-stat/${userId}`);
-		currentStatistics = await res.json();
+		else {
+			const res = await fetchWithToken(`stat/get-stat/${userId}`);
+			currentStatistics.set( await res.json());
+		}
 	})();
 
 </script>
 
 <div>
+	{#if $currentStatistics !== undefined && $currentStatistics !== null}
 	  <div class="container">
 		<div class="image">
-		  <img src="{currentStatistics.ladder}.png" alt="ladder image" width="100" height="100">
+		  <img src="{$currentStatistics?.ladder}.png" alt="ladder image" width="100" height="100">
 		</div>
 		<div class="stats">
-		  <div>Win: {currentStatistics.wins}</div>
-		  <div>Loss: {currentStatistics.losses}</div>
-		  <div>Elo: {currentStatistics.elo} ({currentStatistics.ladder})</div>
+		  <div>Win: {$currentStatistics?.wins}</div>
+		  <div>Loss: {$currentStatistics?.losses}</div>
+		  <div>Elo: {$currentStatistics?.elo} ({$currentStatistics?.ladder})</div>
 		  <div class="ladder" id="ladder"></div>
 		</div>
 	  </div>
+	{/if}
 </div>
 
 <style lang="scss">
@@ -50,6 +57,12 @@
 
 	.stats {
 		flex: 1 1 auto;
+		margin : 2rem;
+		margin-bottom : 1.5rem;
+
+		div {
+			margin-bottom: 0.5rem;
+		}
 	}
 
 </style>

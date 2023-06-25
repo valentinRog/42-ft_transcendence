@@ -52,15 +52,13 @@
 	}
 
 	async function enable2fa(code : string) {
-		console.log(code);
-		const res = await fetchWithToken(`2fa/validate/${code}`, {
+			const res = await fetchWithToken(`2fa/validate/${code}`, {
 			method: 'POST'
 		});
 		const json = await res.json();
 		if (res.status !== 200 && res.status !== 201) {
 			errorMessage = json.message;
 			showModal = true;
-			console.log(errorMessage);
 		}
 		else {
 			dialog.close();

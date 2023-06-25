@@ -6,7 +6,6 @@
 
 	export let show: Map<string, boolean>;
 
-	const fetchHistory = Context.fetchHistory();
 	const fetchWithToken = Context.fetchWithToken();
 	const socket = Context.socket();
 	const settings = Context.settings();
