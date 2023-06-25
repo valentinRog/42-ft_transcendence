@@ -739,6 +739,7 @@
 	$socket.on('game-over', (data: { winnerId: number }) => {
 		$room = null;
 		console.log(data);
+		$matchmaking = false;
 	});
 
 	$socket.on('addChat', (chat) => {

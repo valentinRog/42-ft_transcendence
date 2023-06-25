@@ -26,7 +26,7 @@ type Input = {
 })
 export class PongGateway extends SocketGateway {
   private games: Map<string, PongGame> = new Map();
-  private rooms: Map<string, string> = new Map(); // map clientid and room
+  private rooms: Map<string, { room: string; index: number }> = new Map(); // map clientid and room
 
   @SubscribeMessage('ping')
   handlePing(@ConnectedSocket() client: Socket, @MessageBody() data: number) {
@@ -41,13 +41,13 @@ export class PongGateway extends SocketGateway {
       this.games.set(data.room, game);
     }
     if (data.index === 0) {
-      this.rooms.set(client.id, data.room);
+      this.rooms.set(client.id, { room: data.room, index: 0 });
       this.games.get(data.room).setPlayer1(client);
       const p1 = this.webSocketService.getClientId(client);
       this.webSocketService.setStatus(p1, 'in-game');
       client.emit('index', 0);
     } else if (data.index === 1) {
-      this.rooms.set(client.id, data.room);
+      this.rooms.set(client.id, { room: data.room, index: 1 });
       this.games.get(data.room).setPlayer2(client);
       const p2 = this.webSocketService.getClientId(client);
       this.webSocketService.setStatus(p2, 'in-game');
@@ -59,7 +59,10 @@ export class PongGateway extends SocketGateway {
   handleSpecate(client: Socket, data: { friendId: number }) {
     console.log('spectate', data);
     const friend = this.webSocketService.getSocket(data.friendId);
-    client.emit('enter-room', { room: this.rooms.get(friend.id), index: 2 });
+    client.emit('enter-room', {
+      room: this.rooms.get(friend.id).room,
+      index: 2,
+    });
   }
 
   @SubscribeMessage('input')
@@ -102,19 +105,37 @@ export class PongGateway extends SocketGateway {
     });
   }
 
-  @SubscribeMessage('leave-room')
-  async handleLeaveRoom(client: Socket, data: { room: string; index: number }) {
-    const game = this.games.get(data.room);
+  // @SubscribeMessage('leave-room')
+  // async handleLeaveRoom(client: Socket, data: { room: string; index: number }) {
+  //   const game = this.games.get(data.room);
+  //   if (game) {
+  //     if (data.index === 0 || data.index === 1) {
+  //       this.rooms.delete(client.id);
+  //       await this.gameEnd(game);
+  //       this.games.delete(data.room);
+  //       const result = data.index === 0 ? 1 : 0;
+  //       this.server.to(data.room).emit('game-over', result);
+  //       this.updateStat(game, client, data, result);
+  //     }
+  //   }
+  //   client.leave(data.room);
+  // }
+
+  @SubscribeMessage('disconnect')
+  async handleDisconnect(client: Socket) {
+    if (!this.rooms.has(client.id)) return;
+    const { room, index } = this.rooms.get(client.id);
+    const game = this.games.get(room);
     if (game) {
-      if (data.index === 0 || data.index === 1) {
+      if (index === 0 || index === 1) {
         this.rooms.delete(client.id);
-        await this.gameEnd(game);
-        this.games.delete(data.room);
-        const result = data.index === 0 ? 1 : 0;
-        this.server.to(data.room).emit('game-over', result);
-        this.updateStat(game, client, data, result);
+        this.gameEnd(game);
+        this.games.delete(room);
+        const result = index === 0 ? 1 : 0;
+        this.server.to(room).emit('game-over', result);
+        this.updateStat(game, client, { room, index }, result);
       }
     }
-    client.leave(data.room);
+    client.leave(room);
   }
 }
