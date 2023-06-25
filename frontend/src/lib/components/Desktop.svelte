@@ -68,6 +68,20 @@
 	const friendRequest = Context.friendRequest();
 	const gameRequest = Context.gameRequest();
 
+	let clickedImg : string = '';
+	let clickedName : string = '';
+
+	function changeColor(event : any, img : string, name : string) {
+		clickedImg = img;
+		clickedName = name;
+		event.stopPropagation();
+	}
+
+	function handleOutsideClick() {
+		clickedImg = '';
+		clickedName = '';
+	}
+
 	(async () => {
 		await fetchMe();
 		await fetchFriends();
@@ -90,6 +104,7 @@
 	bind:clientWidth={width}
 	bind:clientHeight={height}
 	on:mousedown={() => ($selected = null)}
+	on:click={handleOutsideClick}
 >
 	<div class="icons">
 		{#each Object.entries($apps).filter(([k, _]) => !notVisible.has(k)) as [k, v]}
@@ -100,7 +115,9 @@
 					$selected = null;
 				}}
 			>
-				<img src={v.DesktopProps.icon} alt={v.DesktopProps.name} draggable="false" />
+				<img src={v.DesktopProps.icon} alt={v.DesktopProps.name} draggable="false"
+				class={clickedImg === v.DesktopProps.icon ? 'clicked' : ''}
+      			on:click={(event) => changeColor(event, v.DesktopProps.icon, v.DesktopProps.name)}/>
 				{#if k === 'Conversation'}
 					<span class="notification-badge">
 						<NotificationBadge count={0} />
@@ -115,7 +132,8 @@
 					</span>
 				{/if}
 				<div class="icon-text">
-					<span>{v.DesktopProps.name}</span>
+					<span class={clickedName === v.DesktopProps.name ? 'highlight' : ''}
+					>{v.DesktopProps.name}</span>
 				</div>
 			</div>
 		{/each}
@@ -192,10 +210,19 @@
 		width: 2.6rem;
 	}
 
+	.clicked {
+		filter: saturate(10%) opacity(70%);
+	}
+
 	.icon-text {
 		color: white;
 		margin-top: 0.19rem;
 		font-size: 0.9rem;
+	}
+
+	.highlight {
+		color: white;
+		background-color: #1084d0;
 	}
 
 	div.desktop {

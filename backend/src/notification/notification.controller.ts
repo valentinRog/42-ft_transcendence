@@ -56,7 +56,7 @@ export class NotificationController {
   }
 
   @Get('get')
-  async getNotifFriend(@GetUser('id') id, @Query('type') type: string) {
+  async getNotification(@GetUser('id') id, @Query('type') type: string) {
     const prisma_user = await this.prisma.user.findUnique({
       where: { id: id },
       include: { notifications: true },
