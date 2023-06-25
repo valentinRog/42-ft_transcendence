@@ -16,11 +16,8 @@
 		if (userId === null) {
 			userId = $user?.id;
 		}
-
 		const res = await fetchWithToken(`stat/get-stat/${userId}`);
 		currentStatistics = await res.json();
-		console.log(currentStatistics);
-
 	})();
 
 </script>

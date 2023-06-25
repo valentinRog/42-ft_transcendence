@@ -27,8 +27,6 @@
 			};
 		});
 		currentHistory = data;
-		console.log(currentHistory);
-
 	})();
 
 
