@@ -58,7 +58,7 @@ model Stat {
   wins   Int    @default(0)
   losses Int    @default(0)
   elo    Int    @default(1000)
-  ladder String @default("bronze")
+  ladder String @default("silver")
   user   User?
 }
 
