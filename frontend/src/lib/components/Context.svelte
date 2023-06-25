@@ -421,8 +421,8 @@
 			DesktopProps: { name: 'FriendRequest', icon: '/computer.png' }
 		},
 		Forum: {
-			TabProps: { name: 'Forum', icon: '/computer.png' },
-			DesktopProps: { name: 'Forum', icon: '/computer.png' }
+			TabProps: { name: 'Forum', icon: '/msn.png' },
+			DesktopProps: { name: 'Forum', icon: '/msn.png' }
 		},
 		Paint: {
 			TabProps: { name: 'Paint', icon: '/paint.png' },
