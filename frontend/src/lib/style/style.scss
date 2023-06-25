@@ -19,6 +19,11 @@
 	src: url('/fonts/pong-score.ttf') format('truetype');
 }
 
+@font-face {
+	font-family: 'pong-text';
+	src: url('/fonts/pong-text.ttf');
+}
+
 body {
 	background-color: $background;
 	font-family: $font;

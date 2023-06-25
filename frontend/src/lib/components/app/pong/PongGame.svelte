@@ -2,6 +2,9 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
 	import type { Writable } from 'svelte/store';
+	import { user } from '$lib/stores';
+
+	export let show: Map<string, boolean>;
 
 	const fetchHistory = Context.fetchHistory();
 	const fetchWithToken = Context.fetchWithToken();
@@ -9,7 +12,20 @@
 	const settings = Context.settings();
 	const soundOn = Context.soundOn();
 	const room = Context.room() as Writable<Context.Room>;
+	const ping = Context.ping();
 	const serverClockDelta = Context.serverClockDelta();
+	const fetchUserById = Context.fetchUserById();
+	const fetchStatistics = Context.fetchStatistics();
+	const statistics = Context.statistics();
+
+	fetchStatistics();
+
+	let opponent: string;
+	let opponentStat: Context.Stat;
+	fetchWithToken(`stat/get-stat/${$room.opponentId}`)
+		.then((r) => r.json())
+		.then((x) => (opponentStat = x));
+	fetchUserById($room.opponentId).then((u) => (opponent = u.username));
 
 	const sounds = {
 		paddle: new Audio('/paddle.mp3'),
@@ -147,11 +163,24 @@
 	export let scale = 1;
 
 	let animationFrame: number;
+	let fps = 0;
+	let lastTime = Date.now();
+	let accu = 0;
 	function draw(ctx: CanvasRenderingContext2D) {
+		if (Date.now() - lastTime >= 1000) {
+			lastTime = Date.now();
+			fps = accu;
+			accu = 0;
+		}
+		accu++;
+
+		const w = dimensions.width * scale;
+		const h = dimensions.height * scale;
+
 		const s = update($room.state, Date.now() - $room.state.time);
-		ctx.clearRect(0, 0, dimensions.width * scale, dimensions.height * scale);
+		ctx.clearRect(0, 0, w, h);
 		ctx.fillStyle = $settings.pong.colors.background;
-		ctx.fillRect(0, 0, dimensions.width * scale, dimensions.height * scale);
+		ctx.fillRect(0, 0, w, h);
 		ctx.fillStyle = $settings.pong.colors.ball;
 		ctx.fillRect(
 			s.ball.x * scale,
@@ -167,7 +196,7 @@
 			dimensions.paddleHeight * scale
 		);
 		ctx.fillRect(
-			dimensions.width * scale - dimensions.paddleWidth * scale - dimensions.paddleOffset * scale,
+			w - dimensions.paddleWidth * scale - dimensions.paddleOffset * scale,
 			s.paddles[1].y * scale,
 			dimensions.paddleWidth * scale,
 			dimensions.paddleHeight * scale
@@ -176,20 +205,33 @@
 		ctx.setLineDash([5, 5]);
 		ctx.strokeStyle = $settings.pong.colors.decorations;
 		ctx.beginPath();
-		ctx.moveTo((dimensions.width / 2) * scale, 0);
-		ctx.lineTo((dimensions.width / 2) * scale, dimensions.height * scale);
+		ctx.moveTo(w / 2, 0);
+		ctx.lineTo(w / 2, h);
 		ctx.stroke();
 
-		ctx.font = '40px pong-score';
+		ctx.font = `${h / 7}px pong-score`;
 		ctx.fillStyle = $settings.pong.colors.score;
-		const getPlayerScoreOffset = (score: number) => {
-			if (score <= 9) return 12;
-			return 17 * (Math.floor(Math.log10(score)) + 1);
-		};
-		const offset1 = getPlayerScoreOffset(s.player1Score);
-		const offset2 = getPlayerScoreOffset(s.player2Score);
-		ctx.fillText(s.player1Score.toString(), (dimensions.width * scale) / 4 - offset1, 60);
-		ctx.fillText(s.player2Score.toString(), (3 * dimensions.width * scale) / 4 - offset2, 60);
+		let tw = ctx.measureText(s.player1Score.toString()).width;
+		ctx.fillText(s.player1Score.toString(), (w - tw) / 4, h / 5);
+		tw = ctx.measureText(s.player2Score.toString()).width;
+		ctx.fillText(s.player2Score.toString(), (3 * w - tw) / 4, h / 5);
+
+		if (show.get('names') && opponent !== undefined) {
+			ctx.font = `${h / 20}px pong-text`;
+			let [p1, p2] = [$user!.username, opponent];
+			if ($room.index === 1) [p1, p2] = [p2, p1];
+			if (show.get('rating') && $statistics !== undefined && opponentStat !== undefined) {
+				let [elo1, elo2] = [$statistics.elo, opponentStat.elo];
+				if ($room.index === 1) [elo2, elo1] = [elo1, elo2];
+				p1 += ` - ${elo1}`;
+				p2 += ` - ${elo2}`;
+				ctx.font = `${h / 30}px pong-text`;
+			}
+			tw = ctx.measureText(p1).width;
+			ctx.fillText(p1, w / 4 - tw / 2, h / 1.1);
+			tw = ctx.measureText(p2).width;
+			ctx.fillText(p2, (3 * w) / 4 - tw / 2, h / 1.1);
+		}
 
 		animationFrame = requestAnimationFrame(() => draw(ctx));
 	}
@@ -287,11 +329,26 @@
 
 <div class="container">
 	<canvas bind:this={canvas} />
-	<p>{$room.opponent}</p>
+	{#if show.get('performances')}
+		<div class="performances">
+			<span>
+				{$ping} ms
+			</span>
+			<span>
+				{fps} fps
+			</span>
+		</div>
+	{/if}
 </div>
 
 <style lang="scss">
 	canvas {
 		background-color: black;
+	}
+
+	div.performances {
+		span:not(:last-child) {
+			margin-right: 0.3rem;
+		}
 	}
 </style>
