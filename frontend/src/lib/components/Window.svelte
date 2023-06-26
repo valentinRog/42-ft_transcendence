@@ -136,6 +136,7 @@
 						on:keydown={handleEdit}
 						on:blur={handleBlur}
 						autofocus
+						autocomplete="off"
 					/>
 				{:else}
 					<p id="group-chat-name" on:dblclick={toggleEdit}>{typeChat}: {currentChat.name}</p>

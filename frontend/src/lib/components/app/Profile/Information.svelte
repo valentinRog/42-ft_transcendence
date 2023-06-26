@@ -40,6 +40,13 @@
 			});
 	}
 
+	const createdAt = $user.createdAt;
+
+	const formattedDate = new Date(createdAt).toLocaleDateString('en', {
+		day: '2-digit',
+		month: '2-digit',
+		year: 'numeric'
+	});
 	(async () => {
 		if (userId === null) {
 			isUser = true;
@@ -61,17 +68,19 @@
 	<ul>
 		<div class="pic-username-login">
 			<div class="username-login">
-				<li class="box">Username: {$currentUser?.username || ''}</li>
+				<li class="box">Username : {$currentUser?.username || ''}</li>
 				<li class="box">Registration date
 					: {$currentUser?.createdAt || ''}</li>
-				<li class="box">Friends: {$currentUser?.friends?.length || '0'}</li>
+				<li class="box">Friends : {$currentUser?.friends?.length || '0'}</li>
 			</div>
-			<li class="pic">
+			<div class="pic">
 				<img src={imgUrl} />
-			</li>
+			</div>
 		</div>
 		{#if isUser}
 			<button type="button" on:click={() => ($openEditProfile = true)}>Edit Profile</button>
+		{:else if $blocks.some((block) => block.blockedId === currentUser?.id)}
+			<button type="button" on:click={() => fetchUnblockUser(currentUser.id)}>UnBlock</button>
 		{:else}
 			{#if $blocks.some(block => block.blockedId === $currentUser?.id)}
 				<button type="button" on:click={() => fetchUnblockUser($currentUser.id)}>UnBlock</button>
@@ -79,32 +88,35 @@
 				<button type="button" on:click={() => fetchBlockUser($currentUser.id)}>Block</button>
 			{/if}
 		{/if}
-
 	</ul>
 </div>
 
 <style lang="scss">
 	#box {
-		width: 20rem;
-		height: 12rem;
+		ul {
+			height: 18rem;
+			display: flex;
+			flex-direction: column;
+		}
 		.pic-username-login {
 			display: flex;
-			align-items: center;
+			align-items: flex-start;
+			justify-content: space-between;
+			width: 22rem;
 			.pic {
-				display: inline-block;
-				position: relative;
-
 				@include tab-contour-hollow;
 				padding: 0.15rem;
-				margin-right: 0.25rem;
-				margin-left: auto;
+				margin-bottom: 0.25rem;
 				background-color: white;
-				height: 5rem;
-				width: 7.5rem;
+				height: 6rem;
+				width: 7rem;
 				display: flex;
 				img {
 					margin: 0 auto;
 				}
+			}
+			.username-login {
+				width: 12rem;
 			}
 		}
 		li {
@@ -112,7 +124,7 @@
 		}
 		li.box {
 			padding: 0.5rem;
-			margin: 0.25rem;
+			margin-bottom: 0.25rem;
 			@include tab-contour-hollow;
 		}
 
@@ -124,8 +136,8 @@
 		button {
 			@include tab-contour;
 			padding: 0.5rem;
-			margin: 0.25rem;
 			font-size: 1rem;
+			margin-top: auto;
 		}
 	}
 </style>

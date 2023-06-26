@@ -25,7 +25,6 @@ type Input = {
 })
 export class PongGateway extends SocketGateway {
   private games: Map<string, PongGame> = new Map();
-  // private rooms: Map<string, { room: string; index: number }> = new Map(); // map clientid and room
 
   @SubscribeMessage('ping')
   handlePing(@ConnectedSocket() client: Socket, @MessageBody() data: number) {
@@ -39,13 +38,14 @@ export class PongGateway extends SocketGateway {
     if (!this.games.has(room)) {
       const game = new PongGame(this.server, room);
       this.games.set(room, game);
-      game.setCallback((index: number) => {
+      game.setCallback(async (index: number) => {
         this.gameEnd(game);
         this.games.delete(room);
-        this.updateStat(game, client, { room, index }, index);
         this.server.to(room).emit('game-over', index);
         game.getPlayer1().leave(room);
         game.getPlayer2().leave(room);
+        this.webSocketService.removeClientRoom(game.getPlayer1().id);
+        this.webSocketService.removeClientRoom(game.getPlayer2().id);
       });
       game.startGame();
     }
@@ -53,12 +53,10 @@ export class PongGateway extends SocketGateway {
       this.games.get(room).setPlayer1(client);
       const p1 = this.webSocketService.getClientId(client);
       this.webSocketService.setStatus(p1, 'in-game');
-      client.emit('index', 0);
     } else if (index === 1) {
       this.games.get(room).setPlayer2(client);
       const p2 = this.webSocketService.getClientId(client);
       this.webSocketService.setStatus(p2, 'in-game');
-      client.emit('index', 1);
     }
   }
 

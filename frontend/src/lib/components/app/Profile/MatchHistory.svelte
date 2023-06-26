@@ -21,52 +21,55 @@
 	(async () => {
 		if (userId === null) {
 			await fetchHistory();
-		}
-		else {
+		} else {
 			const res = await fetchWithToken(`stat/get-history/${userId}`);
 			let data = await res.json();
 			data.forEach(function (element: any, index: number) {
+				const createdAtDate = new Date(element.createdAt);
 				data[index] = {
 					result: $user?.username === element.winnerName ? 'Win' : 'Lose',
 					opponent: $user?.username === element.winnerName ? element.loserName : element.winnerName,
-					createdAt: element.createdAt
+					createdAt: createdAtDate.toLocaleDateString('en', {
+						day: '2-digit',
+						month: '2-digit',
+						year: 'numeric'
+					})
 				};
 			});
 			currentHistory.set(data);
 		}
 	})();
-
 </script>
 
-<div class="sunken-panel" style="height: 15rem; width: 18rem;">
+<div class="sunken-panel">
 	{#if $currentHistory?.length === 0}
-			<tr>
-				<td colspan="3">You have not participated in any matches</td>
-			</tr>
+		<tr>
+			<td colspan="3">You have not participated in any matches</td>
+		</tr>
 	{:else}
-	<table class="interactive">
-		<thead>
-			<tr>
-				<th>Result</th>
-				<th>Opponent</th>
-				<th>Date</th>
-			</tr>
-		</thead>
-		<tbody>
-			{#if $currentHistory !== undefined && $currentHistory !== null}
-				{#each Object.values($currentHistory) as row}
-					<tr
-						class={current === row ? 'highlighted' : ''}
-						on:click={() => (current === row ? (current = null) : (current = row))}
-					>
-						{#each Object.values(row) as cell}
-							<td>{cell}</td>
-						{/each}
-					</tr>
-				{/each}
-			{/if}
-		</tbody>
-	</table>
+		<table class="interactive">
+			<thead>
+				<tr>
+					<th>Result</th>
+					<th>Opponent</th>
+					<th>Date</th>
+				</tr>
+			</thead>
+			<tbody>
+				{#if $currentHistory !== undefined && $currentHistory !== null}
+					{#each Object.values($currentHistory) as row}
+						<tr
+							class={current === row ? 'highlighted' : ''}
+							on:click={() => (current === row ? (current = null) : (current = row))}
+						>
+							{#each Object.values(row) as cell}
+								<td>{cell}</td>
+							{/each}
+						</tr>
+					{/each}
+				{/if}
+			</tbody>
+		</table>
 	{/if}
 </div>
 

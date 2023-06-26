@@ -46,19 +46,22 @@
 <style lang="scss">
 
 	.container {
+		margin-top: 0.5rem;
 		display: flex;
 		align-items: center;
 	}
 
 	.image {
+		@include tab-border($dark-grey, $light-grey);
+		padding: 0 0.2rem;
 		flex: 0 0 auto;
 		margin-right: 10px;
 	}
-
+	
 	.stats {
+		@include tab-border($light-grey, $dark-grey);
 		flex: 1 1 auto;
-		margin : 2rem;
-		margin-bottom : 1.5rem;
+		padding : 0.75rem;
 
 		div {
 			margin-bottom: 0.5rem;

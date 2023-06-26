@@ -101,13 +101,13 @@
 </script>
 
 <div id="box">
-	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" />
 	<div class="create-Chat">
 		<h4>Add New Topic</h4>
 		<form on:submit|preventDefault={createChat}>
 			<label>
 				Topic Name :
-				<input type="text" bind:value={groupName} required />
+				<input type="text" bind:value={groupName} required autocomplete="off" />
 			</label>
 			<label>
 				Access :
