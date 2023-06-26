@@ -453,7 +453,7 @@
 	async function fetchMe() {
 		const res = await fetchWithToken('users/me');
 		const data = await res.json();
-		console.log(data.createdAt);
+		console.log(data);
 		$user = {
 			id: data.id,
 			username: data.username,
@@ -698,6 +698,7 @@
 	$socket.on('friend', (data: { message: string }) => {
 		fetchFriendRequest();
 		fetchFriends();
+		fetchMe();
 	});
 
 	$socket.on('game', fetchGameRequest);
@@ -744,8 +745,7 @@
 		$room = null;
 		fetchHistory();
 		fetchStatistics();
-		console.log(data);
-		$matchmaking = false;
+			$matchmaking = false;
 	});
 
 	$socket.on('addChat', (chat) => {
