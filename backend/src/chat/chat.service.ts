@@ -65,6 +65,8 @@ export class ChatService {
           },
         },
         messages: true,
+        bans: true,
+        mutes: true,
       },
     });
     return newGroupChat;
