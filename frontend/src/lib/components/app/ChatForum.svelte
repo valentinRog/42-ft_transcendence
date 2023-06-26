@@ -221,7 +221,6 @@
 				}
 			});
 			currentChat.chatUsers = [...currentChat.chatUsers];
-			console.log(currentChat.chatUsers);
 		}
 	});
 
@@ -267,7 +266,7 @@
 				</p>
 			{:else}
 				<form on:submit|preventDefault={sendMessage} class="send-message-form">
-					<input type="text" bind:value={messageContent} class="message-input" {disabled} />
+					<input type="text" bind:value={messageContent} class="message-input" {disabled} autocomplete="off" />
 					<button type="submit" class="btn send-btn" {disabled}>Send</button>
 				</form>
 			{/if}
@@ -276,7 +275,7 @@
 	{#if !isUserMuted && !isUserBanned}
 		<div id="user-list">
 			{#if roleId <= 2}
-				<input type="text" bind:value={searchQuery} placeholder="Enter username" />
+				<input type="text" bind:value={searchQuery} placeholder="Enter username" autocomplete="off"/>
 				<select bind:value={selectedAction}>
 					<option value="">Select action</option>
 					{#if roleId <= 1}
@@ -303,7 +302,7 @@
 						<div id="password-change-form">
 							<label>
 								Enter new password:
-								<input type="password" bind:value={password} on:input={updatePassword} />
+								<input type="password" bind:value={password} on:input={updatePassword} autocomplete="off"/>
 							</label>
 							<button on:click={changePassword}>Submit</button>
 						</div>
@@ -318,7 +317,7 @@
 								{:else}
 									Enter password to switch to Protected:
 								{/if}
-								<input type="password" on:input={updatePassword} />
+								<input type="password" on:input={updatePassword} autocomplete="off" />
 							</label>
 							<button on:click={toggleAccess}>Submit</button>
 							<button on:click={closePasswordModal}>Cancel</button>
@@ -349,12 +348,14 @@
 											bind:value={banDuration}
 											placeholder="Ban duration in seconds"
 											min="0"
+											autocomplete="off"
 										/>
 										<input
 											type="number"
 											bind:value={muteDuration}
 											placeholder="Mute duration in seconds"
 											min="0"
+											autocomplete="off"
 										/>
 									</div>
 								{/if}

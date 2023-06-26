@@ -42,7 +42,7 @@ input[type='submit'] {
 button:disabled,
 input[type='submit']:disabled,
 input[type='reset']:disabled,
-:disabled + label {
+:disabled+label {
 	text-shadow: 1px 1px 0 var(--button-highlight);
 	pointer-events: none;
 	color: var(--button-shadow);
@@ -52,28 +52,23 @@ a:hover {
 	cursor: url($click), auto;
 }
 
-// AUTOCOMPLETION
-
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus {
-  background-color: red
-}
-
 // SCROLLBAR
 
 ::-webkit-scrollbar {
 	width: 1rem;
 }
+
 ::-webkit-scrollbar-track {
 	background-image: url('/scroll-back.png');
 	background-repeat: repeat;
 }
+
 ::-webkit-scrollbar-thumb {
 	margin: 0 0.2rem;
 	background-color: $grey;
 	@include tab-border;
 }
+
 ::-webkit-scrollbar-button {
 	background-image: url('/arrow-down.png');
 	background-size: 0.5rem;
@@ -112,18 +107,3 @@ scrollbarthumb {
 	background-color: $grey;
 	@include tab-border;
 }
-
-.loader {
-    background: url('/sablier.gif');
-    background-size: cover;
-	background-color: white;
-}
-.loading-whole-indicator-pic {
-    background: url('/sablier.gif');
-    background-size: cover;
-}
-
-@keyframes loader {
-	0% { transform: rotate(0deg); }
-	100% { transform: rotate(360deg); }
-  }

@@ -93,6 +93,7 @@
 			if (!chatExists) {
 				$chats.push(chat);
 				chatIdLocal = chat.id;
+				$socket.emit('joinRoom', { chatId: chat.id });
 				$socket.emit('otherAddChat', { chat: chat, userId: friendId });
 			}
 			isCreatingChat = false;
@@ -140,7 +141,7 @@
 	<div id="sendMessage-window">
 		{#if isFriend}
 			<form on:submit|preventDefault={sendMessage} class="send-message-form">
-				<input type="text" bind:value={messageContent} class="message-input" />
+				<input type="text" bind:value={messageContent} class="message-input" autocomplete="off"/>
 				<button type="submit" class="btn send-btn" disabled={isCreatingChat}>Send</button>
 			</form>
 		{:else}

@@ -9,7 +9,7 @@
 	const tabTitle = ['Informations', 'Statistics', 'Match history'];
 </script>
 
-<div class="window-body">
+<div class="whole-window">
 	<menu role="tablist">
 		{#each tabTitle as content, index}
 			<li
@@ -25,9 +25,7 @@
 	<div class="window" role="tabpanel">
 		<div class="window-body">
 			{#if activeTabIndex === 0}
-				<div class="window-body">
-					<ProfileInfo {userId} />
-				</div>
+				<ProfileInfo {userId} />
 			{:else if activeTabIndex === 1}
 				<Statistics {userId}/>
 			{:else if activeTabIndex === 2}
@@ -38,5 +36,6 @@
 </div>
 
 <style lang="scss">
+
 	@include onglet;
 </style>

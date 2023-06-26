@@ -65,7 +65,8 @@
 
 		if (isValidPassword) {
 			$chatId = selectedChat.id;
-			$socket.emit('joinChat', { chatId: selectedChat.id, userId: $user?.id });
+			$chats.push(selectedChat);
+			$socket.emit('joinRoom', { chatId: selectedChat.id });
 			$openChatForumWindow = true;
 			selectedChat = null;
 			chatPassword = '';
@@ -101,13 +102,13 @@
 </script>
 
 <div id="box">
-	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" />
 	<div class="create-Chat">
 		<h4>Add New Topic</h4>
 		<form on:submit|preventDefault={createChat}>
 			<label>
 				Topic Name :
-				<input type="text" bind:value={groupName} required />
+				<input type="text" bind:value={groupName} required autocomplete="off" />
 			</label>
 			<label>
 				Access :
@@ -138,7 +139,7 @@
 						<li on:click={() => startChat(chat)}>
 							<div class="chat-item">
 								{#if chat.accessibility === "protected" && !chat.chatUsers.find(c => c.userId === $user?.id)}
-									<h6>logo lock</h6>
+									<img src="padlock.png">
 								{/if}
 								<span>{chat.name}</span>
 							</div>
@@ -343,6 +344,10 @@
 		.border-inside {
 			padding: 0 0.25rem;
 		}
+	}
+
+	img {
+		margin-right: 0.3rem;
 	}
 
 </style>
