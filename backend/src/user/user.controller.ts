@@ -31,7 +31,8 @@ export class UserController {
   constructor(private userService: UserService, private prisma: PrismaClient) {}
 
   @Get('me')
-  getMe(@GetUser() user) {
+  getMe(@GetUser('id') userId: number) {
+    const user = this.prisma.user.findUnique({ where: { id: userId } });
     return user;
   }
 

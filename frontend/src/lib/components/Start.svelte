@@ -9,6 +9,8 @@
 
 	let active = false;
 
+	const notVisible = new Set(['FriendRequest', 'Chat', 'ChatForum', 'EditProfile', 'PongKeybinds']);
+
 </script>
 
 <svelte:body on:click={() => (active = false)} />
@@ -19,7 +21,7 @@
 	</div>
 </div>
 <div class="menu" class:hidden={!active}>
-	{#each Object.entries($apps).filter(([k, _]) => k !== 'FriendRequest' && k !== 'Chat' && k !== 'ChatForum') as [k, v]}
+	{#each Object.entries($apps).filter(([k, _]) => !notVisible.has(k)) as [k, v]}
 		<button class="app-button" on:click|stopPropagation={() => addInstance(k)}>
 			<img src={v.TabProps.icon} alt={v.TabProps.name} draggable="false" />
 			{v.TabProps.name}</button

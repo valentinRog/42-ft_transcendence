@@ -32,6 +32,8 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"date-fns": "^2.30.0",
+		"luxon": "^3.3.0",
 		"socket.io-client": "^4.6.1",
 		"uuid": "^9.0.0"
 	}

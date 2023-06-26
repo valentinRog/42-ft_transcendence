@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { user } from '$lib/stores';
+	import type { User } from '$lib/stores';
 	import { Context } from '$lib/components/Context.svelte';
 
 	const fetchWithToken = Context.fetchWithToken();
@@ -11,7 +12,7 @@
 
 	export let userId: number | null | undefined = null;
 
-	let currentUser: any = {};
+	let currentUser: User;
 	let imgUrl: string | '';
 	let isUser = false;
 
@@ -30,10 +31,8 @@
 		}
 	}
 
-	const friends = Context.contacts();
-
 	async function fetchAvatar() {
-		fetchWithToken(`users/avatar/${currentUser.id}`)
+		fetchWithToken(`users/avatar/${currentUser?.id}`)
 			.then((res) => {
 				if (res.status === 200 || res.status === 201) {
 					return res.blob();
@@ -46,14 +45,17 @@
 				imgUrl = '/avatar.png';
 			});
 	}
+
 </script>
 
 <div id="box">
 	<ul>
 		<div class="pic-username-login">
 			<div class="username-login">
-				<li class="box">Username: {currentUser.username || ''}</li>
-				<li class="box">Login: {currentUser.login || ''}</li>
+				<li class="box">Username: {currentUser?.username || ''}</li>
+				<li class="box">Registration date
+					: {currentUser?.createdAt || ''}</li>
+				<li class="box">Friends: {currentUser?.friends?.length || ''}</li>
 			</div>
 			<li class="pic">
 				<img src={imgUrl} />
@@ -62,45 +64,20 @@
 		{#if isUser}
 			<button type="button" on:click={() => ($openEditProfile = true)}>Edit Profile</button>
 		{:else}
-			{#if $blocks.some(block => block.blockedId === currentUser.id)}
+			{#if $blocks.some(block => block.blockedId === currentUser?.id)}
 				<button type="button" on:click={() => fetchUnblockUser(currentUser.id)}>UnBlock</button>
 			{:else}
 				<button type="button" on:click={() => fetchBlockUser(currentUser.id)}>Block</button>
 			{/if}
 		{/if}
-		{#if userId === $user?.id}
-			<li class="box friends">
-				<p>My friends</p>
-				<ul id="friend-list">
-					{#each $friends as friend (friend.id)}
-						<li class="friend">
-							<div>
-								<p>{friend.username} :</p>
-								<p class="status">{friend.status}</p>
-								{#if friend.status === 'online'}
-									<img class="img-status" src="/online.png" alt="online" />
-								{:else if friend.username === 'vrogiste' && friend.status === 'in-game'}
-									<img class="img-status" src="/in-game-val.png" alt="in-game" />
-								{:else if friend.status === 'in-game'}
-									<img class="img-status" src="/in-game.png" alt="in-game" />
-								{:else if friend.status === 'spectator'}
-									<img class="img-status" src="/spectator.png" alt="spectator" />
-								{:else}
-									<img class="img-status" src="/offline.png" alt="offline" />
-								{/if}
-							</div>
-						</li>
-					{/each}
-				</ul>
-			</li>
-		{/if}
+
 	</ul>
 </div>
 
 <style lang="scss">
 	#box {
 		width: 20rem;
-		height: 20rem;
+		height: 12rem;
 		.pic-username-login {
 			display: flex;
 			align-items: center;
@@ -129,24 +106,17 @@
 			margin: 0.25rem;
 			@include tab-contour-hollow;
 		}
-		li.friends {
-			@include tab-contour-hollow;
-			background-color: white;
-			div {
-				margin-bottom: 0.2rem;
-				display: flex;
-				align-items: center;
-				.status {
-					margin-left: auto;
-				}
-				img {
-					padding-left: 0.5rem;
-				}
-			}
-		}
+
 		.img-status {
 			height: 0.8rem;
 			width: auto;
+		}
+
+		button {
+			@include tab-contour;
+			padding: 0.5rem;
+			margin: 0.25rem;
+			font-size: 1rem;
 		}
 	}
 </style>

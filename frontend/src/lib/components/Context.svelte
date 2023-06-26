@@ -453,12 +453,15 @@
 	async function fetchMe() {
 		const res = await fetchWithToken('users/me');
 		const data = await res.json();
+		console.log(data.createdAt);
 		$user = {
 			id: data.id,
 			username: data.username,
 			login: data.login,
 			twoFactorEnabled: data.twoFactorEnabled,
-			logFrom42: data.logFrom42
+			logFrom42: data.logFrom42,
+			createdAt: data.createdAt,
+			friends: data.friends
 		};
 		return data;
 	}
