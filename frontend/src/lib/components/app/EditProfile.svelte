@@ -2,7 +2,7 @@
 	import { Context } from '$lib/components/Context.svelte';
 	import { user } from '$lib/stores';
 	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
-	import TwoFactorDialog from '$lib/components/TwoFactorDialog.svelte';
+	import TwoFactorDialog from '$lib/components/app/Profile/TwoFactorDialog.svelte';
 
 	const fetchWithToken = Context.fetchWithToken();
 	const addInstance = Context.addInstance();

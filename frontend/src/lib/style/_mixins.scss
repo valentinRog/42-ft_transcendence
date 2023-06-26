@@ -440,3 +440,57 @@
 		height: 1.2rem;
 	}
 }
+
+@mixin select-95 {
+
+	select {
+		appearance: none;
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		position: relative;
+		padding-right: 32px;
+		background-image: url('/button-down.png');
+		background-position: top 2px right 2px;
+		background-repeat: no-repeat;
+		border-radius: 0;
+	}
+
+	select:focus {
+		color: white;
+		background-color: #000080;
+	}
+
+	select:focus option {
+		color: #000;
+		background-color: #fff;
+	}
+
+	select {
+		padding: 3px 4px;
+		border: none;
+		box-shadow:inset -1px -1px white,
+		inset 1px 1px var(--button-shadow), inset -2px -2px var(--button-face),
+		inset 2px 2px var(--window-frame);
+
+		background-color: white;
+		box-sizing: border-box;
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		appearance: none;
+		border-radius: 0;
+	}
+
+	select,
+	option {
+		-webkit-font-smoothing: none;
+		font-size: 11px;
+	}
+
+	select {
+		height: 21px;
+	}
+
+	select:focus {
+		outline: none;
+	}
+}

@@ -176,6 +176,8 @@
 		height: 32rem;
 	}
 
+	@include select-95;
+
 	.chat-window {
 		overflow-x: hidden;
 		margin: 0.2rem;
