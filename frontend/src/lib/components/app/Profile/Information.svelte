@@ -170,7 +170,7 @@
 						width: auto;
 					}
 				}
-			}
+			} 
 		}
 
 		.img-status {
