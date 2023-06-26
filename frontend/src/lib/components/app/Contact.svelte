@@ -176,7 +176,7 @@
 									$selected = null;
 								}}
 							/>
-							{#if friend.status === 'online' || friend.status == 'in-game' || friend.status === 'spectator'}
+							{#if friend.status !== 'offline'}
 								<img
 									class="option-icons"
 									src="/joystick.png"
@@ -184,11 +184,13 @@
 								/>
 							{/if}
 							<img class="option-icons" src="/write.png" on:click={() => startChat(friend)} />
-							<img
-								class="option-icons"
-								src="/no-friend.png"
-								on:click={() => removeFriend(friend.id)}
-							/>
+							{#if friend.status === 'in-game'}
+								<img
+									class="option-icons"
+									src="/camera.png"
+									on:click={() => spectateGame(friend.id)}
+								/>
+							{/if}
 						{/if}
 					</div>
 				</div>
@@ -199,15 +201,19 @@
 					{:else if friend.username === 'vrogiste' && friend.status === 'in-game'}
 						<img src="/in-game-val.png" alt="in-game" />
 					{:else if friend.status === 'in-game'}
-						<a href="#" on:click={() => spectateGame(friend.id)}>
-							<img src="/in-game.png" alt="in-game" />
-						</a>
+						<img src="/in-game.png" alt="in-game" />
 					{:else if friend.status === 'spectator'}
 						<img src="/spectator.png" alt="spectator" />
 					{:else}
 						<img src="/offline.png" alt="offline" />
 					{/if}
+					<img
+						class="remove-icon"
+						src="/red-cross.png"
+						on:click={() => removeFriend(friend.id)}
+					/>
 				</div>
+
 			</div>
 		{/each}
 	</div>
@@ -277,6 +283,11 @@
 				img {
 					height: 0.9rem;
 					padding-left: 0.5rem;
+				}
+
+				.remove-icon {
+					height: 1.3rem;
+					cursor: url($click), auto;
 				}
 			}
 			.option-icons {

@@ -82,7 +82,7 @@
 				</div>
 				{#if !signup}
 					<div class="form-group">
-						<div class="row-icon"><img src="/padlock.png" /></div>
+						<div class="row-icon"><img src="/key_padlock.png" /></div>
 						<label for="twoFactor">2FA:</label>
 						<input type="text" id="twoFactor" name="twoFactor" />
 					</div>
@@ -142,6 +142,7 @@
 				width: 25px;
 				height: 25px;
 			}
+
 			label {
 				color: black;
 				width: 7rem;
