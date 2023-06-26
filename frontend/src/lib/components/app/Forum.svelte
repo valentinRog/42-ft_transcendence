@@ -178,6 +178,10 @@
 
 	@include select-95;
 
+	select {
+		width: 100px;
+	}
+
 	.chat-window {
 		overflow-x: hidden;
 		margin: 0.2rem;
