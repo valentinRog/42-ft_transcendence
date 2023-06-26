@@ -53,7 +53,6 @@
 	};
 
 	type Input = {
-		room: string;
 		clientId: string;
 		stateId: number;
 		clientTime: number;
@@ -237,7 +236,6 @@
 
 	const i1 = setInterval(() => {
 		const input: Input = {
-			room: $room.room,
 			clientId: $socket.id,
 			stateId: $room.state.id + delay,
 			clientTime: Date.now() + delay,
@@ -285,13 +283,6 @@
 		clearInterval(i1);
 		clearInterval(i2);
 		if (animationFrame !== undefined) cancelAnimationFrame(animationFrame);
-		 if ($room.room !== '') {
-		 	$socket.emit('leave-room', { room: $room.room, index: $room.index });
-		 } else {
-		 	fetchWithToken('matchmaking/unqueue', {
-		 		method: 'POST'
-		 	});
-		 }
 		$socket.off('ping');
 		$socket.off('state');
 		$socket.off('input');

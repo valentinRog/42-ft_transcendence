@@ -9,7 +9,6 @@ import { SocketGateway } from '../websocket/websocket.gateway';
 import { PongGame } from './pong.class';
 
 type Input = {
-  room: string;
   clientId: string;
   stateId: number;
   idDelta: number;
@@ -26,7 +25,7 @@ type Input = {
 })
 export class PongGateway extends SocketGateway {
   private games: Map<string, PongGame> = new Map();
-  private rooms: Map<string, { room: string; index: number }> = new Map(); // map clientid and room
+  // private rooms: Map<string, { room: string; index: number }> = new Map(); // map clientid and room
 
   @SubscribeMessage('ping')
   handlePing(@ConnectedSocket() client: Socket, @MessageBody() data: number) {
@@ -34,21 +33,20 @@ export class PongGateway extends SocketGateway {
   }
 
   @SubscribeMessage('enter-room')
-  handleRoom(client: Socket, data: { room: string; index: number }) {
-    client.join(data.room);
-    if (!this.games.has(data.room)) {
-      const game = new PongGame(this.server, data.room);
-      this.games.set(data.room, game);
+  handleRoom(client: Socket) {
+    const { room, index } = this.webSocketService.getClientRoom(client.id);
+    client.join(room);
+    if (!this.games.has(room)) {
+      const game = new PongGame(this.server, room);
+      this.games.set(room, game);
     }
-    if (data.index === 0) {
-      this.rooms.set(client.id, { room: data.room, index: 0 });
-      this.games.get(data.room).setPlayer1(client);
+    if (index === 0) {
+      this.games.get(room).setPlayer1(client);
       const p1 = this.webSocketService.getClientId(client);
       this.webSocketService.setStatus(p1, 'in-game');
       client.emit('index', 0);
-    } else if (data.index === 1) {
-      this.rooms.set(client.id, { room: data.room, index: 1 });
-      this.games.get(data.room).setPlayer2(client);
+    } else if (index === 1) {
+      this.games.get(room).setPlayer2(client);
       const p2 = this.webSocketService.getClientId(client);
       this.webSocketService.setStatus(p2, 'in-game');
       client.emit('index', 1);
@@ -60,19 +58,17 @@ export class PongGateway extends SocketGateway {
     console.log('spectate', data);
     const friend = this.webSocketService.getSocket(data.friendId);
     client.emit('enter-room', {
-      room: this.rooms.get(friend.id).room,
+      room: this.webSocketService.getClientRoom(friend.id).room,
       index: 2,
     });
   }
 
   @SubscribeMessage('input')
   handleInput(client: Socket, input: Input) {
-    if (input.room) {
-      const game = this.games.get(input.room);
-      if (game) {
-        game.handleInput(input);
-      }
-    }
+    const room = this.webSocketService.getClientRoom(client.id)?.room;
+    if (room === undefined) return;
+    const game = this.games.get(room);
+    if (game) game.handleInput(input);
   }
 
   gameEnd(game: PongGame) {
@@ -123,12 +119,12 @@ export class PongGateway extends SocketGateway {
 
   @SubscribeMessage('disconnect')
   async handleDisconnect(client: Socket) {
-    if (!this.rooms.has(client.id)) return;
-    const { room, index } = this.rooms.get(client.id);
+    if (this.webSocketService.getClientRoom(client.id) === undefined) return;
+    const { room, index } = this.webSocketService.getClientRoom(client.id);
     const game = this.games.get(room);
     if (game) {
       if (index === 0 || index === 1) {
-        this.rooms.delete(client.id);
+        this.webSocketService.removeClientRoom(client.id);
         this.gameEnd(game);
         this.games.delete(room);
         const result = index === 0 ? 1 : 0;

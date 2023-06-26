@@ -49,7 +49,6 @@ export abstract class SocketGateway
     console.log(`${user.username} connected`);
     this.webSocketService.addSocket(user.id, client);
     this.webSocketService.setStatus(user.id, 'online');
-    this.webSocketService.setStatus(user.id, 'online');
   }
 
   handleDisconnect(client: Socket) {
@@ -263,9 +262,11 @@ export abstract class SocketGateway
   ) {
     const { chatId, userId, newRoleId } = payload;
     await this.chatService.changeRole(chatId, userId, newRoleId);
-    this.server
-      .to(`chat-${chatId}`)
-      .emit('updateRole', { chatId: chatId, userId: userId, newRoleId: newRoleId });
+    this.server.to(`chat-${chatId}`).emit('updateRole', {
+      chatId: chatId,
+      userId: userId,
+      newRoleId: newRoleId,
+    });
     return;
   }
 
@@ -308,7 +309,6 @@ export abstract class SocketGateway
     @MessageBody() data: { response: boolean; friendId: number },
     @ConnectedSocket() client: Socket,
   ) {
-	console.log(data.friendId);
     const userId = this.webSocketService.getClientId(client);
     if (data.response) {
       this.webSocketService.createRoom(userId, data.friendId);
