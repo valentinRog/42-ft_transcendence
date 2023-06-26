@@ -74,6 +74,7 @@ export class PongGame {
   private player2: Socket | null = null;
   private inputs1: Input[] = [];
   private inputs2: Input[] = [];
+  private callback: (index: number) => void | null = null;
   private state: GameState = {
     ball: {
       x: dimensions.width / 2 - dimensions.ballWidth / 2,
@@ -92,7 +93,7 @@ export class PongGame {
     player2Score: 0,
   };
 
-  private startGame() {
+  startGame() {
     console.log(`Game in room ${this.room} started`);
     this.gameLoop();
   }
@@ -225,8 +226,19 @@ export class PongGame {
     return s;
   }
 
-  gameLoop() {
+  setCallback(callback: (index: number) => void) {
+    this.callback = callback;
+  }
+
+  private gameLoop() {
     this.state = this.update(this.state, Date.now() - this.state.time);
+    if (this.state.player1Score >= 10 || this.state.player2Score >= 10) {
+      if (this.callback !== null) {
+        const winner = this.state.player1Score >= 5 ? 0 : 1;
+        this.callback(winner);
+      }
+      return;
+    }
     this.state.time = Date.now();
     this.state.id++;
     while (this.inputs1.length && this.inputs1[0].serverTime <= Date.now()) {

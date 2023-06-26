@@ -220,7 +220,7 @@ export abstract class SocketGateway
     payload: { chatId: number; userId: number },
   ) {
     const { chatId, userId } = payload;
-    const socket = await this.webSocketService.getSocket(userId);
+    const socket = this.webSocketService.getSocket(userId);
 
     await this.chatService.unBanUser(chatId, userId);
     if (socket) socket.emit('userUnBan', { chatId });
