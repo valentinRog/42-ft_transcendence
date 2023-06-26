@@ -49,7 +49,7 @@
 		if (autoScroll) chatWindow.scrollTop = chatWindow.scrollHeight;
 	});
 
-	function openProfile(userId: string) {
+	function openProfile(userId: number) {
 		addInstance('Profile', { }, { userId: userId });
 		$selected = null;
 	}
@@ -125,7 +125,7 @@
 						<li class={message.user?.id === $user?.id ? 'self' : 'other'}>
 							<div class="message-header">
 								{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
-									<strong on:click={() => openProfile(message.user?.username)}>{message.user?.username}</strong>
+									<strong on:click={() => openProfile(message.user?.id)}>{message.user?.username}</strong>
 								{/if}
 							</div>
 							<div class="message-content">{message.content}</div>
