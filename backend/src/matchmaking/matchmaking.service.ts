@@ -91,7 +91,8 @@ export class MatchmakingService {
     }
     this.socketService.setStatus(user.id, 'spectate');
 
-    return this.socketService.joinRoom(userId, room);
+    // return this.socketService.joinRoom(userId, room);
+    return "doesn't work yet";
   }
 
   async createMatch(userId: number, opponentId: number) {
