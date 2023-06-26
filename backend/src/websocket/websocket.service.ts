@@ -74,18 +74,18 @@ export class WebSocketService {
     return { player1: player1Id, player2: player2Id, room };
   }
 
-  // joinRoom(playerId: number, room: string) {
-  //   const socketPlayer = this.getSocket(playerId);
+  joinRoom(playerId: number, room: string) {
+    const socketPlayer = this.getSocket(playerId);
 
-  //   if (!socketPlayer) {
-  //     throw new NotFoundException('user socket not connected');
-  //   }
+    if (!socketPlayer) {
+      throw new NotFoundException('user socket not connected');
+    }
 
-  //   socketPlayer.join(room);
-  //   socketPlayer.emit('enter-room', room);
+    socketPlayer.join(room);
+    socketPlayer.emit('enter-room', room);
 
-  //   return { spectator: playerId, room: room };
-  // }
+    return { spectator: playerId, room: room };
+  }
 
   sendToUser(userToNotify: number, message: string, event: string) {
     const socket = this.getSocket(userToNotify);
