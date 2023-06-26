@@ -186,6 +186,7 @@
 		export const fetchVerifyPassword = (): ((chatId: number, password: string) => Promise<any>) =>
 			getContext('fetchVerifyPassword');
 		export const fetchCreateChat = (): ((
+			groupName: any,
 			memberUsernames: any,
 			isGroupChat: any,
 			accessibility: string,
@@ -578,6 +579,7 @@
 	}
 
 	async function fetchCreateChat(
+		groupName: any,
 		memberUsernames: any,
 		isGroupChat: any,
 		accessibility: string,
@@ -589,6 +591,7 @@
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
+				groupName,
 				memberUsernames,
 				isGroupChat,
 				accessibility,

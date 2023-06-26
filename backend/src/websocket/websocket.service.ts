@@ -51,6 +51,10 @@ export class WebSocketService {
     return this.rooms.get(clientId);
   }
 
+  setClientRoom(clientId: string, room: string, index: number) {
+    this.rooms.set(clientId, { room: room, index: index });
+  }
+
   removeClientRoom(clientId: string) {
     this.rooms.delete(clientId);
   }
@@ -66,8 +70,8 @@ export class WebSocketService {
     }
     this.rooms.set(socketPlayer1.id, { room: room, index: 0 });
     this.rooms.set(socketPlayer2.id, { room: room, index: 1 });
-    socketPlayer1.join(room);
-    socketPlayer2.join(room);
+    //socketPlayer1.join(room);
+    //socketPlayer2.join(room);
     socketPlayer1.emit('enter-room', { room, index: 0, opponentId: player2Id });
     socketPlayer2.emit('enter-room', { room, index: 1, opponentId: player1Id });
 

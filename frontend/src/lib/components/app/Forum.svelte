@@ -2,12 +2,14 @@
 	import { onMount } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
 	import { user } from '$lib/stores';
+	import { action_destroyer } from 'svelte/internal';
 
 	const socket = Context.socket();
 	const chatId = Context.chatId();
 	const chats = Context.chats();
 	const chatsPublic = Context.chatsPublic();
 	const fetchPublicChats = Context.fetchPublicChats();
+	const fetchCreateChat = Context.fetchCreateChat();
 	const fetchChatById = Context.fetchChatById();
 	const fetchVerifyPassword = Context.fetchVerifyPassword();
 	const openChatForumWindow = Context.openChatForumWindow();
@@ -32,17 +34,10 @@
 		if (groupName.trim() === '' || ['public', 'protected'].indexOf(accessibility) < 0) {
 			return;
 		}
-		$socket.emit('createGroupChat', {
-			groupName: groupName,
-			memberUsernames: [$user?.username],
-			isGroupChat: true,
-			accessibility: accessibility,
-			password: password
-		});
-		$socket.on('createChat', (chatNumber: number) => {
-			$chatId = chatNumber;
-			$openChatForumWindow = true;
-		});
+		const chat = await fetchCreateChat(groupName, [$user?.username], true, accessibility, password);
+		$chats.push(chat);
+		$chatId = chat.id;
+		$openChatForumWindow = true;
 	};
 
 	async function startChat(chat: Context.Chat) {
@@ -163,8 +158,8 @@
 				<dialog class="dialog-box" open={dialogOpen}>
 					<div class="top-bar">
 						<div class="topbutton">
-							<button on:click={closeDialog}>
-								<div class="border-inside">&nbspX&nbsp</div>
+							<button class="exit-button" on:click={closeDialog}>
+								<div>X</div>
 							</button>
 						</div>
 					</div>
@@ -199,6 +194,7 @@
 </div>
 
 <style lang="scss">
+
 	#box {
 		width: 25rem;
 		height: 32rem;
@@ -323,11 +319,11 @@
 
 		.topbutton {
 			margin-left: auto;
-			margin-right: 0.2rem;
 		}
 	}
 
 	.error-message {
+		display: flex;
 		color: rgb(176, 6, 6);
 		text-align: center;
 	}
@@ -336,5 +332,17 @@
 		text-align: center;
 	}
 
+	.exit-button {
+		@include tab-contour;
+		@include tab-contour-active;
+		background-color: $grey;
+		margin-top: 0.2rem;
+		scale: 65%;
+		float:right;
+
+		.border-inside {
+			padding: 0 0.25rem;
+		}
+	}
 
 </style>
