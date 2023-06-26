@@ -220,7 +220,7 @@ export abstract class SocketGateway
     payload: { chatId: number; userId: number },
   ) {
     const { chatId, userId } = payload;
-    const socket = await this.webSocketService.getSocket(userId);
+    const socket = this.webSocketService.getSocket(userId);
 
     await this.chatService.unBanUser(chatId, userId);
     if (socket) socket.emit('userUnBan', { chatId });
@@ -248,7 +248,7 @@ export abstract class SocketGateway
     payload: { chatId: number; userId: number },
   ) {
     const { chatId, userId } = payload;
-    const socket = await this.webSocketService.getSocket(userId);
+    const socket = this.webSocketService.getSocket(userId);
 
     await this.chatService.unMuteUser(chatId, userId);
     socket.emit('userUnMute', { chatId });
@@ -288,21 +288,6 @@ export abstract class SocketGateway
     const { chatId, password } = payload;
     await this.chatService.setPassword(chatId, password);
   }
-
-  //  @SubscribeMessage('response-friend')
-  //  async handleAcceptFriend(
-  //    @MessageBody() data: { response: boolean; friend: string },
-  //    @ConnectedSocket() client: Socket,
-  //  ) {
-  //    const userId = this.webSocketService.getClientId(client);
-  //    const user = await this.userService.getUserById(userId);
-  //    const friend = await this.userService.getUser(data.friend);
-  //    if (!friend) return { error: 'User not found' };
-  //    if (data.response) {
-  //      this.userService.addFriend(user.id, friend.id);
-  //    }
-  //    client.emit('friend-accepted', data.friend);
-  //  }
 
   @SubscribeMessage('response-game')
   async handleMatch(

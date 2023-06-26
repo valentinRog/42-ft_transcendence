@@ -49,7 +49,7 @@
 		if (autoScroll) chatWindow.scrollTop = chatWindow.scrollHeight;
 	});
 
-	function openProfile(userId: string) {
+	function openProfile(userId: number) {
 		addInstance('Profile', { }, { userId: userId });
 		$selected = null;
 	}
@@ -69,7 +69,7 @@
 
 	async function updateLastMessageRead() {
 		const lastMessage = currentChat?.messages[currentChat?.messages.length - 1];
-		if (lastMessage.userId !== $user?.id) {
+		if (lastMessage && lastMessage.userId !== $user?.id) {
 			const chatUser = currentChat.chatUsers.find((user : any) => user.userId === userId);
 			if(chatIdLocal && lastMessage.id !== chatUser.lastReadMessageId && $user?.id) {
 				await fetchUpdateLastMessageRead(chatIdLocal, lastMessage.id, $user?.id);
@@ -86,7 +86,8 @@
 			isCreatingChat = true;
 
 			const memberUsernames = [$user?.username, friendUsername];
-			const chat = await fetchCreateChat(memberUsernames, false, 'private');
+			const groupName = memberUsernames.join('-');
+			const chat = await fetchCreateChat(groupName, memberUsernames, false, 'private');
 			const chatExists = $chats.some((existingChat) => existingChat.id === chat.id);
 
 			if (!chatExists) {
@@ -125,7 +126,7 @@
 						<li class={message.user?.id === $user?.id ? 'self' : 'other'}>
 							<div class="message-header">
 								{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
-									<strong on:click={() => openProfile(message.user?.username)}>{message.user?.username}</strong>
+									<strong on:click={() => openProfile(message.user?.id)}>{message.user?.username}</strong>
 								{/if}
 							</div>
 							<div class="message-content">{message.content}</div>

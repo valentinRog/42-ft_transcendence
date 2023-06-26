@@ -8,6 +8,7 @@
 
 	const fetchWithToken = Context.fetchWithToken();
 	const fetchFriends = Context.fetchFriends();
+	const fetchMe = Context.fetchMe();
 
 	const chats = Context.chats();
 	const chatId = Context.chatId();
@@ -54,6 +55,7 @@
 		});
 		await res.json();
 		fetchFriends();
+		fetchMe();
 	}
 
 	function askGame(friendId: number) {

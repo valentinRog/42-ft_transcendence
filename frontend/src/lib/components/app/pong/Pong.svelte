@@ -51,14 +51,14 @@
 
 <div class="container">
 	<div class="menu">
-		<DropDown name="game" notif={$gameRequest.length}>
+		<DropDown name="Game" notif={$gameRequest.length}>
 			{#if $matchmaking === false}
-				<button on:click={matchmake}>matchmaking</button>
+				<button on:click={matchmake}>Matchmaking</button>
 			{:else}
-				<button class="unavailable">matchmake</button>
+				<button class="unavailable">Matchmaking</button>
 			{/if}
 			{#if $gameRequest.length > 0}
-				<RightDrop name="invitations" notif={$gameRequest.length}>
+				<RightDrop name="Invitations" notif={$gameRequest.length}>
 					{#each $gameRequest as r (r.id)}
 						<RightDrop name={r.senderName}>
 							<button on:click={() => responseGame(r.senderId, true)}>accept</button>
@@ -67,21 +67,21 @@
 					{/each}
 				</RightDrop>
 			{:else}
-				<button class="unavailable"> invitations </button>
+				<button class="unavailable"> Invitations </button>
 			{/if}
 		</DropDown>
-		<DropDown name="settings">
-			<RightDrop name="scale">
+		<DropDown name="Settings">
+			<RightDrop name="Scale">
 				<DropRadios
 					fields={['60%', '80%', '100%', '120%', '140%', '160%']}
 					def="100%"
 					bind:selected={scaleString}
 				/>
 			</RightDrop>
-			<RightDrop name="show">
+			<RightDrop name="Show">
 				<DropCheck fields={selected} />
 			</RightDrop>
-			<RightDrop name="colors">
+			<RightDrop name="Colors">
 				<div class="color">
 					background <input type="color" bind:value={$settings.pong.colors.background} />
 				</div>
@@ -98,7 +98,7 @@
 					decorations <input type="color" bind:value={$settings.pong.colors.decorations} />
 				</div>
 			</RightDrop>
-			<button on:click={() => addInstance('PongKeybinds')}>keybinds</button>
+			<button on:click={() => addInstance('PongKeybinds')}>Keybinds</button>
 		</DropDown>
 	</div>
 	{#if $room !== null}
