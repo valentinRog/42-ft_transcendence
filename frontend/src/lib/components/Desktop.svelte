@@ -211,7 +211,7 @@
 	}
 
 	img {
-		width: 2.6rem;
+		width: 2.4rem;
 	}
 
 	.clicked {

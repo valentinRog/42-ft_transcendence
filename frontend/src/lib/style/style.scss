@@ -57,10 +57,10 @@ a:hover {
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
-  background-color: red 
+  background-color: red
 }
 
-// SCROLLBAR 
+// SCROLLBAR
 
 ::-webkit-scrollbar {
 	width: 1rem;
@@ -112,3 +112,18 @@ scrollbarthumb {
 	background-color: $grey;
 	@include tab-border;
 }
+
+.loader {
+    background: url('/sablier.gif');
+    background-size: cover;
+	background-color: white;
+}
+.loading-whole-indicator-pic {
+    background: url('/sablier.gif');
+    background-size: cover;
+}
+
+@keyframes loader {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+  }
