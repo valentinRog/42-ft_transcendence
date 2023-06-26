@@ -90,6 +90,8 @@
 		export const openChatWindow = (): Writable<boolean> => getContext('openChatWindow');
 		export const openChatForumWindow = (): Writable<boolean> => getContext('openChatForumWindow');
 		export const fetchSettings = (): (() => Promise<any>) => getContext('fetchSettings');
+		export const unreadConversations = (): Writable<number> => getContext('unreadConversations');
+		export const fetchUnreadConversations = (): (() => Promise<number>) =>getContext('fetchUnreadConversations');
 
 		export interface Settings {
 			pong: {
@@ -289,6 +291,7 @@
 	const gameRequest = writable<Context.NotifRequest[]>([]);
 	const history = writable<Context.Match[]>([]);
 	const statistics = writable<Context.Stat>();
+	const unreadConversations = writable(0);
 	const openFriendRequest = writable(false);
 	const openEditProfile = writable(false);
 	const openPongWindow = writable(false);
@@ -305,6 +308,7 @@
 	setContext('gameRequest', gameRequest);
 	setContext('history', history);
 	setContext('statistics', statistics);
+	setContext('unreadConversations', unreadConversations);
 	setContext('openFriendRequest', openFriendRequest);
 	setContext('openEditProfile', openEditProfile);
 	setContext('openPongWindow', openPongWindow);
@@ -453,7 +457,6 @@
 	async function fetchMe() {
 		const res = await fetchWithToken('users/me');
 		const data = await res.json();
-		console.log(data);
 		$user = {
 			id: data.id,
 			username: data.username,
@@ -464,6 +467,17 @@
 			friends: data.friends
 		};
 		return data;
+	}
+
+	async function fetchUnreadConversations() {
+		$unreadConversations = 0;
+		for (const chat of $chats) {
+			if (getUnreadMessagesCount(
+					chat,
+					chat.chatUsers.find((chatUser) => chatUser.userId === $user?.id) ) > 0) {
+				$unreadConversations++;
+			}
+		}
 	}
 
 	async function fetchUserByUsername(username: string) {
@@ -559,6 +573,7 @@
 		const res = await fetchWithToken('chat/allUserChats');
 		const data = await res.json();
 		$chats = data;
+		await fetchUnreadConversations();
 		return data;
 	}
 
@@ -627,6 +642,7 @@
 				}
 			});
 		}
+		await fetchUnreadConversations();
 		return data;
 	}
 
@@ -663,6 +679,7 @@
 	setContext('fetchCreateChat', fetchCreateChat);
 	setContext('fetchVerifyPassword', fetchVerifyPassword);
 	setContext('fetchStatistics', fetchStatistics);
+	setContext('fetchUnreadConversations', fetchUnreadConversations);
 
 	const socket = readable<Socket>(
 		ioClient(PUBLIC_BACKEND_URL, {
@@ -704,8 +721,7 @@
 	$socket.on('game', fetchGameRequest);
 
 	$socket.on('enter-room', (data: { room: string; index: number; opponentId: number }) => {
-		console.log(data);
-		$room = {
+			$room = {
 			room: data.room,
 			index: data.index,
 			opponentId: data.opponentId,
@@ -784,6 +800,7 @@
 		} else {
 			console.error(`Received message for unknown chat with id: ${chatId}`);
 		}
+		fetchUnreadConversations();
 	});
 
 	// ------- END EVENTS --------

@@ -2,6 +2,7 @@
 	import { onDestroy } from 'svelte';
 	import { user } from '$lib/stores';
 	import { Context } from '$lib/components/Context.svelte';
+	import NotificationBadge from '$lib/components/NotificationBadge.svelte';
 
 	const chats = Context.chats();
 	const chatId = Context.chatId();
@@ -95,11 +96,11 @@
 									)}</span
 								>
 							</div>
-							<p class="unread-messages">
-								{getUnreadMessagesCount(
+							<p class="notification-badge">
+								<NotificationBadge count={getUnreadMessagesCount(
 									chat,
 									chat.chatUsers.find((chatUser) => chatUser.userId === $user?.id)
-								)}
+								)} />
 							</p>
 						{:else}
 							<p>No messages yet</p>
@@ -164,20 +165,8 @@
 		justify-content: space-between;
 	}
 
-	.unread-messages {
-		position: absolute;
-		right: 0;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		width: 1.5em;
-		height: 1.5em;
-		color: white;
-		background-color: rgb(213, 1, 1);
-		border-radius: 50%;
-		font-size: 0.6em;
-		margin: 0;
-		align-self: center;
+	.notification-badge {
+		margin-top: 1rem;
 	}
 
 	.timestamp {
