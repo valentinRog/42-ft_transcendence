@@ -194,9 +194,10 @@
 	.icons {
 		position: relative;
 		width: 7rem;
-		height: 100%;
+		height: calc(100vh - $navbar-height);
 		display: flex;
 		flex-direction: column;
+		flex-wrap: wrap;
 	}
 
 	.icon {
@@ -226,6 +227,7 @@
 	}
 
 	div.desktop {
+		overflow: hidden;
 		height: calc(100vh - $navbar-height);
 		position: relative;
 	}

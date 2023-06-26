@@ -1,26 +1,24 @@
 <script lang="ts">
 	export let name: string;
 	export let notif = 0;
-
-	let visible = false;
+	let activeDrop : boolean = false;
 </script>
 
 <div
 	class="container"
-	on:mouseenter={() => (visible = true)}
-	on:mouseleave={() => (visible = false)}
 >
-	<div class="drop">
+	<div on:click={() => { activeDrop = !activeDrop; }} class="drop {activeDrop === true ? 'active' : ''}">
 		{name}
 		{#if notif !== 0}
-			({notif})
+ 			({notif})
 		{/if}
 	</div>
-	<div class="content" class:hidden={!visible}>
+	<div class="content" class:hidden={!activeDrop}>
 		<slot />
 	</div>
 </div>
 
+<svelte:window on:mousedown={() => (activeDrop = false)} />
 <style lang="scss">
 	.hidden {
 		display: none;
@@ -28,16 +26,18 @@
 
 	div.container {
 		position: relative;
-		&:hover {
-			@include tab-border($dark-grey, $light-grey);
-		}
-
 		div.drop {
-			padding: 0.2rem 0.65rem;
-
+			padding: 0 0.65rem;
+			@include tab-border(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
+			
 			&:hover {
+				@include tab-border($dark-grey, $light-grey);
 				cursor: url($click), auto;
+				&.active {
+					@include tab-border($light-grey, $dark-grey);
+				}
 			}
+			
 		}
 
 		div.content {
