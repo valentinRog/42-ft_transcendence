@@ -49,12 +49,12 @@ export class ChatController {
   @UseGuards(JwtGuard)
   @Post('create-chat')
   async createChat(
+    @Body('groupName') groupName: string,
     @Body('memberUsernames') memberUsernames: string[],
     @Body('isGroupChat') isGroupChat: boolean,
     @Body('accessibility') accessibility: string,
     @Body('password') password?: string,
   ) {
-    const groupName = memberUsernames.join('-');
     const newGroupChat = await this.chatService.createChat(
       groupName,
       memberUsernames,

@@ -43,6 +43,7 @@
 	$: {
 		blockedIds = $blocks.map(block => block.blockedId);
 		currentChat = $chats.find((chat) => chat.id === chatIdLocal);
+
 		roleId = currentChat?.chatUsers.find((cu: any) => cu.userId === $user?.id)?.roleId;
 		isProtected = currentChat ? currentChat.accessibility === 'protected' : false;
 		disabled = isUserBanned || isUserMuted;
