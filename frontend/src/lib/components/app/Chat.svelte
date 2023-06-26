@@ -69,7 +69,7 @@
 
 	async function updateLastMessageRead() {
 		const lastMessage = currentChat?.messages[currentChat?.messages.length - 1];
-		if (lastMessage.userId !== $user?.id) {
+		if (lastMessage && lastMessage.userId !== $user?.id) {
 			const chatUser = currentChat.chatUsers.find((user : any) => user.userId === userId);
 			if(chatIdLocal && lastMessage.id !== chatUser.lastReadMessageId && $user?.id) {
 				await fetchUpdateLastMessageRead(chatIdLocal, lastMessage.id, $user?.id);
