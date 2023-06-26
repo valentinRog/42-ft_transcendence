@@ -21,6 +21,8 @@
 	let selectedChat: any = null;
 	let chatPassword = '';
 	let chatsCount = 0;
+	let dialogOpen = false;
+	let errorMessage = "";
 
 	onMount(() => {
 		fetchPublicChats(start, limit).then((chats) => (chatsCount = chats.length));
@@ -50,6 +52,7 @@
 			!updatedChat.chatUsers.find((c: any) => c.userId === $user?.id)
 		) {
 			selectedChat = updatedChat;
+			dialogOpen = true;
 		} else {
 			if ($chats.find((c: any) => c.id === updatedChat.id))
 				$chats.splice(
@@ -71,9 +74,17 @@
 			$openChatForumWindow = true;
 			selectedChat = null;
 			chatPassword = '';
+			errorMessage = "";
 		} else {
-			alert('Wrong password');
+			errorMessage = "Error mdp";
 		}
+	}
+
+	function closeDialog() {
+		dialogOpen = false;
+		selectedChat = null;
+		chatPassword = '';
+		errorMessage = ""
 	}
 
 	function switchView(view: string) {
@@ -149,11 +160,28 @@
 				{/if}
 			</div>
 			{#if selectedChat !== null}
-				<label>
-					Enter Password for {selectedChat.name} :
-					<input type="password" bind:value={chatPassword} required />
-					<button on:click={enterChat}>Enter</button>
-				</label>
+				<dialog class="dialog-box" open={dialogOpen}>
+					<div class="top-bar">
+						<div class="topbutton">
+							<button on:click={closeDialog}>
+								<div class="border-inside">&nbspX&nbsp</div>
+							</button>
+						</div>
+					</div>
+					<div class="form-group">
+						<label>
+							Enter Password for {selectedChat.name} :
+							<input type="password" bind:value={chatPassword} required />
+						</label>
+						{#if errorMessage}
+							<p class="error-message">{errorMessage}</p>
+						{/if}
+					</div>
+					<div class="buttons">
+						<button on:click={enterChat}>Ok</button>
+						<button on:click={closeDialog}>Close</button>
+					</div>
+				</dialog>
 			{/if}
 		</div>
 	{:else if currentView === 'my'}
@@ -247,5 +275,66 @@
 		display: flex;
 		align-items: center;
 	}
+
+	.form-group {
+
+		label {
+			font-size: 1.1rem;
+			margin-bottom: 0.5rem;
+		}
+		padding: 0.8em;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+	}
+
+	dialog {
+		@include tab-contour;
+		padding: 0;
+		position: fixed;
+		top: 30%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		background-color: $grey;
+		height: 10rem;
+		width: 20rem;
+	}
+
+	.buttons {
+		display: flex;
+		justify-content: center;
+		margin-top: 1rem;
+	}
+
+	dialog > div > button {
+		margin-bottom: 12px;
+		margin-left: 0.6rem;
+		margin-right: 0.6rem;
+		padding: 0.3rem
+	}
+
+	div.top-bar {
+		background-color: $blue;
+		height: 1.5rem;
+		display: flex;
+		align-items: center;
+
+		.topbutton {
+			margin-left: auto;
+			margin-right: 0.2rem;
+		}
+	}
+
+	.error-message {
+		color: rgb(176, 6, 6);
+		text-align: center;
+	}
+
+	.dialog-box {
+		text-align: center;
+	}
+
 
 </style>
