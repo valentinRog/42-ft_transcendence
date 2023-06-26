@@ -64,8 +64,12 @@ export class PongGateway extends SocketGateway {
 
   @SubscribeMessage('spectate')
   handleSpecate(client: Socket, data: { friendId: number }) {
-    console.log('spectate', data);
     const friend = this.webSocketService.getSocket(data.friendId);
+    this.webSocketService.setClientRoom(
+      client.id,
+      this.webSocketService.getClientRoom(friend.id).room,
+      2,
+    );
     client.emit('enter-room', {
       room: this.webSocketService.getClientRoom(friend.id).room,
       index: 2,

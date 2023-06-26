@@ -51,6 +51,10 @@ export class WebSocketService {
     return this.rooms.get(clientId);
   }
 
+  setClientRoom(clientId: string, room: string, index: number) {
+    this.rooms.set(clientId, { room: room, index: index });
+  }
+
   removeClientRoom(clientId: string) {
     this.rooms.delete(clientId);
   }
@@ -66,26 +70,13 @@ export class WebSocketService {
     }
     this.rooms.set(socketPlayer1.id, { room: room, index: 0 });
     this.rooms.set(socketPlayer2.id, { room: room, index: 1 });
-    socketPlayer1.join(room);
-    socketPlayer2.join(room);
+    //socketPlayer1.join(room);
+    //socketPlayer2.join(room);
     socketPlayer1.emit('enter-room', { room, index: 0, opponentId: player2Id });
     socketPlayer2.emit('enter-room', { room, index: 1, opponentId: player1Id });
 
     return { player1: player1Id, player2: player2Id, room };
   }
-
-  // joinRoom(playerId: number, room: string) {
-  //   const socketPlayer = this.getSocket(playerId);
-
-  //   if (!socketPlayer) {
-  //     throw new NotFoundException('user socket not connected');
-  //   }
-
-  //   socketPlayer.join(room);
-  //   socketPlayer.emit('enter-room', room);
-
-  //   return { spectator: playerId, room: room };
-  // }
 
   sendToUser(userToNotify: number, message: string, event: string) {
     const socket = this.getSocket(userToNotify);
