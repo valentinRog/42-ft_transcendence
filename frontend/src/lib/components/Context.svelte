@@ -551,12 +551,17 @@
 		const res = await fetchWithToken(`stat/get-history/${$user?.id}`);
 		const data = await res.json();
 		data.forEach(function (element: any, index: number) {
-			data[index] = {
-				result: $user?.username === element.winnerName ? 'Win' : 'Lose',
-				opponent: $user?.username === element.winnerName ? element.loserName : element.winnerName,
-				createdAt: element.createdAt
-			};
-		});
+				const createdAtDate = new Date(element.createdAt);
+				data[index] = {
+					result: $user?.username === element.winnerName ? 'Win' : 'Lose',
+					opponent: $user?.username === element.winnerName ? element.loserName : element.winnerName,
+					createdAt: createdAtDate.toLocaleDateString('en', {
+						day: '2-digit',
+						month: '2-digit',
+						year: 'numeric'
+					})
+				};
+			});
 		$history = data;
 		return new Promise((resolve, reject) => {
 			resolve(data);
