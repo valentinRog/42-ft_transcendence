@@ -2,8 +2,10 @@
 	import { user } from '$lib/stores';
 	import type { User } from '$lib/stores';
 	import { Context } from '$lib/components/Context.svelte';
+	import { writable } from 'svelte/store';
 
 	const fetchWithToken = Context.fetchWithToken();
+	const fetchMe = Context.fetchMe();
 	const fetchBlockUser = Context.fetchBlockUser();
 	const fetchUnblockUser = Context.fetchUnblockUser();
 	const openEditProfile = Context.openEditProfile();
@@ -12,27 +14,19 @@
 
 	export let userId: number | null | undefined = null;
 
-	let currentUser: User;
+	let currentUser = writable<User>();
+
 	let imgUrl: string | '';
 	let isUser = false;
 
 	$: {
 		if (userId === null) {
-			isUser = true;
-			currentUser = $user;
-			fetchAvatar();
-		} else {
-			fetchWithToken(`users/info/${userId}`)
-				.then((res) => res.json())
-				.then((data) => {
-					currentUser = data;
-					fetchAvatar();
-				});
+			currentUser.set($user);
 		}
 	}
 
 	async function fetchAvatar() {
-		fetchWithToken(`users/avatar/${currentUser?.id}`)
+		fetchWithToken(`users/avatar/${$currentUser?.id}`)
 			.then((res) => {
 				if (res.status === 200 || res.status === 201) {
 					return res.blob();
@@ -46,16 +40,31 @@
 			});
 	}
 
+	(async () => {
+		if (userId === null) {
+			isUser = true;
+			await fetchMe();
+			await fetchAvatar();
+		} else {
+			fetchWithToken(`users/info/${userId}`)
+				.then((res) => res.json())
+				.then((data) => {
+					currentUser.set( data.json());
+					fetchAvatar();
+				});
+		}
+	})();
+
 </script>
 
 <div id="box">
 	<ul>
 		<div class="pic-username-login">
 			<div class="username-login">
-				<li class="box">Username: {currentUser?.username || ''}</li>
+				<li class="box">Username: {$currentUser?.username || ''}</li>
 				<li class="box">Registration date
-					: {currentUser?.createdAt || ''}</li>
-				<li class="box">Friends: {currentUser?.friends?.length || ''}</li>
+					: {$currentUser?.createdAt || ''}</li>
+				<li class="box">Friends: {$currentUser?.friends?.length || '0'}</li>
 			</div>
 			<li class="pic">
 				<img src={imgUrl} />
@@ -64,10 +73,10 @@
 		{#if isUser}
 			<button type="button" on:click={() => ($openEditProfile = true)}>Edit Profile</button>
 		{:else}
-			{#if $blocks.some(block => block.blockedId === currentUser?.id)}
-				<button type="button" on:click={() => fetchUnblockUser(currentUser.id)}>UnBlock</button>
+			{#if $blocks.some(block => block.blockedId === $currentUser?.id)}
+				<button type="button" on:click={() => fetchUnblockUser($currentUser.id)}>UnBlock</button>
 			{:else}
-				<button type="button" on:click={() => fetchBlockUser(currentUser.id)}>Block</button>
+				<button type="button" on:click={() => fetchBlockUser($currentUser.id)}>Block</button>
 			{/if}
 		{/if}
 
