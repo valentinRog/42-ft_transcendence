@@ -65,7 +65,8 @@
 
 		if (isValidPassword) {
 			$chatId = selectedChat.id;
-			$socket.emit('joinChat', { chatId: selectedChat.id, userId: $user?.id });
+			$chats.push(selectedChat);
+			$socket.emit('joinRoom', { chatId: selectedChat.id });
 			$openChatForumWindow = true;
 			selectedChat = null;
 			chatPassword = '';

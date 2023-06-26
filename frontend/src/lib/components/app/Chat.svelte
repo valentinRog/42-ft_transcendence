@@ -93,6 +93,7 @@
 			if (!chatExists) {
 				$chats.push(chat);
 				chatIdLocal = chat.id;
+				$socket.emit('joinRoom', { chatId: chat.id });
 				$socket.emit('otherAddChat', { chat: chat, userId: friendId });
 			}
 			isCreatingChat = false;

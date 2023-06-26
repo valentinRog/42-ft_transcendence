@@ -9,6 +9,7 @@
 	const fetchWithToken = Context.fetchWithToken();
 	const fetchFriends = Context.fetchFriends();
 	const fetchMe = Context.fetchMe();
+	const fetchCreateChat = Context.fetchCreateChat();
 
 	const chats = Context.chats();
 	const chatId = Context.chatId();
@@ -21,7 +22,7 @@
 
 	let friendInput: string = '';
 	let groupChatMode = false;
-	let selectedFriends: string[] = [];
+	let selectedFriends: Context.Contact[] = [];
 
 	fetchFriends();
 
@@ -73,27 +74,31 @@
 		selectedFriends = [];
 	}
 
-	function selectFriend(event: MouseEvent) {
-		const friendUsername = (event.target as HTMLInputElement).value;
-		const index = selectedFriends.indexOf(friendUsername);
+	function selectFriend(friend: Context.Contact) {
+		const friendUsername = friend.username;
+		const index = selectedFriends.findIndex((f : Context.Contact) => f.username === friendUsername);
 		if (index > -1)
 			selectedFriends = [...selectedFriends.slice(0, index), ...selectedFriends.slice(index + 1)];
-		else selectedFriends = [...selectedFriends, friendUsername];
+		else selectedFriends = [...selectedFriends, friend];
 	}
 
+
 	async function createGroupChat() {
-		selectedFriends = [$user!.username, ...selectedFriends];
-		const groupName = selectedFriends.join(', ');
-		$socket.emit('createGroupChat', {
-			groupName: groupName,
-			memberUsernames: selectedFriends,
-			isGroupChat: true,
-			accessibility: 'private'
-		});
-		$socket.on('createChat', (chatNumber: number) => {
-			$chatId = chatNumber;
+		const memberUsernames = selectedFriends.map(friend => friend.username);
+		memberUsernames.push($user?.username);
+		const groupName = memberUsernames.join(', ');
+
+		const chat = await fetchCreateChat(groupName, memberUsernames, true, 'private');
+		if (chat) {
+			$chats.push(chat);
+			$chatId = chat.id;
+			$socket.emit('joinRoom', { chatId: chat.id });
+			selectedFriends.forEach(friend => {
+				$socket.emit('otherAddChat', { chat: chat, userId: friend.id });
+			});
+			$chatId = chat.id;
 			$openChatWindow = true;
-		});
+		}
 		toggleGroupChatMode();
 	}
 
@@ -142,9 +147,9 @@
 				{#if groupChatMode}
 					<input
 						type="checkbox"
-						checked={selectedFriends.includes(friend.username)}
+						checked={selectedFriends.includes(friend)}
 						value={friend.username}
-						on:click={selectFriend}
+						on:click={() => selectFriend(friend)}
 						autocomplete="off"
 					/>
 				{/if}

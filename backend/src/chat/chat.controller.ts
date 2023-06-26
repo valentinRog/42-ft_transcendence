@@ -62,6 +62,7 @@ export class ChatController {
       accessibility,
       password,
     );
+    
     return newGroupChat;
   }
   
