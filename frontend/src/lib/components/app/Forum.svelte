@@ -138,7 +138,7 @@
 						<li on:click={() => startChat(chat)}>
 							<div class="chat-item">
 								{#if chat.accessibility === "protected" && !chat.chatUsers.find(c => c.userId === $user?.id)}
-									<h6>logo lock</h6>
+									<img src="padlock.png">
 								{/if}
 								<span>{chat.name}</span>
 							</div>
@@ -343,6 +343,10 @@
 		.border-inside {
 			padding: 0 0.25rem;
 		}
+	}
+
+	img {
+		margin-right: 0.3rem;
 	}
 
 </style>
