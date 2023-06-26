@@ -52,6 +52,16 @@ a:hover {
 	cursor: url($click), auto;
 }
 
+// AUTOCOMPLETION
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  background-color: red 
+}
+
+// SCROLLBAR 
+
 ::-webkit-scrollbar {
 	width: 1rem;
 }
