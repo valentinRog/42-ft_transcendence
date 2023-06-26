@@ -115,12 +115,13 @@ export abstract class SocketGateway
     payload: { chat: any; userId: number },
   ) {
     const { chat, userId } = payload;
+    const socket = await this.webSocketService.getSocket(userId);
 
-    const user = await this.userService.getUserById(userId);
-    const socket = await this.webSocketService.getSocket(user.id);
-
-    socket.emit('addChat', chat);
-    socket.emit('updateChat', chat.id);
+    if (socket) {
+      socket.join(`chat-${chat.id}`);
+      socket.emit('addChat', chat);
+      socket.emit('updateChat', chat.id);
+    }
   }
 
   @SubscribeMessage('sendMessage')

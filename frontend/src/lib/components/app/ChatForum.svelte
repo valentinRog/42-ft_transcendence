@@ -221,7 +221,6 @@
 				}
 			});
 			currentChat.chatUsers = [...currentChat.chatUsers];
-			console.log(currentChat.chatUsers);
 		}
 	});
 
