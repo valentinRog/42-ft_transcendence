@@ -271,8 +271,6 @@
 		display: flex;
 		align-items: center;
 	}
-<<<<<<< HEAD
-=======
 
 	.form-group {
 
@@ -351,5 +349,4 @@
 		margin-right: 0.3rem;
 	}
 
->>>>>>> b5ac9a29d8812870eb793e100353d0fa60a61ecc
 </style>

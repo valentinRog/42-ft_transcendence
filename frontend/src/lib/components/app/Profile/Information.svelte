@@ -68,16 +68,10 @@
 	<ul>
 		<div class="pic-username-login">
 			<div class="username-login">
-<<<<<<< HEAD
-				<li class="box">Username: {currentUser?.username || ''}</li>
-				<li class="box">Registration date : {formattedDate}</li>
-				<li class="box">Friends: {currentUser?.friends?.length || ''}</li>
-=======
-				<li class="box">Username: {$currentUser?.username || ''}</li>
+				<li class="box">Username : {$currentUser?.username || ''}</li>
 				<li class="box">Registration date
 					: {$currentUser?.createdAt || ''}</li>
-				<li class="box">Friends: {$currentUser?.friends?.length || '0'}</li>
->>>>>>> b5ac9a29d8812870eb793e100353d0fa60a61ecc
+				<li class="box">Friends : {$currentUser?.friends?.length || '0'}</li>
 			</div>
 			<div class="pic">
 				<img src={imgUrl} />
@@ -88,21 +82,22 @@
 		{:else if $blocks.some((block) => block.blockedId === currentUser?.id)}
 			<button type="button" on:click={() => fetchUnblockUser(currentUser.id)}>UnBlock</button>
 		{:else}
-<<<<<<< HEAD
-			<button type="button" on:click={() => fetchBlockUser(currentUser.id)}>Block</button>
-=======
 			{#if $blocks.some(block => block.blockedId === $currentUser?.id)}
 				<button type="button" on:click={() => fetchUnblockUser($currentUser.id)}>UnBlock</button>
 			{:else}
 				<button type="button" on:click={() => fetchBlockUser($currentUser.id)}>Block</button>
 			{/if}
->>>>>>> b5ac9a29d8812870eb793e100353d0fa60a61ecc
 		{/if}
 	</ul>
 </div>
 
 <style lang="scss">
 	#box {
+		ul {
+			height: 18rem;
+			display: flex;
+			flex-direction: column;
+		}
 		.pic-username-login {
 			display: flex;
 			align-items: flex-start;
@@ -141,8 +136,8 @@
 		button {
 			@include tab-contour;
 			padding: 0.5rem;
-			margin: 0.25rem;
 			font-size: 1rem;
+			margin-top: auto;
 		}
 	}
 </style>
