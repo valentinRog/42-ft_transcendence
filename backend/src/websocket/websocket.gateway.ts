@@ -289,21 +289,6 @@ export abstract class SocketGateway
     await this.chatService.setPassword(chatId, password);
   }
 
-  //  @SubscribeMessage('response-friend')
-  //  async handleAcceptFriend(
-  //    @MessageBody() data: { response: boolean; friend: string },
-  //    @ConnectedSocket() client: Socket,
-  //  ) {
-  //    const userId = this.webSocketService.getClientId(client);
-  //    const user = await this.userService.getUserById(userId);
-  //    const friend = await this.userService.getUser(data.friend);
-  //    if (!friend) return { error: 'User not found' };
-  //    if (data.response) {
-  //      this.userService.addFriend(user.id, friend.id);
-  //    }
-  //    client.emit('friend-accepted', data.friend);
-  //  }
-
   @SubscribeMessage('response-game')
   async handleMatch(
     @MessageBody() data: { response: boolean; friendId: number },
