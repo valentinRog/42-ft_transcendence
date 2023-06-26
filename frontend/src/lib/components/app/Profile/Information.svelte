@@ -61,17 +61,41 @@
 				});
 		}
 	})();
-
+	const friends = Context.contacts();
 </script>
 
 <div id="box">
-	<ul>
+	<ul class="whole-box">
 		<div class="pic-username-login">
 			<div class="username-login">
 				<li class="box">Username : {$currentUser?.username || ''}</li>
-				<li class="box">Registration date
-					: {$currentUser?.createdAt || ''}</li>
-				<li class="box">Friends : {$currentUser?.friends?.length || '0'}</li>
+				<li class="box">Registration date : {formattedDate || ''}</li>
+				<li class="friend-list">
+					Friends : {$currentUser?.friends?.length || '0'}
+					{#if $currentUser?.id === $user.id}
+						<ul>
+							{#each $friends as friend (friend.id)}
+								<li class="friend">
+									<p>{friend.username}</p>
+									<div class="status-img">
+										<p class="status">{friend.status}</p>
+										{#if friend.status === 'online'}
+											<img src="/online.png" alt="online" />
+										{:else if friend.username === 'vrogiste' && friend.status === 'in-game'}
+											<img src="/in-game-val.png" alt="in-game" />
+										{:else if friend.status === 'in-game'}
+											<img src="/in-game.png" alt="in-game" />
+										{:else if friend.status === 'spectator'}
+											<img src="/spectator.png" alt="spectator" />
+										{:else}
+											<img src="/offline.png" alt="offline" />
+										{/if}
+									</div>
+								</li>
+							{/each}
+						</ul>
+					{/if}
+				</li>
 			</div>
 			<div class="pic">
 				<img src={imgUrl} />
@@ -81,19 +105,17 @@
 			<button type="button" on:click={() => ($openEditProfile = true)}>Edit Profile</button>
 		{:else if $blocks.some((block) => block.blockedId === currentUser?.id)}
 			<button type="button" on:click={() => fetchUnblockUser(currentUser.id)}>UnBlock</button>
+		{:else if $blocks.some((block) => block.blockedId === $currentUser?.id)}
+			<button type="button" on:click={() => fetchUnblockUser($currentUser.id)}>UnBlock</button>
 		{:else}
-			{#if $blocks.some(block => block.blockedId === $currentUser?.id)}
-				<button type="button" on:click={() => fetchUnblockUser($currentUser.id)}>UnBlock</button>
-			{:else}
-				<button type="button" on:click={() => fetchBlockUser($currentUser.id)}>Block</button>
-			{/if}
+			<button type="button" on:click={() => fetchBlockUser($currentUser.id)}>Block</button>
 		{/if}
 	</ul>
 </div>
 
 <style lang="scss">
 	#box {
-		ul {
+		.whole-box {
 			height: 18rem;
 			display: flex;
 			flex-direction: column;
@@ -126,6 +148,29 @@
 			padding: 0.5rem;
 			margin-bottom: 0.25rem;
 			@include tab-contour-hollow;
+		}
+		.friend-list {
+			padding: 0.5rem;
+			@include tab-contour-hollow;
+			background-color: white;
+			.friend {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				width: 15;
+				.status-img {
+					margin-bottom: 0.2rem;
+					display: flex;
+					align-items: center;
+					align-self: flex-end;
+					margin-left: auto;
+					img {
+						padding-left: 0.5rem;
+						height: 0.9rem;
+						width: auto;
+					}
+				}
+			}
 		}
 
 		.img-status {
