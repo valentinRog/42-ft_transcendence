@@ -33,7 +33,7 @@ export class PongGateway extends SocketGateway {
 
   @SubscribeMessage('enter-room')
   handleRoom(client: Socket) {
-    const { room, index } = this.webSocketService.getClientRoom(client.id);
+    const { room, index } = this.pongService.getClientRoom(client.id);
     client.join(room);
     if (!this.games.has(room)) {
       const game = new PongGame(this.server, room);
@@ -44,8 +44,8 @@ export class PongGateway extends SocketGateway {
         this.server.to(room).emit('game-over', index);
         game.getPlayer1().leave(room);
         game.getPlayer2().leave(room);
-        this.webSocketService.removeClientRoom(game.getPlayer1().id);
-        this.webSocketService.removeClientRoom(game.getPlayer2().id);
+        this.pongService.removeClientRoom(game.getPlayer1().id);
+        this.pongService.removeClientRoom(game.getPlayer2().id);
       });
       game.startGame();
     }
@@ -63,20 +63,20 @@ export class PongGateway extends SocketGateway {
   @SubscribeMessage('spectate')
   handleSpecate(client: Socket, data: { friendId: number }) {
     const friend = this.webSocketService.getSocket(data.friendId);
-    this.webSocketService.setClientRoom(
+    this.pongService.setClientRoom(
       client.id,
-      this.webSocketService.getClientRoom(friend.id).room,
+      this.pongService.getClientRoom(friend.id).room,
       2,
     );
     client.emit('enter-room', {
-      room: this.webSocketService.getClientRoom(friend.id).room,
+      room: this.pongService.getClientRoom(friend.id).room,
       index: 2,
     });
   }
 
   @SubscribeMessage('input')
   handleInput(client: Socket, input: Input) {
-    const room = this.webSocketService.getClientRoom(client.id)?.room;
+    const room = this.pongService.getClientRoom(client.id)?.room;
     if (room === undefined) return;
     const game = this.games.get(room);
     if (game) game.handleInput(input);
@@ -114,12 +114,12 @@ export class PongGateway extends SocketGateway {
 
   @SubscribeMessage('disconnect')
   async handleDisconnect(client: Socket) {
-    if (this.webSocketService.getClientRoom(client.id) === undefined) return;
-    const { room, index } = this.webSocketService.getClientRoom(client.id);
+    if (this.pongService.getClientRoom(client.id) === undefined) return;
+    const { room, index } = this.pongService.getClientRoom(client.id);
     const game = this.games.get(room);
     if (game) {
       if (index === 0 || index === 1) {
-        this.webSocketService.removeClientRoom(client.id);
+        this.pongService.removeClientRoom(client.id);
         this.gameEnd(game);
         this.games.delete(room);
         const result = index === 0 ? 1 : 0;

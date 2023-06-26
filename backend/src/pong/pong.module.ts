@@ -10,6 +10,7 @@ import { StatModule } from 'src/stat/stat.module';
 import { StatService } from 'src/stat/stat.service';
 import { PrismaClient } from '@prisma/client';
 import { NotificationService } from 'src/notification/notification.service';
+import { PongService } from './pong.service';
 
 @Module({
   imports: [JwtModule.register({}), HttpModule, WebSocketModule, StatModule],
@@ -21,6 +22,8 @@ import { NotificationService } from 'src/notification/notification.service';
     PrismaClient,
     StatService,
     NotificationService,
+    PongService,
   ],
+  exports: [PongService],
 })
 export class PongModule {}

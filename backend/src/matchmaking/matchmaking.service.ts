@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PlayerDto } from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { WebSocketService } from 'src/websocket/websocket.service';
+import { PongService } from 'src/pong/pong.service';
 
 class MatchmakingQueue {
   private queue: PlayerDto[] = [];
@@ -43,6 +44,7 @@ export class MatchmakingService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly socketService: WebSocketService,
+    private readonly pongService: PongService,
   ) {
     this.queue = new MatchmakingQueue();
   }
@@ -76,7 +78,7 @@ export class MatchmakingService {
   }
 
   handleMatchFound(players: PlayerDto[]) {
-    return this.socketService.createRoom(
+    return this.pongService.createRoom(
       players[0].playerId,
       players[1].playerId,
     );
@@ -109,6 +111,6 @@ export class MatchmakingService {
     }
 
     console.log('createMatch', userId, opponentId);
-    return this.socketService.createRoom(userId, opponentId);
+    return this.pongService.createRoom(userId, opponentId);
   }
 }
