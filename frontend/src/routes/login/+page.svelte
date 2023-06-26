@@ -73,12 +73,12 @@
 				<div class="form-group">
 					<div class="row-icon"><img src="/user.png" /></div>
 					<label for="login">Login:</label>
-					<input type="text" id="login" name="login" />
+					<input type="text" id="login" name="login" autocomplete="off" />
 				</div>
 				<div class="form-group">
 					<div class="row-icon"><img src="/keys-3.png" /></div>
 					<label for="password">Password:</label>
-					<input type="password" id="password" name="password" />
+					<input type="password" id="password" name="password" autocomplete="off" />
 				</div>
 				{#if !signup}
 					<div class="form-group">
@@ -90,7 +90,7 @@
 					<div class="form-group">
 						<div class="row-icon"><img src="/agent.png" /></div>
 						<label for="username">Username:</label>
-						<input type="text" id="username" name="username" />
+						<input type="text" id="username" name="username" autocomplete="off" />
 					</div>
 				{/if}
 				<div class="button-container">

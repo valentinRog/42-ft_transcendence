@@ -21,8 +21,7 @@
 	async function handleSubmit(event: Event) {
 		const form = event.target as HTMLFormElement;
 		const data: Record<string, any> = {};
-		if (!checkboxValue)
-			data['twoFactorEnabled'] = checkboxValue;
+		if (!checkboxValue) data['twoFactorEnabled'] = checkboxValue;
 		for (const element of form.elements) {
 			if (element instanceof HTMLInputElement && element.name && element.type !== 'checkbox') {
 				data[element.name] = element.value;
@@ -33,14 +32,13 @@
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify(data),
+			body: JSON.stringify(data)
 		});
 		const json = await res.json();
 		if (res.status !== 200 && res.status !== 201) {
 			errorMessage = json.message;
 			showModal = true;
-		}
-		else {
+		} else {
 			changes = false;
 			if (!$user?.twoFactorEnabled && checkboxValue) generate2fa();
 			await fetchMe();
@@ -127,6 +125,7 @@
 					accept=".jpg, .jpeg, .png"
 					on:change={(e) => onFileSelected(e)}
 					bind:this={fileinput}
+					autocomplete="off"
 				/>
 				<img src={imgUrl} />
 			</li>
@@ -145,6 +144,7 @@
 						name="username"
 						bind:value={inputUsername}
 						on:input={handleChange}
+						autocomplete="off"
 					/>
 				</div>
 				{#if !$user?.logFrom42}
@@ -156,9 +156,15 @@
 							name="login"
 							bind:value={inputLogin}
 							on:input={handleChange}
+							autocomplete="off"
 						/>
 					</div>
-					<input type="checkbox" id="twoFactorEnabled" bind:checked={checkboxValue} on:change={handleChange} />
+					<input
+						type="checkbox"
+						id="twoFactorEnabled"
+						bind:checked={checkboxValue}
+						on:change={handleChange}
+					/>
 					<label for="twoFactorEnabled">2fa</label>
 				{/if}
 				{#if changes}

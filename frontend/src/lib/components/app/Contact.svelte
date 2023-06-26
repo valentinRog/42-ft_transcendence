@@ -131,7 +131,7 @@
 <div class="box" on:mousedown={() => (visible = 0)}>
 	<ErrorDialog {showModal} {errorMessage} on:close={() => (showModal = false)} />
 	<form on:submit|preventDefault={addFriend} class="add-friend-form">
-		<input type="text" name="friend" bind:value={friendInput} placeholder=" Search..." />
+		<input type="text" name="friend" bind:value={friendInput} placeholder=" Search..." autocomplete="off"/>
 		<input type="submit" value="Add friend" />
 	</form>
 	<div class="friend-list">
@@ -143,6 +143,7 @@
 						checked={selectedFriends.includes(friend.username)}
 						value={friend.username}
 						on:click={selectFriend}
+						autocomplete="off"
 					/>
 				{/if}
 				<div class="name-options">
