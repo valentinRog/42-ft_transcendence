@@ -39,6 +39,15 @@ export class PongGateway extends SocketGateway {
     if (!this.games.has(room)) {
       const game = new PongGame(this.server, room);
       this.games.set(room, game);
+      game.setCallback((index: number) => {
+        this.gameEnd(game);
+        this.games.delete(room);
+        this.updateStat(game, client, { room, index }, index);
+        this.server.to(room).emit('game-over', index);
+        game.getPlayer1().leave(room);
+        game.getPlayer2().leave(room);
+      });
+      game.startGame();
     }
     if (index === 0) {
       this.games.get(room).setPlayer1(client);
@@ -101,22 +110,6 @@ export class PongGateway extends SocketGateway {
     });
   }
 
-  // @SubscribeMessage('leave-room')
-  // async handleLeaveRoom(client: Socket, data: { room: string; index: number }) {
-  //   const game = this.games.get(data.room);
-  //   if (game) {
-  //     if (data.index === 0 || data.index === 1) {
-  //       this.rooms.delete(client.id);
-  //       await this.gameEnd(game);
-  //       this.games.delete(data.room);
-  //       const result = data.index === 0 ? 1 : 0;
-  //       this.server.to(data.room).emit('game-over', result);
-  //       this.updateStat(game, client, data, result);
-  //     }
-  //   }
-  //   client.leave(data.room);
-  // }
-
   @SubscribeMessage('disconnect')
   async handleDisconnect(client: Socket) {
     if (this.webSocketService.getClientRoom(client.id) === undefined) return;
@@ -132,6 +125,6 @@ export class PongGateway extends SocketGateway {
         this.server.to(room).emit('game-over', result);
       }
     }
-    client.leave(room);
+    client.join(room);
   }
 }

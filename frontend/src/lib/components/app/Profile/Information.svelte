@@ -49,7 +49,7 @@
 			fetchWithToken(`users/info/${userId}`)
 				.then((res) => res.json())
 				.then((data) => {
-					currentUser.set( data.json());
+					currentUser.set(data);
 					fetchAvatar();
 				});
 		}

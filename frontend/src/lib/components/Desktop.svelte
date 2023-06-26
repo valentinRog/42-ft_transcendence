@@ -5,6 +5,7 @@
 	import { Context } from '$lib/components/Context.svelte';
 	import Clock from './Clock.svelte';
 	import NotificationBadge from './NotificationBadge.svelte';
+	import { user } from '$lib/stores';
 
 	const chats = Context.chats();
 	const openChatWindow = Context.openChatWindow();
@@ -64,7 +65,8 @@
 	const fetchChats = Context.fetchChats();
 	const fetchFriendRequest = Context.fetchFriendRequest();
 	const fetchGameRequest = Context.fetchGameRequest();
-
+	const fetchUnreadConversations = Context.fetchUnreadConversations();
+	const unreadConversations = Context.unreadConversations();
 	const friendRequest = Context.friendRequest();
 	const gameRequest = Context.gameRequest();
 
@@ -94,6 +96,7 @@
 				if (chat.isGroupChat) $socket.emit('joinRoom', { chatId: chat.id });
 			});
 		});
+
 	})();
 
 	const notVisible = new Set(['FriendRequest', 'Chat', 'ChatForum', 'EditProfile', 'PongKeybinds']);
@@ -120,7 +123,7 @@
       			on:click={(event) => changeColor(event, v.DesktopProps.icon, v.DesktopProps.name)}/>
 				{#if k === 'Conversation'}
 					<span class="notification-badge">
-						<NotificationBadge count={0} />
+						<NotificationBadge count={$unreadConversations} />
 					</span>
 				{:else if k === 'Contact'}
 					<span class="notification-badge">
