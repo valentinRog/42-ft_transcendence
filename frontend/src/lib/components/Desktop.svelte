@@ -18,6 +18,7 @@
 	const selected = Context.selected();
 	const addInstance = Context.addInstance();
 	const removeInstance = Context.removeInstance();
+	const outcome = Context.outcome();
 
 	const socket = Context.socket();
 
@@ -69,10 +70,10 @@
 	const friendRequest = Context.friendRequest();
 	const gameRequest = Context.gameRequest();
 
-	let clickedImg : string = '';
-	let clickedName : string = '';
+	let clickedImg: string = '';
+	let clickedName: string = '';
 
-	function changeColor(event : any, img : string, name : string) {
+	function changeColor(event: any, img: string, name: string) {
 		clickedImg = img;
 		clickedName = name;
 		event.stopPropagation();
@@ -95,7 +96,6 @@
 				if (chat.isGroupChat) $socket.emit('joinRoom', { chatId: chat.id });
 			});
 		});
-
 	})();
 
 	const notVisible = new Set(['FriendRequest', 'Chat', 'ChatForum', 'EditProfile', 'PongKeybinds']);
@@ -117,9 +117,13 @@
 					$selected = null;
 				}}
 			>
-				<img src={v.DesktopProps.icon} alt={v.DesktopProps.name} draggable="false"
-				class={clickedImg === v.DesktopProps.icon ? 'clicked' : ''}
-      			on:click={(event) => changeColor(event, v.DesktopProps.icon, v.DesktopProps.name)}/>
+				<img
+					src={v.DesktopProps.icon}
+					alt={v.DesktopProps.name}
+					draggable="false"
+					class={clickedImg === v.DesktopProps.icon ? 'clicked' : ''}
+					on:click={(event) => changeColor(event, v.DesktopProps.icon, v.DesktopProps.name)}
+				/>
 				{#if k === 'Conversation'}
 					<span class="notification-badge">
 						<NotificationBadge count={$unreadConversations} />
@@ -135,7 +139,8 @@
 				{/if}
 				<div class="icon-text">
 					<span class={clickedName === v.DesktopProps.name ? 'highlight' : ''}
-					>{v.DesktopProps.name}</span>
+						>{v.DesktopProps.name}</span
+					>
 				</div>
 			</div>
 		{/each}
