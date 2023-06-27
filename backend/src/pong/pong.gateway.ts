@@ -46,6 +46,14 @@ export class PongGateway extends SocketGateway {
         game.getPlayer2().leave(room);
         this.pongService.removeClientRoom(game.getPlayer1().id);
         this.pongService.removeClientRoom(game.getPlayer2().id);
+
+        this.statService.updateStat(
+          this.webSocketService.getClientId(game.getPlayer1()),
+          {
+            result: Math.abs(index - 1),
+            opponentId: this.webSocketService.getClientId(game.getPlayer2()),
+          },
+        );
       });
       game.startGame();
     }
@@ -95,42 +103,5 @@ export class PongGateway extends SocketGateway {
     } else {
       console.log('players not found');
     }
-  }
-
-  async updateStat(
-    game: PongGame,
-    client: Socket,
-    data: { room: string; index: number },
-    result: number,
-  ) {
-    const winner = await this.userService.getUserById(
-      this.webSocketService.getClientId(client),
-    );
-    const opponent = data.index === 0 ? game.getPlayer2() : game.getPlayer1();
-    const loser = await this.userService.getUserById(
-      this.webSocketService.getClientId(opponent),
-    );
-    await this.statService.updateStat(winner.id, {
-      result: result,
-      opponentName: loser.username,
-    });
-  }
-
-  @SubscribeMessage('disconnect')
-  async handlePongDisconnect(client: Socket) {
-    if (this.pongService.getClientRoom(client.id) === undefined) return;
-    const { room, index } = this.pongService.getClientRoom(client.id);
-    const game = this.games.get(room);
-    if (game) {
-      if (index === 0 || index === 1) {
-        this.pongService.removeClientRoom(client.id);
-        this.gameEnd(game);
-        this.games.delete(room);
-        const result = index === 0 ? 1 : 0;
-        await this.updateStat(game, client, { room, index }, result);
-        this.server.to(room).emit('game-over', result);
-      }
-    }
-    client.join(room);
   }
 }

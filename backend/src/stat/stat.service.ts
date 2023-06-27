@@ -28,7 +28,7 @@ export class StatService {
       include: { stat: true },
     });
     const playerB = await this.prisma.user.findUnique({
-      where: { username: dto.opponentName },
+      where: { id: dto.opponentId },
       include: { stat: true },
     });
     const elo = new Elo({ kFactor: 20 });
