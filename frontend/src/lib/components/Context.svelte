@@ -105,10 +105,8 @@
 				down: string;
 				colors: {
 					background: string;
-					paddle: string;
-					ball: string;
-					score: string;
-					decorations: string;
+					objects: string;
+					text: string;
 				};
 			};
 		}
@@ -343,11 +341,9 @@
 			up: 'ArrowUp',
 			down: 'ArrowDown',
 			colors: {
-				background: 'black',
-				paddle: 'white',
-				ball: 'white',
-				score: 'white',
-				decorations: 'white'
+				background: '#000000',
+				objects: '#ffffff',
+				text: '#ffffff'
 			}
 		}
 	});
@@ -361,6 +357,9 @@
 		const data = await res.json();
 		$settings.pong.up = data.up;
 		$settings.pong.down = data.down;
+		$settings.pong.colors.background = data.backgroundColor;
+		$settings.pong.colors.objects = data.objectsColor;
+		$settings.pong.colors.text = data.textColor;
 		return data;
 	}
 

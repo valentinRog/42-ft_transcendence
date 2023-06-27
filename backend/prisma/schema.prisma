@@ -42,13 +42,13 @@ model Match {
 }
 
 model Notification {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  senderId  	Int
-  senderName	String
-  userId    Int
-  type      String
-  user      User     @relation(fields: [userId], references: [id])
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  senderId   Int
+  senderName String
+  userId     Int
+  type       String
+  user       User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, senderId, type])
 }
@@ -63,10 +63,13 @@ model Stat {
 }
 
 model Settings {
-  id   Int    @id @default(autoincrement())
-  up   String @default("ArrowUp")
-  down String @default("ArrowDown")
-  user User?
+  id              Int    @id @default(autoincrement())
+  up              String @default("ArrowUp")
+  down            String @default("ArrowDown")
+  backgroundColor String @default("#000000")
+  objectsColor    String @default("#ffffff")
+  textColor       String @default("#ffffff")
+  user            User?
 }
 
 model Message {

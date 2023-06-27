@@ -201,14 +201,13 @@
 		ctx.clearRect(0, 0, w, h);
 		ctx.fillStyle = $settings.pong.colors.background;
 		ctx.fillRect(0, 0, w, h);
-		ctx.fillStyle = $settings.pong.colors.ball;
+		ctx.fillStyle = $settings.pong.colors.objects;
 		ctx.fillRect(
 			s.ball.x * scale,
 			s.ball.y * scale,
 			dimensions.ballWidth * scale,
 			dimensions.ballWidth * scale
 		);
-		ctx.fillStyle = $settings.pong.colors.paddle;
 		ctx.fillRect(
 			dimensions.paddleOffset * scale,
 			s.paddles[0].y * scale,
@@ -223,14 +222,14 @@
 		);
 
 		ctx.setLineDash([5, 5]);
-		ctx.strokeStyle = $settings.pong.colors.decorations;
+		ctx.strokeStyle = $settings.pong.colors.text;
 		ctx.beginPath();
 		ctx.moveTo(w / 2, 0);
 		ctx.lineTo(w / 2, h);
 		ctx.stroke();
 
 		ctx.font = `${h / 7}px pong-score`;
-		ctx.fillStyle = $settings.pong.colors.score;
+		ctx.fillStyle = $settings.pong.colors.text;
 		let tw = ctx.measureText(s.player1Score.toString()).width;
 		ctx.fillText(s.player1Score.toString(), (w - tw) / 4, h / 5);
 		tw = ctx.measureText(s.player2Score.toString()).width;

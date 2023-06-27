@@ -18,6 +18,27 @@
 
 	fetchSettings();
 
+	function saveColors() {
+		fetchWithToken('settings/edit', {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				backgroundColor: $settings.pong.colors.background,
+				objectsColor: $settings.pong.colors.objects,
+				textColor: $settings.pong.colors.text
+			})
+		});
+	}
+
+	function resetColors() {
+		$settings.pong.colors.background = '#000000';
+		$settings.pong.colors.objects = '#ffffff';
+		$settings.pong.colors.text = '#ffffff';
+		saveColors();
+	}
+
 	let scale = 1;
 
 	let scaleString: string;
@@ -85,20 +106,23 @@
 			</RightDrop>
 			<RightDrop name="Colors">
 				<div class="color">
-					background <input type="color" bind:value={$settings.pong.colors.background} />
+					background <input
+						type="color"
+						bind:value={$settings.pong.colors.background}
+						on:change={saveColors}
+					/>
 				</div>
 				<div class="color">
-					paddle <input type="color" bind:value={$settings.pong.colors.paddle} />
+					objects <input
+						type="color"
+						bind:value={$settings.pong.colors.objects}
+						on:change={saveColors}
+					/>
 				</div>
 				<div class="color">
-					ball <input type="color" bind:value={$settings.pong.colors.ball} />
+					text <input type="color" bind:value={$settings.pong.colors.text} on:change={saveColors} />
 				</div>
-				<div class="color">
-					score <input type="color" bind:value={$settings.pong.colors.score} />
-				</div>
-				<div class="color">
-					decorations <input type="color" bind:value={$settings.pong.colors.decorations} />
-				</div>
+				<button on:click={resetColors}>reset</button>
 			</RightDrop>
 			<button on:click={() => addInstance('PongKeybinds')}>Keybinds</button>
 		</DropDown>
