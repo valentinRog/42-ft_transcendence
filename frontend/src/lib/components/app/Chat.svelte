@@ -2,6 +2,7 @@
 	import { onMount, afterUpdate } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
 	import { user } from '$lib/stores';
+	import { destroy_block } from 'svelte/internal';
 
 	const socket = Context.socket();
 
@@ -26,6 +27,7 @@
 	let autoScroll = true;
 	let isCreatingChat = false;
 	let blockedIds: number[];
+	let noMember = false;
 
 	$: {
 		blockedIds = $blocks.map(block => block.blockedId);
@@ -33,14 +35,16 @@
 		isFriend = (friendUsername != undefined);
 		if (chatIdLocal !== null && chatIdLocal !== undefined) {
 			currentChat = $chats.find((chat) => chat.id === chatIdLocal);
-			if (currentChat.isGroupChat) isFriend = true;
+			if (currentChat && currentChat.isGroupChat) isFriend = true;
 		}
 	}
 
 	onMount(() => {
-		$socket.on('updateChat', (chatId: number) => {
-			if (chatIdLocal === null || chatIdLocal === undefined) chatIdLocal = chatId;
+		$socket.on('updateChat', (chatId: number) => {	
+			if (chatIdLocal === null || chatIdLocal === undefined)
+				chatIdLocal = chatId;
 		});
+		$socket.on('updateGroupChat', () => { noMember = true; });
 		chatWindow.scrollTop = chatWindow.scrollHeight;
 		updateLastMessageRead();
 	});
@@ -91,7 +95,7 @@
 			const chatExists = $chats.some((existingChat) => existingChat.id === chat.id);
 
 			if (!chatExists) {
-				$chats.push(chat);
+				$chats = [...$chats, chat];
 				chatIdLocal = chat.id;
 				$socket.emit('joinRoom', { chatId: chat.id });
 				$socket.emit('otherAddChat', { chat: chat, userId: friendId });
@@ -139,13 +143,13 @@
 		</ul>
 	</div>
 	<div id="sendMessage-window">
-		{#if isFriend}
+		{#if isFriend && !noMember}
 			<form on:submit|preventDefault={sendMessage} class="send-message-form">
 				<input type="text" bind:value={messageContent} class="message-input" autocomplete="off"/>
 				<button type="submit" class="btn send-btn" disabled={isCreatingChat}>Send</button>
 			</form>
 		{:else}
-			<p>You are no longer friends with this user.</p>
+			<p>You can't talk with this chat</p>
 		{/if}
 	</div>
 </div>

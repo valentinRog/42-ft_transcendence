@@ -173,6 +173,7 @@ export abstract class SocketGateway
 
     if (isSuccessful) {
       client.emit('leaveChat', data.chatId);
+      client.emit('updateGroupChat');
       client.leave(`chat-${data.chatId}`);
     }
   }

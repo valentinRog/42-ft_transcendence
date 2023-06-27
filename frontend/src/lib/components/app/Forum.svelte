@@ -32,7 +32,7 @@
 			return;
 		}
 		const chat = await fetchCreateChat(groupName, [$user?.username], true, accessibility, password);
-		$chats.push(chat);
+		$chats = [...$chats, chat];
 		$chatId = chat.id;
 		$openChatForumWindow = true;
 	};

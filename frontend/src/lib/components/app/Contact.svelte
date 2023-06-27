@@ -90,7 +90,7 @@
 
 		const chat = await fetchCreateChat(groupName, memberUsernames, true, 'private');
 		if (chat) {
-			$chats.push(chat);
+			$chats = [...$chats, chat];
 			$chatId = chat.id;
 			$socket.emit('joinRoom', { chatId: chat.id });
 			selectedFriends.forEach(friend => {

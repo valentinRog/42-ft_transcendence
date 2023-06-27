@@ -17,7 +17,7 @@
 	let friendUsername: string | undefined = '';
 
 	$: {
-		if (name === 'Chat') {
+		if (name === 'Chat' || name === 'ChatForum') {
 			currentChat = $chats.find((chat) => chat.id === chatIdLocal);
 			if (currentChat?.isGroupChat) typeChat = 'Group';
 			else {
@@ -42,6 +42,8 @@
 				<p>{name} of {props.username}</p>
 			{:else if name === 'Profile'}
 				<p>My {name}</p>
+			{:else if name === 'ChatForum' && currentChat}
+				<p>Forum: {currentChat.name}</p>
 			{:else if name === 'Chat' && currentChat && currentChat.isGroupChat}
 				<p>{typeChat} {currentChat.name}</p>
 			{:else if name === 'Chat'}

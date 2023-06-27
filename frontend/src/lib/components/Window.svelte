@@ -3,6 +3,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
 	import { user } from '$lib/stores';
+	import LeaveGroupDialog from './app/LeaveGroupDialog.svelte';
 
 	const dispatch = createEventDispatcher();
 	const chatId = Context.chatId();
@@ -30,13 +31,15 @@
 	let typeChat: string | null = null;
 	let friendUsername: string | null | undefined = '';
 
+	let isDialogOpen = false;
+
 	$: {
 		if (top + height > parentHeight) top = parentHeight - height;
 		if (left + width > parentWidth) left = parentWidth - width;
 		if (top < 0) top = 0;
 		if (left < 0) left = 0;
 
-		if (name === 'Chat') {
+		if (name === 'Chat' || name === 'ChatForum') {
 			currentChat = $chats.find((chat) => chat.id === chatIdLocal);
 			if (currentChat?.isGroupChat) typeChat = 'Group';
 			else {
@@ -65,8 +68,6 @@
 	}
 
 	let prevName: string;
-	let dialog: HTMLDialogElement;
-	let isDialogOpen = false;
 
 	function toggleEdit() {
 		if (name === 'Chat') {
@@ -97,12 +98,10 @@
 
 	async function leaveGroup() {
 		isDialogOpen = true;
-		dialog.showModal();
 	}
 
 	async function leaveGroupConfirm() {
 		isDialogOpen = false;
-		dialog.close();
 		$socket.emit('leaveGroup', { chatId: chatIdLocal });
 	}
 </script>
@@ -128,6 +127,8 @@
 				<p class="title">{name} of {props.username}</p>
 			{:else if name === 'Profile'}
 				<p class="title">My {name}</p>
+			{:else if name === 'ChatForum' && currentChat}
+				<p>Forum: {currentChat.name}</p>
 			{:else if name === 'Chat' && currentChat && currentChat.isGroupChat}
 				{#if editable}
 					<input
@@ -149,19 +150,8 @@
 			<div class="buttons">
 				{#if name === 'Chat' && currentChat && currentChat.isGroupChat && currentChat.accessibility === 'private'}
 					<button on:click={() => leaveGroup()}>
-						<div class="border-inside">
-							<i class="fas fa-sign-out-alt" />
-						</div>
-						<dialog bind:this={dialog} class="dialog" open={isDialogOpen}>
-							<p>Voulez-vous vraiment quitter le groupe {currentChat?.name} ?</p>
-							<button on:click={() => leaveGroupConfirm()}>Oui</button>
-							<button
-								on:click|stopPropagation={() => {
-									isDialogOpen = false;
-									dialog.close();
-								}}>Non</button
-							>
-						</dialog>
+						LeaveGroup
+						<!-- <img src="no-friend.png"> -->
 					</button>
 				{/if}
 				<button on:click={() => dispatch('minimize')}>
@@ -175,6 +165,9 @@
 
 		<slot />
 	</div>
+{#if isDialogOpen}
+    <LeaveGroupDialog {currentChat} on:confirm={leaveGroupConfirm} on:close={() => (isDialogOpen = false)} />
+{/if}
 </section>
 
 <svelte:window on:mouseup={() => (moving = false)} on:mousemove={onMouseMove} />
@@ -223,5 +216,9 @@
 	}
 	.selected {
 		background-color: $blue !important;
+	}
+
+	img {
+		scale: 110%;
 	}
 </style>
