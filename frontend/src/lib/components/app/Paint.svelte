@@ -202,14 +202,16 @@
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		shapes = [];
 	}
+
+	let activeDrop: string | null = null;
 </script>
 
 <div>
 	<div class="menu">
-		<DropDown name="File">
+		<DropDown name="File" bind:activeDrop>
 			<button on:click={clear}>New</button>
 		</DropDown>
-		<DropDown name="Edit">
+		<DropDown name="Edit" bind:activeDrop>
 			<button
 				on:click={() => {
 					console.log(shapes.length);
