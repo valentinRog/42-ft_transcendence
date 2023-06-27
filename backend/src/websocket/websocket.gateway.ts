@@ -51,11 +51,12 @@ export abstract class SocketGateway
     this.webSocketService.addSocket(user.id, client);
     this.webSocketService.setStatus(user.id, 'online');
     this.updateStatusForFriends(user.id, 'online');
+    console.log(`${user.id} connected`);
   }
 
   handleDisconnect(client: Socket) {
     const userId = this.webSocketService.getClientId(client);
-    if (userId) { 
+    if (userId) {
       this.webSocketService.setStatus(userId, 'offline');
       this.updateStatusForFriends(userId, 'offline');
     }

@@ -66,7 +66,7 @@ export class MatchmakingService {
 
     if (this.queue.getSize() >= 2) {
       const players = [this.queue.dequeue_last(), this.queue.dequeue_last()];
-      return await this.handleMatchFound(players);
+      return this.handleMatchFound(players);
     }
     return { response: 'Player added to queue' };
   }
