@@ -8,4 +8,16 @@ export class EditSettingsDto {
   @IsString()
   @IsOptional()
   down?: string;
+
+  @IsString()
+  @IsOptional()
+  backgroundColor?: string;
+
+  @IsString()
+  @IsOptional()
+  objectsColor?: string;
+
+  @IsString()
+  @IsOptional()
+  textColor?: string;
 }
