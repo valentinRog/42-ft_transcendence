@@ -47,11 +47,13 @@
 			})
 		)
 	);
+
+	let activeDrop: string | null = null;
 </script>
 
 <div class="container">
 	<div class="menu">
-		<DropDown name="Game" notif={$gameRequest.length}>
+		<DropDown name="Game" notif={$gameRequest.length} bind:activeDrop>
 			{#if $matchmaking === false}
 				<button on:click={matchmake}>Matchmaking</button>
 			{:else}
@@ -70,7 +72,7 @@
 				<button class="unavailable"> Invitations </button>
 			{/if}
 		</DropDown>
-		<DropDown name="Settings">
+		<DropDown name="Settings" bind:activeDrop>
 			<RightDrop name="Scale">
 				<DropRadios
 					fields={['60%', '80%', '100%', '120%', '140%', '160%']}
