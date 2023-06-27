@@ -41,6 +41,13 @@ export class UserService {
     }
   }
 
+  async getFriends(userId: number): Promise<number[]> {
+     const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    return user.friends;
+  }
+
   async findFriend(id: number, friendId: number): Promise<boolean> {
     const user = await this.prisma.user.findUnique({
       where: { id: id },

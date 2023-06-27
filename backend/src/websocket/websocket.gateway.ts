@@ -48,15 +48,29 @@ export abstract class SocketGateway
       client.disconnect();
       return;
     }
-    console.log(`${user.username} connected`);
     this.webSocketService.addSocket(user.id, client);
     this.webSocketService.setStatus(user.id, 'online');
+    this.updateStatusForFriends(user.id, 'online');
   }
 
   handleDisconnect(client: Socket) {
     const userId = this.webSocketService.getClientId(client);
-    if (userId) this.webSocketService.setStatus(userId, 'offline');
+    if (userId) { 
+      this.webSocketService.setStatus(userId, 'offline');
+      this.updateStatusForFriends(userId, 'offline');
+    }
     console.log(`${userId} disconnected`);
+  }
+
+  async updateStatusForFriends(userId: number, status: string) {
+    const userFriends = await this.userService.getFriends(userId);
+    userFriends.forEach((friendId: number) => {
+      console.log(friendId);
+      const friendSocket = this.webSocketService.getSocket(friendId);
+      if (friendSocket) {
+        friendSocket.emit('updateStatus', { friendId: userId, status });
+      }
+    });
   }
 
   @SubscribeMessage('joinRoom')

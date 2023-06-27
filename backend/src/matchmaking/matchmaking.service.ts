@@ -92,7 +92,6 @@ export class MatchmakingService {
       console.log('User is not ready');
     }
     this.socketService.setStatus(user.id, 'spectate');
-
     return this.socketService.joinRoom(userId, room);
   }
 

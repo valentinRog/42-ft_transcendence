@@ -500,8 +500,6 @@
 		return data;
 	}
 
-	intervals.push(setInterval(fetchFriends, 3000));
-
 	async function fetchGetUserBlocks() {
 		const res = await fetchWithToken('users/me/blocks');
 		const data = await res.json();
@@ -809,6 +807,16 @@
 			console.error(`Received message for unknown chat with id: ${chatId}`);
 		}
 		fetchUnreadConversations();
+	});
+
+	$socket.on('updateStatus', (data) => {
+		const { friendId, status } = data;
+		for (let i = 0; i < $contacts.length; i++) {
+			if ($contacts[i].id === friendId) {
+				$contacts[i].status = status;
+				break;
+			}
+		}
 	});
 
 	// ------- END EVENTS --------

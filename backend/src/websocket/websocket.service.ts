@@ -77,4 +77,5 @@ export class WebSocketService {
   getAllStatus(): Map<number, string> {
     return this.userStatus;
   }
+
 }
