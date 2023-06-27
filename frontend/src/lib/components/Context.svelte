@@ -6,6 +6,9 @@
 		export const fetchWithToken = (): ((url: string, options?: RequestInit) => Promise<Response>) =>
 			getContext('fetchWithToken');
 
+		export const fetchWithTokenNoLogout = (): ((url: string, options?: RequestInit) => Promise<Response>) =>
+			getContext('fetchWithTokenNoLogout');
+
 		export type Match = {
 			result: string;
 			opponent: string;
@@ -284,7 +287,19 @@
 		return res;
 	}
 
+	function fetchWithTokenNoLogout(route: string, options: RequestInit = {}): Promise<Response> {
+		const res = fetch(`${PUBLIC_BACKEND_URL}/${route}`, {
+			...options,
+			headers: {
+				...options.headers,
+				Authorization: `Bearer ${$token}`
+			}
+		});
+		return res;
+	}
+
 	setContext('fetchWithToken', fetchWithToken);
+	setContext('fetchWithTokenNoLogout', fetchWithTokenNoLogout);
 
 	const contacts = writable<Context.Contact[]>([]);
 	const blocks = writable<Context.Block[]>([]);

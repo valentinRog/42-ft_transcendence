@@ -22,6 +22,7 @@
 	let errorMessage: string | null = null;
 
 	const fetchWithToken = Context.fetchWithToken();
+	const fetchWithTokenNoLogout = Context.fetchWithTokenNoLogout();
 
 	$: if (dialog && showDialog) dialog.showModal();
 
@@ -52,7 +53,7 @@
 	}
 
 	async function enable2fa(code : string) {
-			const res = await fetchWithToken(`2fa/validate/${code}`, {
+			const res = await fetchWithTokenNoLogout(`2fa/validate/${code}`, {
 			method: 'POST'
 		});
 		const json = await res.json();
@@ -61,20 +62,20 @@
 			showModal = true;
 		}
 		else {
-			dialog.close();
 			const res = await fetchWithToken('2fa/enable', {
 				method: 'POST',
 			});
 			const data = await res.json();
 			$token = data.token;
 			sessionStorage.setItem('token', data.token);
+			dialog.close();
 		}
 	}
 
-	function handleOK () {
+	async function handleOK () {
 		if (numbers.length === 6) {
 			const code = numbers.join("");
-			enable2fa(code);
+			await enable2fa(code);
 		}
 	}
 
