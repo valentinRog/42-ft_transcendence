@@ -79,6 +79,7 @@
 		await fetchPublicChats(start, limit).then(({chats, totalChatsCount}) => {
 			chatsCount = totalChatsCount;
 		});
+		console.log(chatsCount);
 	};
 
 	const refreshChats = async () => {
@@ -91,7 +92,6 @@
 </script>
 
 <div id="box">
-	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" />
 	<div class="create-Chat">
 		<h4>Add New Topic</h4>
 		<form on:submit|preventDefault={createChat}>
