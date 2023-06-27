@@ -2,16 +2,14 @@
 	import { onMount } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
 	import { user } from '$lib/stores';
-	import { action_destroyer } from 'svelte/internal';
+	import PasswordDialog from './PasswordDialog.svelte';
 
-	const socket = Context.socket();
 	const chatId = Context.chatId();
 	const chats = Context.chats();
 	const chatsPublic = Context.chatsPublic();
 	const fetchPublicChats = Context.fetchPublicChats();
 	const fetchCreateChat = Context.fetchCreateChat();
 	const fetchChatById = Context.fetchChatById();
-	const fetchVerifyPassword = Context.fetchVerifyPassword();
 	const openChatForumWindow = Context.openChatForumWindow();
 
 	let currentView = 'public';
@@ -24,7 +22,6 @@
 	let chatPassword = '';
 	let chatsCount = 0;
 	let dialogOpen = false;
-	let errorMessage = "";
 
 	onMount(() => {
 		fetchPublicChats(start, limit).then((chats) => (chatsCount = chats.length));
@@ -58,29 +55,6 @@
 			$chatId = chat.id;
 			$openChatForumWindow = true;
 		}
-	}
-
-	async function enterChat() {
-		const isValidPassword = await fetchVerifyPassword(selectedChat.id, chatPassword);
-
-		if (isValidPassword) {
-			$chatId = selectedChat.id;
-			$chats.push(selectedChat);
-			$socket.emit('joinRoom', { chatId: selectedChat.id });
-			$openChatForumWindow = true;
-			selectedChat = null;
-			chatPassword = '';
-			errorMessage = "";
-		} else {
-			errorMessage = "Error mdp";
-		}
-	}
-
-	function closeDialog() {
-		dialogOpen = false;
-		selectedChat = null;
-		chatPassword = '';
-		errorMessage = ""
 	}
 
 	function switchView(view: string) {
@@ -156,28 +130,10 @@
 				{/if}
 			</div>
 			{#if selectedChat !== null}
-				<dialog class="dialog-box" open={dialogOpen}>
-					<div class="top-bar">
-						<div class="topbutton">
-							<button class="exit-button" on:click={closeDialog}>
-								<div>X</div>
-							</button>
-						</div>
-					</div>
-					<div class="form-group">
-						<label>
-							Enter Password for {selectedChat.name} :
-							<input type="password" bind:value={chatPassword} required />
-						</label>
-						{#if errorMessage}
-							<p class="error-message">{errorMessage}</p>
-						{/if}
-					</div>
-					<div class="buttons">
-						<button on:click={enterChat}>Ok</button>
-						<button on:click={closeDialog}>Close</button>
-					</div>
-				</dialog>
+				{#if dialogOpen}
+					<PasswordDialog {selectedChat} {chatPassword} on:close={() => (dialogOpen = false)}/>
+				{/if}
+
 			{/if}
 		</div>
 	{:else if currentView === 'my'}
@@ -202,6 +158,11 @@
 	}
 
 	@include select-95;
+	@include form-95;
+
+	input {
+		height : 21px;
+	}
 
 	select {
 		width: 100px;
@@ -238,11 +199,14 @@
 		margin-top: 1rem;
 	}
 
-	.create-Chat,
 	button {
-		@include tab-border($light-grey, $dark-grey);
+		@include tab-contour;
 		padding: 0.5rem;
 		margin-bottom: 0.2rem;
+		@include tab-contour-active;
+		background-color: $grey;
+		width: 8rem;
+		font-size: 0.9rem;
 	}
 
 	ul {
@@ -273,78 +237,6 @@
 		align-items: center;
 	}
 
-	.form-group {
-
-		label {
-			font-size: 1.1rem;
-			margin-bottom: 0.5rem;
-		}
-		padding: 0.8em;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		text-align: center;
-	}
-
-	dialog {
-		@include tab-contour;
-		padding: 0;
-		position: fixed;
-		top: 30%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		background-color: $grey;
-		height: 10rem;
-		width: 20rem;
-	}
-
-	.buttons {
-		display: flex;
-		justify-content: center;
-		margin-top: 1rem;
-	}
-
-	dialog > div > button {
-		margin-bottom: 12px;
-		margin-left: 0.6rem;
-		margin-right: 0.6rem;
-		padding: 0.3rem
-	}
-
-	div.top-bar {
-		background-color: $blue;
-		height: 1.5rem;
-		display: flex;
-		align-items: center;
-
-		.topbutton {
-			margin-left: auto;
-		}
-	}
-
-	.error-message {
-		display: flex;
-		color: rgb(176, 6, 6);
-		text-align: center;
-	}
-
-	.dialog-box {
-		text-align: center;
-	}
-
-	.exit-button {
-		@include tab-contour;
-		@include tab-contour-active;
-		background-color: $grey;
-		margin-top: 0.2rem;
-		scale: 65%;
-		float:right;
-
-		.border-inside {
-			padding: 0 0.25rem;
-		}
-	}
 
 	img {
 		margin-right: 0.3rem;
