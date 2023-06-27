@@ -57,6 +57,7 @@ export class MatchmakingService {
       return 'User is not ready';
     }
     this.socketService.setStatus(player.playerId, 'queue');
+    this.socketService.updateStatusForFriends(player.playerId, 'queue');
 
     if (this.queue.isPlayerInQueue(player)) {
       console.log('Player already in queue');

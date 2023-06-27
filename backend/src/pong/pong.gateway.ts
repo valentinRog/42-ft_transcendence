@@ -53,12 +53,12 @@ export class PongGateway extends SocketGateway {
       this.games.get(room).setPlayer1(client);
       const p1 = this.webSocketService.getClientId(client);
       this.webSocketService.setStatus(p1, 'in-game');
-      this.updateStatusForFriends(p1, 'in-game');
+      this.webSocketService.updateStatusForFriends(p1, 'in-game');
     } else if (index === 1) {
       this.games.get(room).setPlayer2(client);
       const p2 = this.webSocketService.getClientId(client);
       this.webSocketService.setStatus(p2, 'in-game');
-      this.updateStatusForFriends(p2, 'in-game');
+      this.webSocketService.updateStatusForFriends(p2, 'in-game');
     }
   }
 
@@ -90,8 +90,8 @@ export class PongGateway extends SocketGateway {
     if (p1 && p2) {
       this.webSocketService.setStatus(p1, 'online');
       this.webSocketService.setStatus(p2, 'online');
-      this.updateStatusForFriends(p1, 'online');
-      this.updateStatusForFriends(p2, 'online');
+      this.webSocketService.updateStatusForFriends(p1, 'online');
+      this.webSocketService.updateStatusForFriends(p2, 'online');
     } else {
       console.log('players not found');
     }

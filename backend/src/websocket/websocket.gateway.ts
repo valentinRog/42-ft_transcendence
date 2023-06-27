@@ -50,7 +50,7 @@ export abstract class SocketGateway
     }
     this.webSocketService.addSocket(user.id, client);
     this.webSocketService.setStatus(user.id, 'online');
-    this.updateStatusForFriends(user.id, 'online');
+    this.webSocketService.updateStatusForFriends(user.id, 'online');
     console.log(`${user.id} connected`);
   }
 
@@ -58,20 +58,9 @@ export abstract class SocketGateway
     const userId = this.webSocketService.getClientId(client);
     if (userId) {
       this.webSocketService.setStatus(userId, 'offline');
-      this.updateStatusForFriends(userId, 'offline');
+      this.webSocketService.updateStatusForFriends(userId, 'offline');
     }
     console.log(`${userId} disconnected`);
-  }
-
-  async updateStatusForFriends(userId: number, status: string) {
-    const userFriends = await this.userService.getFriends(userId);
-    userFriends.forEach((friendId: number) => {
-      console.log(friendId);
-      const friendSocket = this.webSocketService.getSocket(friendId);
-      if (friendSocket) {
-        friendSocket.emit('updateStatus', { friendId: userId, status });
-      }
-    });
   }
 
   @SubscribeMessage('joinRoom')
