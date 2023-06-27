@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount, onDestroy, afterUpdate } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
 	import { user } from '$lib/stores';
 
@@ -22,6 +22,9 @@
 	let searchQuery = '';
 	let selectedAction: string = '';
 	let RoleName: string[] = ["Admin", "Moderator", "User"];
+
+	let chatWindow: HTMLDivElement;
+	let autoScroll = true;
 
 	//BAN AND MUTE
 	let isUserBanned = false;
@@ -105,10 +108,13 @@
 
 		const user = await fetchUserByUsername(searchQuery);
 		const userId = user.id;
+		const isInChat = currentChat.chatUsers.some((c : any) => c.userId === userId);
 
-		if (userId && actions[selectedAction as keyof typeof actions]) {
+		if (!isInChat && (selectedAction === "User" || selectedAction === "Moderator"))
+			return;
+
+		if (userId && actions[selectedAction as keyof typeof actions])
 			actions[selectedAction as keyof typeof actions](userId);
-		}
 	};
 
 	function openProfile(userId: number) {
@@ -224,12 +230,24 @@
 		}
 	});
 
+	function handleScroll() {
+		if (chatWindow.scrollTop + chatWindow.clientHeight + 1 >= chatWindow.scrollHeight) {
+			autoScroll = true;
+		} else {
+			autoScroll = false;
+		}
+	}
+
+	afterUpdate(() => {
+		if (autoScroll) chatWindow.scrollTop = chatWindow.scrollHeight;
+	});
+
 
 </script>
 
 <div id="box">
 	<div class="chat-container">
-		<div id="chat-window">
+		<div id="chat-window" bind:this={chatWindow} on:scroll={handleScroll}>
 			{#if isUserBanned}
 				<p>
 					You are banned from this Topics {banExpiresAt
@@ -274,95 +292,104 @@
 	</div>
 	{#if !isUserMuted && !isUserBanned}
 		<div id="user-list">
-			{#if roleId <= 2}
-				<input type="text" bind:value={searchQuery} placeholder="Enter username" autocomplete="off"/>
-				<select bind:value={selectedAction}>
-					<option value="">Select action</option>
-					{#if roleId <= 1}
-						<option value="Moderator">Moderator</option>
-						<option value="User">User</option>
-					{/if}
-					<option value="ban">Ban</option>
-					<option value="unban">unBan</option>
-					<option value="mute">Mute</option>
-					<option value="unmute">unMute</option>
-				</select>
-				{#if selectedAction === 'ban' || selectedAction === 'mute'}
-					<input
-						type="number"
-						bind:value={actionDuration}
-						placeholder="Enter duration in seconds"
-						min="0"
-					/>
-				{/if}
-				<button on:click={performAction}>Submit</button>
-				<div id="access-control">
-					{#if isProtected}
-						<button on:click={toggleAccess}>Switch to Public</button>
-						<div id="password-change-form">
-							<label>
-								Enter new password:
-								<input type="password" bind:value={password} on:input={updatePassword} autocomplete="off"/>
-							</label>
-							<button on:click={changePassword}>Submit</button>
-						</div>
-					{:else}
-						<button on:click={toggleAccess}>Switch to Protected</button>
-					{/if}
-					{#if passwordModalVisible}
-						<div id="password-modal">
-							<label>
-								{#if isProtected}
-									Enter new password:
-								{:else}
-									Enter password to switch to Protected:
-								{/if}
-								<input type="password" on:input={updatePassword} autocomplete="off" />
-							</label>
-							<button on:click={toggleAccess}>Submit</button>
-							<button on:click={closePasswordModal}>Cancel</button>
-						</div>
-					{/if}
-				</div>
-			{/if}
-			{#if currentChat}
-				<h5>Users in this chat:</h5>
-				<ul>
-					{#each currentChat.chatUsers as chatUser, index (index)}
-						<li on:click={() => selectUser(chatUser)}>
-							({RoleName[chatUser.roleId - 1]}) {chatUser.user?.username}
-							{#if selectedUser === chatUser}
-								<button on:click={() => openProfile(chatUser.userId)}>Check Profile</button>
-								{#if roleId <= 1 && roleId < chatUser.roleId}
-									<button on:click={() => changeRole(chatUser.userId, 2)}>Made Moderator</button>
-									<button on:click={() => changeRole(chatUser.userId, 3)}>Make User</button>
-								{/if}
-								{#if roleId <= 2 && roleId < chatUser.roleId}
-									<div>
-										<button on:click={() => muteUser(chatUser.userId, null)}>Mute</button>
-										<button on:click={() => banUser(chatUser.userId, null)}>Ban</button>
-										<button on:click={() => unMuteUser(chatUser.userId)}>Unmute</button>
-										<button on:click={() => unBanUser(chatUser.userId)}>Unban</button>
-										<input
-											type="number"
-											bind:value={banDuration}
-											placeholder="Ban duration in seconds"
-											min="0"
-											autocomplete="off"
-										/>
-										<input
-											type="number"
-											bind:value={muteDuration}
-											placeholder="Mute duration in seconds"
-											min="0"
-											autocomplete="off"
-										/>
-									</div>
-								{/if}
+			<div class="admin-mode">
+				{#if roleId <= 2}
+					<div class="username-action-row">
+						<input type="text" bind:value={searchQuery} placeholder="username" autocomplete="off"/>
+						<select bind:value={selectedAction}>
+							<option value="">Action</option>
+							{#if roleId <= 1}
+								<option value="Moderator">Moderator</option>
+								<option value="User">User</option>
 							{/if}
-						</li>
-					{/each}
-				</ul>
+							<option value="ban">Ban</option>
+							<option value="unban">unBan</option>
+							<option value="mute">Mute</option>
+							<option value="unmute">unMute</option>
+						</select>
+					</div>
+					{#if selectedAction === 'ban' || selectedAction === 'mute'}
+						<div class="duration-submit-row">
+							<input
+								type="number"
+								class="duration-input"
+								bind:value={actionDuration}
+								placeholder="in sec"
+								min="0"
+							/>
+						</div>
+					{/if}
+					<button on:click={performAction}>Submit</button>
+					<div id="access-control">
+						{#if isProtected}
+							<button on:click={toggleAccess}>Switch to Public</button>
+							<div id="password-change-form">
+								<label>
+									Enter new password:
+									<input type="password" bind:value={password} on:input={updatePassword} autocomplete="off"/>
+								</label>
+								<button on:click={changePassword}>Submit</button>
+							</div>
+						{:else}
+							<button on:click={toggleAccess}>Switch to Protected</button>
+						{/if}
+						{#if passwordModalVisible}
+							<div id="password-modal">
+								<label>
+									{#if isProtected}
+										<p>Enter new password:</p>
+									{:else}
+										<p>Enter password to switch to Protected:</p>
+									{/if}
+									<input type="password" on:input={updatePassword} autocomplete="off" />
+								</label>
+								<button on:click={toggleAccess}>Submit</button>
+								<button on:click={closePasswordModal}>Cancel</button>
+							</div>
+						{/if}
+					</div>
+				{/if}
+			</div>
+			{#if currentChat}
+				<div class="users">
+					<h5>Users in this chat:</h5>
+					<ul>
+						{#each currentChat.chatUsers as chatUser, index (index)}
+							<li on:click={() => selectUser(chatUser)}>
+								({RoleName[chatUser.roleId - 1]}) {chatUser.user?.username}
+								{#if selectedUser === chatUser}
+									<button on:click={() => openProfile(chatUser.userId)}>Check Profile</button>
+									{#if roleId <= 1 && roleId < chatUser.roleId}
+										<button on:click={() => changeRole(chatUser.userId, 2)}>Made Moderator</button>
+										<button on:click={() => changeRole(chatUser.userId, 3)}>Make User</button>
+									{/if}
+									{#if roleId <= 2 && roleId < chatUser.roleId}
+										<div>
+											<button on:click={() => muteUser(chatUser.userId, null)}>Mute</button>
+											<button on:click={() => banUser(chatUser.userId, null)}>Ban</button>
+											<button on:click={() => unMuteUser(chatUser.userId)}>Unmute</button>
+											<button on:click={() => unBanUser(chatUser.userId)}>Unban</button>
+											<input class="duration-input"
+												type="number"
+												bind:value={banDuration}
+												placeholder="Ban duration in seconds"
+												min="0"
+												autocomplete="off"
+											/>
+											<input class="duration-input"
+												type="number"
+												bind:value={muteDuration}
+												placeholder="Mute duration in seconds"
+												min="0"
+												autocomplete="off"
+											/>
+										</div>
+									{/if}
+								{/if}
+							</li>
+						{/each}
+					</ul>
+				</div>
 			{/if}
 		</div>
 	{/if}
@@ -380,6 +407,10 @@
 		width: 20rem;
 	}
 
+	.duration-input {
+		width: 4rem;
+	}
+
 	#chat-window {
 		height: 85%;
 		overflow-y: auto;
@@ -393,8 +424,10 @@
 	}
 
 	#user-list {
+		margin-left: 20.3rem;
 		overflow-y: auto;
 		overflow-x: hidden;
+		height: 17rem;
 	}
 
 	.btn {
@@ -486,4 +519,52 @@
 		text-align: center;
 		font-size: 0.9rem;
 	}
+
+	.admin-mode {
+		display: flex;
+		flex-direction: column;
+		align-items: start;
+	}
+
+	.admin-mode input[type="text"],
+	.admin-mode select,
+	.admin-mode .duration-input {
+		width: 100%;
+		padding: 2px;
+		margin-bottom: 2px;
+		box-sizing: border-box;
+	}
+
+	.admin-mode .duration-input {
+		width: 3.5rem;
+	}
+
+	.admin-mode button {
+		margin-top: 5px;
+		padding: 3px 7px;
+	}
+
+	#access-control {
+		margin-top: 10px;
+		display: flex;
+		flex-direction: column;
+	}
+
+	#password-change-form, 
+	#password-modal {
+		display: flex;
+		flex-direction: column;
+		gap: 5px;
+	}
+
+	.username-action-row,
+	.duration-submit-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 10px;
+	}
+
+
+
 </style>

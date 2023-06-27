@@ -27,9 +27,7 @@
 
 	function getLastMessageSender(chat: any) {
 		if (chat.messages.length > 0) {
-			return chat.chatUsers.find(
-				(chatUser: any) => chatUser.userId === chat.messages[chat.messages.length - 1].userId
-			)?.user?.username;
+			return chat.messages[chat.messages.length - 1].user?.username;
 		} else {
 			return 'No messages yet';
 		}
@@ -84,7 +82,7 @@
 						{#if chat.messages.length > 0}
 							<div class="message-details">
 								<p>
-									{getLastMessageSender(chat) === $user?.username
+									{chat.messages[chat.messages.length - 1].userId === $user?.id
 										? 'you'
 										: getLastMessageSender(chat)}
 									: {chat.messages[chat.messages.length - 1].content}
