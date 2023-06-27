@@ -16,3 +16,4 @@
 		cursor: wait;
 	}
 </style>
+<link rel="icon" type="image/jpg" href="/yoooo.png">

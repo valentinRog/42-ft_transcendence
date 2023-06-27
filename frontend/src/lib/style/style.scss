@@ -92,7 +92,6 @@ a:hover {
 	background-size: 25% auto;
 }
 
-// a vérifier !!!
 scrollbar {
 	width: 1rem;
 }
@@ -107,3 +106,5 @@ scrollbarthumb {
 	background-color: $grey;
 	@include tab-border;
 }
+
+

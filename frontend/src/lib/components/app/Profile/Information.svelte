@@ -40,7 +40,7 @@
 			});
 	}
 
-	const createdAt = $user.createdAt;
+	const createdAt = $user?.createdAt;
 
 	const formattedDate = new Date(createdAt).toLocaleDateString('en', {
 		day: '2-digit',
@@ -102,13 +102,13 @@
 			</div>
 		</div>
 		{#if isUser}
-			<button type="button" on:click={() => ($openEditProfile = true)}>Edit Profile</button>
+		<button type="button" on:click={() => ($openEditProfile = true)}>Edit Profile</button>
 		{:else if $blocks.some((block) => block.blockedId === currentUser?.id)}
-			<button type="button" on:click={() => fetchUnblockUser(currentUser.id)}>UnBlock</button>
+		<button type="button" on:click={() => fetchUnblockUser(currentUser.id)}>UnBlock</button>
 		{:else if $blocks.some((block) => block.blockedId === $currentUser?.id)}
-			<button type="button" on:click={() => fetchUnblockUser($currentUser.id)}>UnBlock</button>
+		<button type="button" on:click={() => fetchUnblockUser($currentUser.id)}>UnBlock</button>
 		{:else}
-			<button type="button" on:click={() => fetchBlockUser($currentUser.id)}>Block</button>
+		<button type="button" on:click={() => fetchBlockUser($currentUser.id)}>Block</button>
 		{/if}
 	</ul>
 </div>
@@ -152,6 +152,8 @@
 		.friend-list {
 			padding: 0.5rem;
 			@include tab-contour-hollow;
+			max-height: 8rem;
+			overflow-y: scroll;
 			background-color: white;
 			.friend {
 				display: flex;
