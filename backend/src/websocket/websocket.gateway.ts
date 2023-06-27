@@ -65,7 +65,6 @@ export abstract class SocketGateway
   async updateStatusForFriends(userId: number, status: string) {
     const userFriends = await this.userService.getFriends(userId);
     userFriends.forEach((friendId: number) => {
-      console.log(friendId);
       const friendSocket = this.webSocketService.getSocket(friendId);
       if (friendSocket) {
         friendSocket.emit('updateStatus', { friendId: userId, status });
