@@ -6,6 +6,9 @@
 		export const fetchWithToken = (): ((url: string, options?: RequestInit) => Promise<Response>) =>
 			getContext('fetchWithToken');
 
+		export const fetchWithTokenNoLogout = (): ((url: string, options?: RequestInit) => Promise<Response>) =>
+			getContext('fetchWithTokenNoLogout');
+
 		export type Match = {
 			result: string;
 			opponent: string;
@@ -157,7 +160,7 @@
 			componentType: string,
 			propsWin?: Record<string, any>,
 			props?: Record<string, any>
-		) => void) => getContext('addInstance');
+		) => string ) => getContext('addInstance');
 
 		export const removeInstance = (): ((id: string) => void) => getContext('removeInstance');
 
@@ -284,7 +287,19 @@
 		return res;
 	}
 
+	function fetchWithTokenNoLogout(route: string, options: RequestInit = {}): Promise<Response> {
+		const res = fetch(`${PUBLIC_BACKEND_URL}/${route}`, {
+			...options,
+			headers: {
+				...options.headers,
+				Authorization: `Bearer ${$token}`
+			}
+		});
+		return res;
+	}
+
 	setContext('fetchWithToken', fetchWithToken);
+	setContext('fetchWithTokenNoLogout', fetchWithTokenNoLogout);
 
 	const contacts = writable<Context.Contact[]>([]);
 	const blocks = writable<Context.Block[]>([]);
@@ -368,7 +383,7 @@
 	const zstack = writable<string[]>([]);
 	const selected = writable<string | null>(null);
 
-	function addInstance(
+	function addInstance (
 		componentType: string,
 		propsWin: Record<string, any> = {},
 		props: Record<string, any> = {}
@@ -383,6 +398,7 @@
 			props
 		});
 		$appInstances = $appInstances;
+		return id;
 	}
 
 	function removeInstance(id: string) {
@@ -473,8 +489,8 @@
 	async function fetchUnreadConversations() {
 		$unreadConversations = 0;
 		for (const chat of $chats) {
-			if ( getUnreadMessagesCount(chat, 
-				chat.chatUsers.find((chatUser) => chatUser.userId === $user?.id)) > 0 
+			if ( getUnreadMessagesCount(chat,
+				chat.chatUsers.find((chatUser) => chatUser.userId === $user?.id)) > 0
 				&& chat.accessibility === "private") {
 				$unreadConversations++;
 			}

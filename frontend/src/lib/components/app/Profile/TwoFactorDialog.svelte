@@ -15,18 +15,20 @@
 		}
 	});
 
-	let dialog: HTMLDialogElement;
-
 	export let showDialog : boolean;
+	export let internetWindow : string;
+
+	let dialog: HTMLDialogElement;
 	let showModal = false;
 	let errorMessage: string | null = null;
-
-	const fetchWithToken = Context.fetchWithToken();
-
-	$: if (dialog && showDialog) dialog.showModal();
-
 	let numbers: string[] = [];
 	let activeInput: HTMLInputElement;
+
+	const fetchWithToken = Context.fetchWithToken();
+	const fetchWithTokenNoLogout = Context.fetchWithTokenNoLogout();
+	const removeInstance = Context.removeInstance();
+
+	$: if (dialog && showDialog) dialog.showModal();
 
 	function addNumber(event: any) {
 		activeInput = event.target;
@@ -52,7 +54,7 @@
 	}
 
 	async function enable2fa(code : string) {
-			const res = await fetchWithToken(`2fa/validate/${code}`, {
+			const res = await fetchWithTokenNoLogout(`2fa/validate/${code}`, {
 			method: 'POST'
 		});
 		const json = await res.json();
@@ -61,21 +63,26 @@
 			showModal = true;
 		}
 		else {
-			dialog.close();
 			const res = await fetchWithToken('2fa/enable', {
 				method: 'POST',
 			});
 			const data = await res.json();
 			$token = data.token;
 			sessionStorage.setItem('token', data.token);
+			close();
 		}
 	}
 
-	function handleOK () {
+	async function handleOK () {
 		if (numbers.length === 6) {
 			const code = numbers.join("");
-			enable2fa(code);
+			await enable2fa(code);
 		}
+	}
+
+	function close() {
+		dialog.close();
+		removeInstance(internetWindow);
 	}
 
 </script>
@@ -84,7 +91,7 @@
 	<ErrorDialog {showModal} {errorMessage} on:close={() => (showModal = false)} />
 	<div class="top-bar">
 		<div class="topbutton">
-			<button on:click={() => dialog.close()}>
+			<button on:click={() => close()}>
 				<div class="border-inside">&nbspX&nbsp</div>
 			</button>
 		</div>
@@ -103,7 +110,7 @@
 	</div>
 	<div class="buttons" on:click|stopPropagation>
 		<button on:click={handleOK}>OK</button>
-		<button on:click={() => dialog.close()}>Cancel</button>
+		<button on:click={() => close()}>Cancel</button>
 	</div>
 </dialog>
 

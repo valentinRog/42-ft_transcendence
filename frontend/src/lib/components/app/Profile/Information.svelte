@@ -72,7 +72,7 @@
 				<li class="box">Registration date : {formattedDate || ''}</li>
 				<li class="friend-list">
 					Friends : {$currentUser?.friends?.length || '0'}
-					{#if $currentUser?.id === $user.id}
+					{#if $currentUser?.id === $user?.id}
 						<ul>
 							{#each $friends as friend (friend.id)}
 								<li class="friend">
