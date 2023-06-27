@@ -639,7 +639,7 @@
 	async function fetchPublicChats(start: number, limit: number) {
 		const response = await fetchWithToken(`chat/publicChats?start=${start}&limit=${limit}`);
 		const data = await response.json();
-		$chatsPublic = data;
+		$chatsPublic = data.chats;
 		return data;
 	}
 
