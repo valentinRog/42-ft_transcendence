@@ -18,6 +18,7 @@
 	let messageContent = '';
 	let roleId: number;
 	let disabled = false;
+	let sortedChatUsers : any;
 
 	let searchQuery = '';
 	let selectedAction: string = '';
@@ -44,9 +45,10 @@
 	let isProtected: any;
 
 	$: {
+		
 		blockedIds = $blocks.map(block => block.blockedId);
 		currentChat = $chats.find((chat) => chat.id === chatIdLocal);
-
+		sortedChatUsers = currentChat.chatUsers.slice().sort((a : any, b : any) => a.roleId - b.roleId);
 		roleId = currentChat?.chatUsers.find((cu: any) => cu.userId === $user?.id)?.roleId;
 		isProtected = currentChat ? currentChat.accessibility === 'protected' : false;
 		disabled = isUserBanned || isUserMuted;
@@ -162,7 +164,10 @@
 	}
 
 	function selectUser(user: any) {
-		selectedUser = user;
+		if (selectedUser && selectedUser.id === user.id)
+			selectedUser = null;
+		else
+			selectedUser = user;
 	}
 
 	function changeRole(userId: number, newRoleId: number) {
@@ -317,21 +322,26 @@
 								placeholder="in sec"
 								min="0"
 							/>
+							
 						</div>
 					{/if}
-					<button on:click={performAction}>Submit</button>
+					<div class="submit-row">
+						<button on:click={performAction}>Submit</button>
+					</div>
 					<div id="access-control">
-						{#if isProtected}
-							<button on:click={toggleAccess}>Switch to Public</button>
-							<div id="password-change-form">
-								<label>
-									Enter new password:
-									<input type="password" bind:value={password} on:input={updatePassword} autocomplete="off"/>
-								</label>
-								<button on:click={changePassword}>Submit</button>
-							</div>
-						{:else}
-							<button on:click={toggleAccess}>Switch to Protected</button>
+						{#if roleId === 1}
+							{#if isProtected}
+								<button class="switch" on:click={toggleAccess}>Switch to Public</button>
+								<div id="password-change-form">
+									<label>
+										Enter new password:
+										<input type="password" bind:value={password} on:input={updatePassword} autocomplete="off"/>
+									</label>
+									<button on:click={changePassword}>Submit</button>
+								</div>
+							{:else}
+								<button class="switch" on:click={toggleAccess}>Switch to Protected</button>
+							{/if}
 						{/if}
 						{#if passwordModalVisible}
 							<div id="password-modal">
@@ -354,14 +364,19 @@
 				<div class="users">
 					<h5>Users in this chat:</h5>
 					<ul>
-						{#each currentChat.chatUsers as chatUser, index (index)}
-							<li on:click={() => selectUser(chatUser)}>
-								({RoleName[chatUser.roleId - 1]}) {chatUser.user?.username}
+						{#each sortedChatUsers as chatUser, index (index)}
+							<li>
+								<div on:click={() => selectUser(chatUser)}>
+									({RoleName[chatUser.roleId - 1]}) {chatUser.user?.username}
+								</div>
 								{#if selectedUser === chatUser}
 									<button on:click={() => openProfile(chatUser.userId)}>Check Profile</button>
 									{#if roleId <= 1 && roleId < chatUser.roleId}
-										<button on:click={() => changeRole(chatUser.userId, 2)}>Made Moderator</button>
-										<button on:click={() => changeRole(chatUser.userId, 3)}>Make User</button>
+										{#if chatUser.roleId === 3}
+											<button on:click={() => changeRole(chatUser.userId, 2)}>Made Moderator</button>
+										{:else if chatUser.roleId === 2}
+											<button on:click={() => changeRole(chatUser.userId, 3)}>Make User</button>
+										{/if}
 									{/if}
 									{#if roleId <= 2 && roleId < chatUser.roleId}
 										<div>
@@ -440,7 +455,8 @@
 	}
 
 	h5 {
-		margin: 0;
+		margin-top: 0.5rem;
+		margin-bottom: 0.8rem;
 		text-align: center;
 		color: $dark-grey;
 	}
@@ -552,19 +568,24 @@
 
 	#password-change-form, 
 	#password-modal {
-		display: flex;
+		margin-top: 0.8rem;
+		text-align: center;
 		flex-direction: column;
-		gap: 5px;
+		font-size: 0.9rem;
+		button {
+			width: 3rem;
+			margin-left: auto;
+			margin-right: auto;
+		}
 	}
 
 	.username-action-row,
-	.duration-submit-row {
+	.duration-row,
+	.submit-row {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 		gap: 10px;
 	}
-
-
 
 </style>
