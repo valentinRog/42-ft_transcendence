@@ -111,8 +111,8 @@
 		}
 	};
 
-	function openProfile(username: string) {
-		addInstance('Profile', {}, { username: username });
+	function openProfile(userId: number) {
+		addInstance('Profile', {}, { userId });
 		$selected = null;
 	}
 
@@ -244,7 +244,7 @@
 								<li class={message.user?.username === $user?.username ? 'self' : 'other'}>
 									<div class="message-header">
 										{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
-											<strong on:click={() => openProfile(message.user?.username)}
+											<strong on:click={() => openProfile(message.userId)}
 												>{message.user?.username}</strong
 											>
 										{/if}
@@ -332,7 +332,7 @@
 						<li on:click={() => selectUser(chatUser)}>
 							({RoleName[chatUser.roleId - 1]}) {chatUser.user?.username}
 							{#if selectedUser === chatUser}
-								<button on:click={() => openProfile(chatUser.user?.username)}>Check Profile</button>
+								<button on:click={() => openProfile(chatUser.userId)}>Check Profile</button>
 								{#if roleId <= 1 && roleId < chatUser.roleId}
 									<button on:click={() => changeRole(chatUser.userId, 2)}>Made Moderator</button>
 									<button on:click={() => changeRole(chatUser.userId, 3)}>Make User</button>

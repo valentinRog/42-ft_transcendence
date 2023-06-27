@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { NotFoundException } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class WebSocketService {
   private websockets: Map<number, Socket> = new Map();
   private reverseMap: Map<string, number> = new Map();
   private userStatus: Map<number, string> = new Map();
+
+  constructor(private readonly prisma: PrismaService) {}
 
   addSocket(clientId: number, socket: Socket): void {
     if (this.websockets.has(clientId)) {
@@ -78,4 +81,18 @@ export class WebSocketService {
     return this.userStatus;
   }
 
+  async updateStatusForFriends(userId: number, status: string) {
+    const userFriends = (
+      await this.prisma.user.findUnique({
+        where: { id: userId },
+      })
+    ).friends;
+    userFriends.forEach((friendId: number) => {
+      console.log(friendId);
+      const friendSocket = this.getSocket(friendId);
+      if (friendSocket) {
+        friendSocket.emit('updateStatus', { friendId: userId, status });
+      }
+    });
+  }
 }

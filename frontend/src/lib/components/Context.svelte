@@ -488,12 +488,9 @@
 	async function fetchUnreadConversations() {
 		$unreadConversations = 0;
 		for (const chat of $chats) {
-			if (
-				getUnreadMessagesCount(
-					chat,
-					chat.chatUsers.find((chatUser) => chatUser.userId === $user?.id)
-				) > 0
-			) {
+			if ( getUnreadMessagesCount(chat, 
+				chat.chatUsers.find((chatUser) => chatUser.userId === $user?.id)) > 0 
+				&& chat.accessibility === "private") {
 				$unreadConversations++;
 			}
 		}
