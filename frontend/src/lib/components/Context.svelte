@@ -91,7 +91,8 @@
 		export const openChatForumWindow = (): Writable<boolean> => getContext('openChatForumWindow');
 		export const fetchSettings = (): (() => Promise<any>) => getContext('fetchSettings');
 		export const unreadConversations = (): Writable<number> => getContext('unreadConversations');
-		export const fetchUnreadConversations = (): (() => Promise<number>) =>getContext('fetchUnreadConversations');
+		export const fetchUnreadConversations = (): (() => Promise<number>) =>
+			getContext('fetchUnreadConversations');
 
 		export interface Settings {
 			pong: {
@@ -232,8 +233,7 @@
 
 		export interface Room {
 			room: string;
-			index: number;
-			opponentId: number;
+			players: [number, number];
 			state: GameState;
 		}
 
@@ -473,9 +473,12 @@
 	async function fetchUnreadConversations() {
 		$unreadConversations = 0;
 		for (const chat of $chats) {
-			if (getUnreadMessagesCount(
+			if (
+				getUnreadMessagesCount(
 					chat,
-					chat.chatUsers.find((chatUser) => chatUser.userId === $user?.id) ) > 0) {
+					chat.chatUsers.find((chatUser) => chatUser.userId === $user?.id)
+				) > 0
+			) {
 				$unreadConversations++;
 			}
 		}
@@ -551,17 +554,17 @@
 		const res = await fetchWithToken(`stat/get-history/${$user?.id}`);
 		const data = await res.json();
 		data.forEach(function (element: any, index: number) {
-				const createdAtDate = new Date(element.createdAt);
-				data[index] = {
-					result: $user?.username === element.winnerName ? 'Win' : 'Lose',
-					opponent: $user?.username === element.winnerName ? element.loserName : element.winnerName,
-					createdAt: createdAtDate.toLocaleDateString('en', {
-						day: '2-digit',
-						month: '2-digit',
-						year: 'numeric'
-					})
-				};
-			});
+			const createdAtDate = new Date(element.createdAt);
+			data[index] = {
+				result: $user?.username === element.winnerName ? 'Win' : 'Lose',
+				opponent: $user?.username === element.winnerName ? element.loserName : element.winnerName,
+				createdAt: createdAtDate.toLocaleDateString('en', {
+					day: '2-digit',
+					month: '2-digit',
+					year: 'numeric'
+				})
+			};
+		});
 		$history = data;
 		return new Promise((resolve, reject) => {
 			resolve(data);
@@ -728,11 +731,10 @@
 
 	$socket.on('game', fetchGameRequest);
 
-	$socket.on('enter-room', (data: { room: string; index: number; opponentId: number }) => {
-			$room = {
+	$socket.on('enter-room', (data: { room: string; players: [number, number] }) => {
+		$room = {
 			room: data.room,
-			index: data.index,
-			opponentId: data.opponentId,
+			players: data.players,
 			state: {
 				ball: {
 					x: 0,
@@ -769,7 +771,7 @@
 		$room = null;
 		fetchHistory();
 		fetchStatistics();
-			$matchmaking = false;
+		$matchmaking = false;
 	});
 
 	$socket.on('addChat', (chat) => {

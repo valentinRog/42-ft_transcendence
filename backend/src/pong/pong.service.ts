@@ -30,8 +30,8 @@ export class PongService {
     this.rooms.set(socketPlayer2.id, { room: room, index: 1 });
     //socketPlayer1.join(room);
     //socketPlayer2.join(room);
-    socketPlayer1.emit('enter-room', { room, index: 0, opponentId: player2Id });
-    socketPlayer2.emit('enter-room', { room, index: 1, opponentId: player1Id });
+    socketPlayer1.emit('enter-room', { room, players: [player1Id, player2Id] });
+    socketPlayer2.emit('enter-room', { room, players: [player1Id, player2Id] });
 
     return { player1: player1Id, player2: player2Id, room };
   }
