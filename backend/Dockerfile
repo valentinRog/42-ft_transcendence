@@ -1,10 +1,13 @@
-FROM node:latest
+FROM node:20
 
 WORKDIR /app
 
 COPY . .
 
 RUN npm i
-RUN npx prisma generate
 
-CMD npx prisma migrate reset --force && npm run build && npm run start:prod
+RUN chmod +x ./entrypoint.sh
+
+ENTRYPOINT ["./entrypoint.sh"]
+
+CMD npm run start:prod

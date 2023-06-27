@@ -3,22 +3,19 @@
 	import { writable } from 'svelte/store';
 	import { user } from '$lib/stores';
 
-	export let userId: number | null | undefined = null;
+	export let userId: number | null = null;
 
 	const fetchWithToken = Context.fetchWithToken();
 	const fetchHistory = Context.fetchHistory();
 	const history = Context.history();
+	const outcome = Context.outcome();
 
 	let current: Context.Match | null = null;
 	let currentHistory = writable<Context.Match[]>();
 
-	$: {
-		if (userId === null) {
-			currentHistory.set($history);
-		}
-	}
+	$: if (userId === null) $currentHistory = $history;
 
-	(async () => {
+	async function updateHistory() {
 		if (userId === null) {
 			await fetchHistory();
 		} else {
@@ -36,13 +33,16 @@
 					})
 				};
 			});
-			currentHistory.set(data);
+			$currentHistory = data;
 		}
-	})();
+	}
+
+	updateHistory();
+	$: if ($outcome) updateHistory();
 </script>
 
 <div class="sunken-panel">
-	{#if $currentHistory?.length === 0}
+	{#if $currentHistory.length === 0}
 		<tr>
 			<td colspan="3">You have not participated in any matches</td>
 		</tr>

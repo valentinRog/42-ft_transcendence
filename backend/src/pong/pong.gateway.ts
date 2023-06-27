@@ -35,7 +35,7 @@ export class PongGateway extends SocketGateway {
     const game = this.games.get(room);
     this.gameEnd(game);
     this.games.delete(room);
-    this.server.to(room).emit('game-over', winner);
+    this.server.to(room).emit('game-over', { winnerId: winner });
     game.getPlayer1().leave(room);
     game.getPlayer2().leave(room);
     this.pongService.removeClientRoom(game.getPlayer1().id);

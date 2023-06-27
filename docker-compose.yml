@@ -32,6 +32,11 @@ services:
     networks:
       - net
     restart: always
+    volumes:
+      - db:/var/lib/postgresql/data
 
 networks:
   net:
+
+volumes:
+  db:

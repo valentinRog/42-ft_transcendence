@@ -6,15 +6,17 @@
 	function clear() {
 		textareaValue = '';
 	}
+
+	let activeDrop: string | null = null;
 </script>
 
 <div class="window-body">
 	<div class="menu">
-		<DropDown name="File">
+		<DropDown name="File" bind:activeDrop>
 			<button on:click={clear}>New</button>
 			<button class="unavailable">Save</button>
 		</DropDown>
-		<DropDown name="Edit">
+		<DropDown name="Edit" bind:activeDrop>
 			<button class="unavailable">Undo</button>
 		</DropDown>
 	</div>

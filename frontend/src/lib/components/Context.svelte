@@ -243,6 +243,7 @@
 		export const matchmaking = (): Writable<boolean> => getContext('matchmaking');
 		export const nPongs = (): Writable<number> => getContext('nPongs');
 		export const room = (): Writable<Room | null> => getContext('room');
+		export const outcome = (): Writable<'win' | 'lose' | null> => getContext('outcome');
 	}
 </script>
 
@@ -726,10 +727,12 @@
 	const matchmaking = writable(false);
 	const nPongs = writable(0);
 	const room = writable<Context.Room | null>(null);
+	const outcome = writable<'win' | 'lose' | null>(null);
 
 	setContext('room', room);
 	setContext('nPongs', nPongs);
 	setContext('matchmaking', matchmaking);
+	setContext('outcome', outcome);
 
 	// ------- EVENTS --------
 
@@ -787,10 +790,12 @@
 	});
 
 	$socket.on('game-over', (data: { winnerId: number }) => {
-		$room = null;
 		fetchHistory();
 		fetchStatistics();
 		$matchmaking = false;
+		$outcome = data.winnerId === $room!.players.indexOf($user!.id) ? 'win' : 'lose';
+		$room = null;
+		console.log($outcome);
 	});
 
 	$socket.on('addChat', (chat) => {
