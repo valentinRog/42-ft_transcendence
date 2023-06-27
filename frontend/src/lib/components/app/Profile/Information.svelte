@@ -170,7 +170,7 @@
 						width: auto;
 					}
 				}
-			} 
+			}
 		}
 
 		.img-status {
@@ -179,7 +179,11 @@
 		}
 
 		button {
-			@include tab-contour;
+			@include button-95;
+
+			width: 7rem;
+			margin-left: auto;
+			margin-right: auto;
 			padding: 0.5rem;
 			font-size: 1rem;
 			margin-top: auto;

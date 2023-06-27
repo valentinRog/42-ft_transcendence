@@ -84,6 +84,7 @@
 	}
 
 	.buttons {
+
 		display: flex;
 		justify-content: center;
 		margin-top: 1rem;
@@ -100,11 +101,14 @@
 	}
 
 	dialog > div > button {
+		@include tab-contour;
+		@include tab-contour-active;
+		background-color: $grey;
 		margin-bottom: 12px;
 		margin-left: 0.6rem;
 		margin-right: 0.6rem;
 		width: 5rem;
-		padding: 0.3rem
+		padding: 0.3rem;
 	}
 
 	div.top-bar {

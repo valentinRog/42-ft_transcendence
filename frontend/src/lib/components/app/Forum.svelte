@@ -166,6 +166,8 @@
 
 	select {
 		width: 100px;
+		bottom: 0.1rem;
+		height: 21px;
 	}
 
 	.chat-window {
@@ -200,11 +202,10 @@
 	}
 
 	button {
-		@include tab-contour;
+		@include button-95;
+
 		padding: 0.5rem;
 		margin-bottom: 0.2rem;
-		@include tab-contour-active;
-		background-color: $grey;
 		width: 8rem;
 		font-size: 0.9rem;
 	}

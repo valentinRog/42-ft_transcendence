@@ -175,6 +175,8 @@
 	}
 
 	.send-btn {
+		@include button-95;
+
 		margin-left: auto;
 		order: 2;
 	}
