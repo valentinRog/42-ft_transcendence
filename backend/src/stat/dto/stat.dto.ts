@@ -7,5 +7,5 @@ export class UpdateStatDto {
 
   @IsString()
   @IsNotEmpty()
-  opponentName: string;
+  opponentId: number;
 }

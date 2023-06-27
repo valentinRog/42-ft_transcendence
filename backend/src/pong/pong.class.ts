@@ -65,7 +65,6 @@ export class PongGame {
   constructor(server: Server, room: string) {
     this.server = server;
     this.room = room;
-    this.startGame();
   }
   private server: Server;
   private tickRate = 30;

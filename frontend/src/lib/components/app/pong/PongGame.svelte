@@ -9,14 +9,19 @@
 	const fetchWithToken = Context.fetchWithToken();
 	const socket = Context.socket();
 	const settings = Context.settings();
+	const fetchSettings = Context.fetchSettings();
 	const soundOn = Context.soundOn();
 	const room = Context.room() as Writable<Context.Room>;
 	const ping = Context.ping();
 	const serverClockDelta = Context.serverClockDelta();
 	const fetchUserById = Context.fetchUserById();
 	const fetchStatistics = Context.fetchStatistics();
+	const nPongs = Context.nPongs();
+
+	$nPongs++;
 
 	fetchStatistics();
+	fetchSettings();
 
 	interface Player {
 		id: number;
@@ -248,9 +253,9 @@
 		animationFrame = requestAnimationFrame(() => draw(ctx));
 	}
 
-	let i1: number;
+	let intervals: number[] = [];
 	if (index !== -1) {
-		i1 = setInterval(() => {
+		const i = setInterval(() => {
 			const input: Input = {
 				clientId: $socket.id,
 				stateId: $room.state.id + delay,
@@ -265,9 +270,10 @@
 				inputs.shift();
 			}
 		}, 1000 / tickRate);
+		intervals.push(i);
 	}
 
-	const i2 = setInterval(() => $socket.emit('ping', Date.now()), 1000);
+	intervals.push(setInterval(() => $socket.emit('ping', Date.now()), 1000));
 
 	let canvas: HTMLCanvasElement;
 
@@ -301,12 +307,10 @@
 	});
 
 	onDestroy(() => {
-		clearInterval(i1);
-		clearInterval(i2);
+		$nPongs--;
+		if ($nPongs === 0) $socket.off('state');
+		intervals.forEach(clearInterval);
 		if (animationFrame !== undefined) cancelAnimationFrame(animationFrame);
-		$socket.off('ping');
-		$socket.off('state');
-		$socket.off('input');
 	});
 
 	function handleKeyDown(e: KeyboardEvent) {

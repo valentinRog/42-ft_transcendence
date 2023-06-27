@@ -31,6 +31,24 @@ export class PongGateway extends SocketGateway {
     client?.emit('ping', [data, Date.now()]);
   }
 
+  gameOver(winner: number, room: string) {
+    const game = this.games.get(room);
+    this.gameEnd(game);
+    this.games.delete(room);
+    this.server.to(room).emit('game-over', winner);
+    game.getPlayer1().leave(room);
+    game.getPlayer2().leave(room);
+    this.pongService.removeClientRoom(game.getPlayer1().id);
+    this.pongService.removeClientRoom(game.getPlayer2().id);
+    this.statService.updateStat(
+      this.webSocketService.getClientId(game.getPlayer1()),
+      {
+        result: Math.abs(winner - 1),
+        opponentId: this.webSocketService.getClientId(game.getPlayer2()),
+      },
+    );
+  }
+
   @SubscribeMessage('enter-room')
   handleRoom(client: Socket) {
     const { room, index } = this.pongService.getClientRoom(client.id);
@@ -38,15 +56,7 @@ export class PongGateway extends SocketGateway {
     if (!this.games.has(room)) {
       const game = new PongGame(this.server, room);
       this.games.set(room, game);
-      game.setCallback(async (index: number) => {
-        this.gameEnd(game);
-        this.games.delete(room);
-        this.server.to(room).emit('game-over', index);
-        game.getPlayer1().leave(room);
-        game.getPlayer2().leave(room);
-        this.pongService.removeClientRoom(game.getPlayer1().id);
-        this.pongService.removeClientRoom(game.getPlayer2().id);
-      });
+      game.setCallback((winner: number) => this.gameOver(winner, room));
       game.startGame();
     }
     if (index === 0) {
@@ -64,6 +74,7 @@ export class PongGateway extends SocketGateway {
 
   @SubscribeMessage('spectate')
   handleSpecate(client: Socket, data: { friendId: number }) {
+    if (this.pongService.getClientRoom(client.id) !== undefined) return;
     const friend = this.webSocketService.getSocket(data.friendId);
     this.pongService.setClientRoom(
       client.id,
@@ -97,40 +108,14 @@ export class PongGateway extends SocketGateway {
     }
   }
 
-  async updateStat(
-    game: PongGame,
-    client: Socket,
-    data: { room: string; index: number },
-    result: number,
-  ) {
-    const winner = await this.userService.getUserById(
-      this.webSocketService.getClientId(client),
-    );
-    const opponent = data.index === 0 ? game.getPlayer2() : game.getPlayer1();
-    const loser = await this.userService.getUserById(
-      this.webSocketService.getClientId(opponent),
-    );
-    await this.statService.updateStat(winner.id, {
-      result: result,
-      opponentName: loser.username,
-    });
-  }
-
-  @SubscribeMessage('disconnect')
-  async handlePongDisconnect(client: Socket) {
+  async handleDisconnect(client: Socket) {
+    super.handleDisconnect(client);
     if (this.pongService.getClientRoom(client.id) === undefined) return;
     const { room, index } = this.pongService.getClientRoom(client.id);
+    if (index !== 0 && index !== 1) return;
     const game = this.games.get(room);
-    if (game) {
-      if (index === 0 || index === 1) {
-        this.pongService.removeClientRoom(client.id);
-        this.gameEnd(game);
-        this.games.delete(room);
-        const result = index === 0 ? 1 : 0;
-        await this.updateStat(game, client, { room, index }, result);
-        this.server.to(room).emit('game-over', result);
-      }
-    }
-    client.join(room);
+    if (game === undefined) return;
+    this.gameEnd(game);
+    this.gameOver(Math.abs(index - 1), room);
   }
 }
