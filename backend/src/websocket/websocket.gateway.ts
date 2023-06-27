@@ -290,7 +290,11 @@ export abstract class SocketGateway
     @ConnectedSocket() client: Socket,
   ) {
     const userId = this.webSocketService.getClientId(client);
-    if (data.response) {
+    if (
+      data.response &&
+      !this.pongService.isMatched(userId) &&
+      !this.pongService.isMatched(data.friendId)
+    ) {
       this.pongService.createRoom(userId, data.friendId);
     }
   }

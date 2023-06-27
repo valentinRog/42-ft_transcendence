@@ -64,7 +64,6 @@
 	const fetchGetUserBlocks = Context.fetchGetUserBlocks();
 	const fetchChats = Context.fetchChats();
 	const fetchFriendRequest = Context.fetchFriendRequest();
-	const fetchGameRequest = Context.fetchGameRequest();
 	const fetchUnreadConversations = Context.fetchUnreadConversations();
 	const unreadConversations = Context.unreadConversations();
 	const friendRequest = Context.friendRequest();
@@ -89,7 +88,6 @@
 		await fetchFriends();
 		await fetchGetUserBlocks();
 		await fetchFriendRequest();
-		await fetchGameRequest();
 
 		fetchChats().then(() => {
 			$chats.forEach((chat) => {

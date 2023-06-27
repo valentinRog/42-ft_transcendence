@@ -8,6 +8,11 @@ export class PongService {
 
   constructor(private readonly socketService: WebSocketService) {}
 
+  isMatched(userId: number) {
+    const clientId = this.socketService.getSocket(userId).id;
+    return this.rooms.has(clientId);
+  }
+
   getClientRoom(clientId: string) {
     return this.rooms.get(clientId);
   }

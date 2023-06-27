@@ -7,6 +7,7 @@ import { PrismaClient } from '@prisma/client';
 import { NotificationService } from './notification.service';
 import { ResponseDto } from './dto';
 import { UserService } from 'src/user/user.service';
+import { WebSocketService } from 'src/websocket/websocket.service';
 
 @UseGuards(JwtGuard)
 @Controller('notification')
@@ -15,6 +16,7 @@ export class NotificationController {
     private prisma: PrismaClient,
     private notifService: NotificationService,
     private userService: UserService,
+    private socketService: WebSocketService,
   ) {}
 
   @Post('add-friend')
@@ -52,7 +54,8 @@ export class NotificationController {
       where: { id: dto.friendId },
     });
     if (!prisma_friend) throw new NotFoundException('User not found');
-    return await this.notifService.notifyEvent(prisma_friend, user, 'game');
+    const socket = this.socketService.getSocket(prisma_friend.id);
+    if (socket) socket.emit('game', { id: user.id, username: user.username });
   }
 
   @Get('get')

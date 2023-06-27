@@ -47,16 +47,8 @@
 		scale = parseInt(scaleString) / 100;
 	}
 
-	function matchmake() {
-		if ($matchmaking) return;
-		$matchmaking = true;
-		fetchWithToken('matchmaking/queue', {
-			method: 'POST'
-		});
-	}
-
 	function responseGame(senderId: number, accept: boolean) {
-		$gameRequest = $gameRequest.filter((x) => x.senderId !== senderId);
+		$gameRequest = $gameRequest.filter((x) => x.id !== senderId);
 		$socket.emit('response-game', { response: accept, friendId: senderId });
 	}
 
@@ -77,16 +69,16 @@
 	<div class="menu">
 		<DropDown name="Game" notif={$gameRequest.length} bind:activeDrop>
 			{#if $matchmaking === false}
-				<button on:click={matchmake}>Matchmaking</button>
+				<button on:click={() => ($matchmaking = true)}>Matchmaking</button>
 			{:else}
 				<button class="unavailable">Matchmaking</button>
 			{/if}
 			{#if $gameRequest.length > 0}
 				<RightDrop name="Invitations" notif={$gameRequest.length}>
 					{#each $gameRequest as r (r.id)}
-						<RightDrop name={r.senderName}>
-							<button on:click={() => responseGame(r.senderId, true)}>accept</button>
-							<button on:click={() => responseGame(r.senderId, false)}>decline</button>
+						<RightDrop name={r.username}>
+							<button on:click={() => responseGame(r.id, true)}>accept</button>
+							<button on:click={() => responseGame(r.id, false)}>decline</button>
 						</RightDrop>
 					{/each}
 				</RightDrop>

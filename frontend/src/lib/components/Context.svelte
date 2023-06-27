@@ -82,7 +82,8 @@
 		export const contacts = (): Writable<Contact[]> => getContext('contacts');
 		export const blocks = (): Writable<Block[]> => getContext('blocks');
 		export const friendRequest = (): Writable<NotifRequest[]> => getContext('friendRequest');
-		export const gameRequest = (): Writable<NotifRequest[]> => getContext('gameRequest');
+		export const gameRequest = (): Writable<{ id: number; username: string }[]> =>
+			getContext('gameRequest');
 		export const history = (): Writable<Match[]> => getContext('history');
 		export const statistics = (): Writable<Stat> => getContext('statistics');
 		export const openFriendRequest = (): Writable<boolean> => getContext('openFriendRequest');
@@ -181,7 +182,6 @@
 		export const fetchFriends = (): (() => Promise<any>) => getContext('fetchFriends');
 		export const fetchGetUserBlocks = (): (() => Promise<any>) => getContext('fetchGetUserBlocks');
 		export const fetchFriendRequest = (): (() => Promise<any>) => getContext('fetchFriendRequest');
-		export const fetchGameRequest = (): (() => Promise<any>) => getContext('fetchGameRequest');
 		export const fetchChats = (): (() => Promise<any>) => getContext('fetchChats');
 		export const fetchChatById = (): ((chatId: number) => Promise<any>) =>
 			getContext('fetchChatById');
@@ -306,7 +306,7 @@
 	const contacts = writable<Context.Contact[]>([]);
 	const blocks = writable<Context.Block[]>([]);
 	const friendRequest = writable<Context.NotifRequest[]>([]);
-	const gameRequest = writable<Context.NotifRequest[]>([]);
+	const gameRequest = writable<{ id: number; username: string }[]>([]);
 	const history = writable<Context.Match[]>([]);
 	const statistics = writable<Context.Stat>();
 	const unreadConversations = writable(0);
@@ -561,13 +561,6 @@
 		return data;
 	}
 
-	async function fetchGameRequest() {
-		const res = await fetchWithToken('notification/get?type=game');
-		const data = await res.json();
-		$gameRequest = data;
-		return data;
-	}
-
 	async function fetchHistory() {
 		const res = await fetchWithToken(`stat/get-history/${$user?.id}`);
 		const data = await res.json();
@@ -692,7 +685,6 @@
 	}
 
 	setContext('fetchPublicChats', fetchPublicChats);
-	setContext('fetchGameRequest', fetchGameRequest);
 	setContext('fetchHistory', fetchHistory);
 	setContext('fetchMe', fetchMe);
 	setContext('fetchUserByUsername', fetchUserByUsername);
@@ -734,6 +726,18 @@
 	setContext('matchmaking', matchmaking);
 	setContext('outcome', outcome);
 
+	$: if ($matchmaking) {
+		fetchWithToken('matchmaking/queue', {
+			method: 'POST'
+		});
+	}
+
+	$: if (!$matchmaking) {
+		fetchWithToken('matchmaking/unqueue', {
+			method: 'POST'
+		});
+	}
+
 	// ------- EVENTS --------
 
 	$socket.on('disconnect', logout);
@@ -751,9 +755,12 @@
 		fetchMe();
 	});
 
-	$socket.on('game', fetchGameRequest);
+	$socket.on('game', (data: { id: number; username: string }) => {
+		$gameRequest = [...$gameRequest, { ...data }];
+	});
 
 	$socket.on('enter-room', (data: { room: string; players: [number, number] }) => {
+		$matchmaking = false;
 		$room = {
 			room: data.room,
 			players: data.players,
@@ -795,7 +802,6 @@
 		$matchmaking = false;
 		$outcome = data.winnerId === $room!.players.indexOf($user!.id) ? 'win' : 'lose';
 		$room = null;
-		console.log($outcome);
 	});
 
 	$socket.on('addChat', (chat) => {
