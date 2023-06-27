@@ -92,7 +92,6 @@ export class PongGateway extends SocketGateway {
       this.webSocketService.setStatus(p2, 'online');
       this.updateStatusForFriends(p1, 'online');
       this.updateStatusForFriends(p2, 'online');
-      
     } else {
       console.log('players not found');
     }
@@ -118,7 +117,7 @@ export class PongGateway extends SocketGateway {
   }
 
   @SubscribeMessage('disconnect')
-  async handleDisconnect(client: Socket) {
+  async handlePongDisconnect(client: Socket) {
     if (this.pongService.getClientRoom(client.id) === undefined) return;
     const { room, index } = this.pongService.getClientRoom(client.id);
     const game = this.games.get(room);
