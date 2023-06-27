@@ -5,7 +5,6 @@
 	import { Context } from '$lib/components/Context.svelte';
 	import Clock from './Clock.svelte';
 	import NotificationBadge from './NotificationBadge.svelte';
-	import { user } from '$lib/stores';
 
 	const chats = Context.chats();
 	const openChatWindow = Context.openChatWindow();

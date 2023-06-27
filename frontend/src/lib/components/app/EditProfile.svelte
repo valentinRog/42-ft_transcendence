@@ -11,9 +11,9 @@
 	let showModal = false;
 	let showDialog = false;
 	let errorMessage: string | null = null;
+	let internetWindow: string;
 
 	let changes = false;
-
 	let inputLogin = $user?.login;
 	let inputUsername = $user?.username;
 	let checkboxValue = $user?.twoFactorEnabled;
@@ -50,7 +50,7 @@
 			method: 'POST'
 		});
 		const data = await res.json();
-		addInstance('Internet', {}, { url: data.qrcode });
+		internetWindow = addInstance('Internet', {}, { url: data.qrcode });
 		showDialog = true;
 	}
 
@@ -114,7 +114,7 @@
 </script>
 
 <div class="window-body">
-	<TwoFactorDialog {showDialog} on:close={() => (showDialog = false)} />
+	<TwoFactorDialog {showDialog} {internetWindow} on:close={() => (showDialog = false)} />
 	<ErrorDialog {showModal} {errorMessage} on:close={() => (showModal = false)} />
 	<div id="formular">
 		<div class="pic-username-login">

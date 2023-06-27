@@ -15,19 +15,20 @@
 		}
 	});
 
-	let dialog: HTMLDialogElement;
-
 	export let showDialog : boolean;
+	export let internetWindow : string;
+
+	let dialog: HTMLDialogElement;
 	let showModal = false;
 	let errorMessage: string | null = null;
+	let numbers: string[] = [];
+	let activeInput: HTMLInputElement;
 
 	const fetchWithToken = Context.fetchWithToken();
 	const fetchWithTokenNoLogout = Context.fetchWithTokenNoLogout();
+	const removeInstance = Context.removeInstance();
 
 	$: if (dialog && showDialog) dialog.showModal();
-
-	let numbers: string[] = [];
-	let activeInput: HTMLInputElement;
 
 	function addNumber(event: any) {
 		activeInput = event.target;
@@ -68,7 +69,7 @@
 			const data = await res.json();
 			$token = data.token;
 			sessionStorage.setItem('token', data.token);
-			dialog.close();
+			close();
 		}
 	}
 
@@ -79,13 +80,18 @@
 		}
 	}
 
+	function close() {
+		dialog.close();
+		removeInstance(internetWindow);
+	}
+
 </script>
 
 <dialog bind:this={dialog} on:close>
 	<ErrorDialog {showModal} {errorMessage} on:close={() => (showModal = false)} />
 	<div class="top-bar">
 		<div class="topbutton">
-			<button on:click={() => dialog.close()}>
+			<button on:click={() => close()}>
 				<div class="border-inside">&nbspX&nbsp</div>
 			</button>
 		</div>
@@ -104,7 +110,7 @@
 	</div>
 	<div class="buttons" on:click|stopPropagation>
 		<button on:click={handleOK}>OK</button>
-		<button on:click={() => dialog.close()}>Cancel</button>
+		<button on:click={() => close()}>Cancel</button>
 	</div>
 </dialog>
 
