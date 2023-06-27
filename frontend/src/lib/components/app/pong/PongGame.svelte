@@ -15,16 +15,33 @@
 	const serverClockDelta = Context.serverClockDelta();
 	const fetchUserById = Context.fetchUserById();
 	const fetchStatistics = Context.fetchStatistics();
-	const statistics = Context.statistics();
 
 	fetchStatistics();
 
-	let opponent: string;
-	let opponentStat: Context.Stat;
-	fetchWithToken(`stat/get-stat/${$room.opponentId}`)
-		.then((r) => r.json())
-		.then((x) => (opponentStat = x));
-	fetchUserById($room.opponentId).then((u) => (opponent = u.username));
+	interface Player {
+		id: number;
+		name: string;
+		elo: number;
+	}
+
+	let player1: Player;
+	let player2: Player;
+
+	async function getPlayer(id: number): Promise<Player> {
+		const u = await fetchUserById(id);
+		const res = await fetchWithToken(`stat/get-stat/${id}`);
+		const stat = await res.json();
+		return {
+			id: u.id,
+			name: u.username,
+			elo: stat.elo
+		};
+	}
+
+	getPlayer($room.players[0]).then((p) => (player1 = p));
+	getPlayer($room.players[1]).then((p) => (player2 = p));
+
+	const index = $room.players.indexOf($user!.id);
 
 	const sounds = {
 		paddle: new Audio('/paddle.mp3'),
@@ -214,15 +231,12 @@
 		tw = ctx.measureText(s.player2Score.toString()).width;
 		ctx.fillText(s.player2Score.toString(), (3 * w - tw) / 4, h / 5);
 
-		if (show.get('names') && opponent !== undefined) {
+		if (show.get('names') && player1 && player2) {
+			let [p1, p2] = [player1.name, player2.name];
 			ctx.font = `${h / 20}px pong-text`;
-			let [p1, p2] = [$user!.username, opponent];
-			if ($room.index === 1) [p1, p2] = [p2, p1];
-			if (show.get('rating') && $statistics !== undefined && opponentStat !== undefined) {
-				let [elo1, elo2] = [$statistics.elo, opponentStat.elo];
-				if ($room.index === 1) [elo2, elo1] = [elo1, elo2];
-				p1 += ` - ${elo1}`;
-				p2 += ` - ${elo2}`;
+			if (show.get('rating')) {
+				p1 += ` - ${player1.elo}`;
+				p2 += ` - ${player2.elo}`;
 				ctx.font = `${h / 30}px pong-text`;
 			}
 			tw = ctx.measureText(p1).width;
@@ -234,21 +248,24 @@
 		animationFrame = requestAnimationFrame(() => draw(ctx));
 	}
 
-	const i1 = setInterval(() => {
-		const input: Input = {
-			clientId: $socket.id,
-			stateId: $room.state.id + delay,
-			clientTime: Date.now() + delay,
-			serverTime: Date.now() + delay + $serverClockDelta,
-			up,
-			down
-		};
-		$socket.emit('input', input);
-		inputs.push(input);
-		if (inputs.length > 100) {
-			inputs.shift();
-		}
-	}, 1000 / tickRate);
+	let i1: number;
+	if (index !== -1) {
+		i1 = setInterval(() => {
+			const input: Input = {
+				clientId: $socket.id,
+				stateId: $room.state.id + delay,
+				clientTime: Date.now() + delay,
+				serverTime: Date.now() + delay + $serverClockDelta,
+				up,
+				down
+			};
+			$socket.emit('input', input);
+			inputs.push(input);
+			if (inputs.length > 100) {
+				inputs.shift();
+			}
+		}, 1000 / tickRate);
+	}
 
 	const i2 = setInterval(() => $socket.emit('ping', Date.now()), 1000);
 
@@ -266,13 +283,17 @@
 
 	$socket.on('state', (s: Context.GameState) => {
 		s.time -= $serverClockDelta;
+		if (index === -1) {
+			$room.state = s;
+			return;
+		}
 		while (inputs.length && inputs[0].clientTime < s.time) {
 			inputs.shift();
 		}
 		for (let i = 1; i < inputs.length && inputs[i].clientTime <= Date.now(); i++) {
 			s = update(s, inputs[i].clientTime - inputs[i - 1].clientTime);
-			s.paddles[$room.index].up = inputs[i].up;
-			s.paddles[$room.index].down = inputs[i].down;
+			s.paddles[index].up = inputs[i].up;
+			s.paddles[index].down = inputs[i].down;
 			s.time = inputs[i].clientTime;
 			s.id = inputs[i].stateId;
 		}

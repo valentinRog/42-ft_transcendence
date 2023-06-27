@@ -62,7 +62,6 @@
 		}
 		else {
 			dialog.close();
-
 			const res = await fetchWithToken('2fa/enable', {
 				method: 'POST',
 			});

@@ -276,7 +276,7 @@
 	.whole-window {
 		margin: 0.4rem;
 	}
-	.window {		
+	.window {
 		box-shadow: inset -1px -1px var(--window-frame), inset 1px 1px var(--button-face),
 			inset -2px -2px var(--button-shadow), inset 2px 2px white;
 		background: $grey;
@@ -413,7 +413,7 @@
 		@include tab-border(white, black);
 		overflow: hidden;
 	}
-	
+
 	table {
 		border-collapse: collapse;
 		position: relative;
@@ -421,7 +421,7 @@
 		white-space: nowrap;
 		background-color: white;
 	}
-	
+
 	table > thead > tr > * {
 		position: sticky;
 		top: 0;
@@ -432,16 +432,16 @@
 		font-weight: normal;
 		padding: 0 0.5rem;
 	}
-	
+
 	table.interactive > tbody > tr {
 		cursor: pointer;
 	}
-	
+
 	table.interactive > tbody > tr.highlighted {
 		color: white;
 		background-color: #1084d0;
 	}
-	
+
 	table > tbody > tr > * {
 		padding: 0 0.5rem;
 		height: 1.2rem;
@@ -474,7 +474,7 @@
 	}
 
 	select {
-		padding: 3px 4px;
+		padding: 2px 5px;
 		border: none;
 		box-shadow:inset -1px -1px white,
 		inset 1px 1px var(--button-shadow), inset -2px -2px var(--button-face),
@@ -488,11 +488,14 @@
 		border-radius: 0;
 	}
 
-	select {
-		height: 21px;
-	}
-
 	select:focus {
 		outline: none;
 	}
+}
+
+
+@mixin button-95 {
+	@include tab-contour;
+	@include tab-contour-active;
+	background-color: $grey;
 }

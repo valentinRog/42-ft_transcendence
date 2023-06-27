@@ -72,7 +72,7 @@ export class PongGateway extends SocketGateway {
     );
     client.emit('enter-room', {
       room: this.pongService.getClientRoom(friend.id).room,
-      index: 2,
+      players: [data.friendId, this.webSocketService.getClientId(client)],
     });
   }
 

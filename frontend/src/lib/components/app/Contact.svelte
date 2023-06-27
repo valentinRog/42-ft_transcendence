@@ -266,6 +266,7 @@
 			}
 			input[type='submit'] {
 				@include input-submit;
+				@include button-95;
 			}
 		}
 	}
@@ -313,6 +314,8 @@
 		}
 	}
 	button {
+		@include button-95;
+
 		padding: 0.3rem 0.625rem;
 		margin: 0 0.25rem;
 		width: 100%;
