@@ -31,6 +31,24 @@ export class PongGateway extends SocketGateway {
     client?.emit('ping', [data, Date.now()]);
   }
 
+  gameOver(winner: number, room: string) {
+    const game = this.games.get(room);
+    this.gameEnd(game);
+    this.games.delete(room);
+    this.server.to(room).emit('game-over', winner);
+    game.getPlayer1().leave(room);
+    game.getPlayer2().leave(room);
+    this.pongService.removeClientRoom(game.getPlayer1().id);
+    this.pongService.removeClientRoom(game.getPlayer2().id);
+    this.statService.updateStat(
+      this.webSocketService.getClientId(game.getPlayer1()),
+      {
+        result: Math.abs(winner - 1),
+        opponentId: this.webSocketService.getClientId(game.getPlayer2()),
+      },
+    );
+  }
+
   @SubscribeMessage('enter-room')
   handleRoom(client: Socket) {
     const { room, index } = this.pongService.getClientRoom(client.id);
@@ -38,23 +56,7 @@ export class PongGateway extends SocketGateway {
     if (!this.games.has(room)) {
       const game = new PongGame(this.server, room);
       this.games.set(room, game);
-      game.setCallback(async (index: number) => {
-        this.gameEnd(game);
-        this.games.delete(room);
-        this.server.to(room).emit('game-over', index);
-        game.getPlayer1().leave(room);
-        game.getPlayer2().leave(room);
-        this.pongService.removeClientRoom(game.getPlayer1().id);
-        this.pongService.removeClientRoom(game.getPlayer2().id);
-
-        this.statService.updateStat(
-          this.webSocketService.getClientId(game.getPlayer1()),
-          {
-            result: Math.abs(index - 1),
-            opponentId: this.webSocketService.getClientId(game.getPlayer2()),
-          },
-        );
-      });
+      game.setCallback((winner: number) => this.gameOver(winner, room));
       game.startGame();
     }
     if (index === 0) {
@@ -103,5 +105,16 @@ export class PongGateway extends SocketGateway {
     } else {
       console.log('players not found');
     }
+  }
+
+  async handleDisconnect(client: Socket) {
+    super.handleDisconnect(client);
+    if (this.pongService.getClientRoom(client.id) === undefined) return;
+    const { room, index } = this.pongService.getClientRoom(client.id);
+    if (index !== 0 && index !== 1) return;
+    const game = this.games.get(room);
+    if (game === undefined) return;
+    this.gameEnd(game);
+    this.gameOver(index, room);
   }
 }
