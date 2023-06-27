@@ -6,8 +6,10 @@
 		export const fetchWithToken = (): ((url: string, options?: RequestInit) => Promise<Response>) =>
 			getContext('fetchWithToken');
 
-		export const fetchWithTokenNoLogout = (): ((url: string, options?: RequestInit) => Promise<Response>) =>
-			getContext('fetchWithTokenNoLogout');
+		export const fetchWithTokenNoLogout = (): ((
+			url: string,
+			options?: RequestInit
+		) => Promise<Response>) => getContext('fetchWithTokenNoLogout');
 
 		export type Match = {
 			result: string;
@@ -160,7 +162,7 @@
 			componentType: string,
 			propsWin?: Record<string, any>,
 			props?: Record<string, any>
-		) => string ) => getContext('addInstance');
+		) => string) => getContext('addInstance');
 
 		export const removeInstance = (): ((id: string) => void) => getContext('removeInstance');
 
@@ -241,6 +243,7 @@
 		}
 
 		export const matchmaking = (): Writable<boolean> => getContext('matchmaking');
+		export const nPongs = (): Writable<number> => getContext('nPongs');
 		export const room = (): Writable<Room | null> => getContext('room');
 	}
 </script>
@@ -383,7 +386,7 @@
 	const zstack = writable<string[]>([]);
 	const selected = writable<string | null>(null);
 
-	function addInstance (
+	function addInstance(
 		componentType: string,
 		propsWin: Record<string, any> = {},
 		props: Record<string, any> = {}
@@ -489,9 +492,13 @@
 	async function fetchUnreadConversations() {
 		$unreadConversations = 0;
 		for (const chat of $chats) {
-			if ( getUnreadMessagesCount(chat,
-				chat.chatUsers.find((chatUser) => chatUser.userId === $user?.id)) > 0
-				&& chat.accessibility === "private") {
+			if (
+				getUnreadMessagesCount(
+					chat,
+					chat.chatUsers.find((chatUser) => chatUser.userId === $user?.id)
+				) > 0 &&
+				chat.accessibility === 'private'
+			) {
 				$unreadConversations++;
 			}
 		}
@@ -718,9 +725,11 @@
 	setContext('serverClockDelta', serverClockDelta);
 
 	const matchmaking = writable(false);
+	const nPongs = writable(0);
 	const room = writable<Context.Room | null>(null);
 
 	setContext('room', room);
+	setContext('nPongs', nPongs);
 	setContext('matchmaking', matchmaking);
 
 	// ------- EVENTS --------

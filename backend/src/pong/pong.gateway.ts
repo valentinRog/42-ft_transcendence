@@ -74,6 +74,7 @@ export class PongGateway extends SocketGateway {
 
   @SubscribeMessage('spectate')
   handleSpecate(client: Socket, data: { friendId: number }) {
+    if (this.pongService.getClientRoom(client.id) !== undefined) return;
     const friend = this.webSocketService.getSocket(data.friendId);
     this.pongService.setClientRoom(
       client.id,
@@ -115,6 +116,6 @@ export class PongGateway extends SocketGateway {
     const game = this.games.get(room);
     if (game === undefined) return;
     this.gameEnd(game);
-    this.gameOver(index, room);
+    this.gameOver(Math.abs(index - 1), room);
   }
 }
