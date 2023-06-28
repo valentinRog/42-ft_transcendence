@@ -292,8 +292,8 @@ export abstract class SocketGateway
     const userId = this.webSocketService.getClientId(client);
     if (
       data.response &&
-      this.webSocketService.getSocket(userId) &&
-      this.webSocketService.getSocket(data.friendId) &&
+      this.webSocketService.getStatus(userId) === 'online' &&
+      this.webSocketService.getStatus(data.friendId) === 'online' &&
       !this.pongService.isMatched(userId) &&
       !this.pongService.isMatched(data.friendId)
     ) {
