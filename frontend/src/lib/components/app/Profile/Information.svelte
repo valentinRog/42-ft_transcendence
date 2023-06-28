@@ -15,7 +15,7 @@
 	const selected = Context.selected();
 	const askGame = Context.askGame();
 
-	export let userId: number | null | undefined = null;
+	export let userId: number | null = null;
 
 	let currentUser = writable<User>();
 	let imgUrl: string | '';
@@ -44,6 +44,13 @@
 		year: 'numeric'
 	});
 
+	$: {
+		if (userId === null) {
+			currentUser.set($user);
+		}
+		fetchAvatar();
+	}
+
 	(async () => {
 		if (userId === null) {
 			isUser = true;
@@ -58,12 +65,6 @@
 		}
 	})();
 
-	$: {
-		if (userId === null) {
-			currentUser.set($user);
-		}
-		fetchAvatar();
-	}
 </script>
 
 <div id="box">

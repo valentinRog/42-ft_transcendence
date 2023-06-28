@@ -17,8 +17,8 @@
 	let typeChat: string | null = null;
 	let friendUsername: string | undefined = '';
 
-	let username: string | null;
-	fetchUserById(props.userId).then((data: any) => (username = data.username));
+	let username: string | null = null;
+	if (props.userId) fetchUserById(props.userId).then((data: any) => (username = data.username));
 
 	$: {
 		if (name === 'Chat' || name === 'ChatForum') {

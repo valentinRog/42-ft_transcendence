@@ -57,8 +57,8 @@
 		}
 	}
 
-	let username: string | null;
-	fetchUserById(props.userId).then((data: any) => (username = data.username));
+	let username: string | null = null;
+	if (props.userId) fetchUserById(props.userId).then((data: any) => (username = data.username));
 
 	let moving = false;
 	onMount(() => {
