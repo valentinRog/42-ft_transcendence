@@ -15,7 +15,7 @@
 	const selected = Context.selected();
 	const askGame = Context.askGame();
 
-	export let userId: number | null | undefined = null;
+	export let userId: number | null = null;
 
 	let currentUser = writable<User>();
 	let imgUrl: string | '';
@@ -44,6 +44,13 @@
 		year: 'numeric'
 	});
 
+	$: {
+		if (userId === null) {
+			currentUser.set($user);
+		}
+		fetchAvatar();
+	}
+
 	(async () => {
 		if (userId === null) {
 			isUser = true;
@@ -59,12 +66,6 @@
 		}
 	})();
 
-	$: {
-		if (userId === null) {
-			currentUser.set($user);
-		}
-		fetchAvatar();
-	}
 </script>
 
 <div id="box">
@@ -112,8 +113,8 @@
 		</div>
 		{#if isUser}
 			<button type="button" on:click={() => ($openEditProfile = true)}>Edit Profile</button>
-		{:else if $blocks.some((block) => block.blockedId === currentUser?.id)}
-			<button type="button" on:click={() => fetchUnblockUser(currentUser.id)}>UnBlock</button>
+		{:else if $blocks.some((block) => block.blockedId === $currentUser?.id)}
+			<button type="button" on:click={() => fetchUnblockUser($currentUser.id)}>UnBlock</button>
 		{:else if $blocks.some((block) => block.blockedId === $currentUser?.id)}
 			<button type="button" on:click={() => fetchUnblockUser($currentUser.id)}>UnBlock</button>
 		{:else}
