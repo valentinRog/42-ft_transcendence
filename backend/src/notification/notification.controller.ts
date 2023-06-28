@@ -36,7 +36,7 @@ export class NotificationController {
     const prisma_friend = await this.prisma.user.findUnique({
       where: { username: dto.friend },
     });
-    await this.notifService.removeNotification(prisma_friend.id, 'friend');
+    await this.notifService.removeNotification(id, prisma_friend.id, 'friend');
     if (dto.response) {
       if (!prisma_friend) throw new NotFoundException('User not found');
       return await this.userService.addFriend(id, prisma_friend.id);

@@ -33,8 +33,10 @@
 
 	div.container {
 		position: relative;
+		text-align: center;
+
 		div.drop {
-			padding: 0 0.65rem;
+			padding: 0 0.5rem;
 			@include tab-border(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
 
 			&:hover {
