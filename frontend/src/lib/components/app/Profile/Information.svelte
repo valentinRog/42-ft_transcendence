@@ -104,6 +104,8 @@
 		{#if isUser}
 		<button type="button" on:click={() => ($openEditProfile = true)}>Edit Profile</button>
 		{:else if $blocks.some((block) => block.blockedId === currentUser?.id)}
+		<button type="button" on:click={() => fetchUnblockUser(currentUser.id)}>UnBlock</button>
+		{:else if $blocks.some((block) => block.blockedId === $currentUser?.id)}
 		<button type="button" on:click={() => fetchUnblockUser($currentUser.id)}>UnBlock</button>
 		{:else}
 		<button type="button" on:click={() => fetchBlockUser($currentUser.id)}>Block</button>

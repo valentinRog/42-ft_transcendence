@@ -42,7 +42,7 @@
 </script>
 
 <div class="sunken-panel">
-	{#if $currentHistory.length === 0}
+	{#if $currentHistory?.length === 0}
 		<tr>
 			<td colspan="3">You have not participated in any matches</td>
 		</tr>
