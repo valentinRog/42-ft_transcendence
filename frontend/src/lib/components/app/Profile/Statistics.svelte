@@ -29,14 +29,14 @@
 <div>
 	{#if $currentStatistics !== undefined && $currentStatistics !== null}
 		<div class="container">
-			<div class="image">
-				<img src="{$currentStatistics?.ladder}.png" alt="ladder image" width="100" height="100" />
-			</div>
 			<div class="stats">
 				<div>Win: {$currentStatistics?.wins}</div>
 				<div>Loss: {$currentStatistics?.losses}</div>
 				<div>Elo: {$currentStatistics?.elo} ({$currentStatistics?.ladder})</div>
 				<div class="ladder" id="ladder" />
+			</div>
+			<div class="image">
+				<img src="{$currentStatistics?.ladder}.png" alt="ladder image" width="100" height="100" />
 			</div>
 		</div>
 	{/if}
@@ -51,20 +51,23 @@
 
 	.image {
 		@include tab-border($dark-grey, $light-grey);
-		height: 6.4rem;
+		height: 6.5rem;
 		padding: 0 0.2rem;
-		flex: 0 0 auto;
-		margin-right: 10px;
+		margin-left: 10px;
+		img {
+			padding-bottom: 0.5rem;
+			height: 100%;
+			width: 100%;
+		}
 	}
 
 	.stats {
 		@include tab-border($light-grey, $dark-grey);
 		flex: 1 1 auto;
-		padding: 0.75rem;
+		padding: 0.6rem;
 
 		div {
-			margin-top: 0.4rem;
-			margin-bottom: 0.5rem;
+			margin-top: 0.6rem;
 		}
 	}
 </style>
