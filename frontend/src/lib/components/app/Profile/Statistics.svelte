@@ -64,7 +64,7 @@
 	.stats {
 		@include tab-border($light-grey, $dark-grey);
 		flex: 1 1 auto;
-		padding: 0.6rem;
+		padding: 0.15rem 0.6rem;
 
 		div {
 			margin-top: 0.6rem;

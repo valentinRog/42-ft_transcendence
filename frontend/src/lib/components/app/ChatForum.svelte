@@ -18,11 +18,11 @@
 	let messageContent = '';
 	let roleId: number;
 	let disabled = false;
-	let sortedChatUsers : any;
+	let sortedChatUsers: any;
 
 	let searchQuery = '';
 	let selectedAction: string = '';
-	let RoleName: string[] = ["Admin", "Moderator", "User"];
+	let RoleName: string[] = ['Admin', 'Moderator', 'User'];
 
 	let chatWindow: HTMLDivElement;
 	let autoScroll = true;
@@ -45,10 +45,9 @@
 	let isProtected: any;
 
 	$: {
-
-		blockedIds = $blocks.map(block => block.blockedId);
+		blockedIds = $blocks.map((block) => block.blockedId);
 		currentChat = $chats.find((chat) => chat.id === chatIdLocal);
-		sortedChatUsers = currentChat.chatUsers.slice().sort((a : any, b : any) => a.roleId - b.roleId);
+		sortedChatUsers = currentChat.chatUsers.slice().sort((a: any, b: any) => a.roleId - b.roleId);
 		roleId = currentChat?.chatUsers.find((cu: any) => cu.userId === $user?.id)?.roleId;
 		isProtected = currentChat ? currentChat.accessibility === 'protected' : false;
 		disabled = isUserBanned || isUserMuted;
@@ -109,17 +108,16 @@
 		if (searchQuery.trim() === '') return;
 		const user = await fetchUserByUsername(searchQuery);
 		const userId = user.id;
-		const isInChat = currentChat.chatUsers.some((c : any) => c.userId === userId);
+		const isInChat = currentChat.chatUsers.some((c: any) => c.userId === userId);
 
-		if (!isInChat && (selectedAction === "User" || selectedAction === "Moderator"))
-			return;
+		if (!isInChat && (selectedAction === 'User' || selectedAction === 'Moderator')) return;
 
 		if (userId && actions[selectedAction as keyof typeof actions])
 			actions[selectedAction as keyof typeof actions](userId);
 	};
 
 	function openProfile(userId: number) {
-		addInstance('Profile', {}, { userId });
+		addInstance('Profile', { userId }, { userId });
 		$selected = null;
 	}
 
@@ -163,10 +161,8 @@
 	}
 
 	function selectUser(user: any) {
-		if (selectedUser && selectedUser.id === user.id)
-			selectedUser = null;
-		else
-			selectedUser = user;
+		if (selectedUser && selectedUser.id === user.id) selectedUser = null;
+		else selectedUser = user;
 	}
 
 	function changeRole(userId: number, newRoleId: number) {
@@ -223,8 +219,7 @@
 
 	$socket.on('updateRole', (data: any) => {
 		if (data.chatId === chatIdLocal) {
-			if ($user?.id === data.userId)
-				roleId = data.newRoleId;
+			if ($user?.id === data.userId) roleId = data.newRoleId;
 			currentChat.chatUsers.forEach((chatUser: any) => {
 				if (chatUser.userId === data.userId) {
 					chatUser.roleId = data.newRoleId;
@@ -246,7 +241,28 @@
 		if (autoScroll) chatWindow.scrollTop = chatWindow.scrollHeight;
 	});
 
+	const formatter = new Intl.DateTimeFormat('en', {
+		hour12: false,
+		hour: 'numeric',
+		minute: '2-digit'
+	});
 
+	let colors: string[];
+	let nbUsers: number;
+	let colorUsers: Map<number, string> = new Map<number, string>();
+
+	function setColorUsers() {
+		for (let i = 0; i < nbUsers; i++) {
+			colorUsers.set(currentChat?.chatUsers[i].userId, colors[i % 7]);
+		}
+	}
+	$: {
+		nbUsers = currentChat?.chatUsers.length;
+		colors = ['DeepSkyBlue ', 'Lime', 'OrangeRed', 'Gold', 'Fuchsia', 'CornflowerBlue ', 'grey'];
+		setColorUsers();
+		console.log(currentChat?.chatUsers);
+		// console.log(colorUsers.get(14));
+	}
 </script>
 
 <div id="box">
@@ -264,14 +280,20 @@
 						{#each currentChat?.messages || [] as message, i (i)}
 							{#if !blockedIds.includes(message.userId)}
 								<li class={message.user?.username === $user?.username ? 'self' : 'other'}>
-									<div class="message-header">
-										{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
-											<strong on:click={() => openProfile(message.userId)}
-												>{message.user?.username}</strong
-											>
-										{/if}
+									<div class="whole-message">
+										<div class="clock">
+											{#if (i !== 0 && formatter.format(new Date(currentChat?.messages[i - 1].createdAt)) !== formatter.format(new Date(currentChat?.messages[i].createdAt))) || i === 0}
+												{formatter.format(new Date(message.createdAt))}
+											{/if}
+										</div>
+										<div class="border" />
+										<div class="message-header" style:color={colorUsers.get(message.userId)}>
+											<strong on:dblclick={() => openProfile(message.userId === $user.id ? null : message.user?.id)}
+												>{message.user?.username}
+											</strong>
+										</div>
+										<div class="message-content">: {message.content}</div>
 									</div>
-									<div class="message-content">{message.content}</div>
 								</li>
 							{/if}
 						{/each}
@@ -288,7 +310,13 @@
 				</p>
 			{:else}
 				<form on:submit|preventDefault={sendMessage} class="send-message-form">
-					<input type="text" bind:value={messageContent} class="message-input" {disabled} autocomplete="off" />
+					<input
+						type="text"
+						bind:value={messageContent}
+						class="message-input"
+						{disabled}
+						autocomplete="off"
+					/>
 					<button type="submit" class="btn send-btn" {disabled}>Send</button>
 				</form>
 			{/if}
@@ -299,7 +327,7 @@
 			<div class="admin-mode">
 				{#if roleId <= 2}
 					<div class="username-action-row">
-						<input type="text" bind:value={searchQuery} placeholder="username" autocomplete="off"/>
+						<input type="text" bind:value={searchQuery} placeholder="username" autocomplete="off" />
 						<select bind:value={selectedAction}>
 							<option value="">Action</option>
 							{#if roleId <= 1}
@@ -321,7 +349,6 @@
 								placeholder="in sec"
 								min="0"
 							/>
-
 						</div>
 					{/if}
 					<div class="submit-row">
@@ -334,7 +361,12 @@
 								<div id="password-change-form">
 									<label>
 										Enter new password:
-										<input type="password" bind:value={password} on:input={updatePassword} autocomplete="off"/>
+										<input
+											type="password"
+											bind:value={password}
+											on:input={updatePassword}
+											autocomplete="off"
+										/>
 									</label>
 									<button on:click={changePassword}>Submit</button>
 								</div>
@@ -372,7 +404,8 @@
 									<button on:click={() => openProfile(chatUser.userId)}>Check Profile</button>
 									{#if roleId <= 1 && roleId < chatUser.roleId}
 										{#if chatUser.roleId === 3}
-											<button on:click={() => changeRole(chatUser.userId, 2)}>Made Moderator</button>
+											<button on:click={() => changeRole(chatUser.userId, 2)}>Made Moderator</button
+											>
 										{:else if chatUser.roleId === 2}
 											<button on:click={() => changeRole(chatUser.userId, 3)}>Make User</button>
 										{/if}
@@ -383,14 +416,16 @@
 											<button on:click={() => banUser(chatUser.userId, null)}>Ban</button>
 											<button on:click={() => unMuteUser(chatUser.userId)}>Unmute</button>
 											<button on:click={() => unBanUser(chatUser.userId)}>Unban</button>
-											<input class="duration-input"
+											<input
+												class="duration-input"
 												type="number"
 												bind:value={banDuration}
 												placeholder="Ban duration in seconds"
 												min="0"
 												autocomplete="off"
 											/>
-											<input class="duration-input"
+											<input
+												class="duration-input"
 												type="number"
 												bind:value={muteDuration}
 												placeholder="Mute duration in seconds"
@@ -410,7 +445,6 @@
 </div>
 
 <style lang="scss">
-
 	@include select-95;
 
 	select {
@@ -420,37 +454,52 @@
 	}
 
 	#box {
-		width: 30rem;
-		height: 17rem;
-	}
+		display: flex;
+		flex-direction: row;
+		width: 36rem;
+		height: 30rem;
 
-	.chat-container {
-		float: left;
-		height: 17rem;
-		width: 20rem;
+		#user-list {
+			overflow-y: auto;
+			overflow-x: hidden;
+		}
+
+		.chat-container {
+			margin: 0.2rem;
+			width: 75%;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			
+			#chat-window {
+				background-color: white;
+				@include tab-border($light-grey, $dark-grey);
+				overflow-y: auto;
+				overflow-x: hidden;
+				padding: 0.5rem;
+				height: 27rem;
+			}
+		}
+
+		#sendMessage-window {
+			background-color: $grey;
+			margin-bottom: 0.5rem;
+
+			input[type='text'].message-input {
+				@include tab-border(white, black);
+				background-color: $light-grey;
+				width: 100%;
+				box-sizing: border-box;
+				margin-right: 0.5rem;
+				padding: 0.2rem;
+				order: 1;
+				text-decoration: none;
+			}
+		}
 	}
 
 	.duration-input {
 		width: 4rem;
-	}
-
-	#chat-window {
-		height: 85%;
-		overflow-y: auto;
-		overflow-x: hidden;
-		padding: 0.5rem;
-		border-bottom: 1px solid #000;
-	}
-
-	#sendMessage-window {
-		padding: 0.5rem;
-	}
-
-	#user-list {
-		margin-left: 20.3rem;
-		overflow-y: auto;
-		overflow-x: hidden;
-		height: 17rem;
 	}
 
 	.btn {
@@ -469,15 +518,6 @@
 		color: $dark-grey;
 	}
 
-	input[type='text'].message-input {
-		@include tab-border(white, black);
-		background-color: $light-grey;
-		width: 100%;
-		box-sizing: border-box;
-		margin-right: 0.5rem;
-		order: 1;
-	}
-
 	ul {
 		list-style: none;
 		padding: 0;
@@ -486,51 +526,36 @@
 	}
 
 	li {
-		margin-bottom: 0.5rem;
 		word-break: break-word;
 		display: flex;
 		flex-direction: column;
 	}
 
 	li.self .message-header {
-		color: white;
+		cursor: url($click), auto;
+		color: red;
 	}
-
-	li.self .message-header,
-	li.self .message-content {
-		align-self: flex-end;
-		display: flex;
-		justify-content: flex-end;
-		width: 9.5rem;
-	}
-
 	li.other .message-header {
-		color: $blue;
+		cursor: url($click), auto;
 	}
 
-	li.other .message-header,
-	li.other .message-content {
-		align-self: flex-start;
+	.whole-message {
 		display: flex;
-		justify-content: flex-start;
-		width: 9.5rem;
-	}
+		align-items: center;
+		margin: 0.1rem 0.1rem;
 
-	.message-header {
-		font-size: 0.85em;
-		font-weight: bold;
-		color: #242424d1;
-	}
+		.clock {
+			margin-right: 0.2rem;
+			width: 2rem;
+			font-size: 0.8rem;
+			// font-weight: bold;
+		}
 
-	.message-content {
-		margin-top: 0.2rem;
-		padding-left: 0.5rem;
-		padding-right: 0.5rem;
-		padding-top: 0.3rem;
-		padding-bottom: 0.3rem;
-		font-size: 0.9em;
-		@include tab-border(white, black);
-		background-color: white;
+		.message-header {
+			margin-right: 0.5rem;
+			width: fit-content;
+			font-weight: bold;
+		}
 	}
 
 	.send-message-form {
@@ -549,7 +574,7 @@
 		align-items: start;
 	}
 
-	.admin-mode input[type="text"],
+	.admin-mode input[type='text'],
 	.admin-mode select,
 	.admin-mode .duration-input {
 		width: 100%;
@@ -594,5 +619,4 @@
 		align-items: center;
 		gap: 10px;
 	}
-
 </style>

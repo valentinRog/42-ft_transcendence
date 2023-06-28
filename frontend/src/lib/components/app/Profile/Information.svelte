@@ -14,6 +14,7 @@
 	const addInstance = Context.addInstance();
 	const selected = Context.selected();
 	const askGame = Context.askGame();
+	const startChat = Context.startChat();
 
 	export let userId: number | null = null;
 
@@ -118,6 +119,7 @@
 			<button class="button-alone" type="button" on:click={() => fetchUnblockUser($currentUser.id)}>UnBlock</button>
 		{:else}
 			<div class="buttons">
+				<button type="button" on:click={() => startChat($currentUser)}>Open chat</button>
 				<button type="button" on:click={() => askGame($currentUser.id)}>Ask game</button>
 				<button type="button" on:click={() => fetchBlockUser($currentUser.id)}>Block</button>
 			</div>
@@ -213,8 +215,7 @@
 			position: absolute;
 			flex-direction: row;
 			align-items: center;
-			bottom: 0.7rem;
-			right: calc(50% - 7rem);
+			bottom: 0.4rem;
 			button {
 				@include button-95;
 				margin: 0.2rem;
