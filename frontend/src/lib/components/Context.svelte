@@ -165,6 +165,8 @@
 
 		export const removeInstance = (): ((id: string) => void) => getContext('removeInstance');
 
+		export const askGame = (): ((friendId: number) => string) => getContext('askGame');
+
 		export const fetchHistory = (): (() => Promise<any>) => getContext('fetchHistory');
 		export const fetchMe = (): (() => Promise<any>) => getContext('fetchMe');
 		export const fetchUserByUsername = (): ((username: string) => Promise<any>) =>
@@ -416,6 +418,7 @@
 	setContext('selected', selected);
 	setContext('addInstance', addInstance);
 	setContext('removeInstance', removeInstance);
+	setContext('askGame', askGame);
 
 	const apps = readable<Record<Context.App, Context.AppProps>>({
 		Profile: {
@@ -508,6 +511,16 @@
 		const res = await fetchWithToken(`users/info/name/${username}`);
 		const data = await res.json();
 		return data;
+	}
+
+	function askGame(friendId: number) {
+		fetchWithToken('notification/ask-game', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ friendId: friendId })
+		});
 	}
 
 	async function fetchUserById(id: number) {

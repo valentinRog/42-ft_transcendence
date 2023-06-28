@@ -5,6 +5,7 @@
 	const chatId = Context.chatId();
 	const chats = Context.chats();
 	const contacts = Context.contacts();
+	const fetchUserById = Context.fetchUserById();
 
 	export let name: string;
 	export let icon: string;
@@ -15,6 +16,9 @@
 	let chatIdLocal: number | null = $chatId;
 	let typeChat: string | null = null;
 	let friendUsername: string | undefined = '';
+
+	let username: string | null;
+	fetchUserById(props.userId).then((data: any) => (username = data.username));
 
 	$: {
 		if (name === 'Chat' || name === 'ChatForum') {
@@ -38,8 +42,8 @@
 	<div class="border-inside">
 		<img src={icon} alt={name} />
 		<a href="/">
-			{#if name === 'Profile' && props.username}
-				<p>{name} of {props.username}</p>
+			{#if name === 'Profile' && username}
+				<p>{name} of {username}</p>
 			{:else if name === 'Profile'}
 				<p>My {name}</p>
 			{:else if name === 'ChatForum' && currentChat}

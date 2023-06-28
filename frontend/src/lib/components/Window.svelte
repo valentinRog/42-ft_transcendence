@@ -4,6 +4,7 @@
 	import { Context } from '$lib/components/Context.svelte';
 	import { user } from '$lib/stores';
 	import LeaveGroupDialog from './app/LeaveGroupDialog.svelte';
+	import Contact from './app/Contact.svelte';
 
 	const dispatch = createEventDispatcher();
 	const chatId = Context.chatId();
@@ -11,6 +12,7 @@
 	const contacts = Context.contacts();
 	const socket = Context.socket();
 	const selected = Context.selected();
+	const fetchUserById = Context.fetchUserById();
 
 	export let props: Record<string, any>;
 	export let name: string;
@@ -54,6 +56,9 @@
 			}
 		}
 	}
+
+	let username: string | null;
+	fetchUserById(props.userId).then((data: any) => (username = data.username));
 
 	let moving = false;
 	onMount(() => {
@@ -123,10 +128,10 @@
 			}}
 		>
 			<img src={icon} draggable="false" />
-			{#if name === 'Profile' && props.username}
-				<p class="title">{name} of {props.username}</p>
+			{#if name === 'Profile' && username}
+				<p class="title">{name} of {username}</p>
 			{:else if name === 'Profile'}
-				<p class="title">{name}</p>
+				<p class="title">My {name}</p>
 			{:else if name === 'ChatForum' && currentChat}
 				<p>Forum: {currentChat.name}</p>
 			{:else if name === 'Chat' && currentChat && currentChat.isGroupChat}
@@ -149,9 +154,7 @@
 			{/if}
 			<div class="buttons">
 				{#if name === 'Chat' && currentChat && currentChat.isGroupChat && currentChat.accessibility === 'private'}
-					<button on:click={() => leaveGroup()}>
-						LeaveGroup
-					</button>
+					<button on:click={() => leaveGroup()}> LeaveGroup </button>
 				{/if}
 				<button on:click={() => dispatch('minimize')}>
 					<div class="border-inside">_</div>
@@ -164,9 +167,13 @@
 
 		<slot />
 	</div>
-{#if isDialogOpen}
-    <LeaveGroupDialog {currentChat} on:confirm={leaveGroupConfirm} on:close={() => (isDialogOpen = false)} />
-{/if}
+	{#if isDialogOpen}
+		<LeaveGroupDialog
+			{currentChat}
+			on:confirm={leaveGroupConfirm}
+			on:close={() => (isDialogOpen = false)}
+		/>
+	{/if}
 </section>
 
 <svelte:window on:mouseup={() => (moving = false)} on:mousemove={onMouseMove} />

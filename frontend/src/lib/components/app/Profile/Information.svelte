@@ -11,6 +11,9 @@
 	const openEditProfile = Context.openEditProfile();
 	const blocks = Context.blocks();
 	const friends = Context.contacts();
+	const addInstance = Context.addInstance();
+	const selected = Context.selected();
+	const askGame = Context.askGame();
 
 	export let userId: number | null | undefined = null;
 
@@ -62,7 +65,6 @@
 		}
 		fetchAvatar();
 	}
-
 </script>
 
 <div id="box">
@@ -76,7 +78,13 @@
 					{#if $currentUser?.id === $user?.id}
 						<ul>
 							{#each $friends as friend (friend.id)}
-								<li class="friend">
+								<li
+									class="friend"
+									on:dblclick={() => {
+										addInstance('Profile', { userId: friend.id }, { userId: friend.id });
+										$selected = null;
+									}}
+								>
 									<p>{friend.username}</p>
 									<div class="status-img">
 										<p class="status">{friend.status}</p>
@@ -103,13 +111,16 @@
 			</div>
 		</div>
 		{#if isUser}
-		<button type="button" on:click={() => ($openEditProfile = true)}>Edit Profile</button>
+			<button type="button" on:click={() => ($openEditProfile = true)}>Edit Profile</button>
 		{:else if $blocks.some((block) => block.blockedId === currentUser?.id)}
-		<button type="button" on:click={() => fetchUnblockUser(currentUser.id)}>UnBlock</button>
+			<button type="button" on:click={() => fetchUnblockUser(currentUser.id)}>UnBlock</button>
 		{:else if $blocks.some((block) => block.blockedId === $currentUser?.id)}
-		<button type="button" on:click={() => fetchUnblockUser($currentUser.id)}>UnBlock</button>
+			<button type="button" on:click={() => fetchUnblockUser($currentUser.id)}>UnBlock</button>
 		{:else}
-		<button type="button" on:click={() => fetchBlockUser($currentUser.id)}>Block</button>
+			<div class="buttons">
+				<button type="button" on:click={() => askGame($currentUser.id)}>Ask game</button>
+				<button type="button" on:click={() => fetchBlockUser($currentUser.id)}>Block</button>
+			</div>
 		{/if}
 	</ul>
 </div>
@@ -117,7 +128,7 @@
 <style lang="scss">
 	#box {
 		.whole-box {
-			height: 18rem;
+			height: 20rem;
 			display: flex;
 			flex-direction: column;
 		}
@@ -134,7 +145,7 @@
 				display: flex;
 				justify-content: center;
 				align-items: center;
-					img {
+				img {
 					position: center;
 					height: 5rem;
 				}
@@ -155,7 +166,7 @@
 		.friend-list {
 			padding: 0.5rem;
 			@include tab-contour-hollow;
-			max-height: 8rem;
+			max-height: 8.8rem;
 			overflow-y: auto;
 			background-color: white;
 			.friend {
@@ -182,19 +193,20 @@
 			height: 0.8rem;
 			width: auto;
 		}
-
-		button {
-			@include button-95;
-
-			width: 7rem;
-			margin-left: auto;
-			margin-right: auto;
-			padding: 0.5rem;
-			font-size: 1rem;
+		.buttons {
+			display: flex;
 			position: absolute;
-			top: 90%;
-			left: 50%;
-			transform: translate(-50%, -50%);
+			flex-direction: row;
+			align-items: center;
+			bottom: 0.5rem;
+			right: calc(50% - 7rem);
+			button {
+				@include button-95;
+				margin: 0.2rem;
+				width: 7rem;
+				padding: 0.5rem;
+				font-size: 1rem;
+			}
 		}
 	}
 </style>

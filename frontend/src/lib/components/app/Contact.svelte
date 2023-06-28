@@ -5,12 +5,10 @@
 	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
 
 	const socket = Context.socket();
-
 	const fetchWithToken = Context.fetchWithToken();
 	const fetchFriends = Context.fetchFriends();
 	const fetchMe = Context.fetchMe();
 	const fetchCreateChat = Context.fetchCreateChat();
-
 	const chats = Context.chats();
 	const chatId = Context.chatId();
 	const openChatWindow = Context.openChatWindow();
@@ -19,10 +17,13 @@
 	const openFriendRequest = Context.openFriendRequest();
 	const openPongWindow = Context.openPongWindow();
 	const friendInfoId = Context.friendInfoId();
+	const addInstance = Context.addInstance();
+	const selected = Context.selected();
+	const askGame = Context.askGame();
+	let selectedFriends: Context.Contact[] = [];
 
 	let friendInput: string = '';
 	let groupChatMode = false;
-	let selectedFriends: Context.Contact[] = [];
 
 	fetchFriends();
 
@@ -57,16 +58,6 @@
 		await res.json();
 		fetchFriends();
 		fetchMe();
-	}
-
-	function askGame(friendId: number) {
-		fetchWithToken('notification/ask-game', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ friendId: friendId })
-		});
 	}
 
 	function toggleGroupChatMode() {
@@ -123,8 +114,6 @@
 		$openChatWindow = true;
 	}
 
-	const addInstance = Context.addInstance();
-	const selected = Context.selected();
 	let visible: number = 0;
 
 	function spectateGame(friendId: number) {
@@ -178,7 +167,7 @@
 								class="option-icons"
 								src="/profile2.png"
 								on:click={() => {
-									addInstance('Profile', {}, { userId: friend.id });
+									addInstance('Profile', {userId: friend.id}, {userId: friend.id});
 									$selected = null;
 								}}
 							/>
