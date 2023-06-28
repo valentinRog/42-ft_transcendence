@@ -23,6 +23,7 @@
 		if (userId === null) {
 			currentUser.set($user);
 		}
+		fetchAvatar();
 	}
 
 	async function fetchAvatar() {
