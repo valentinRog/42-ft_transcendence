@@ -2,7 +2,6 @@
 	import { onMount, afterUpdate } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
 	import { user } from '$lib/stores';
-	import { destroy_block } from 'svelte/internal';
 
 	const socket = Context.socket();
 
@@ -93,11 +92,12 @@
 			const groupName = memberUsernames.join('-');
 			const chat = await fetchCreateChat(groupName, memberUsernames, false, 'private');
 			const chatExists = $chats.some((existingChat) => existingChat.id === chat.id);
-
+			console.log(chat);
 			if (!chatExists) {
-				$chats = [...$chats, chat];
+				//$chats = [...$chats, chat];
 				chatIdLocal = chat.id;
 				$socket.emit('joinRoom', { chatId: chat.id });
+				$socket.emit('otherAddChat', { chat: chat, userId: $user?.id });
 				$socket.emit('otherAddChat', { chat: chat, userId: friendId });
 			}
 			isCreatingChat = false;
