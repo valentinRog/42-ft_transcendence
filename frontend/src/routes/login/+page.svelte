@@ -134,7 +134,7 @@
 			flex-direction: column;
 			gap: 0.8rem;
 			padding: 1rem;
-			height: 19rem;
+			height: 17.5rem;
 			width: 25rem;
 			margin-top: 0.2rem;
 

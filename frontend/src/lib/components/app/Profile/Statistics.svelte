@@ -26,48 +26,53 @@
 	$: if ($outcome) updateStatistics();
 </script>
 
-<div>
+<div class="statistic-pic">
 	{#if $currentStatistics !== undefined && $currentStatistics !== null}
-		<div class="container">
+		<ul class="whole-box">
 			<div class="stats">
-				<div>Win: {$currentStatistics?.wins}</div>
-				<div>Loss: {$currentStatistics?.losses}</div>
-				<div>Elo: {$currentStatistics?.elo} ({$currentStatistics?.ladder})</div>
+				<li class="box">Win: {$currentStatistics?.wins}</li>
+				<li class="box">Loss: {$currentStatistics?.losses}</li>
+				<li class="box">Elo: {$currentStatistics?.elo} ({$currentStatistics?.ladder})</li>
 				<div class="ladder" id="ladder" />
 			</div>
-			<div class="image">
+			<div class="ladder-image">
 				<img src="{$currentStatistics?.ladder}.png" alt="ladder image" width="100" height="100" />
 			</div>
-		</div>
+		</ul>
 	{/if}
 </div>
 
 <style lang="scss">
-	.container {
-		margin-top: 0.5rem;
-		display: flex;
-		align-items: center;
+
+	li {
+		list-style: none;
+		padding: 0.5rem;
+		margin-bottom: 0.25rem;
+		width: 12rem;
+		@include tab-contour-hollow;
 	}
 
-	.image {
-		@include tab-border($dark-grey, $light-grey);
-		height: 6.5rem;
-		padding: 0 0.2rem;
-		margin-left: 10px;
-		img {
-			padding-bottom: 0.5rem;
-			height: 100%;
-			width: 100%;
+	.statistic-pic {
+
+		.whole-box {
+			display: flex;
+			flex-direction: row;
+		}
+
+		.ladder-image {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			overflow: hidden;
+			margin-left: 3rem;
+			width: 7rem;
+			height: 6.72rem;
+			@include tab-border($dark-grey, $light-grey);
+
+			img {
+				position: center;
+			}
 		}
 	}
 
-	.stats {
-		@include tab-border($light-grey, $dark-grey);
-		flex: 1 1 auto;
-		padding: 0.15rem 0.6rem;
-
-		div {
-			margin-top: 0.6rem;
-		}
-	}
 </style>

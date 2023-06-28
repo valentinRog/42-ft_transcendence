@@ -70,7 +70,7 @@
 
 <div id="box">
 	<ul class="whole-box">
-		<div class="pic-username-login">
+		<div class="information-pic">
 			<div class="username-login">
 				<li class="box">Username : {$currentUser?.username || ''}</li>
 				<li class="box">Registration date : {formattedDate || ''}</li>
@@ -134,7 +134,17 @@
 			display: flex;
 			flex-direction: column;
 		}
-		.pic-username-login {
+
+		li {
+			list-style: none;
+		}
+		li.box {
+			padding: 0.5rem;
+			margin-bottom: 0.25rem;
+			@include tab-contour-hollow;
+		}
+
+		.information-pic{
 			display: flex;
 			align-items: flex-start;
 			justify-content: space-between;
@@ -159,14 +169,7 @@
 				width: 12rem;
 			}
 		}
-		li {
-			list-style: none;
-		}
-		li.box {
-			padding: 0.5rem;
-			margin-bottom: 0.25rem;
-			@include tab-contour-hollow;
-		}
+
 		.friend-list {
 			padding: 0.5rem;
 			@include tab-contour-hollow;
@@ -191,12 +194,14 @@
 					}
 				}
 			}
+
+			.img-status {
+				height: 0.8rem;
+				width: auto;
+			}
 		}
 
-		.img-status {
-			height: 0.8rem;
-			width: auto;
-		}
+
 
 		.button-alone {
 			@include button-95;
