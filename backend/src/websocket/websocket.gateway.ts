@@ -292,6 +292,8 @@ export abstract class SocketGateway
     const userId = this.webSocketService.getClientId(client);
     if (
       data.response &&
+      this.webSocketService.getSocket(userId) &&
+      this.webSocketService.getSocket(data.friendId) &&
       !this.pongService.isMatched(userId) &&
       !this.pongService.isMatched(data.friendId)
     ) {
