@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import { NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -45,19 +44,6 @@ export class WebSocketService {
 
   getSize(): number {
     return this.websockets.size;
-  }
-
-  joinRoom(playerId: number, room: string) {
-    const socketPlayer = this.getSocket(playerId);
-
-    if (!socketPlayer) {
-      throw new NotFoundException('user socket not connected');
-    }
-
-    socketPlayer.join(room);
-    socketPlayer.emit('enter-room', room);
-
-    return { spectator: playerId, room: room };
   }
 
   sendToUser(userToNotify: number, message: string, event: string) {

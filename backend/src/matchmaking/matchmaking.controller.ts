@@ -10,20 +10,11 @@ export class MatchmakingController {
 
   @Post('queue')
   async queue(@GetUser() user) {
-    const player = {
-      playerId: user.id,
-      elo: user.stat.elo,
-    };
-    return await this.matchmakingService.handlePlayerJoinedQueue(player);
+    return await this.matchmakingService.handlePlayerJoinedQueue(user.id);
   }
 
   @Post('unqueue')
   async unqueue(@GetUser() user) {
-    const player = {
-      playerId: user.id,
-      elo: user.stat.elo,
-    };
-
-    return this.matchmakingService.handlePlayerLeftQueue(player);
+    return this.matchmakingService.handlePlayerLeftQueue(user.id);
   }
 }

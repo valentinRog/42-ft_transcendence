@@ -21,9 +21,16 @@
 	async function handleOK() {
 		const isValidPassword = await fetchVerifyPassword(selectedChat.id, chatPassword);
 
+
 		if (isValidPassword) {
 			$chatId = selectedChat.id;
-			$chats = [...$chats, selectedChat];
+
+			let chatIndex = $chats.findIndex(chat => chat.id === selectedChat.id);
+
+			if (chatIndex !== -1)
+				$chats.splice(chatIndex, 1, selectedChat);
+			else
+				$chats.push(selectedChat);
 			$socket.emit('joinRoom', { chatId: selectedChat.id });
 			$openChatForumWindow = true;
 			dialog.close();

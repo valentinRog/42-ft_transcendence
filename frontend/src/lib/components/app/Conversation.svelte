@@ -57,7 +57,7 @@
 			const dateA = new Date(chatA.messages.length > 0 ? chatA.messages[chatA.messages.length - 1].createdAt : chatA.createdAt);
 			const dateB = new Date(chatB.messages.length > 0 ? chatB.messages[chatB.messages.length - 1].createdAt : chatB.createdAt);
 			return dateB.getTime() - dateA.getTime();
-		}) as chat (chat.id)}
+		}) as chat, i (i)}
 			{#if chat.accessibility === 'private'}
 				<div class="chat" on:click={() => startChat(chat.id, chat)}>
 					<div class="chat-header">

@@ -76,17 +76,18 @@ export class PongGateway extends SocketGateway {
   handleSpecate(client: Socket, data: { friendId: number }) {
     if (this.pongService.getClientRoom(client.id) !== undefined) return;
     const friend = this.webSocketService.getSocket(data.friendId);
-    this.pongService.setClientRoom(
-      client.id,
-      this.pongService.getClientRoom(friend.id).room,
-      2,
-    );
+    const room = this.pongService.getClientRoom(friend.id).room;
+    this.pongService.setClientRoom(client.id, room, 2);
     const userId = this.webSocketService.getClientId(client);
     this.webSocketService.setStatus(userId, 'spectate');
     this.webSocketService.updateStatusForFriends(userId, 'spectate');
+    const game = this.games.get(room);
     client.emit('enter-room', {
-      room: this.pongService.getClientRoom(friend.id).room,
-      players: [data.friendId, this.webSocketService.getClientId(client)],
+      room,
+      players: [
+        this.webSocketService.getClientId(game.getPlayer1()),
+        this.webSocketService.getClientId(game.getPlayer2()),
+      ],
     });
   }
 
