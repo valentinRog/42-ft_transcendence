@@ -83,10 +83,15 @@ export class MatchmakingService {
   }
 
   handleMatchFound(players: number[]) {
-    const err = 'User not ready';
     const [p1, p2] = players;
-    if (this.socketService.getStatus(p1) !== 'queue') return err;
-    if (this.socketService.getStatus(p2) !== 'queue') return err;
+    if (this.socketService.getStatus(p1) !== 'queue') {
+      this.queue.enqueue(p2);
+      throw new Error('Player not ready');
+    }
+    if (this.socketService.getStatus(p2) !== 'queue') {
+      this.queue.enqueue(p1);
+      throw new Error('Player not ready');
+    }
     return this.pongService.createRoom(p1, p2);
   }
 }
