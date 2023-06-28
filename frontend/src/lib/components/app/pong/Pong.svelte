@@ -75,7 +75,7 @@
 			{/if}
 			{#if $gameRequest.length > 0}
 				<RightDrop name="Invitations" notif={$gameRequest.length}>
-					{#each $gameRequest as r (r.id)}
+					{#each $gameRequest as r, i (i)}
 						<RightDrop name={r.username}>
 							<button on:click={() => responseGame(r.id, true)}>accept</button>
 							<button on:click={() => responseGame(r.id, false)}>decline</button>
