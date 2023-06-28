@@ -761,6 +761,7 @@
 
 	$socket.on('enter-room', (data: { room: string; players: [number, number] }) => {
 		$matchmaking = false;
+		$gameRequest = [];
 		$room = {
 			room: data.room,
 			players: data.players,
