@@ -156,7 +156,7 @@
 			padding: 0.5rem;
 			@include tab-contour-hollow;
 			max-height: 8rem;
-			overflow-y: scroll;
+			overflow-y: auto;
 			background-color: white;
 			.friend {
 				display: flex;

@@ -13,7 +13,7 @@
 
 <style lang="scss">
 	.loading {
-		cursor: wait;
+		cursor: url($loading), auto;
 	}
 </style>
-<link rel="icon" type="image/jpg" href="/yoooo.png">
+<link rel="icon" type="image/jpg" href="yo.png">
