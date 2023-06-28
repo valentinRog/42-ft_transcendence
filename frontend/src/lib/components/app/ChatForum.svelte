@@ -320,7 +320,7 @@
 								placeholder="in sec"
 								min="0"
 							/>
-							
+
 						</div>
 					{/if}
 					<div class="submit-row">
@@ -409,6 +409,15 @@
 </div>
 
 <style lang="scss">
+
+	@include select-95;
+
+	select {
+		width: 100px;
+		bottom: 0.1rem;
+		height: 21px;
+	}
+
 	#box {
 		width: 30rem;
 		height: 17rem;
@@ -563,7 +572,7 @@
 		flex-direction: column;
 	}
 
-	#password-change-form, 
+	#password-change-form,
 	#password-modal {
 		margin-top: 0.8rem;
 		text-align: center;

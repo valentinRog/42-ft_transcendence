@@ -29,9 +29,9 @@
 	let noMember = false;
 
 	$: {
-		blockedIds = $blocks.map(block => block.blockedId);
+		blockedIds = $blocks.map((block) => block.blockedId);
 		friendUsername = $contacts.find((contact) => contact.id === friendId)?.username;
-		isFriend = (friendUsername != undefined);
+		isFriend = friendUsername != undefined;
 		if (chatIdLocal !== null && chatIdLocal !== undefined) {
 			currentChat = $chats.find((chat) => chat.id === chatIdLocal);
 			if (currentChat && currentChat.isGroupChat) isFriend = true;
@@ -39,11 +39,12 @@
 	}
 
 	onMount(() => {
-		$socket.on('updateChat', (chatId: number) => {	
-			if (chatIdLocal === null || chatIdLocal === undefined)
-				chatIdLocal = chatId;
+		$socket.on('updateChat', (chatId: number) => {
+			if (chatIdLocal === null || chatIdLocal === undefined) chatIdLocal = chatId;
 		});
-		$socket.on('updateGroupChat', () => { noMember = true; });
+		$socket.on('updateGroupChat', () => {
+			noMember = true;
+		});
 		chatWindow.scrollTop = chatWindow.scrollHeight;
 		updateLastMessageRead();
 	});
@@ -53,7 +54,7 @@
 	});
 
 	function openProfile(userId: number) {
-		addInstance('Profile', { }, { userId: userId });
+		addInstance('Profile', {}, { userId: userId });
 		$selected = null;
 	}
 
@@ -65,19 +66,18 @@
 		}
 	}
 
-	async function handleClick(event : any) {
-		if (event.button === 0)
-			updateLastMessageRead()
+	async function handleClick(event: any) {
+		if (event.button === 0) updateLastMessageRead();
 	}
 
 	async function updateLastMessageRead() {
 		const lastMessage = currentChat?.messages[currentChat?.messages.length - 1];
 		if (lastMessage && lastMessage.userId !== $user?.id) {
-			const chatUser = currentChat.chatUsers.find((user : any) => user.userId === userId);
-			if(chatIdLocal && lastMessage.id !== chatUser.lastReadMessageId && $user?.id) {
+			const chatUser = currentChat.chatUsers.find((user: any) => user.userId === userId);
+			if (chatIdLocal && lastMessage.id !== chatUser.lastReadMessageId && $user?.id) {
 				await fetchUpdateLastMessageRead(chatIdLocal, lastMessage.id, $user?.id);
-				currentChat.chatUsers
-					.find((user : any) => user.userId === userId).lastReadMessageId = lastMessage.id;
+				currentChat.chatUsers.find((user: any) => user.userId === userId).lastReadMessageId =
+					lastMessage.id;
 			}
 		}
 	}
@@ -116,7 +116,7 @@
 	});
 </script>
 
-<div id="box"  on:click={handleClick}>
+<div id="box" on:click={handleClick}>
 	<div id="chat-window" bind:this={chatWindow} on:scroll={handleScroll}>
 		{#if !currentChat}
 			<h5>Waiting for messages...</h5>
@@ -130,11 +130,19 @@
 						<li class={message.user?.id === $user?.id ? 'self' : 'other'}>
 							<div class="message-header">
 								{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
-									<strong on:click={() => openProfile(message.user?.id)}>{message.user?.username}</strong>
+									<strong on:click={() => openProfile(message.user?.id)}
+										>{message.user?.username}</strong
+									>
 								{/if}
 							</div>
 							<div class="message-content">{message.content}</div>
-							<h6 class="clock">{formatter.format(new Date(message.createdAt))}</h6>
+							<h6 class="clock">
+								{#if (i !== currentChat?.messages.length - 1 
+									&& formatter.format(new Date(currentChat?.messages[i + 1].createdAt)) !== formatter.format(new Date(currentChat?.messages[i].createdAt)))
+									|| i === currentChat?.messages.length - 1}
+									{formatter.format(new Date(message.createdAt))}
+								{/if}
+							</h6>
 						</li>
 					{/if}
 				{/each}
@@ -144,7 +152,7 @@
 	<div id="sendMessage-window">
 		{#if isFriend && !noMember}
 			<form on:submit|preventDefault={sendMessage} class="send-message-form">
-				<input type="text" bind:value={messageContent} class="message-input" autocomplete="off"/>
+				<input type="text" bind:value={messageContent} class="message-input" autocomplete="off" />
 				<button type="submit" class="btn send-btn" disabled={isCreatingChat}>Send</button>
 			</form>
 		{:else}
@@ -199,18 +207,24 @@
 		order: 1;
 		outline: none;
 	}
-
+	
 	ul {
 		list-style: none;
 		display: flex;
 		flex-direction: column;
 	}
-
+	
 	li {
 		margin-bottom: 0.25rem;
 		word-break: break-word;
 		display: flex;
 		flex-direction: column;
+	}
+
+	li.other {
+		h6 {
+			margin-left: auto;
+		}
 	}
 
 	li.self .message-header {

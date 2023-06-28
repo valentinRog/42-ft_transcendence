@@ -282,8 +282,8 @@
 				}
 
 				.remove-icon {
-					padding-left: 0.1rem;
-					height: 1.3rem;
+					padding-left: 0.4rem;
+					height: 0.7rem;
 					cursor: url($click), auto;
 				}
 			}
