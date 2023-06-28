@@ -16,10 +16,11 @@
 	const friendRequest = Context.friendRequest();
 	const openFriendRequest = Context.openFriendRequest();
 	const openPongWindow = Context.openPongWindow();
-	const friendInfoId = Context.friendInfoId();
 	const addInstance = Context.addInstance();
 	const selected = Context.selected();
 	const askGame = Context.askGame();
+	const startChat = Context.startChat();
+
 	let selectedFriends: Context.Contact[] = [];
 
 	let friendInput: string = '';
@@ -91,27 +92,6 @@
 			$openChatWindow = true;
 		}
 		toggleGroupChatMode();
-	}
-
-	function findChat(user1: string, user2: string) {
-		let foundChat;
-
-		$chats.forEach((chat) => {
-			const users = chat.chatUsers.map((chatUser) => chatUser.user.username);
-			if (users.includes(user1) && users.includes(user2) && chat.isGroupChat === false) {
-				foundChat = chat;
-			}
-		});
-		return foundChat;
-	}
-
-	function startChat(friend: Context.Contact) {
-		let chat: any;
-
-		if ($user) chat = findChat($user?.username, friend.username);
-		$chatId = chat?.id;
-		$friendInfoId = friend.id;
-		$openChatWindow = true;
 	}
 
 	let visible: number = 0;

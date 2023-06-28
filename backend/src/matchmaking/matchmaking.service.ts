@@ -1,38 +1,37 @@
 import { Injectable } from '@nestjs/common';
-import { PlayerDto } from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { WebSocketService } from 'src/websocket/websocket.service';
 import { PongService } from 'src/pong/pong.service';
 
 class MatchmakingQueue {
-  private queue: PlayerDto[] = [];
+  private queue: number[] = [];
 
-  public enqueue(player: PlayerDto): void {
-    this.queue.push(player);
+  enqueue(playerId: number): void {
+    this.queue.push(playerId);
   }
 
-  public dequeue_player(player: PlayerDto): PlayerDto | undefined {
-    const index = this.queue.findIndex((p) => p.playerId === player.playerId);
+  dequeue_player(player: number): number | undefined {
+    const index = this.queue.findIndex((p) => p === player);
     if (index !== -1) {
       return this.queue.splice(index, 1)[0];
     }
     return undefined;
   }
 
-  public dequeue_last(): PlayerDto | undefined {
+  dequeue_last(): number | undefined {
     return this.queue.shift();
   }
 
-  public getSize(): number {
+  getSize(): number {
     return this.queue.length;
   }
 
-  public isEmpty(): boolean {
+  isEmpty(): boolean {
     return this.queue.length === 0;
   }
 
-  public isPlayerInQueue(player: PlayerDto): boolean {
-    const index = this.queue.findIndex((p) => p.playerId === player.playerId);
+  isPlayerInQueue(player: number): boolean {
+    const index = this.queue.findIndex((p) => p === player);
     return index !== -1;
   }
 }
@@ -49,9 +48,9 @@ export class MatchmakingService {
     this.queue = new MatchmakingQueue();
   }
 
-  async handlePlayerJoinedQueue(player: PlayerDto) {
+  async handlePlayerJoinedQueue(playerId: number) {
     const user = await this.prisma.user.findUnique({
-      where: { id: player.playerId },
+      where: { id: playerId },
     });
     if (this.socketService.getStatus(user.id) !== 'online') {
       return 'User is not ready';
@@ -61,13 +60,13 @@ export class MatchmakingService {
     ) {
       return 'User is already in a room';
     }
-    this.socketService.setStatus(player.playerId, 'queue');
-    this.socketService.updateStatusForFriends(player.playerId, 'queue');
+    this.socketService.setStatus(playerId, 'queue');
+    this.socketService.updateStatusForFriends(playerId, 'queue');
 
-    if (this.queue.isPlayerInQueue(player)) {
+    if (this.queue.isPlayerInQueue(playerId)) {
       console.log('Player already in queue');
     }
-    this.queue.enqueue(player);
+    this.queue.enqueue(playerId);
     console.log(this.queue);
 
     if (this.queue.getSize() >= 2) {
@@ -77,34 +76,22 @@ export class MatchmakingService {
     return { response: 'Player added to queue' };
   }
 
-  handlePlayerLeftQueue(player: PlayerDto) {
+  handlePlayerLeftQueue(player: number) {
     const queue = this.queue.dequeue_player(player);
     console.log(this.queue);
     return queue;
   }
 
-  handleMatchFound(players: PlayerDto[]) {
-    return this.pongService.createRoom(
-      players[0].playerId,
-      players[1].playerId,
-    );
-  }
-
-  async createMatch(userId: number, opponentId: number) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
-    if (this.socketService.getStatus(user.id) !== 'online') {
-      console.log('User is not ready');
+  handleMatchFound(players: number[]) {
+    const [p1, p2] = players;
+    if (this.socketService.getStatus(p1) !== 'queue') {
+      this.queue.enqueue(p2);
+      throw new Error('Player not ready');
     }
-    const friend = await this.prisma.user.findUnique({
-      where: { id: opponentId },
-    });
-    if (this.socketService.getStatus(friend.id) !== 'online') {
-      console.log('Friend is not ready');
+    if (this.socketService.getStatus(p2) !== 'queue') {
+      this.queue.enqueue(p1);
+      throw new Error('Player not ready');
     }
-
-    console.log('createMatch', userId, opponentId);
-    return this.pongService.createRoom(userId, opponentId);
+    return this.pongService.createRoom(p1, p2);
   }
 }

@@ -166,6 +166,7 @@
 		export const removeInstance = (): ((id: string) => void) => getContext('removeInstance');
 
 		export const askGame = (): ((friendId: number) => string) => getContext('askGame');
+		export const startChat = (): ((friend: Context.User) => string) => getContext('startChat');
 
 		export const fetchHistory = (): (() => Promise<any>) => getContext('fetchHistory');
 		export const fetchMe = (): (() => Promise<any>) => getContext('fetchMe');
@@ -315,7 +316,7 @@
 	const openFriendRequest = writable(false);
 	const openEditProfile = writable(false);
 	const openPongWindow = writable(false);
-	const friendInfoId = writable<Context.User | null>(null);
+	const friendInfoId = writable<number | null>(null);
 	const chats = writable<Context.Chat[]>([]);
 	const chatsPublic = writable<Context.Chat[]>([]);
 	const chatId = writable<number | null>(null);
@@ -419,6 +420,7 @@
 	setContext('addInstance', addInstance);
 	setContext('removeInstance', removeInstance);
 	setContext('askGame', askGame);
+	setContext('startChat', startChat);
 
 	const apps = readable<Record<Context.App, Context.AppProps>>({
 		Profile: {
@@ -521,6 +523,27 @@
 			},
 			body: JSON.stringify({ friendId: friendId })
 		});
+	}
+	
+	function findChat(user1: string, user2: string) {
+		let foundChat;
+
+		$chats.forEach((chat) => {
+			const users = chat.chatUsers.map((chatUser) => chatUser.user.username);
+			if (users.includes(user1) && users.includes(user2) && chat.isGroupChat === false) {
+				foundChat = chat;
+			}
+		});
+		return foundChat;
+	}
+
+	function startChat(friend: Context.Contact) {
+		let chat: any;
+
+		if ($user) chat = findChat($user?.username, friend.username);
+		$chatId = chat?.id;
+		$friendInfoId = friend.id;
+		$openChatWindow = true;
 	}
 
 	async function fetchUserById(id: number) {

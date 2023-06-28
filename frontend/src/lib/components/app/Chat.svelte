@@ -54,7 +54,7 @@
 	});
 
 	function openProfile(userId: number) {
-		addInstance('Profile', {}, { userId: userId });
+		addInstance('Profile', { userId: userId }, { userId: userId });
 		$selected = null;
 	}
 
@@ -130,7 +130,7 @@
 						<li class={message.user?.id === $user?.id ? 'self' : 'other'}>
 							<div class="message-header">
 								{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
-									<strong on:click={() => openProfile(message.user?.id)}
+									<strong on:click={() => openProfile(message.user?.id === $user.id ? null : message.user?.id)}
 										>{message.user?.username}</strong
 									>
 								{/if}
@@ -168,17 +168,17 @@
 	}
 
 	#chat-window {
-		height: 91%;
-		margin-right: 0.2rem;
+		height: 90%;
 		overflow-y: auto;
 		overflow-x: hidden;
 		padding: 0.5rem;
 		margin: 0.25rem;
+		margin-bottom: 0.15rem;
 		@include tab-border($light-grey, $dark-grey);
 	}
 
 	#sendMessage-window {
-		padding: 0.4rem 0.2rem 0.2rem 0.2rem;
+		padding: 0.2rem 0.25rem 0.4rem 0.25rem;
 	}
 
 	.btn {
@@ -187,7 +187,6 @@
 
 	.send-btn {
 		@include button-95;
-
 		margin-left: auto;
 		order: 2;
 	}
@@ -202,6 +201,7 @@
 		@include tab-border(white, black);
 		background-color: white;
 		width: 100%;
+		padding: 0.3rem;
 		box-sizing: border-box;
 		margin-right: 0.5rem;
 		order: 1;
@@ -228,9 +228,12 @@
 	}
 
 	li.self .message-header {
+		strong {
+			cursor: url($click), auto;
+		}
 		color: white;
 	}
-
+	
 	li.self .message-header,
 	li.self .message-content {
 		margin-top: 0.1rem;
@@ -241,6 +244,9 @@
 	}
 
 	li.other .message-header {
+		strong {
+			cursor: url($click), auto;
+		}
 		color: $blue;
 	}
 
