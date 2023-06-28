@@ -52,6 +52,7 @@
 
 	.image {
 		@include tab-border($dark-grey, $light-grey);
+		height: 6.4rem;
 		padding: 0 0.2rem;
 		flex: 0 0 auto;
 		margin-right: 10px;
@@ -63,6 +64,7 @@
 		padding: 0.75rem;
 
 		div {
+			margin-top: 0.4rem;
 			margin-bottom: 0.5rem;
 		}
 	}

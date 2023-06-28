@@ -75,4 +75,10 @@
 
 <style lang="scss">
 	@include table-95;
+
+	.sunken-panel {
+		td {
+			padding: 0.3rem;
+		}
+	}
 </style>
