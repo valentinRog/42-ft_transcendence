@@ -125,18 +125,20 @@
 			align-items: flex-start;
 			justify-content: space-between;
 			width: 22rem;
+
 			.pic {
 				@include tab-contour-hollow;
-				padding: 0.15rem;
-				margin-bottom: 0.25rem;
 				background-color: white;
-				height: 6rem;
-				width: 7rem;
+				padding: 0.15rem;
 				display: flex;
-				img {
-					margin: 0 auto;
+				justify-content: center;
+				align-items: center;
+					img {
+					position: center;
+					height: 5rem;
 				}
 			}
+
 			.username-login {
 				width: 12rem;
 			}

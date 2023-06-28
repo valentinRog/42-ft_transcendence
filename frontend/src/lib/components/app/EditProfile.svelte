@@ -219,29 +219,57 @@
 		}
 
 		.pic {
-			display: inline-block;
-			position: relative;
-			cursor: pointer;
-			@include tab-contour-hollow;
-			margin-left: 28%;
-			background-color: white;
-			height: 5rem;
-			width: 7.5rem;
-			img {
-				display: block;
-				margin: 0 auto;
-				height: 4.8rem;
-			}
+				@include tab-contour-hollow;
+				background-color: white;
+				padding: 0.15rem;
+				display: flex;
+				justify-content: center;
+				align-items: center;
 
-			input[type='file'] {
-				position: absolute;
-				top: 0;
-				left: 0;
-				opacity: 0;
-				cursor: pointer;
-				width: 100%;
-				height: 100%;
+				width: 7.1rem;
+				margin-left: auto;
+				margin-right: auto;
+
+				img {
+					position: center;
+					height: 5rem;
+				}
+
+				input[type='file'] {
+					position: absolute;
+					height: 5rem;
+					width: 7.1rem;
+					margin-left: auto;
+					margin-right: auto;
+					opacity: 0;
+					cursor: pointer;
 			}
 		}
+
+		//.pic {
+		//	display: inline-block;
+		//	position: relative;
+		//	cursor: pointer;
+		//	@include tab-contour-hollow;
+		//	margin-left: 28%;
+		//	background-color: white;
+		//	height: 5rem;
+		//	width: 7.5rem;
+		//	img {
+		//		display: block;
+		//		margin: 0 auto;
+		//		height: 4.8rem;
+		//	}
+
+		//	input[type='file'] {
+		//		position: absolute;
+		//		top: 0;
+		//		left: 0;
+		//		opacity: 0;
+		//		cursor: pointer;
+		//		width: 100%;
+		//		height: 100%;
+		//	}
+		//}
 	}
 </style>

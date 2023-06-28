@@ -14,7 +14,6 @@
 	$: if (userId === null) $currentStatistics = $statistics;
 
 	async function updateStatistics() {
-		console.log("gettings stats")
 		if (userId === null) {
 			await fetchStatistics();
 		} else {
