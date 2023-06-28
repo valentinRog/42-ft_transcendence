@@ -132,7 +132,7 @@ export abstract class SocketGateway
     const socket = this.webSocketService.getSocket(
       otherChatUser ? (otherChatUser as any).user.id : payload.friendId,
     );
-    
+
     const sendMessage = async () => {
       const newMessage = await this.chatService.addMessageToDatabase(
         chat.id,
@@ -151,7 +151,10 @@ export abstract class SocketGateway
       }
     };
 
-    if (chat.chatUsers && !chat.chatUsers.find((c) => (c as any).user.id === user.id)) {
+    if (
+      chat.chatUsers &&
+      !chat.chatUsers.find((c) => (c as any).user.id === user.id)
+    ) {
       const chatUser = await this.chatService.addUserToChat(chat.id, user.id);
       const newchat = await this.chatService.findChatById(chat.id);
       client.join(`chat-${chat.id}`);
