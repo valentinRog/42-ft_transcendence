@@ -45,7 +45,6 @@
 	let isProtected: any;
 
 	$: {
-		
 		blockedIds = $blocks.map(block => block.blockedId);
 		currentChat = $chats.find((chat) => chat.id === chatIdLocal);
 		sortedChatUsers = currentChat.chatUsers.slice().sort((a : any, b : any) => a.roleId - b.roleId);
