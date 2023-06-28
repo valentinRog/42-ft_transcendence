@@ -214,7 +214,6 @@
 		<DropDown name="Edit" bind:activeDrop>
 			<button
 				on:click={() => {
-					console.log(shapes.length);
 					ctx.clearRect(0, 0, canvas.width, canvas.height);
 					shapes.pop();
 					drawOldStuff();

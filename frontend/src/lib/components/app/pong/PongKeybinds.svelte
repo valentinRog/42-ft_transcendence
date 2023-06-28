@@ -17,7 +17,6 @@
 				body: `{"${editing}": "${e.key}"}`
 			});
 			const res = await fetchSettings();
-			console.log(res);
 			editing = null;
 		}
 	}

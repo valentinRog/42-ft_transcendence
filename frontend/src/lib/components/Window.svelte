@@ -126,7 +126,7 @@
 			{#if name === 'Profile' && props.username}
 				<p class="title">{name} of {props.username}</p>
 			{:else if name === 'Profile'}
-				<p class="title">My {name}</p>
+				<p class="title">{name}</p>
 			{:else if name === 'ChatForum' && currentChat}
 				<p>Forum: {currentChat.name}</p>
 			{:else if name === 'Chat' && currentChat && currentChat.isGroupChat}
@@ -151,7 +151,6 @@
 				{#if name === 'Chat' && currentChat && currentChat.isGroupChat && currentChat.accessibility === 'private'}
 					<button on:click={() => leaveGroup()}>
 						LeaveGroup
-						<!-- <img src="no-friend.png"> -->
 					</button>
 				{/if}
 				<button on:click={() => dispatch('minimize')}>

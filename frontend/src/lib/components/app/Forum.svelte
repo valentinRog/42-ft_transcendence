@@ -79,7 +79,6 @@
 		await fetchPublicChats(start, limit).then(({chats, totalChatsCount}) => {
 			chatsCount = totalChatsCount;
 		});
-		console.log(chatsCount);
 	};
 
 	const refreshChats = async () => {
