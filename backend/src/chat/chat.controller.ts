@@ -21,8 +21,8 @@ export class ChatController {
     @Query('start') start: string,
     @Query('limit') limit: string,
   ) {
-    const chats = this.chatService.getChatsPublic(Number(start), Number(limit));
-    return chats;
+    const {chats, totalChatsCount} = await this.chatService.getChatsPublic(Number(start), Number(limit));
+    return { chats, totalChatsCount };
   }
 
   @UseGuards(JwtGuard)

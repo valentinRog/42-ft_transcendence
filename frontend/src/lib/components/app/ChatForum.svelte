@@ -107,7 +107,6 @@
 
 	const performAction = async () => {
 		if (searchQuery.trim() === '') return;
-
 		const user = await fetchUserByUsername(searchQuery);
 		const userId = user.id;
 		const isInChat = currentChat.chatUsers.some((c : any) => c.userId === userId);
@@ -531,7 +530,6 @@
 	}
 
 	p {
-		font-weight: bold;
 		text-align: center;
 		font-size: 0.9rem;
 	}

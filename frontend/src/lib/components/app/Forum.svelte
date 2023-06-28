@@ -23,9 +23,12 @@
 	let chatsCount = 0;
 	let dialogOpen = false;
 
-	onMount(() => {
-		fetchPublicChats(start, limit).then((chats) => (chatsCount = chats.length));
+	onMount(async () => {
+		await fetchPublicChats(start, limit).then(({chats, totalChatsCount}) => {
+			chatsCount = totalChatsCount;
+		});
 	});
+
 
 	const createChat = async () => {
 		if (groupName.trim() === '' || ['public', 'protected'].indexOf(accessibility) < 0) {
@@ -62,21 +65,33 @@
 		currentView = view;
 	}
 
-	function previousChats() {
+	const previousChats = async () => {
 		if (start > 0) {
 			start -= limit;
-			fetchPublicChats(start, limit).then((chats) => (chatsCount = chats.length));
+			await fetchPublicChats(start, limit).then(({chats, totalChatsCount}) => {
+				chatsCount = totalChatsCount;
+			});
 		}
-	}
+	};
 
-	function nextChats() {
+	const nextChats = async () => {
 		start += limit;
-		fetchPublicChats(start, limit).then((chats) => (chatsCount = chats.length));
-	}
+		await fetchPublicChats(start, limit).then(({chats, totalChatsCount}) => {
+			chatsCount = totalChatsCount;
+		});
+		console.log(chatsCount);
+	};
+
+	const refreshChats = async () => {
+		start = 0;
+		await fetchPublicChats(start, limit).then(({chats, totalChatsCount}) => {
+			chatsCount = totalChatsCount;
+		});
+	};
+
 </script>
 
 <div id="box">
-	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" />
 	<div class="create-Chat">
 		<h4>Add New Topic</h4>
 		<form on:submit|preventDefault={createChat}>
@@ -105,7 +120,10 @@
 		<button on:click={() => switchView('my')}>My Topics</button>
 	</div>
 	{#if currentView === 'public'}
-		<h3>Public Topics</h3>
+		<div class="public-topic-header">
+			<h3>Public Topics</h3>
+			<img src="./refresh.png" class="refresh-button" on:click={refreshChats}>
+		</div>
 		<div class="chat-windows">
 			<ul>
 				{#each $chatsPublic as chat (chat.id)}
@@ -125,7 +143,7 @@
 				{#if start >= limit}
 					<button on:click={previousChats}>Previous</button>
 				{/if}
-				{#if chatsCount === limit}
+				{#if start + limit < chatsCount}
 					<button on:click={nextChats}>Next</button>
 				{/if}
 			</div>
@@ -242,5 +260,20 @@
 	img {
 		margin-right: 0.3rem;
 	}
+
+	.public-topic-header {
+		position: relative;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.refresh-button {
+		position: absolute;
+		left: 8rem;
+		width: 1rem;
+		height: 1rem;
+	}
+
 
 </style>

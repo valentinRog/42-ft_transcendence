@@ -165,7 +165,17 @@ export class ChatService {
       skip: start,
       take: limit,
     });
-    return chats;
+
+    const totalChatsCount = await this.prisma.chat.count({
+      where: {
+        OR: [
+          { accessibility: 'public' },
+          { accessibility: 'protected' }
+        ]
+      }
+    });
+    
+    return { chats, totalChatsCount };
   }
 
   async addUserToChat(chatId: number, userId: number) {
