@@ -48,13 +48,12 @@
 		if (userId === null) {
 			isUser = true;
 			await fetchMe();
-			await fetchAvatar();
 		} else {
 			fetchWithToken(`users/info/${userId}`)
 				.then((res) => res.json())
 				.then((data) => {
 					currentUser.set(data);
-					fetchAvatar();
+					//fetchAvatar();
 				});
 		}
 	})();
@@ -111,11 +110,11 @@
 			</div>
 		</div>
 		{#if isUser}
-			<button type="button" on:click={() => ($openEditProfile = true)}>Edit Profile</button>
+			<button class="button-alone" type="button" on:click={() => ($openEditProfile = true)}>Edit Profile</button>
 		{:else if $blocks.some((block) => block.blockedId === currentUser?.id)}
-			<button type="button" on:click={() => fetchUnblockUser(currentUser.id)}>UnBlock</button>
+			<button class="button-alone" type="button" on:click={() => fetchUnblockUser(currentUser.id)}>UnBlock</button>
 		{:else if $blocks.some((block) => block.blockedId === $currentUser?.id)}
-			<button type="button" on:click={() => fetchUnblockUser($currentUser.id)}>UnBlock</button>
+			<button class="button-alone" type="button" on:click={() => fetchUnblockUser($currentUser.id)}>UnBlock</button>
 		{:else}
 			<div class="buttons">
 				<button type="button" on:click={() => askGame($currentUser.id)}>Ask game</button>
@@ -193,12 +192,27 @@
 			height: 0.8rem;
 			width: auto;
 		}
+
+		.button-alone {
+			@include button-95;
+
+			width: 7rem;
+			margin-left: auto;
+			margin-right: auto;
+			padding: 0.5rem;
+			font-size: 1rem;
+			position: absolute;
+			top: 90%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
+
 		.buttons {
 			display: flex;
 			position: absolute;
 			flex-direction: row;
 			align-items: center;
-			bottom: 0.5rem;
+			bottom: 0.7rem;
 			right: calc(50% - 7rem);
 			button {
 				@include button-95;

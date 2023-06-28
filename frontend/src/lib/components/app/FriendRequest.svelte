@@ -69,7 +69,7 @@
 <style lang="scss">
 
 	#box {
-		width: 13.3rem;
+		width: 13.5rem;
 		height: 17rem;
 	}
 
