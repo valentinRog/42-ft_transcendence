@@ -28,8 +28,8 @@
 <style lang="scss">
 	div.menu {
 		display: flex;
-		height: 1.5rem;
 		margin: 0 0.2rem;
+
 		@include tab-border(white, $dark-grey);
 
 		button:not(.unavailable) {

@@ -55,7 +55,7 @@ export class NotificationService {
     }
   }
 
-  async removeNotification(friendId: number, message: string) {
+  async removeNotification(userId: number, friendId: number, message: string) {
     try {
       const userToNotify = await this.prisma.notification.findMany({
         where: {
@@ -65,6 +65,7 @@ export class NotificationService {
       });
       await this.prisma.notification.deleteMany({
         where: {
+          userId: userId,
           senderId: friendId,
           type: message,
         },
