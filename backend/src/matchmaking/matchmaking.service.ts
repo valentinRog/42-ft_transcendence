@@ -56,6 +56,11 @@ export class MatchmakingService {
     if (this.socketService.getStatus(user.id) !== 'online') {
       return 'User is not ready';
     }
+    if (
+      this.pongService.getClientRoom(this.socketService.getSocket(user.id).id)
+    ) {
+      return 'User is already in a room';
+    }
     this.socketService.setStatus(player.playerId, 'queue');
     this.socketService.updateStatusForFriends(player.playerId, 'queue');
 
@@ -83,17 +88,6 @@ export class MatchmakingService {
       players[0].playerId,
       players[1].playerId,
     );
-  }
-
-  async joinSpectate(userId: number, room: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
-    if (this.socketService.getStatus(user.id) !== 'online') {
-      console.log('User is not ready');
-    }
-    this.socketService.setStatus(user.id, 'spectate');
-    return this.socketService.joinRoom(userId, room);
   }
 
   async createMatch(userId: number, opponentId: number) {

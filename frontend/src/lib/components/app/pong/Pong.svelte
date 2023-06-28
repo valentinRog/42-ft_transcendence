@@ -68,7 +68,7 @@
 <div class="container">
 	<div class="menu">
 		<DropDown name="Game" notif={$gameRequest.length} bind:activeDrop>
-			{#if $matchmaking === false}
+			{#if $matchmaking === false && $room === null}
 				<button on:click={() => ($matchmaking = true)}>Matchmaking</button>
 			{:else}
 				<button class="unavailable">Matchmaking</button>

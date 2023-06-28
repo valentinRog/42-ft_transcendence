@@ -71,8 +71,6 @@ export class NotificationService {
         },
       });
       return userToNotify.map((item) => item.userId);
-    } catch (error) {
-      console.log('No notifications found');
-    }
+    } catch (error) {}
   }
 }

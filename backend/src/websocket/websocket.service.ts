@@ -88,7 +88,6 @@ export class WebSocketService {
       })
     ).friends;
     userFriends.forEach((friendId: number) => {
-      console.log(friendId);
       const friendSocket = this.getSocket(friendId);
       if (friendSocket) {
         friendSocket.emit('updateStatus', { friendId: userId, status });

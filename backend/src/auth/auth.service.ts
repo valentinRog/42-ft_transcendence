@@ -48,7 +48,6 @@ export class AuthService {
           },
         },
       });
-      console.log(user.id.toString());
       await this.userService.saveImageFromUrl(dto.avatar, user.id.toString());
       return user;
     } catch (error) {
@@ -120,7 +119,6 @@ export class AuthService {
       expiresIn: '1d',
       secret: this.config.get('JWT_SECRET'),
     });
-    console.log('token', token);
     return { access_token: token };
   }
 

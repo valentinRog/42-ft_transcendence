@@ -81,6 +81,9 @@ export class PongGateway extends SocketGateway {
       this.pongService.getClientRoom(friend.id).room,
       2,
     );
+    const userId = this.webSocketService.getClientId(client);
+    this.webSocketService.setStatus(userId, 'spectate');
+    this.webSocketService.updateStatusForFriends(userId, 'spectate');
     client.emit('enter-room', {
       room: this.pongService.getClientRoom(friend.id).room,
       players: [data.friendId, this.webSocketService.getClientId(client)],

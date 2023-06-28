@@ -92,7 +92,6 @@
 			const groupName = memberUsernames.join('-');
 			const chat = await fetchCreateChat(groupName, memberUsernames, false, 'private');
 			const chatExists = $chats.some((existingChat) => existingChat.id === chat.id);
-			console.log(chat);
 			if (!chatExists) {
 				//$chats = [...$chats, chat];
 				chatIdLocal = chat.id;
