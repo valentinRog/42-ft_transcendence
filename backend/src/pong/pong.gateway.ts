@@ -115,6 +115,7 @@ export class PongGateway extends SocketGateway {
     super.handleDisconnect(client);
     if (this.pongService.getClientRoom(client.id) === undefined) return;
     const { room, index } = this.pongService.getClientRoom(client.id);
+    this.pongService.removeClientRoom(client.id);
     if (index !== 0 && index !== 1) return;
     const game = this.games.get(room);
     if (game === undefined) return;
