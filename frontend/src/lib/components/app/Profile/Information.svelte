@@ -9,22 +9,14 @@
 	const fetchBlockUser = Context.fetchBlockUser();
 	const fetchUnblockUser = Context.fetchUnblockUser();
 	const openEditProfile = Context.openEditProfile();
-
 	const blocks = Context.blocks();
+	const friends = Context.contacts();
 
 	export let userId: number | null | undefined = null;
 
 	let currentUser = writable<User>();
-
 	let imgUrl: string | '';
 	let isUser = false;
-
-	$: {
-		if (userId === null) {
-			currentUser.set($user);
-		}
-		fetchAvatar();
-	}
 
 	async function fetchAvatar() {
 		fetchWithToken(`users/avatar/${$currentUser?.id}`)
@@ -48,6 +40,7 @@
 		month: '2-digit',
 		year: 'numeric'
 	});
+
 	(async () => {
 		if (userId === null) {
 			isUser = true;
@@ -62,7 +55,14 @@
 				});
 		}
 	})();
-	const friends = Context.contacts();
+
+	$: {
+		if (userId === null) {
+			currentUser.set($user);
+		}
+		fetchAvatar();
+	}
+
 </script>
 
 <div id="box">
