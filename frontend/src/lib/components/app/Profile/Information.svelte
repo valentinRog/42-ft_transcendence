@@ -190,7 +190,10 @@
 			margin-right: auto;
 			padding: 0.5rem;
 			font-size: 1rem;
-			margin-top: 6rem;
+			position: absolute;
+			top: 90%;
+			left: 50%;
+			transform: translate(-50%, -50%);
 		}
 	}
 </style>
