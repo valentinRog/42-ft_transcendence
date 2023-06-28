@@ -185,6 +185,7 @@
 
 		padding: 0.2rem;
 		background-color: $grey;
+
 		form {
 			@include tab-border($light-grey, $dark-grey);
 			display: flex;
@@ -193,7 +194,6 @@
 			padding: 1rem;
 			width: 18rem;
 			margin-top: 0.2rem;
-
 			label {
 				color: black;
 				width: 7rem;
@@ -221,14 +221,13 @@
 		.pic {
 				@include tab-contour-hollow;
 				background-color: white;
-				padding: 0.15rem;
 				display: flex;
 				justify-content: center;
 				align-items: center;
-
 				width: 7.1rem;
 				margin-left: auto;
 				margin-right: auto;
+				overflow: hidden;
 
 				img {
 					position: center;

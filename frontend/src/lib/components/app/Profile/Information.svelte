@@ -139,12 +139,14 @@
 			width: 22rem;
 
 			.pic {
+				width: 7rem;
+				height: 5.5rem;
 				@include tab-contour-hollow;
 				background-color: white;
-				padding: 0.15rem;
 				display: flex;
 				justify-content: center;
 				align-items: center;
+				overflow: hidden;
 				img {
 					position: center;
 					height: 5rem;
