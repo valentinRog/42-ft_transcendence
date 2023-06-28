@@ -47,8 +47,8 @@
 	$: {
 		if (userId === null) {
 			currentUser.set($user);
+			fetchAvatar();
 		}
-		fetchAvatar();
 	}
 
 	(async () => {
@@ -60,7 +60,7 @@
 				.then((res) => res.json())
 				.then((data) => {
 					currentUser.set(data);
-					//fetchAvatar();
+					fetchAvatar();
 				});
 		}
 	})();
