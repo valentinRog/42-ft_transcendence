@@ -1,12 +1,17 @@
 <script lang="ts">
 	import { Context } from '$lib/components/Context.svelte';
+	import { writable } from 'svelte/store';
 
 	const fetchWithToken = Context.fetchWithToken();
 	const fetchFriendRequest = Context.fetchFriendRequest();
 	const fetchFriends = Context.fetchFriends();
 	const fetchMe = Context.fetchMe();
+	const addInstance = Context.addInstance();
 
-	async function answerFriendRequest(friendUsername: string, response: boolean) {
+	let currentRequest: Context.NotifRequest | null = null;
+
+	async function answerFriendRequest(friendUsername: string | undefined, response: boolean) {
+		if (friendUsername === undefined) return;
 		const res = await fetchWithToken('notification/friend-response', {
 			method: 'POST',
 			headers: {
@@ -20,30 +25,63 @@
 		fetchMe();
 	}
 
+	function checkProfile (userId: number | undefined) {
+		if (userId === undefined) return;
+		addInstance('Profile', {}, { userId: userId });
+	}
+
 	const friendRequest = Context.friendRequest();
 	fetchFriendRequest();
+
 </script>
 
 <div id="box">
-	<div id="friend-list">
-		{#each $friendRequest as request (request.id)}
-			<div class="friend">
-				<p>{request.senderName}</p>
-				<button on:click={() => answerFriendRequest(request.senderName, true)}>Accept</button>
-				<button on:click={() => answerFriendRequest(request.senderName, false)}>Refuse</button>
-			</div>
-		{/each}
+	{#if $friendRequest?.length === 0}
+		<tr>
+			<td colspan="3">You don't have any friend request</td>
+		</tr>
+	{:else}
+	<div class="panel">
+			<table class="interactive">
+				<thead>
+					<tr>
+						<th>Username</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each $friendRequest as request}
+						<tr
+								class={currentRequest === request ? 'highlighted' : ''}
+								on:click={() => (currentRequest = request)}
+							>
+							<td>{request.senderName}</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
 	</div>
+			<button on:click={() => answerFriendRequest(currentRequest?.senderName, true)}>Accept</button>
+			<button on:click={() => answerFriendRequest(currentRequest?.senderName, false)}>Refuse</button>
+			<button on:click={() => checkProfile(currentRequest?.senderId) }>Check Profile</button>
+	{/if}
 </div>
 
 <style lang="scss">
+
 	#box {
-		width: 15.5rem;
-		height: 20rem;
+		width: 13.3rem;
+		height: 17rem;
 	}
 
+	.panel {
+		height: 90%;
+	}
+
+	@include table-95;
+
 	button {
-		margin: 0.25rem 0 0rem 0.5rem;
-		padding: 0.15rem 0.25rem;
+		@include button-95;
+		padding: 0.3rem 0.6rem;
+		white-space: nowrap;
 	}
 </style>
