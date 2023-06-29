@@ -14,7 +14,7 @@ services:
   backend:
     build: backend
     ports:
-      - 3000:3000
+      - 9000:3000
     depends_on:
       - postgres
     networks:
@@ -25,10 +25,8 @@ services:
 
   postgres:
     image: postgres
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123
-      POSTGRES_DB: nest
+    env_file:
+      - .env
     networks:
       - net
     restart: always
