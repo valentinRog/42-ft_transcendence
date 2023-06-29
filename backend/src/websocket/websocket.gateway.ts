@@ -48,6 +48,8 @@ export abstract class SocketGateway
       client.disconnect();
       return;
     }
+    if (this.webSocketService.getSocket(user.id))
+      this.webSocketService.getSocket(user.id).disconnect();
     this.webSocketService.addSocket(user.id, client);
     this.webSocketService.setStatus(user.id, 'online');
     this.webSocketService.updateStatusForFriends(user.id, 'online');
