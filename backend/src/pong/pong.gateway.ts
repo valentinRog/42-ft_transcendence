@@ -120,7 +120,7 @@ export class PongGateway extends SocketGateway {
     this.pongService.removeClientRoom(client.id);
     if (index !== 0 && index !== 1) return;
     const game = this.games.get(room);
-=    this.gameEnd(game);
+    this.gameEnd(game);
     this.gameOver(Math.abs(index - 1), room);
   }
 }
