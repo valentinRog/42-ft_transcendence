@@ -100,6 +100,7 @@ export class PongGateway extends SocketGateway {
   }
 
   gameEnd(game: PongGame) {
+    if (!game) return;
     const p1 = this.webSocketService.getClientId(game.getPlayer1());
     const p2 = this.webSocketService.getClientId(game.getPlayer2());
     if (p1 && p2) {
@@ -119,8 +120,7 @@ export class PongGateway extends SocketGateway {
     this.pongService.removeClientRoom(client.id);
     if (index !== 0 && index !== 1) return;
     const game = this.games.get(room);
-    if (game === undefined) return;
-    this.gameEnd(game);
+=    this.gameEnd(game);
     this.gameOver(Math.abs(index - 1), room);
   }
 }
