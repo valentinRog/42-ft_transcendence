@@ -14,6 +14,7 @@
 	const addInstance = Context.addInstance();
 	const selected = Context.selected();
 	const askGame = Context.askGame();
+	const startChat = Context.startChat();
 
 	export let userId: number | null = null;
 
@@ -69,7 +70,7 @@
 
 <div id="box">
 	<ul class="whole-box">
-		<div class="pic-username-login">
+		<div class="information-pic">
 			<div class="username-login">
 				<li class="box">Username : {$currentUser?.username || ''}</li>
 				<li class="box">Registration date : {formattedDate || ''}</li>
@@ -118,6 +119,7 @@
 			<button class="button-alone" type="button" on:click={() => fetchUnblockUser($currentUser.id)}>UnBlock</button>
 		{:else}
 			<div class="buttons">
+				<button type="button" on:click={() => startChat($currentUser)}>Open chat</button>
 				<button type="button" on:click={() => askGame($currentUser.id)}>Ask game</button>
 				<button type="button" on:click={() => fetchBlockUser($currentUser.id)}>Block</button>
 			</div>
@@ -132,19 +134,31 @@
 			display: flex;
 			flex-direction: column;
 		}
-		.pic-username-login {
+
+		li {
+			list-style: none;
+		}
+		li.box {
+			padding: 0.5rem;
+			margin-bottom: 0.25rem;
+			@include tab-contour-hollow;
+		}
+
+		.information-pic{
 			display: flex;
 			align-items: flex-start;
 			justify-content: space-between;
 			width: 22rem;
 
 			.pic {
+				width: 7rem;
+				height: 5.5rem;
 				@include tab-contour-hollow;
 				background-color: white;
-				padding: 0.15rem;
 				display: flex;
 				justify-content: center;
 				align-items: center;
+				overflow: hidden;
 				img {
 					position: center;
 					height: 5rem;
@@ -155,14 +169,7 @@
 				width: 12rem;
 			}
 		}
-		li {
-			list-style: none;
-		}
-		li.box {
-			padding: 0.5rem;
-			margin-bottom: 0.25rem;
-			@include tab-contour-hollow;
-		}
+
 		.friend-list {
 			padding: 0.5rem;
 			@include tab-contour-hollow;
@@ -187,12 +194,14 @@
 					}
 				}
 			}
+
+			.img-status {
+				height: 0.8rem;
+				width: auto;
+			}
 		}
 
-		.img-status {
-			height: 0.8rem;
-			width: auto;
-		}
+
 
 		.button-alone {
 			@include button-95;
@@ -213,8 +222,7 @@
 			position: absolute;
 			flex-direction: row;
 			align-items: center;
-			bottom: 0.7rem;
-			right: calc(50% - 7rem);
+			bottom: 0.4rem;
 			button {
 				@include button-95;
 				margin: 0.2rem;

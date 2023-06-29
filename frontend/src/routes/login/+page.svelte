@@ -104,7 +104,7 @@
 							updateActionUrl();
 						}}>{signup ? 'I have an account' : 'Create an account'}</button
 					>
-					<a href="{PUBLIC_BACKEND_URL}/auth/42login">
+					<a href="{PUBLIC_BACKEND_URL}/auth/42login" class="login">
 						<div>
 							<p>Login with</p>
 							<img src="/42.png" />
@@ -134,6 +134,7 @@
 			flex-direction: column;
 			gap: 0.8rem;
 			padding: 1rem;
+			height: 17.5rem;
 			width: 25rem;
 			margin-top: 0.2rem;
 
@@ -228,7 +229,6 @@
 			a {
 				display: block;
 				text-align: center;
-				height: 1.7rem;
 			}
 		}
 	}

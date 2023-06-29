@@ -60,17 +60,16 @@
 				</tbody>
 			</table>
 	</div>
-	<div class="buttons">
-		<button on:click={() => answerFriendRequest(currentRequest?.senderName, true)}>Accept</button>
-		<button on:click={() => answerFriendRequest(currentRequest?.senderName, false)}>Refuse</button>
-		<button on:click={() => checkProfile(currentRequest?.senderId) }>Check Profile</button>
-	</div>
+			<button on:click={() => answerFriendRequest(currentRequest?.senderName, true)}>Accept</button>
+			<button on:click={() => answerFriendRequest(currentRequest?.senderName, false)}>Refuse</button>
+			<button on:click={() => checkProfile(currentRequest?.senderId) }>Check Profile</button>
 	{/if}
 </div>
 
 <style lang="scss">
 
 	#box {
+		width: 13.3rem;
 		height: 17rem;
 	}
 
@@ -80,14 +79,9 @@
 
 	@include table-95;
 
-	.buttons {
-		margin-left: auto;
-		margin-right: auto;
-		width: 13.4rem;
-		button {
-			@include button-95;
-			padding: 0.3rem 0.6rem;
-			white-space: nowrap;
-		}
+	button {
+		@include button-95;
+		padding: 0.3rem 0.6rem;
+		white-space: nowrap;
 	}
 </style>
