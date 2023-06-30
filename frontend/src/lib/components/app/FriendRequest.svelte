@@ -74,18 +74,13 @@
 	}
 
 	.buttons {
-		//margin-left: auto;
-		//margin-right: auto;
 		width: 13.5rem;
 	}
 
 	.panel {
 		height: 90%;
-		width: auto;
-
 		tr > * {
-			width: fit-content;
-
+			width: 13.5rem;
 		}
 	}
 
