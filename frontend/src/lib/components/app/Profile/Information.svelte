@@ -113,8 +113,8 @@
 		</div>
 		{#if isUser}
 			<button class="button-alone" type="button" on:click={() => ($openEditProfile = true)}>Edit Profile</button>
-		{:else if $blocks.some((block) => block.blockedId === currentUser?.id)}
-			<button class="button-alone" type="button" on:click={() => fetchUnblockUser(currentUser.id)}>UnBlock</button>
+		{:else if $blocks.some((block) => block.blockedId === $currentUser?.id)}
+			<button class="button-alone" type="button" on:click={() => fetchUnblockUser($currentUser.id)}>UnBlock</button>
 		{:else if $blocks.some((block) => block.blockedId === $currentUser?.id)}
 			<button class="button-alone" type="button" on:click={() => fetchUnblockUser($currentUser.id)}>UnBlock</button>
 		{:else}
@@ -142,9 +142,11 @@
 			padding: 0.5rem;
 			margin-bottom: 0.25rem;
 			@include tab-contour-hollow;
+			overflow: hidden;
 		}
 
 		.information-pic{
+
 			display: flex;
 			align-items: flex-start;
 			justify-content: space-between;

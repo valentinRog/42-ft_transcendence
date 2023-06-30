@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { Context } from '$lib/components/Context.svelte';
-	import { writable } from 'svelte/store';
 
 	const fetchWithToken = Context.fetchWithToken();
 	const fetchFriendRequest = Context.fetchFriendRequest();
@@ -10,14 +9,14 @@
 
 	let currentRequest: Context.NotifRequest | null = null;
 
-	async function answerFriendRequest(friendUsername: string | undefined, response: boolean) {
-		if (friendUsername === undefined) return;
+	async function answerFriendRequest(requestId: number | undefined, response: boolean) {
+		if (requestId === undefined) requestId = $friendRequest[0].senderId;
 		const res = await fetchWithToken('notification/friend-response', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({ friend: friendUsername, response: response })
+			body: JSON.stringify({ friendId: requestId, response: response })
 		});
 		await res.json();
 		fetchFriendRequest();
@@ -26,7 +25,7 @@
 	}
 
 	function checkProfile (userId: number | undefined) {
-		if (userId === undefined) return;
+		if (userId === undefined) userId = $friendRequest[0].userId;
 		addInstance('Profile', {}, { userId: userId });
 	}
 
@@ -60,21 +59,34 @@
 				</tbody>
 			</table>
 	</div>
-			<button on:click={() => answerFriendRequest(currentRequest?.senderName, true)}>Accept</button>
-			<button on:click={() => answerFriendRequest(currentRequest?.senderName, false)}>Refuse</button>
+		<div class="buttons">
+			<button on:click={() => answerFriendRequest(currentRequest?.senderId, true)}>Accept</button>
+			<button on:click={() => answerFriendRequest(currentRequest?.senderId, false)}>Refuse</button>
 			<button on:click={() => checkProfile(currentRequest?.senderId) }>Check Profile</button>
+		</div>
 	{/if}
 </div>
 
 <style lang="scss">
 
 	#box {
-		width: 13.3rem;
 		height: 17rem;
+	}
+
+	.buttons {
+		//margin-left: auto;
+		//margin-right: auto;
+		width: 13.5rem;
 	}
 
 	.panel {
 		height: 90%;
+		width: auto;
+
+		tr > * {
+			width: fit-content;
+
+		}
 	}
 
 	@include table-95;
@@ -82,6 +94,5 @@
 	button {
 		@include button-95;
 		padding: 0.3rem 0.6rem;
-		white-space: nowrap;
 	}
 </style>

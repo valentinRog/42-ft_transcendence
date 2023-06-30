@@ -80,5 +80,9 @@
 		td {
 			padding: 0.3rem;
 		}
+
+		tr > * {
+			width: 14rem;
+		}
 	}
 </style>

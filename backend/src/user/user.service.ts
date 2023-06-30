@@ -37,12 +37,17 @@ export class UserService {
       delete user.hash;
       return user;
     } catch (error) {
-      throw new ForbiddenException('Credentials taken');
+      if (error.code === 'P2002')
+        throw new ForbiddenException('Credentials taken');
+      else
+        throw new ForbiddenException(
+          'Login and Username cannot exceed 25 chars',
+        );
     }
   }
 
   async getFriends(userId: number): Promise<number[]> {
-     const user = await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
     return user.friends;
@@ -187,7 +192,7 @@ export class UserService {
   }
 
   async getUserBlocks(username: string) {
-    const user = await this.prisma.user.findUnique({ 
+    const user = await this.prisma.user.findUnique({
       where: { username: username },
       include: { blocks: true },
     });

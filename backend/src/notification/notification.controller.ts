@@ -35,13 +35,9 @@ export class NotificationController {
 
   @Post('friend-response')
   async responseFriend(@GetUser('id') id, @Body() dto: ResponseDto) {
-    const prisma_friend = await this.prisma.user.findUnique({
-      where: { username: dto.friend },
-    });
-    await this.notifService.removeNotification(id, prisma_friend.id, 'friend');
+    await this.notifService.removeNotification(id, dto.friendId, 'friend');
     if (dto.response) {
-      if (!prisma_friend) throw new NotFoundException('User not found');
-      return await this.userService.addFriend(id, prisma_friend.id);
+      return await this.userService.addFriend(id, dto.friendId);
     }
     return { message: 'declined' };
   }

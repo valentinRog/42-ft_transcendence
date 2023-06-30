@@ -407,11 +407,11 @@
 @mixin table-95 {
 	.sunken-panel {
 		box-sizing: border-box;
-		overflow: auto;
-		width: 22rem !important;
 		height: 100% !important;
 		@include tab-border(white, black);
 		overflow: hidden;
+		overflow-y: scroll;
+		overflow-x: scroll;
 	}
 
 	table {
@@ -426,7 +426,6 @@
 		position: sticky;
 		top: 0;
 		height: 1.5rem;
-		width: 14rem;
 		background: $grey;
 		box-sizing: border-box;
 		font-weight: normal;

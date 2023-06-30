@@ -84,7 +84,7 @@ export class AuthService {
       ) {
         throw new ForbiddenException('Credentials taken');
       }
-      throw error;
+      throw new ForbiddenException('Login and Username cannot exceed 25 chars');
     }
   }
 

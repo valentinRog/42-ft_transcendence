@@ -9,8 +9,8 @@ datasource db {
 
 model User {
   id                  Int            @id @default(autoincrement())
-  login               String         @unique
-  username            String         @unique
+  login               String         @unique @db.VarChar(25)
+  username            String         @unique @db.VarChar(25)
   hash                String?
   logFrom42           Boolean        @default(false)
   createdAt           DateTime       @default(now())
